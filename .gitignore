@@ -1,0 +1,117 @@
+# ======================================================================
+# Vastralaye — root .gitignore (FastAPI backend + React/Vite frontend)
+# ======================================================================
+
+# ----------------------------------------------------------------------
+# IDEs & editors
+# ----------------------------------------------------------------------
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+*.code-workspace
+.history/
+*.sublime-project
+*.sublime-workspace
+.fleet/
+*.swp
+*.swo
+*~
+
+# ----------------------------------------------------------------------
+# Operating system junk
+# ----------------------------------------------------------------------
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ----------------------------------------------------------------------
+# Environment files & secrets (never commit credentials)
+# ----------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+!.env.template
+*.pem
+
+# ----------------------------------------------------------------------
+# Python (vastralaye_backend)
+# ----------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+.venv/
+venv/
+env/
+ENV/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.coverage
+.coverage.*
+htmlcov/
+.ipynb_checkpoints/
+
+# ----------------------------------------------------------------------
+# Node / React / Vite (vastralaye_frontend_react)
+# ----------------------------------------------------------------------
+node_modules/
+dist/
+dist-ssr/
+build/
+.vite/
+.eslintcache
+*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.npm/
+
+# ----------------------------------------------------------------------
+# Logs
+# ----------------------------------------------------------------------
+*.log
+logs/
+
+# ----------------------------------------------------------------------
+# Databases & dumps
+# ----------------------------------------------------------------------
+*.sqlite3
+*.sqlite
+*.db
+*.dump
+
+# ----------------------------------------------------------------------
+# Runtime uploads & generated files (served from backend static/)
+# Keep seed assets in vastralaye_backend/app/static/products/ tracked.
+# ----------------------------------------------------------------------
+vastralaye_backend/static/products/
+vastralaye_backend/static/categories/
+vastralaye_backend/static/avatars/
+vastralaye_backend/static/invoices/
+vastralaye_backend/static/uploads/
+vastralaye_backend/static/videos/
+
+# ----------------------------------------------------------------------
+# Office temp/lock files (Excel seed data helpers)
+# ----------------------------------------------------------------------
+~$*.xls*
+~$*.doc*
+
+# ----------------------------------------------------------------------
+# Misc
+# ----------------------------------------------------------------------
+*.bak
+*.tmp
+.cache/
