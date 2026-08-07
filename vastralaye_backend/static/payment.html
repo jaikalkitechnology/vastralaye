@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Processing Payment...</title>
+    <script src="https://mercury.phonepe.com/web/bundle/checkout.js"></script>
+</head>
+<body style="font-family: Arial; text-align:center; padding-top:100px;">
+
+<h2>Processing Payment...</h2>
+<p>Please wait, do not refresh.</p>
+
+<script>
+async function startPayment() {
+
+    // Get orderId from URL
+    const pathParts = window.location.pathname.split("/");
+    const orderId = pathParts[2];
+
+    if (!orderId) {
+        document.body.innerHTML = "<h2>Invalid payment link</h2>";
+        return;
+    }
+
+    const response = await fetch(
+        "https://api.mizorpaymart.com/get-token/" + orderId
+    );
+
+    const data = await response.json();
+
+    if (!data.tokenUrl) {
+        document.body.innerHTML = "<h2>Payment generation failed</h2>";
+        console.log(data);
+        return;
+    }
+
+    window.PhonePeCheckout.transact({
+        tokenUrl: data.tokenUrl,
+        type: "IFRAME",
+        callback: function(response) {
+
+            if (response === "USER_CANCEL") {
+                window.location.href = "/payment-cancel";
+            }
+            else if (response === "CONCLUDED") {
+                window.location.href = "/payment-success";
+            }
+        }
+    });
+}
+
+// AUTO START WHEN PAGE LOADS
+window.onload = startPayment;
+</script>
+
+</body>
+</html>
