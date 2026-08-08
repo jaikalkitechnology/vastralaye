@@ -11,6 +11,8 @@ import {
   Play,
   RefreshCw,
   Link2,
+  Pencil,
+  X,
 } from 'lucide-react';
 import { getYouTubeId, youTubeThumb } from '@/lib/media';
 
@@ -58,6 +60,7 @@ const AdminReels = () => {
   const [showOnHome, setShowOnHome] = useState(true);
   const [showOnPdp, setShowOnPdp] = useState(true);
   const [publishNow, setPublishNow] = useState(true);
+  const [editingId, setEditingId] = useState<number | null>(null);
   const [videoSource, setVideoSource] = useState<'upload' | 'link'>('upload');
   const [videoLink, setVideoLink] = useState('');
   const [videoFile, setVideoFile] = useState<File | null>(null);
@@ -88,6 +91,7 @@ const AdminReels = () => {
   }, []);
 
   const resetForm = () => {
+    setEditingId(null);
     setCaption('');
     setProductId('');
     setShowOnHome(true);
@@ -101,13 +105,35 @@ const AdminReels = () => {
     if (posterInputRef.current) posterInputRef.current.value = '';
   };
 
+  const startEdit = (reel: AdminReel) => {
+    setEditingId(reel.id);
+    setCaption(reel.caption || '');
+    setProductId(reel.product ? String(reel.product.id) : '');
+    setShowOnHome(reel.show_on_home);
+    setShowOnPdp(reel.show_on_pdp);
+    setPublishNow(reel.is_published);
+    setVideoFile(null);
+    setPosterFile(null);
+    if (/^https?:\/\//i.test(reel.video_url || '')) {
+      setVideoSource('link');
+      setVideoLink(reel.video_url);
+    } else {
+      setVideoSource('upload');
+      setVideoLink('');
+    }
+    if (videoInputRef.current) videoInputRef.current.value = '';
+    if (posterInputRef.current) posterInputRef.current.value = '';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (videoSource === 'upload' && !videoFile)
+    /* When editing, media is optional — leaving it empty keeps the existing video. */
+    if (!editingId && videoSource === 'upload' && !videoFile)
       return toast({ title: 'Please choose a video file (MP4)' });
     if (videoSource === 'link') {
       const link = videoLink.trim();
-      if (!/^https?:\/\/.+/.test(link))
+      if ((!editingId || link) && !/^https?:\/\/.+/.test(link))
         return toast({ title: 'Please paste a valid video link (YouTube or MP4 URL)' });
     }
     if (!caption.trim()) return toast({ title: 'Please add a caption' });
@@ -119,19 +145,26 @@ const AdminReels = () => {
     form.append('show_on_pdp', String(showOnPdp));
     form.append('is_published', String(publishNow));
     if (videoSource === 'upload' && videoFile) form.append('video_file', videoFile);
-    if (videoSource === 'link') form.append('video_link', videoLink.trim());
+    if (videoSource === 'link' && videoLink.trim()) form.append('video_link', videoLink.trim());
     if (posterFile) form.append('poster_file', posterFile);
 
     setUploading(true);
     try {
-      await api.post('/admin/reels', form, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-      toast({ title: 'Reel uploaded' });
+      if (editingId) {
+        await api.put(`/admin/reels/${editingId}`, form, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+        toast({ title: 'Reel updated' });
+      } else {
+        await api.post('/admin/reels', form, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+        toast({ title: 'Reel uploaded' });
+      }
       resetForm();
       fetchAll();
     } catch (err: any) {
-      toast({ title: err?.response?.data?.detail || 'Upload failed' });
+      toast({ title: err?.response?.data?.detail || (editingId ? 'Update failed' : 'Upload failed') });
     } finally {
       setUploading(false);
     }
@@ -153,6 +186,7 @@ const AdminReels = () => {
     try {
       await api.delete(`/admin/reels/${reel.id}`);
       setReels((prev) => prev.filter((r) => r.id !== reel.id));
+      if (editingId === reel.id) resetForm();
       toast({ title: 'Reel deleted' });
     } catch {
       toast({ title: 'Failed to delete reel' });
@@ -179,7 +213,20 @@ const AdminReels = () => {
       <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-6 items-start">
         {/* Upload panel */}
         <form onSubmit={handleUpload} className="bg-white border border-border rounded-md p-5">
-          <h2 className="text-xs font-semibold uppercase tracking-[0.16em] mb-4">Upload New Reel</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xs font-semibold uppercase tracking-[0.16em]">
+              {editingId ? `Edit Reel #${editingId}` : 'Upload New Reel'}
+            </h2>
+            {editingId && (
+              <button
+                type="button"
+                onClick={resetForm}
+                className="text-xs text-muted-foreground hover:text-espresso inline-flex items-center gap-1"
+              >
+                <X className="h-3.5 w-3.5" /> Cancel edit
+              </button>
+            )}
+          </div>
 
           {/* Video source toggle: upload a file or paste a link (e.g. YouTube) */}
           <div className="flex border border-border rounded-sm overflow-hidden mb-3">
@@ -210,7 +257,11 @@ const AdminReels = () => {
             >
               <UploadCloud className="h-8 w-8 mx-auto text-maroon mb-2" strokeWidth={1.5} />
               <span className="block text-sm font-medium text-espresso">
-                {videoFile ? videoFile.name : 'Click to choose a video'}
+                {videoFile
+                  ? videoFile.name
+                  : editingId
+                  ? 'Choose a new video (optional — current one is kept)'
+                  : 'Click to choose a video'}
               </span>
               <span className="block text-xs text-muted-foreground mt-1">
                 Vertical 9:16 · MP4 · up to 30s · max 30 MB
@@ -328,7 +379,7 @@ const AdminReels = () => {
 
           <Button type="submit" disabled={uploading} className="w-full mt-5">
             <UploadCloud className="h-4 w-4" />
-            {uploading ? 'Uploading…' : 'Upload Reel'}
+            {uploading ? 'Saving…' : editingId ? 'Update Reel' : 'Upload Reel'}
           </Button>
         </form>
 
@@ -419,6 +470,14 @@ const AdminReels = () => {
                         className="ml-auto text-[10px] font-semibold uppercase tracking-[0.08em] text-maroon hover:underline"
                       >
                         {reel.is_published ? 'Unpublish' : 'Publish'}
+                      </button>
+                      <button
+                        type="button"
+                        aria-label="Edit reel"
+                        onClick={() => startEdit(reel)}
+                        className="text-muted-foreground hover:text-espresso"
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
                       </button>
                       <button
                         type="button"

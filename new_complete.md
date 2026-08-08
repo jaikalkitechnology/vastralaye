@@ -56,6 +56,16 @@ direct MP4 URL).
 | Storefront | Reel cards use the YouTube thumbnail as poster fallback; the lightbox plays YouTube links in an **embedded player** (privacy-enhanced `youtube-nocookie.com`, autoplay) while uploaded/direct-MP4 reels keep the native `<video>` player — on both the homepage row and the PDP "Watch It Styled" strip | `src/components/ReelsSection.tsx` |
 | Shared | `getYouTubeId()` / `youTubeThumb()` / `youTubeEmbed()` helpers | `src/lib/media.ts` |
 
+## 5. Reels — edit option in the admin panel ✅
+
+**Admin page:** `/admin/reels` — every reel card now has a **pencil (edit) button**; clicking it
+loads the reel into the form for editing in place, same flow as Banners/Testimonials.
+
+| Layer | What shipped | File(s) |
+|---|---|---|
+| Backend | New `PUT /api/v1/admin/reels/{id}` — updates caption, linked product, Home/PDP placements and publish state; **video and poster are optional on edit** (omitted = keep the current media; a new upload or link replaces it, with old local files cleaned up and external links left alone); same validation as create | `vastralaye_backend/app/routers/reels.py` |
+| Admin UI | Edit-in-place: form header switches to "Edit Reel #id" with a *Cancel edit* action; all fields prefill (caption, product, placements, publish); the video source auto-detects — an external link opens in **Video Link** mode with the URL prefilled, an uploaded video opens in **Upload File** mode with a "current one is kept" hint; submit becomes *Update Reel* (PUT); deleting the reel being edited resets the form | `src/pages/admin/AdminReels.tsx` |
+
 ---
 
 ## Shared infrastructure added
