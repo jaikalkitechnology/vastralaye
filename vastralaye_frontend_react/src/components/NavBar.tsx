@@ -19,7 +19,7 @@ import {
   Tag,
   ArrowRight,
   Package,
-  Sparkles,pro
+  Sparkles,
 } from "lucide-react";
 
 import {
@@ -91,7 +91,9 @@ const NavBar = () => {
   /* LOCK SCROLL WHEN MOBILE MENU OPEN */
   useEffect(() => {
     document.body.style.overflow = isMobileMenuOpen ? "hidden" : "";
-    return () => (document.body.style.overflow = "");
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [isMobileMenuOpen]);
 
   /* WISHLIST COUNT */
