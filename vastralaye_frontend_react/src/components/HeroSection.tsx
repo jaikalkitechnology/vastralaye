@@ -1,13 +1,29 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { api } from '@/api/api';
+import { mediaUrl } from '@/lib/media';
 
 /**
  * Light editorial hero (design.md §5.2) — warm ivory/blush canvas,
  * serif headline left, arch-framed campaign image right, slow
  * crossfade + Ken Burns on the active slide.
+ *
+ * Slides come from the admin Banner Control page (GET /fronted/banners);
+ * the static set below is the fallback when none are configured.
  */
-const slides = [
+interface HeroSlide {
+  id: number;
+  overline: string;
+  titleA: string;
+  titleB: string;
+  description: string;
+  image: string;
+  ctaPrimary: { label: string; to: string };
+  ctaSecondary: { label: string; to: string } | null;
+}
+
+const fallbackSlides: HeroSlide[] = [
   {
     id: 1,
     overline: "The Festive Edit '26",
@@ -44,16 +60,50 @@ const slides = [
 ];
 
 const HeroSection = () => {
+  const [slides, setSlides] = useState<HeroSlide[]>(fallbackSlides);
   const [current, setCurrent] = useState(0);
+
+  /* Admin-managed banners; fall back to the static slides when none exist. */
+  useEffect(() => {
+    let cancelled = false;
+    api
+      .get('/fronted/banners')
+      .then((res) => {
+        if (cancelled || !Array.isArray(res.data) || res.data.length === 0) return;
+        const mapped: HeroSlide[] = res.data.map((b: any) => ({
+          id: b.id,
+          overline: b.overline || '',
+          titleA: b.title_line_1 || '',
+          titleB: b.title_line_2 || '',
+          description: b.description || '',
+          image: mediaUrl(b.image_url),
+          ctaPrimary: {
+            label: b.cta_primary_label || 'Shop Now',
+            to: b.cta_primary_link || '/products',
+          },
+          ctaSecondary: b.cta_secondary_label
+            ? { label: b.cta_secondary_label, to: b.cta_secondary_link || '/products' }
+            : null,
+        }));
+        setSlides(mapped);
+        setCurrent(0);
+      })
+      .catch(() => {
+        /* keep fallback slides */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrent((prev) => (prev + 1) % slides.length);
     }, 6000);
     return () => clearInterval(timer);
-  }, []);
+  }, [slides.length]);
 
-  const slide = slides[current];
+  const slide = slides[Math.min(current, slides.length - 1)];
 
   return (
     <section className="relative overflow-hidden bg-gradient-to-r from-blush via-ivory to-sand">
@@ -69,11 +119,15 @@ const HeroSection = () => {
               transition={{ duration: 0.5, ease: 'easeOut' }}
               className="order-2 lg:order-1 text-center lg:text-left"
             >
-              <span className="overline-label mb-4">{slide.overline}</span>
+              {slide.overline && <span className="overline-label mb-4">{slide.overline}</span>}
               <h1 className="font-serif text-4xl md:text-5xl xl:text-6xl font-medium leading-[1.12] text-espresso mb-5">
                 {slide.titleA}
-                <br />
-                <em className="italic text-maroon">{slide.titleB}</em>
+                {slide.titleB && (
+                  <>
+                    <br />
+                    <em className="italic text-maroon">{slide.titleB}</em>
+                  </>
+                )}
               </h1>
               <p className="text-muted-foreground text-base md:text-lg max-w-xl mx-auto lg:mx-0 mb-8">
                 {slide.description}
@@ -85,12 +139,14 @@ const HeroSection = () => {
                 >
                   {slide.ctaPrimary.label}
                 </Link>
-                <Link
-                  to={slide.ctaSecondary.to}
-                  className="inline-block border border-espresso text-espresso text-xs font-semibold uppercase tracking-[0.16em] px-9 py-4 rounded-sm hover:bg-espresso hover:text-ivory transition-colors"
-                >
-                  {slide.ctaSecondary.label}
-                </Link>
+                {slide.ctaSecondary && (
+                  <Link
+                    to={slide.ctaSecondary.to}
+                    className="inline-block border border-espresso text-espresso text-xs font-semibold uppercase tracking-[0.16em] px-9 py-4 rounded-sm hover:bg-espresso hover:text-ivory transition-colors"
+                  >
+                    {slide.ctaSecondary.label}
+                  </Link>
+                )}
               </div>
             </motion.div>
           </AnimatePresence>

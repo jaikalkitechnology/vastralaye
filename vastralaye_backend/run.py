@@ -105,6 +105,9 @@ app.include_router(reels.router)   # ✅ shoppable product reels
 from app.routers import newsletter
 app.include_router(newsletter.router)   # ✅ newsletter signups
 
+from app.routers import site_content
+app.include_router(site_content.router)   # ✅ banners, testimonials, settings
+
 
 # ---------------------- Run the Server ----------------------
 if __name__ == "__main__":
