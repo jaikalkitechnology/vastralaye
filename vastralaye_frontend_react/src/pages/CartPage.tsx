@@ -1258,8 +1258,8 @@ const PaymentMethodModal: React.FC<PaymentMethodModalProps> = ({
           </div>
 
           {/* Order Summary */}
-          <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
-            <p className="text-xs font-medium text-gray-600 mb-2">
+          <div className="p-3 bg-ivory rounded-sm border border-border">
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-espresso mb-2">
               Order Summary ({cartItems.length}{' '}
               {cartItems.length === 1 ? 'item' : 'items'})
             </p>
@@ -1267,12 +1267,12 @@ const PaymentMethodModal: React.FC<PaymentMethodModalProps> = ({
               {cartItems.map((item) => (
                 <div
                   key={item.id}
-                  className="flex justify-between text-xs text-gray-500"
+                  className="flex justify-between text-xs text-muted-foreground"
                 >
                   <span className="truncate flex-1 mr-2">
                     {item.product.name} × {item.quantity}
                   </span>
-                  <span className="font-medium text-gray-700">
+                  <span className="font-medium text-espresso">
                     {formatPrice(
                       (item.product.discountPrice || item.product.price) *
                         item.quantity
@@ -1281,27 +1281,27 @@ const PaymentMethodModal: React.FC<PaymentMethodModalProps> = ({
                 </div>
               ))}
             </div>
-            <div className="mt-2 pt-2 border-t border-dashed border-gray-300 space-y-1.5">
-              <div className="flex justify-between text-xs text-gray-500">
+            <div className="mt-2 pt-2 border-t border-dashed border-border space-y-1.5">
+              <div className="flex justify-between text-xs text-muted-foreground">
                 <span>Subtotal</span>
                 <span>{formatPrice(modalSubtotal)}</span>
               </div>
-              <div className="flex justify-between text-xs font-medium text-gray-700">
+              <div className="flex justify-between text-xs font-medium text-espresso">
                 <span>GST (18%)</span>
                 <span>{formatPrice((modalSubtotal * 18) / 100)}</span>
               </div>
-              <div className="flex justify-between text-xs text-gray-500">
+              <div className="flex justify-between text-xs text-muted-foreground">
                 <span>Shipping</span>
                 <span>
                   {modalShipping === 0 ? (
-                    <span className="text-green-600">Free</span>
+                    <span className="text-green-700">Free</span>
                   ) : (
                     formatPrice(modalShipping)
                   )}
                 </span>
               </div>
               {discount > 0 && (
-                <div className="flex justify-between items-center text-xs font-medium text-green-600 bg-green-50/80 p-1.5 rounded border border-green-100 mt-1">
+                <div className="flex justify-between items-center text-xs font-medium text-green-700 bg-green-50 p-1.5 rounded-sm border border-green-200 mt-1">
                   <span className="flex items-center gap-1">
                     <Percent className="w-3 h-3" /> Coupon Applied
                   </span>
@@ -1312,23 +1312,23 @@ const PaymentMethodModal: React.FC<PaymentMethodModalProps> = ({
           </div>
 
           {/* Total */}
-          <div className="p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg border border-gray-200">
+          <div className="p-4 bg-ivory rounded-sm border border-border">
             <div className="flex justify-between items-center">
-              <span className="font-medium text-gray-700">Order Total</span>
-              <span className="text-xl font-bold text-gray-900">
+              <span className="font-medium text-espresso">Order Total</span>
+              <span className="font-serif text-xl font-medium text-espresso">
                 {formatPrice(total)}
               </span>
             </div>
-            <p className="text-[10px] text-gray-400 text-right mt-0.5">
+            <p className="text-[10px] text-muted-foreground text-right mt-0.5">
               Inclusive of GST
             </p>
             {selectedMethod === 'cod' ? (
-              <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">
+              <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
                 <AlertCircle className="h-3 w-3" /> Pay cash when your order is
                 delivered
               </p>
             ) : (
-              <p className="text-xs text-blue-600 mt-2 flex items-center gap-1">
+              <p className="text-xs text-green-700 mt-2 flex items-center gap-1">
                 <Shield className="h-3 w-3" /> Secure payment via UPI/Payment Gateway
               </p>
             )}
@@ -1339,7 +1339,7 @@ const PaymentMethodModal: React.FC<PaymentMethodModalProps> = ({
             <Button
               onClick={handlePlaceOrder}
               disabled={isPlacingOrder || !selectedMethod}
-              className="flex-1 bg-gradient-to-r from-[#5E9F50] to-[#4d8f40] hover:from-[#4d8f40] hover:to-[#3d7f30] text-white"
+              className="flex-1 bg-maroon hover:bg-terracotta text-ivory text-xs font-semibold uppercase tracking-[0.16em] rounded-sm transition-colors"
             >
               {isPlacingOrder ? (
                 <>
@@ -1358,7 +1358,7 @@ const PaymentMethodModal: React.FC<PaymentMethodModalProps> = ({
             <Button
               onClick={onClose}
               variant="outline"
-              className="border-gray-300"
+              className="text-xs font-semibold uppercase tracking-[0.16em] rounded-sm"
               disabled={isPlacingOrder}
             >
               Cancel

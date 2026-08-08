@@ -483,7 +483,7 @@ const Contact = () => {
                           {errors.name}
                         </p>
                       ) : (
-                        <span className="text-sm text-gray-500">
+                        <span className="text-sm text-muted-foreground">
                           {formData.name.length > 0 ? `${formData.name.length}/50` : "Required"}
                         </span>
                       )}
@@ -543,7 +543,7 @@ const Contact = () => {
 
                   {/* Message Type */}
                   <div>
-                    <label className="text-sm font-medium text-gray-700 mb-2 block">
+                    <label className="text-sm font-medium text-espresso mb-2 block">
                       Message Type *
                     </label>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -553,8 +553,8 @@ const Contact = () => {
                           type="button"
                           onClick={() => handleTypeSelect(type)}
                           className={`px-4 py-3 rounded-lg border transition-all text-sm ${formData.type === type
-                            ? "bg-blue-50 border-blue-500 text-blue-700"
-                            : "border-gray-300 hover:border-gray-400 hover:bg-gray-50"
+                            ? "bg-blush border-maroon text-maroon"
+                            : "border-border text-muted-foreground hover:border-gold hover:bg-ivory"
                             }`}
                         >
                           {type}
@@ -568,7 +568,7 @@ const Contact = () => {
                           {errors.type}
                         </p>
                       ) : (
-                        <span className="text-sm text-gray-500">
+                        <span className="text-sm text-muted-foreground">
                           Will be sent to: {getRelevantEmail(formData.type)}
                         </span>
                       )}
@@ -598,14 +598,14 @@ const Contact = () => {
                           {errors.message}
                         </p>
                       ) : (
-                        <span className="text-sm text-gray-500">
+                        <span className="text-sm text-muted-foreground">
                           {formData.message.length > 0 ? `${formData.message.length}/1000` : "Minimum 10 characters"}
                         </span>
                       )}
-                      <span className={`text-sm ${formData.message.length < 10 ? "text-gray-500" :
-                        formData.message.length > 800 ? "text-red-600" :
-                          formData.message.length > 500 ? "text-yellow-600" :
-                            "text-green-600"
+                      <span className={`text-sm ${formData.message.length < 10 ? "text-muted-foreground" :
+                        formData.message.length > 800 ? "text-sale" :
+                          formData.message.length > 500 ? "text-terracotta" :
+                            "text-gold"
                         }`}>
                         {formData.message.length}/1000
                       </span>

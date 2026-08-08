@@ -901,20 +901,19 @@ export default function AdminProductsPage(): JSX.Element {
                 </div>
               )}
 
-              <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-                <div className="text-sm text-gray-700 font-medium">
+              <div className="flex items-center justify-between pt-4 border-t border-border">
+                <div className="text-[13px] text-muted-foreground">
                   {products.length} product{products.length !== 1 ? "s" : ""} found
-                  {hasActiveFilters && <span className="ml-2 text-blue-600 font-semibold">(filtered)</span>}
+                  {hasActiveFilters && <span className="ml-2 text-maroon font-semibold">(filtered)</span>}
                 </div>
                 {hasActiveFilters && (
-                  <Button variant="outline" size="sm" onClick={clearAllFilters} className="border-gray-300">
+                  <Button variant="outline" size="sm" onClick={clearAllFilters} className="rounded-sm text-[12px]">
                     <X className="h-4 w-4 mr-1.5" /> Clear All
                   </Button>
                 )}
               </div>
             </div>
-          </CardContent>
-        </Card>
+        </div>
 
         {/* Products Table */}
         <Card className="border-gray-200 shadow-sm">

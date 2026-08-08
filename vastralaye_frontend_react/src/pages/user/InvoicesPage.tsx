@@ -750,14 +750,14 @@ const InvoicesPage: React.FC = () => {
           <Button
             variant="outline"
             size="sm"
-            className="border-[#7A1F2B] text-[#7A1F2B]"
+            className="rounded-sm"
             onClick={handlePrintInvoice}
           >
             <Printer className="w-4 h-4" />
           </Button>
           <Button
             size="sm"
-            className="bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] text-white"
+            className="rounded-sm bg-maroon text-ivory hover:bg-terracotta"
             onClick={() => handleDownloadPDF('pdf')}
             disabled={generatingPDF}
           >
@@ -766,7 +766,7 @@ const InvoicesPage: React.FC = () => {
           <Button
             variant="outline"
             size="sm"
-            className="border-[#7A1F2B] text-[#7A1F2B]"
+            className="rounded-sm"
             onClick={handleShare}
           >
             <Share2 className="w-4 h-4" />
