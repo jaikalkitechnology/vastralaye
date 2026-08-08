@@ -2,6 +2,7 @@
 
 > **Status: ✅ ALL IMPLEMENTED** — banners, social links and testimonials are live in the admin panel
 > (`/admin/banners`, `/admin/settings`, `/admin/testimonials`) and wired to the storefront with fallbacks.
+> Full implementation record: [`new_complete.md`](new_complete.md).
 
 Next batch of work: make the storefront's hard-coded content editable from the admin panel.
 (Previous design/implementation status lives in [`complete.md`](complete.md) and [`pending.md`](pending.md).)
