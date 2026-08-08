@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { api } from '@/api/api';
 import { toast } from '@/components/ui/use-toast';
+import Reveal from '@/components/motion/Reveal';
 
 /** Maroon newsletter band (design.md §5.7) — posts to the newsletter API. */
 const NewsletterBand = () => {
@@ -29,6 +30,7 @@ const NewsletterBand = () => {
   return (
     <section className="bg-maroon text-ivory">
       <div className="container mx-auto px-4 py-14 md:py-16 text-center">
+        <Reveal>
         <span className="block text-[11px] md:text-xs font-semibold uppercase tracking-[0.3em] text-gold mb-2">
           Stay in the loop
         </span>
@@ -53,6 +55,7 @@ const NewsletterBand = () => {
             {submitting ? 'Subscribing…' : 'Subscribe'}
           </button>
         </form>
+        </Reveal>
       </div>
     </section>
   );

@@ -1,4 +1,5 @@
 import { Truck, Banknote, RefreshCcw, Sparkles } from 'lucide-react';
+import Reveal from '@/components/motion/Reveal';
 
 /** Thin trust band under the hero (design.md §5.3). */
 const items = [
@@ -11,6 +12,7 @@ const items = [
 const UspStrip = () => (
   <section className="bg-blush border-y border-border">
     <div className="container mx-auto px-4">
+      <Reveal y={12}>
       <div className="grid grid-cols-2 md:grid-cols-4">
         {items.map(({ icon: Icon, label }, i) => (
           <div
@@ -24,6 +26,7 @@ const UspStrip = () => (
           </div>
         ))}
       </div>
+      </Reveal>
     </div>
   </section>
 );

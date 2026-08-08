@@ -3,6 +3,7 @@ import Ornament from '@/components/decor/Ornament';
 import { Star } from 'lucide-react';
 import { api } from '@/api/api';
 import { mediaUrl } from '@/lib/media';
+import Reveal from '@/components/motion/Reveal';
 
 interface TestimonialItem {
   quote: string;
@@ -63,17 +64,18 @@ const Testimonials = () => {
   return (
     <section className="py-14 md:py-20">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-10">
+        <Reveal className="text-center mb-10">
           <span className="overline-label mb-2">Word of mouth</span>
           <h2 className="font-serif text-3xl md:text-4xl font-medium text-espresso">
             Loved by Our Customers
           </h2>
           <Ornament />
-        </div>
+        </Reveal>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6">
-          {items.slice(0, 6).map((t) => (
-            <figure key={t.who + t.quote.slice(0, 24)} className="bg-white border border-border rounded-sm p-7">
+          {items.slice(0, 6).map((t, i) => (
+            <Reveal key={t.who + t.quote.slice(0, 24)} delay={i * 0.08}>
+            <figure className="bg-white border border-border rounded-sm p-7 h-full">
               <div className="flex gap-0.5 mb-3" aria-label={`${t.rating} out of 5 stars`}>
                 {Array.from({ length: 5 }).map((_, i) => (
                   <Star
@@ -99,6 +101,7 @@ const Testimonials = () => {
                 </span>
               </figcaption>
             </figure>
+            </Reveal>
           ))}
         </div>
       </div>

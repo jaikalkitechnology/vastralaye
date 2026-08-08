@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import Reveal from '@/components/motion/Reveal';
 
 /**
  * Editorial 2-up collection banners (design.md §5.6) — image cards with
@@ -25,9 +26,9 @@ const PromoSection = () => (
   <section className="py-6 md:py-10">
     <div className="container mx-auto px-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
-        {banners.map((b) => (
+        {banners.map((b, i) => (
+          <Reveal key={b.title} delay={i * 0.12}>
           <Link
-            key={b.title}
             to={b.to}
             className="group relative block overflow-hidden rounded-sm aspect-[16/11]"
           >
@@ -51,6 +52,7 @@ const PromoSection = () => (
               </span>
             </span>
           </Link>
+          </Reveal>
         ))}
       </div>
     </div>

@@ -4,6 +4,7 @@ import { listCategories, listSubcategories, listProducts } from '../api/apihelpe
 import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowRight, RefreshCw } from 'lucide-react';
 import { BASE_IMG } from '@/config';
+import Reveal from '@/components/motion/Reveal';
 
 /**
  * Shop by Category — arch (mehrab) cards per design.md §5.4.
@@ -71,7 +72,7 @@ const CategorySection = () => {
     <section className="py-14 md:py-20">
       <div className="container mx-auto px-4">
         {/* Section head */}
-        <div className="text-center mb-10 md:mb-12">
+        <Reveal className="text-center mb-10 md:mb-12">
           <span className="overline-label mb-2">Explore</span>
           <h2 className="font-serif text-3xl md:text-4xl font-medium text-espresso">Shop by Category</h2>
           <svg
@@ -88,7 +89,7 @@ const CategorySection = () => {
             </g>
             <circle cx="65" cy="7" r="1.5" fill="#C99A45" />
           </svg>
-        </div>
+        </Reveal>
 
         {/* Loading skeletons (arch shaped) */}
         {loading && (
@@ -118,6 +119,7 @@ const CategorySection = () => {
         {/* Arch category cards */}
         {!loading && !error && categories.length > 0 && (
           <>
+            <Reveal delay={0.1}>
             <div className="flex gap-4 overflow-x-auto pb-2 md:grid md:grid-cols-4 lg:grid-cols-6 md:gap-6 md:overflow-visible snap-x">
               {categories.slice(0, 6).map((cat: any) => (
                 <Link
@@ -149,6 +151,7 @@ const CategorySection = () => {
                 </Link>
               ))}
             </div>
+            </Reveal>
 
             <div className="text-center mt-10">
               <Link

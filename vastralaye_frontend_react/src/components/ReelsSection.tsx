@@ -5,6 +5,7 @@ import { api } from '@/api/api';
 import { BASE_IMG } from '@/config';
 import { getYouTubeId, youTubeThumb } from '@/lib/media';
 import ReelViewer, { Reel } from './ReelViewer';
+import Reveal from '@/components/motion/Reveal';
 
 export type { Reel };
 
@@ -97,14 +98,15 @@ const ReelsSection = ({
   return (
     <section id={id} className="py-14 md:py-20">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-10">
+        <Reveal className="text-center mb-10">
           <span className="overline-label mb-2">{overline}</span>
           <h2 className="font-serif text-3xl md:text-4xl font-medium text-espresso">{title}</h2>
           <p className="text-muted-foreground mt-2 text-sm md:text-base">
             Styling reels from our studio and our community — tap to shop the look.
           </p>
-        </div>
+        </Reveal>
 
+        <Reveal delay={0.1}>
         <div className="relative">
           {/* Slider arrows — shown only when there are more videos than fit */}
           {canLeft && (
@@ -204,6 +206,7 @@ const ReelsSection = ({
           ))}
           </div>
         </div>
+        </Reveal>
       </div>
 
       {/* Full-screen reel viewer (shared carousel component) */}
