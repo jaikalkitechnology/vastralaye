@@ -229,16 +229,16 @@ const ProductListItem = ({ product }: ProductListItemProps) => {
         {/* Full stars */}
         {Array.from({ length: fullStars }).map((_, i) => (
           <div key={`full-${i}`} className="relative">
-            <div className="absolute inset-0 bg-[#E1783E] blur-sm opacity-40"></div>
-            <Star className="h-4 w-4 text-[#E1783E] fill-[#E1783E] relative z-10" />
+            <div className="absolute inset-0 bg-[#B85C38] blur-sm opacity-40"></div>
+            <Star className="h-4 w-4 text-[#B85C38] fill-[#B85C38] relative z-10" />
           </div>
         ))}
 
         {/* Half star */}
         {hasHalfStar && (
           <div className="relative">
-            <div className="absolute inset-0 bg-[#E1783E] blur-sm opacity-40"></div>
-            <StarHalf className="h-4 w-4 text-[#E1783E] fill-[#E1783E] relative z-10" />
+            <div className="absolute inset-0 bg-[#B85C38] blur-sm opacity-40"></div>
+            <StarHalf className="h-4 w-4 text-[#B85C38] fill-[#B85C38] relative z-10" />
           </div>
         )}
 
@@ -282,7 +282,7 @@ const ProductListItem = ({ product }: ProductListItemProps) => {
       className="group relative flex flex-col md:flex-row bg-gradient-to-b from-white to-gray-50 rounded-xl sm:rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-0.5 border border-gray-200/50 w-full"
     >
       {/* Top Gradient Accent */}
-      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#559F4B] to-[#E1783E]"></div>
+      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#7A1F2B] to-[#B85C38]"></div>
 
       {/* IMAGE SECTION - Left Side */}
       <div 
@@ -328,7 +328,7 @@ const ProductListItem = ({ product }: ProductListItemProps) => {
 
         {/* Loading indicator for reviews */}
         {reviewsLoading && (
-          <div className="absolute bottom-3 left-3 bg-gradient-to-r from-[#559F4B] to-[#E1783E] text-white text-xs font-medium px-3 py-1.5 rounded-full shadow-lg">
+          <div className="absolute bottom-3 left-3 bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] text-white text-xs font-medium px-3 py-1.5 rounded-full shadow-lg">
             Loading reviews...
           </div>
         )}
@@ -339,7 +339,7 @@ const ProductListItem = ({ product }: ProductListItemProps) => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-start justify-between gap-3 mb-4">
           <div className="flex-1">
-            <h3 className="text-xl md:text-2xl font-bold text-gray-900 line-clamp-2 group-hover:text-[#559F4B] transition-colors duration-300">
+            <h3 className="text-xl md:text-2xl font-bold text-gray-900 line-clamp-2 group-hover:text-[#7A1F2B] transition-colors duration-300">
               {product.name}
             </h3>
             <p className="text-sm text-gray-500 mt-1 line-clamp-1">
@@ -373,7 +373,7 @@ const ProductListItem = ({ product }: ProductListItemProps) => {
                 <span className="text-lg md:text-xl text-gray-400 line-through">
                   {INR(price)}
                 </span>
-                <Badge className="bg-gradient-to-r from-[#559F4B] to-[#6ab45c] hover:from-[#6ab45c] hover:to-[#559F4B] text-white font-bold py-1 px-3">
+                <Badge className="bg-gradient-to-r from-[#7A1F2B] to-[#9a3540] hover:from-[#9a3540] hover:to-[#7A1F2B] text-white font-bold py-1 px-3">
                   Save {INR(youSave)}
                 </Badge>
               </>
@@ -385,16 +385,16 @@ const ProductListItem = ({ product }: ProductListItemProps) => {
         <div className="flex flex-wrap items-center gap-2 mb-4">
           {/* Category/Tags */}
           {product.category && (
-            <Badge variant="outline" className="flex items-center gap-1 border-[#559F4B]/30">
-              <Tag className="h-3.5 w-3.5 text-[#559F4B]" />
-              <span className="text-[#559F4B] font-medium">{product.category}</span>
+            <Badge variant="outline" className="flex items-center gap-1 border-[#7A1F2B]/30">
+              <Tag className="h-3.5 w-3.5 text-[#7A1F2B]" />
+              <span className="text-[#7A1F2B] font-medium">{product.category}</span>
             </Badge>
           )}
 
           {/* Brand */}
           {product.brand && (
-            <Badge variant="outline" className="flex items-center gap-1 border-[#E1783E]/30">
-              <span className="text-[#E1783E] font-medium">{product.brand}</span>
+            <Badge variant="outline" className="flex items-center gap-1 border-[#B85C38]/30">
+              <span className="text-[#B85C38] font-medium">{product.brand}</span>
             </Badge>
           )}
 
@@ -418,8 +418,8 @@ const ProductListItem = ({ product }: ProductListItemProps) => {
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
           {product.freeShipping && (
             <div className="flex items-center gap-2 text-sm text-gray-600">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#559F4B]/20 to-[#559F4B]/10 flex items-center justify-center">
-                <Truck className="h-4 w-4 text-[#559F4B]" />
+              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#7A1F2B]/20 to-[#7A1F2B]/10 flex items-center justify-center">
+                <Truck className="h-4 w-4 text-[#7A1F2B]" />
               </div>
               <span className="font-medium">Free Shipping</span>
             </div>
@@ -427,8 +427,8 @@ const ProductListItem = ({ product }: ProductListItemProps) => {
           
           {product.warranty && (
             <div className="flex items-center gap-2 text-sm text-gray-600">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#E1783E]/20 to-[#E1783E]/10 flex items-center justify-center">
-                <Shield className="h-4 w-4 text-[#E1783E]" />
+              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#B85C38]/20 to-[#B85C38]/10 flex items-center justify-center">
+                <Shield className="h-4 w-4 text-[#B85C38]" />
               </div>
               <span className="font-medium">{product.warranty}</span>
             </div>
@@ -443,7 +443,7 @@ const ProductListItem = ({ product }: ProductListItemProps) => {
               disabled={!isInStock}
               className={`w-full py-3 text-base font-bold rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl ${
                 isInStock 
-                  ? "bg-gradient-to-r from-[#559F4B] to-[#E1783E] hover:from-[#E1783E] hover:to-[#559F4B] text-white transform hover:scale-[1.02]" 
+                  ? "bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] hover:from-[#B85C38] hover:to-[#7A1F2B] text-white transform hover:scale-[1.02]" 
                   : "bg-gradient-to-r from-gray-400 to-gray-500 text-white cursor-not-allowed"
               }`}
             >
@@ -457,7 +457,7 @@ const ProductListItem = ({ product }: ProductListItemProps) => {
    
           {/* Discount Badge */}
           {hasDiscount && (
-            <Badge className="bg-gradient-to-r from-[#E1783E] to-[#f08a4e] hover:from-[#f08a4e] hover:to-[#E1783E] text-white border-0 shadow-lg font-bold py-1.5 px-3 text-sm">
+            <Badge className="bg-gradient-to-r from-[#B85C38] to-[#c96f4a] hover:from-[#c96f4a] hover:to-[#B85C38] text-white border-0 shadow-lg font-bold py-1.5 px-3 text-sm">
               <BadgePercent className="h-3.5 w-3.5 mr-1.5" />
               {discountPercent}% OFF
             </Badge>
@@ -466,7 +466,7 @@ const ProductListItem = ({ product }: ProductListItemProps) => {
           {/* Stock Status Badge */}
           <Badge className={`${
             isInStock 
-              ? "bg-gradient-to-r from-[#559F4B] to-[#6ab45c] hover:from-[#6ab45c] hover:to-[#559F4B]" 
+              ? "bg-gradient-to-r from-[#7A1F2B] to-[#9a3540] hover:from-[#9a3540] hover:to-[#7A1F2B]" 
               : "bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700"
             } text-white border-0 shadow-lg font-bold py-1.5 px-3 text-sm`}
           >
@@ -483,7 +483,7 @@ const ProductListItem = ({ product }: ProductListItemProps) => {
 
                     {/* Featured Badge */}
           {product.featured && (
-            <Badge className="bg-gradient-to-r from-[#559F4B] to-[#6ab45c] hover:from-[#6ab45c] hover:to-[#559F4B] text-white border-0 shadow-lg font-bold py-1.5 px-3 text-sm">
+            <Badge className="bg-gradient-to-r from-[#7A1F2B] to-[#9a3540] hover:from-[#9a3540] hover:to-[#7A1F2B] text-white border-0 shadow-lg font-bold py-1.5 px-3 text-sm">
               <Zap className="h-3.5 w-3.5 mr-1.5" />
               Featured
             </Badge>
@@ -491,7 +491,7 @@ const ProductListItem = ({ product }: ProductListItemProps) => {
 
           {/* Best Seller Badge */}
           {product.bestSeller && (
-            <Badge className="bg-gradient-to-r from-[#E1783E] to-[#f08a4e] hover:from-[#f08a4e] hover:to-[#E1783E] text-white border-0 shadow-lg font-bold py-1.5 px-3 text-sm">
+            <Badge className="bg-gradient-to-r from-[#B85C38] to-[#c96f4a] hover:from-[#c96f4a] hover:to-[#B85C38] text-white border-0 shadow-lg font-bold py-1.5 px-3 text-sm">
               <TrendingUp className="h-3.5 w-3.5 mr-1.5" />
               Best Seller
             </Badge>
@@ -506,7 +506,7 @@ const ProductListItem = ({ product }: ProductListItemProps) => {
               className={`p-3 rounded-lg border transition-all duration-300 ${
                 isWishlisted 
                   ? "text-rose-500 border-rose-300 bg-rose-50" 
-                  : "text-gray-600 border-gray-300 hover:border-[#E1783E] hover:text-[#E1783E]"
+                  : "text-gray-600 border-gray-300 hover:border-[#B85C38] hover:text-[#B85C38]"
               }`}
             >
               <Heart className={`h-5 w-5 ${isWishlisted ? "fill-rose-500" : ""}`} />
@@ -514,7 +514,7 @@ const ProductListItem = ({ product }: ProductListItemProps) => {
             
             {/* View Details Arrow */}
             <div className="hidden lg:block opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <div className="flex items-center text-sm text-[#559F4B] font-medium">
+              <div className="flex items-center text-sm text-[#7A1F2B] font-medium">
                 View Details
                 <ArrowRight className="h-4 w-4 ml-1" />
               </div>
@@ -524,7 +524,7 @@ const ProductListItem = ({ product }: ProductListItemProps) => {
       </div>
 
       {/* Hover Effect Border */}
-      <div className="absolute inset-0 border-2 border-transparent group-hover:border-[#559F4B]/20 rounded-xl sm:rounded-2xl transition-all duration-500 pointer-events-none"></div>
+      <div className="absolute inset-0 border-2 border-transparent group-hover:border-[#7A1F2B]/20 rounded-xl sm:rounded-2xl transition-all duration-500 pointer-events-none"></div>
     </Link>
   );
 };

@@ -109,6 +109,9 @@ app.include_router(product_excel.router)
 from app.routers import category_excel
 app.include_router(category_excel.router)
 
+from app.routers import reels
+app.include_router(reels.router)
+
 
 # ---------------------- Run the Server ----------------------
 if __name__ == "__main__":

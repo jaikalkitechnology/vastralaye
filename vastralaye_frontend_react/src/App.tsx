@@ -38,6 +38,7 @@ import AdminCoupons from "@/pages/admin/AdminCoupons";
 import AdminAnalytics from "@/pages/admin/AdminAnalytics";
 import AdminLayout from "@/components/admin/AdminLayout";
 import AdminOrder from "@/pages/admin/AdminOrder";
+import AdminReels from "@/pages/admin/AdminReels";
 import Reviews from "@/pages/admin/CustomerReviews";
 import PrivacyPolicy from "@/pages/policy/PrivacyPolicy";
 import TermsAndConditions from "@/pages/policy/TermsConditions";
@@ -77,6 +78,7 @@ const AppContent = () => {
         <Route path="/admin/analytics" element={<AdminLayout><AdminAnalytics /></AdminLayout>} />
         <Route path="/admin/orders" element={<AdminLayout><AdminOrder /></AdminLayout>} />
         <Route path="/admin/reviews" element={<AdminLayout><Reviews /></AdminLayout>} />
+        <Route path="/admin/reels" element={<AdminLayout><AdminReels /></AdminLayout>} />
 
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />

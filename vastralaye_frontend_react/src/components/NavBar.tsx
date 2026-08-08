@@ -145,6 +145,10 @@ const NavBar = () => {
 
   return (
     <header className={`sticky top-0 z-50 bg-white border-b transition-all ${isScrolled ? "shadow-md" : "shadow-sm"}`}>
+      {/* ANNOUNCEMENT BAR */}
+      <div className="bg-maroon text-ivory text-center text-[11px] md:text-xs uppercase tracking-[0.18em] py-2 px-4">
+        Free shipping on orders above ₹999 · <span className="text-gold font-semibold">Easy 7-day returns</span> · Handcrafted in India
+      </div>
       {/* HEADER */}
       <div className="container flex items-center h-16 px-4">
         {/* LOGO */}

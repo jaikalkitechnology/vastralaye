@@ -90,7 +90,7 @@ const OrderInvoice: React.FC<OrderInvoiceProps> = ({ order, userDetails }) => {
   return (
     <div className="space-y-4">
       <div className="flex justify-end gap-2">
-        <Button onClick={downloadPDF} className="bg-[#559F4B] hover:bg-[#457a3d]">
+        <Button onClick={downloadPDF} className="bg-[#7A1F2B] hover:bg-[#457a3d]">
           <Download className="w-4 h-4 mr-2" />
           Download Invoice
         </Button>
@@ -105,7 +105,7 @@ const OrderInvoice: React.FC<OrderInvoiceProps> = ({ order, userDetails }) => {
         {/* Header */}
         <div className="flex justify-between items-start border-b-2 border-gray-200 pb-6 mb-6">
           <div>
-            <h1 className="text-3xl font-bold text-[#559F4B]">INVOICE</h1>
+            <h1 className="text-3xl font-bold text-[#7A1F2B]">INVOICE</h1>
             <p className="text-gray-600 mt-1">#{order.id}</p>
           </div>
           <div className="text-right">
@@ -207,7 +207,7 @@ const OrderInvoice: React.FC<OrderInvoiceProps> = ({ order, userDetails }) => {
             </div>
             <div className="flex justify-between py-2 border-t border-gray-200 text-lg font-bold">
               <span>Total:</span>
-              <span className="text-[#559F4B]">{formatPrice(order.total_amount)}</span>
+              <span className="text-[#7A1F2B]">{formatPrice(order.total_amount)}</span>
             </div>
           </div>
         </div>

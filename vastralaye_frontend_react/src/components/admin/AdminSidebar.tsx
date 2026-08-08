@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { 
+import {
   LayoutDashboard,
   Users,
   ShoppingBag,
@@ -10,7 +10,8 @@ import {
   BarChart,
   Package,
   TrendingUp,
-  MessageSquare
+  MessageSquare,
+  Clapperboard
 } from 'lucide-react';
 import { useStore } from '@/contexts/StoreContext';
 import { Button } from '@/components/ui/button';
@@ -58,6 +59,11 @@ const AdminSidebar = () => {
       path: '/admin/coupons',
       icon: <Tag className="h-5 w-5" />,
     },
+    {
+      name: 'Reels',
+      path: '/admin/reels',
+      icon: <Clapperboard className="h-5 w-5" />,
+    },
     // {
     //   name: 'Analytics',
     //   path: '/admin/analytics',
@@ -85,11 +91,11 @@ const AdminSidebar = () => {
       {/* Header */}
       <div className="p-6 border-b border-gray-800">
         <Link to="/admin" className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-r from-[#559F4B] to-[#E1783E] rounded-lg flex items-center justify-center shadow-md">
+          <div className="w-10 h-10 bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] rounded-lg flex items-center justify-center shadow-md">
             <LayoutDashboard className="h-6 w-6 text-white" />
           </div>
           <div>
-            <h1 className="text-lg font-semibold text-white">Mizorpaymart</h1>
+            <h1 className="text-lg font-semibold text-white">Vastralaye</h1>
             <p className="text-gray-400 text-sm">Admin Panel</p>
           </div>
         </Link>
@@ -107,7 +113,7 @@ const AdminSidebar = () => {
                 className={cn(
                   "flex items-center gap-3 px-3 py-3 rounded-lg transition-all",
                   active
-                    ? "bg-gradient-to-r from-[#559F4B]/20 to-[#E1783E]/20 text-white border-l-4 border-[#559F4B]"
+                    ? "bg-gradient-to-r from-[#7A1F2B]/20 to-[#B85C38]/20 text-white border-l-4 border-[#7A1F2B]"
                     : "text-gray-300 hover:bg-gray-800 hover:text-white"
                 )}
               >
@@ -128,7 +134,7 @@ const AdminSidebar = () => {
       <div className="p-4 border-t border-gray-800 space-y-3">
         {/* User Info */}
         <div className="flex items-center gap-3 p-2">
-          <div className="w-8 h-8 bg-gradient-to-r from-[#559F4B] to-[#E1783E] rounded-full flex items-center justify-center text-white text-sm font-medium shadow-sm">
+          <div className="w-8 h-8 bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] rounded-full flex items-center justify-center text-white text-sm font-medium shadow-sm">
             {currentUser?.first_name?.[0]?.toUpperCase() || 'A'}
           </div>
           <div className="flex-1 min-w-0">

@@ -896,7 +896,7 @@ const InvoicesPage: React.FC = () => {
   if (loading) return (
     <UserLayout>
       <div className="flex flex-col justify-center items-center h-64 gap-4">
-        <Loader2 className="h-8 w-8 animate-spin text-[#559F4B]" />
+        <Loader2 className="h-8 w-8 animate-spin text-[#7A1F2B]" />
         <p className="text-gray-600">Loading invoice…</p>
       </div>
     </UserLayout>
@@ -942,8 +942,8 @@ const InvoicesPage: React.FC = () => {
       <div className="max-w-6xl mx-auto p-4 md:p-6 space-y-6">
 
         {/* ══ TOOLBAR ══ */}
-        <div className="bg-gradient-to-r from-[#559F4B]/10 via-[#E1783E]/5 to-[#559F4B]/10
-                        rounded-2xl p-4 sm:p-6 border border-[#559F4B]/20">
+        <div className="bg-gradient-to-r from-[#7A1F2B]/10 via-[#B85C38]/5 to-[#7A1F2B]/10
+                        rounded-2xl p-4 sm:p-6 border border-[#7A1F2B]/20">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
 
             {/* Left */}
@@ -951,13 +951,13 @@ const InvoicesPage: React.FC = () => {
               <Button
                 variant="outline" size="icon"
                 onClick={() => navigate(`/orders/${orderId}`)}
-                className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl border-[#559F4B]/30 flex-shrink-0"
+                className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl border-[#7A1F2B]/30 flex-shrink-0"
               >
-                <ArrowLeft className="h-4 w-4 text-[#559F4B]" />
+                <ArrowLeft className="h-4 w-4 text-[#7A1F2B]" />
               </Button>
               <div className="min-w-0">
                 <h1 className="text-lg sm:text-2xl font-bold truncate
-                               bg-gradient-to-r from-[#559F4B] to-[#E1783E]
+                               bg-gradient-to-r from-[#7A1F2B] to-[#B85C38]
                                bg-clip-text text-transparent">
                   {invoice.invoice_number}
                 </h1>
@@ -982,7 +982,7 @@ const InvoicesPage: React.FC = () => {
               </Badge>
 
               <Button size="sm" variant="outline"
-                className="border-[#559F4B] text-[#559F4B]"
+                className="border-[#7A1F2B] text-[#7A1F2B]"
                 onClick={handlePrint}>
                 <Printer className="w-4 h-4 mr-1" />
                 <span className="hidden sm:inline">Print</span>
@@ -990,7 +990,7 @@ const InvoicesPage: React.FC = () => {
 
               <Button
                 size="sm"
-                className="bg-gradient-to-r from-[#559F4B] to-[#E1783E] text-white hover:opacity-90"
+                className="bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] text-white hover:opacity-90"
                 onClick={handleDownloadPDF}
                 disabled={generatingPDF}
               >
@@ -1012,7 +1012,7 @@ const InvoicesPage: React.FC = () => {
           <div className="no-print flex flex-col sm:flex-row items-start sm:items-center
                           justify-between px-5 py-3 bg-gray-50 border-b border-gray-200 gap-2">
             <div className="flex items-center gap-2 text-sm text-gray-600">
-              <Eye className="w-4 h-4 text-[#559F4B]" />
+              <Eye className="w-4 h-4 text-[#7A1F2B]" />
               <span className="font-medium">Invoice Preview</span>
               <span className="text-gray-400">—</span>
               <span className="text-gray-400">
@@ -1027,7 +1027,7 @@ const InvoicesPage: React.FC = () => {
                 onClick={handleDownloadPDF}
                 disabled={generatingPDF}
                 className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium
-                           bg-[#559F4B] hover:bg-[#457a3d] text-white rounded-lg
+                           bg-[#7A1F2B] hover:bg-[#457a3d] text-white rounded-lg
                            transition-colors disabled:opacity-50"
               >
                 {generatingPDF
@@ -1057,9 +1057,9 @@ const InvoicesPage: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 
           {/* Customer */}
-          <Card className="border-[#559F4B]/20 shadow-md">
-            <CardHeader className="pb-3 border-b border-[#559F4B]/10">
-              <CardTitle className="flex items-center gap-2 text-[#559F4B] text-sm">
+          <Card className="border-[#7A1F2B]/20 shadow-md">
+            <CardHeader className="pb-3 border-b border-[#7A1F2B]/10">
+              <CardTitle className="flex items-center gap-2 text-[#7A1F2B] text-sm">
                 <User className="w-4 h-4" />Bill To
               </CardTitle>
             </CardHeader>
@@ -1110,7 +1110,7 @@ const InvoicesPage: React.FC = () => {
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500">Amount</span>
-                <span className="font-bold text-[#559F4B]">{formatPrice(invoice.total_amount)}</span>
+                <span className="font-bold text-[#7A1F2B]">{formatPrice(invoice.total_amount)}</span>
               </div>
               {invoice.paid_date && (
                 <div className="flex justify-between">
@@ -1132,15 +1132,15 @@ const InvoicesPage: React.FC = () => {
           </Card>
 
           {/* Actions */}
-          <Card className="border-[#559F4B]/20 shadow-md">
-            <CardHeader className="pb-3 border-b border-[#559F4B]/10">
-              <CardTitle className="flex items-center gap-2 text-[#559F4B] text-sm">
+          <Card className="border-[#7A1F2B]/20 shadow-md">
+            <CardHeader className="pb-3 border-b border-[#7A1F2B]/10">
+              <CardTitle className="flex items-center gap-2 text-[#7A1F2B] text-sm">
                 <DownloadCloud className="w-4 h-4" />Actions
               </CardTitle>
             </CardHeader>
             <CardContent className="p-4 space-y-2">
               <Button
-                className="w-full bg-[#559F4B] hover:bg-[#457a3d] text-white text-sm"
+                className="w-full bg-[#7A1F2B] hover:bg-[#457a3d] text-white text-sm"
                 onClick={handleDownloadPDF}
                 disabled={generatingPDF}
               >
@@ -1150,7 +1150,7 @@ const InvoicesPage: React.FC = () => {
                 }
               </Button>
               <Button variant="outline"
-                className="w-full border-[#559F4B] text-[#559F4B] text-sm"
+                className="w-full border-[#7A1F2B] text-[#7A1F2B] text-sm"
                 onClick={handlePrint}>
                 <Printer className="w-4 h-4 mr-2" />Print Invoice
               </Button>

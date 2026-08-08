@@ -63,11 +63,23 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				navy: '#1A2456',
-				cream: '#F8F5F0',
-				terracotta: '#D35400',
-				charcoal: '#333333',
+				/* Brand palette (design.md §3.1) — legacy names re-pointed */
+				navy: '#7A1F2B',
+				maroon: '#7A1F2B',
+				cream: '#FAF6F0',
+				ivory: '#FAF6F0',
+				terracotta: '#B85C38',
+				gold: '#C99A45',
+				blush: '#F6E8E4',
+				sand: '#EFE7DB',
+				espresso: '#2B1B12',
+				charcoal: '#2B1B12',
+				sale: '#C62828',
 				lightgray: '#F9F9F9',
+			},
+			fontFamily: {
+				serif: ['Fraunces', 'Georgia', 'serif'],
+				sans: ['Jost', 'system-ui', 'sans-serif'],
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

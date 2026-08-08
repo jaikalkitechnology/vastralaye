@@ -1,0 +1,373 @@
+import { useEffect, useRef, useState } from 'react';
+import { api } from '@/api/api';
+import { BASE_IMG } from '@/config';
+import { Button } from '@/components/ui/button';
+import { toast } from '@/components/ui/use-toast';
+import {
+  Clapperboard,
+  UploadCloud,
+  Trash2,
+  Eye,
+  Play,
+  RefreshCw,
+} from 'lucide-react';
+
+interface ReelProduct {
+  id: number;
+  name: string;
+  price: number;
+  discount_price?: number | null;
+  image?: string | null;
+}
+
+interface AdminReel {
+  id: number;
+  caption: string;
+  video_url: string;
+  poster_url?: string | null;
+  show_on_home: boolean;
+  show_on_pdp: boolean;
+  is_published: boolean;
+  views: number;
+  product?: ReelProduct | null;
+}
+
+const mediaUrl = (path?: string | null) => {
+  if (!path) return '';
+  if (/^https?:\/\//i.test(path)) return path;
+  let s = path.startsWith('/') ? path : `/${path}`;
+  if (!s.startsWith('/static/')) s = `/static${s}`;
+  return `${(BASE_IMG || '').replace(/\/$/, '')}${s}`;
+};
+
+/**
+ * Admin › Reels — upload & manage the shoppable product videos shown on
+ * the storefront homepage ("Vastralaye in Motion") and product pages
+ * ("Watch It Styled"). See admin_design.md §5.9.
+ */
+const AdminReels = () => {
+  const [reels, setReels] = useState<AdminReel[]>([]);
+  const [products, setProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [uploading, setUploading] = useState(false);
+
+  const [caption, setCaption] = useState('');
+  const [productId, setProductId] = useState<string>('');
+  const [showOnHome, setShowOnHome] = useState(true);
+  const [showOnPdp, setShowOnPdp] = useState(true);
+  const [publishNow, setPublishNow] = useState(true);
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [posterFile, setPosterFile] = useState<File | null>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
+  const posterInputRef = useRef<HTMLInputElement>(null);
+
+  const fetchAll = async () => {
+    setLoading(true);
+    try {
+      const [reelsRes, productsRes] = await Promise.all([
+        api.get('/admin/reels'),
+        api.get('/api/v1/admin/products').catch(() => api.get('/admin/products')),
+      ]);
+      setReels(Array.isArray(reelsRes.data) ? reelsRes.data : []);
+      const prods: any = productsRes?.data;
+      setProducts(Array.isArray(prods) ? prods : prods?.products || prods?.items || []);
+    } catch (err) {
+      console.error('Failed to load reels', err);
+      toast({ title: 'Failed to load reels' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAll();
+  }, []);
+
+  const resetForm = () => {
+    setCaption('');
+    setProductId('');
+    setShowOnHome(true);
+    setShowOnPdp(true);
+    setPublishNow(true);
+    setVideoFile(null);
+    setPosterFile(null);
+    if (videoInputRef.current) videoInputRef.current.value = '';
+    if (posterInputRef.current) posterInputRef.current.value = '';
+  };
+
+  const handleUpload = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!videoFile) return toast({ title: 'Please choose a video file (MP4)' });
+    if (!caption.trim()) return toast({ title: 'Please add a caption' });
+
+    const form = new FormData();
+    form.append('caption', caption.trim());
+    if (productId) form.append('product_id', productId);
+    form.append('show_on_home', String(showOnHome));
+    form.append('show_on_pdp', String(showOnPdp));
+    form.append('is_published', String(publishNow));
+    form.append('video_file', videoFile);
+    if (posterFile) form.append('poster_file', posterFile);
+
+    setUploading(true);
+    try {
+      await api.post('/admin/reels', form, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      toast({ title: 'Reel uploaded' });
+      resetForm();
+      fetchAll();
+    } catch (err: any) {
+      toast({ title: err?.response?.data?.detail || 'Upload failed' });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const togglePublish = async (reel: AdminReel) => {
+    try {
+      await api.patch(`/admin/reels/${reel.id}/publish`);
+      setReels((prev) =>
+        prev.map((r) => (r.id === reel.id ? { ...r, is_published: !r.is_published } : r))
+      );
+    } catch {
+      toast({ title: 'Failed to update reel' });
+    }
+  };
+
+  const deleteReel = async (reel: AdminReel) => {
+    if (!window.confirm(`Delete reel "${reel.caption}"? This cannot be undone.`)) return;
+    try {
+      await api.delete(`/admin/reels/${reel.id}`);
+      setReels((prev) => prev.filter((r) => r.id !== reel.id));
+      toast({ title: 'Reel deleted' });
+    } catch {
+      toast({ title: 'Failed to delete reel' });
+    }
+  };
+
+  return (
+    <div className="p-6">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-semibold flex items-center gap-2">
+            <Clapperboard className="h-6 w-6 text-maroon" /> Reels
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Upload product videos shown on the homepage and product pages.
+          </p>
+        </div>
+        <Button variant="outline" onClick={fetchAll} disabled={loading}>
+          <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
+        </Button>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-6 items-start">
+        {/* Upload panel */}
+        <form onSubmit={handleUpload} className="bg-white border border-border rounded-md p-5">
+          <h2 className="text-xs font-semibold uppercase tracking-[0.16em] mb-4">Upload New Reel</h2>
+
+          <label
+            htmlFor="reel-video"
+            className="block border-2 border-dashed border-sand rounded-md bg-ivory text-center px-4 py-8 cursor-pointer hover:border-gold transition-colors"
+          >
+            <UploadCloud className="h-8 w-8 mx-auto text-maroon mb-2" strokeWidth={1.5} />
+            <span className="block text-sm font-medium text-espresso">
+              {videoFile ? videoFile.name : 'Click to choose a video'}
+            </span>
+            <span className="block text-xs text-muted-foreground mt-1">
+              Vertical 9:16 · MP4 · up to 30s · max 30 MB
+            </span>
+          </label>
+          <input
+            id="reel-video"
+            ref={videoInputRef}
+            type="file"
+            accept="video/mp4,video/webm,video/quicktime"
+            className="hidden"
+            onChange={(e) => setVideoFile(e.target.files?.[0] || null)}
+          />
+
+          <div className="mt-4">
+            <label className="block text-[11px] font-semibold uppercase tracking-[0.14em] mb-1.5">
+              Caption
+            </label>
+            <input
+              type="text"
+              value={caption}
+              onChange={(e) => setCaption(e.target.value)}
+              placeholder="e.g. 3 ways to drape this saree"
+              className="w-full border border-input rounded-sm px-3 py-2.5 text-sm bg-white focus:outline-none focus:border-maroon"
+            />
+          </div>
+
+          <div className="mt-4">
+            <label className="block text-[11px] font-semibold uppercase tracking-[0.14em] mb-1.5">
+              Linked Product (optional)
+            </label>
+            <select
+              value={productId}
+              onChange={(e) => setProductId(e.target.value)}
+              className="w-full border border-input rounded-sm px-3 py-2.5 text-sm bg-white focus:outline-none focus:border-maroon"
+            >
+              <option value="">— No linked product —</option>
+              {products.map((p: any) => (
+                <option key={p.id} value={p.id}>
+                  {p.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="mt-4">
+            <label className="block text-[11px] font-semibold uppercase tracking-[0.14em] mb-2">
+              Show On
+            </label>
+            <label className="flex items-center gap-2.5 text-sm mb-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={showOnHome}
+                onChange={(e) => setShowOnHome(e.target.checked)}
+                className="accent-[#7A1F2B]"
+              />
+              Homepage — “Vastralaye in Motion” row
+            </label>
+            <label className="flex items-center gap-2.5 text-sm cursor-pointer">
+              <input
+                type="checkbox"
+                checked={showOnPdp}
+                onChange={(e) => setShowOnPdp(e.target.checked)}
+                className="accent-[#7A1F2B]"
+              />
+              Product page — “Watch It Styled”
+            </label>
+          </div>
+
+          <div className="mt-4">
+            <label className="block text-[11px] font-semibold uppercase tracking-[0.14em] mb-1.5">
+              Poster Image (optional)
+            </label>
+            <input
+              ref={posterInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={(e) => setPosterFile(e.target.files?.[0] || null)}
+              className="w-full text-xs text-muted-foreground file:mr-3 file:px-3 file:py-2 file:border file:border-input file:rounded-sm file:bg-ivory file:text-espresso file:text-xs"
+            />
+          </div>
+
+          <label className="flex items-center gap-2.5 text-sm mt-4 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={publishNow}
+              onChange={(e) => setPublishNow(e.target.checked)}
+              className="accent-[#7A1F2B]"
+            />
+            Publish immediately
+          </label>
+
+          <Button type="submit" disabled={uploading} className="w-full mt-5">
+            <UploadCloud className="h-4 w-4" />
+            {uploading ? 'Uploading…' : 'Upload Reel'}
+          </Button>
+        </form>
+
+        {/* Library */}
+        <div>
+          {loading ? (
+            <div className="text-sm text-muted-foreground py-10 text-center">Loading reels…</div>
+          ) : reels.length === 0 ? (
+            <div className="border border-dashed border-border rounded-md bg-white text-center py-16 px-6">
+              <Clapperboard className="h-10 w-10 mx-auto text-muted-foreground mb-3" strokeWidth={1.2} />
+              <p className="text-sm text-muted-foreground">
+                No reels yet. Upload your first product video — it will appear on the storefront
+                homepage and product pages.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+              {reels.map((reel) => (
+                <div key={reel.id} className="bg-white border border-border rounded-md overflow-hidden">
+                  <div className="relative aspect-[9/14] bg-sand">
+                    {reel.poster_url ? (
+                      <img
+                        src={mediaUrl(reel.poster_url)}
+                        alt={reel.caption}
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
+                    ) : (
+                      <video
+                        src={mediaUrl(reel.video_url)}
+                        className="absolute inset-0 w-full h-full object-cover"
+                        muted
+                        playsInline
+                        preload="metadata"
+                      />
+                    )}
+                    <a
+                      href={mediaUrl(reel.video_url)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="Preview video"
+                      className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 flex items-center justify-center shadow"
+                    >
+                      <Play className="h-4 w-4 text-maroon fill-maroon ml-0.5" />
+                    </a>
+                    <span
+                      className={`absolute top-2 left-2 text-[10px] font-semibold uppercase tracking-[0.1em] px-2 py-0.5 rounded-full bg-white/95 ${
+                        reel.is_published ? 'text-green-700' : 'text-muted-foreground'
+                      }`}
+                    >
+                      {reel.is_published ? 'Published' : 'Draft'}
+                    </span>
+                    <span className="absolute bottom-2 left-2 flex items-center gap-1 text-white text-[11px] drop-shadow">
+                      <Eye className="h-3 w-3" /> {reel.views}
+                    </span>
+                  </div>
+                  <div className="p-3">
+                    <div className="text-xs font-semibold truncate">{reel.caption}</div>
+                    {reel.product && (
+                      <div className="text-[11px] text-muted-foreground truncate mt-0.5">
+                        {reel.product.name}
+                      </div>
+                    )}
+                    <div className="flex items-center gap-1.5 mt-2">
+                      {reel.show_on_home && (
+                        <span className="text-[10px] border border-border rounded-full px-2 py-0.5 text-muted-foreground">
+                          Home
+                        </span>
+                      )}
+                      {reel.show_on_pdp && (
+                        <span className="text-[10px] border border-border rounded-full px-2 py-0.5 text-muted-foreground">
+                          PDP
+                        </span>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => togglePublish(reel)}
+                        className="ml-auto text-[10px] font-semibold uppercase tracking-[0.08em] text-maroon hover:underline"
+                      >
+                        {reel.is_published ? 'Unpublish' : 'Publish'}
+                      </button>
+                      <button
+                        type="button"
+                        aria-label="Delete reel"
+                        onClick={() => deleteReel(reel)}
+                        className="text-sale hover:text-red-700"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default AdminReels;

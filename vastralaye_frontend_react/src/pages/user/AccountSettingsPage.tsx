@@ -109,7 +109,7 @@ const AccountSettingsPage = () => {
       case 3:
         return 'from-yellow-500 to-yellow-400';
       case 4:
-        return 'from-[#559F4B] to-[#E1783E]';
+        return 'from-[#7A1F2B] to-[#B85C38]';
       default:
         return 'from-gray-300 to-gray-300';
     }
@@ -224,8 +224,8 @@ const AccountSettingsPage = () => {
         {/* Header */}
         <div className="space-y-2">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-2xl bg-gradient-to-r from-[#559F4B]/10 to-[#E1783E]/10">
-              <Shield className="w-8 h-8 bg-gradient-to-r from-[#559F4B] to-[#E1783E] bg-clip-text text-transparent" />
+            <div className="p-3 rounded-2xl bg-gradient-to-r from-[#7A1F2B]/10 to-[#B85C38]/10">
+              <Shield className="w-8 h-8 bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] bg-clip-text text-transparent" />
             </div>
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Account Settings</h1>
@@ -241,10 +241,10 @@ const AccountSettingsPage = () => {
           <div className="lg:col-span-2 space-y-6">
             {/* Security Settings */}
             <Card className="border-0 shadow-lg rounded-2xl overflow-hidden">
-              <div className="bg-gradient-to-r from-[#559F4B]/5 to-[#E1783E]/5 p-1">
+              <div className="bg-gradient-to-r from-[#7A1F2B]/5 to-[#B85C38]/5 p-1">
                 <CardHeader className="bg-white">
                   <CardTitle className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-gradient-to-r from-[#559F4B] to-[#E1783E] text-white">
+                    <div className="p-2 rounded-lg bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] text-white">
                       <Key className="w-5 h-5" />
                     </div>
                     <div>
@@ -269,7 +269,7 @@ const AccountSettingsPage = () => {
                         onChange={handlePasswordChange}
                         required
                         placeholder="Enter your current password"
-                        className="pr-12 py-6 rounded-xl border-gray-300 focus:border-[#559F4B] focus:ring-[#559F4B] transition-all group-hover:border-gray-400"
+                        className="pr-12 py-6 rounded-xl border-gray-300 focus:border-[#7A1F2B] focus:ring-[#7A1F2B] transition-all group-hover:border-gray-400"
                       />
                       <Button
                         type="button"
@@ -298,7 +298,7 @@ const AccountSettingsPage = () => {
                         onChange={handlePasswordChange}
                         required
                         placeholder="Create a strong new password"
-                        className="pr-12 py-6 rounded-xl border-gray-300 focus:border-[#559F4B] focus:ring-[#559F4B] transition-all group-hover:border-gray-400"
+                        className="pr-12 py-6 rounded-xl border-gray-300 focus:border-[#7A1F2B] focus:ring-[#7A1F2B] transition-all group-hover:border-gray-400"
                       />
                       <Button
                         type="button"
@@ -322,7 +322,7 @@ const AccountSettingsPage = () => {
                           <span className="text-sm font-medium text-gray-700">Password strength</span>
                           <span className={`text-sm font-bold ${
                             passwordStrength >= 4
-                              ? 'text-[#559F4B]'
+                              ? 'text-[#7A1F2B]'
                               : passwordStrength >= 3
                               ? 'text-amber-600'
                               : 'text-red-500'
@@ -340,19 +340,19 @@ const AccountSettingsPage = () => {
                         </div>
                         <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
                           <div className="flex items-center gap-2">
-                            <div className={`w-1.5 h-1.5 rounded-full ${passwordData.newPassword.length >= 8 ? 'bg-[#559F4B]' : 'bg-gray-300'}`}></div>
+                            <div className={`w-1.5 h-1.5 rounded-full ${passwordData.newPassword.length >= 8 ? 'bg-[#7A1F2B]' : 'bg-gray-300'}`}></div>
                             <span>8+ characters</span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <div className={`w-1.5 h-1.5 rounded-full ${/[A-Z]/.test(passwordData.newPassword) ? 'bg-[#559F4B]' : 'bg-gray-300'}`}></div>
+                            <div className={`w-1.5 h-1.5 rounded-full ${/[A-Z]/.test(passwordData.newPassword) ? 'bg-[#7A1F2B]' : 'bg-gray-300'}`}></div>
                             <span>Uppercase letter</span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <div className={`w-1.5 h-1.5 rounded-full ${/[0-9]/.test(passwordData.newPassword) ? 'bg-[#559F4B]' : 'bg-gray-300'}`}></div>
+                            <div className={`w-1.5 h-1.5 rounded-full ${/[0-9]/.test(passwordData.newPassword) ? 'bg-[#7A1F2B]' : 'bg-gray-300'}`}></div>
                             <span>Number</span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <div className={`w-1.5 h-1.5 rounded-full ${/[^A-Za-z0-9]/.test(passwordData.newPassword) ? 'bg-[#559F4B]' : 'bg-gray-300'}`}></div>
+                            <div className={`w-1.5 h-1.5 rounded-full ${/[^A-Za-z0-9]/.test(passwordData.newPassword) ? 'bg-[#7A1F2B]' : 'bg-gray-300'}`}></div>
                             <span>Special character</span>
                           </div>
                         </div>
@@ -371,7 +371,7 @@ const AccountSettingsPage = () => {
                         onChange={handlePasswordChange}
                         required
                         placeholder="Re-enter your new password"
-                        className="pr-12 py-6 rounded-xl border-gray-300 focus:border-[#559F4B] focus:ring-[#559F4B] transition-all group-hover:border-gray-400"
+                        className="pr-12 py-6 rounded-xl border-gray-300 focus:border-[#7A1F2B] focus:ring-[#7A1F2B] transition-all group-hover:border-gray-400"
                       />
                       <Button
                         type="button"
@@ -421,7 +421,7 @@ const AccountSettingsPage = () => {
                   <Button 
                     type="submit" 
                     disabled={isLoading}
-                    className="w-full md:w-auto bg-gradient-to-r from-[#559F4B] to-[#E1783E] hover:from-[#559F4B]/90 hover:to-[#E1783E]/90 text-white font-semibold py-6 px-8 rounded-xl shadow-md hover:shadow-lg transition-all duration-300"
+                    className="w-full md:w-auto bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] hover:from-[#7A1F2B]/90 hover:to-[#B85C38]/90 text-white font-semibold py-6 px-8 rounded-xl shadow-md hover:shadow-lg transition-all duration-300"
                   >
                     <Save className="w-4 h-4 mr-2" />
                     {isLoading ? 'Updating Password...' : 'Update Password'}
@@ -495,10 +495,10 @@ const AccountSettingsPage = () => {
           <div className="space-y-6">
             {/* Account Status Card */}
             <Card className="border-0 shadow-lg rounded-2xl overflow-hidden">
-              <div className="bg-gradient-to-r from-[#559F4B]/10 to-[#E1783E]/10 p-1">
+              <div className="bg-gradient-to-r from-[#7A1F2B]/10 to-[#B85C38]/10 p-1">
                 <CardHeader className="bg-white">
                   <CardTitle className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-gradient-to-r from-[#559F4B] to-[#E1783E] text-white">
+                    <div className="p-2 rounded-lg bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] text-white">
                       <UserCheck className="w-5 h-5" />
                     </div>
                     <h2 className="text-lg font-bold text-gray-900">Account Status</h2>
@@ -532,30 +532,30 @@ const AccountSettingsPage = () => {
 
                 <div className="flex justify-between items-center p-3 rounded-xl bg-gradient-to-r from-amber-50 to-amber-50/50">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-gradient-to-r from-[#559F4B]/20 to-[#E1783E]/20">
-                      <Calendar className="w-4 h-4 text-[#559F4B]" />
+                    <div className="p-2 rounded-lg bg-gradient-to-r from-[#7A1F2B]/20 to-[#B85C38]/20">
+                      <Calendar className="w-4 h-4 text-[#7A1F2B]" />
                     </div>
                     <span className="text-sm font-medium text-gray-700">Member Since</span>
                   </div>
-                  <span className="text-sm font-bold bg-gradient-to-r from-[#559F4B] to-[#E1783E] bg-clip-text text-transparent">
+                  <span className="text-sm font-bold bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] bg-clip-text text-transparent">
                     {new Date().getFullYear()}
                   </span>
                 </div>
 
-                <div className="mt-6 p-4 rounded-xl bg-gradient-to-r from-[#559F4B]/5 to-[#E1783E]/5 border border-[#559F4B]/20">
+                <div className="mt-6 p-4 rounded-xl bg-gradient-to-r from-[#7A1F2B]/5 to-[#B85C38]/5 border border-[#7A1F2B]/20">
                   <div className="flex items-center gap-3 mb-3">
-                    <Sparkles className="w-5 h-5 text-[#E1783E]" />
+                    <Sparkles className="w-5 h-5 text-[#B85C38]" />
                     <span className="text-sm font-bold text-gray-900">Account Level</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
                     <div 
-                      className="bg-gradient-to-r from-[#559F4B] to-[#E1783E] h-2 rounded-full" 
+                      className="bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] h-2 rounded-full" 
                       style={{ width: '85%' }}
                     ></div>
                   </div>
                   <div className="flex justify-between text-xs">
                     <span className="text-gray-600">Gold Member</span>
-                    <span className="font-bold text-[#559F4B]">85%</span>
+                    <span className="font-bold text-[#7A1F2B]">85%</span>
                   </div>
                   <p className="text-xs text-gray-500 mt-2">85% to Platinum Level</p>
                 </div>
