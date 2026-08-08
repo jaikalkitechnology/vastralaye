@@ -3,6 +3,7 @@ import { Instagram } from 'lucide-react';
 import { listProducts } from '@/api/apihelper';
 import { BASE_IMG, BASE_URL } from '@/config';
 import { useSiteSettings } from '@/hooks/use-site-settings';
+import Reveal from '@/components/motion/Reveal';
 
 const FALLBACK_INSTAGRAM_URL = 'https://instagram.com';
 
@@ -55,15 +56,15 @@ const InstagramGrid = () => {
   return (
     <section className="py-14 md:py-20 pt-4 md:pt-8">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-10">
+        <Reveal className="text-center mb-10">
           <span className="overline-label mb-2">@vastralaye</span>
           <h2 className="font-serif text-3xl md:text-4xl font-medium text-espresso">As Worn By You</h2>
-        </div>
+        </Reveal>
 
         <div className="grid grid-cols-3 md:grid-cols-6 gap-2.5 md:gap-3.5">
-          {tiles.map((src) => (
+          {tiles.map((src, i) => (
+            <Reveal key={src} delay={i * 0.05} y={14}>
             <a
-              key={src}
               href={instagramUrl}
               target="_blank"
               rel="noopener noreferrer"
@@ -79,6 +80,7 @@ const InstagramGrid = () => {
                 <Instagram className="h-6 w-6 text-ivory opacity-0 group-hover:opacity-100 transition-opacity" strokeWidth={1.5} />
               </span>
             </a>
+            </Reveal>
           ))}
         </div>
       </div>

@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import Reveal from '@/components/motion/Reveal';
 
 /** Craft storytelling band on blush (design.md §5.7). */
 const stats = [
@@ -12,7 +13,7 @@ const BrandStory = () => (
     <div className="container mx-auto px-4">
       <div className="grid grid-cols-1 lg:grid-cols-2 items-center gap-10 lg:gap-16 py-14 md:py-20">
         {/* Arch image */}
-        <div className="flex justify-center">
+        <Reveal className="flex justify-center">
           <div className="relative w-[260px] sm:w-[320px] lg:w-[380px]">
             <div className="relative aspect-[4/4.6] overflow-hidden rounded-t-[999px] bg-sand">
               <img
@@ -23,10 +24,10 @@ const BrandStory = () => (
               />
             </div>
           </div>
-        </div>
+        </Reveal>
 
         {/* Copy */}
-        <div className="text-center lg:text-left">
+        <Reveal delay={0.12} className="text-center lg:text-left">
           <span className="overline-label mb-3">Our craft</span>
           <h2 className="font-serif text-3xl md:text-4xl font-medium text-espresso leading-tight mb-4">
             From Loom to Wardrobe,
@@ -55,7 +56,7 @@ const BrandStory = () => (
           >
             Read our story
           </Link>
-        </div>
+        </Reveal>
       </div>
     </div>
   </section>
