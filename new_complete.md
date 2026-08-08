@@ -43,6 +43,19 @@ type-clean) and backend `py_compile`. New tables auto-create on API startup — 
 | Admin UI | Quote textarea, name/city, **tap-to-set star rating**, optional customer-photo upload, sort order, show/hide toggle; edit-in-place; list cards with stars, Live/Hidden chip, avatar (photo or initial), Hide/Show, edit and delete | `src/pages/admin/AdminTestimonials.tsx` |
 | Storefront | `Testimonials` fetches the API; renders **round customer avatar** beside the name when a photo exists and real star counts per rating; **falls back to the built-in three quotes** when none exist | `src/components/home/Testimonials.tsx` |
 
+## 4. Reels — external video link option (YouTube) ✅
+
+**Admin page:** `/admin/reels` — the upload panel now has an **"Upload File / Video Link"** toggle,
+so a reel can come from an uploaded MP4 **or** a pasted link (YouTube watch/Shorts/youtu.be, or a
+direct MP4 URL).
+
+| Layer | What shipped | File(s) |
+|---|---|---|
+| Backend | `POST /api/v1/admin/reels` now accepts `video_link` as an alternative to `video_file` (exactly one required; http(s) validated, ≤255 chars; uploaded file wins if both are sent). External links are stored in `video_url` untouched; local-file cleanup on delete already skips external URLs | `vastralaye_backend/app/routers/reels.py` |
+| Admin UI | Source toggle (maroon active state), link input with live **"✓ YouTube link detected"** hint, validation on submit; library cards show the **YouTube thumbnail** automatically when no poster is uploaded plus a small "YouTube" badge | `src/pages/admin/AdminReels.tsx` |
+| Storefront | Reel cards use the YouTube thumbnail as poster fallback; the lightbox plays YouTube links in an **embedded player** (privacy-enhanced `youtube-nocookie.com`, autoplay) while uploaded/direct-MP4 reels keep the native `<video>` player — on both the homepage row and the PDP "Watch It Styled" strip | `src/components/ReelsSection.tsx` |
+| Shared | `getYouTubeId()` / `youTubeThumb()` / `youTubeEmbed()` helpers | `src/lib/media.ts` |
+
 ---
 
 ## Shared infrastructure added

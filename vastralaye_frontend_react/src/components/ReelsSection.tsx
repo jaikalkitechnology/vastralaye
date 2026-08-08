@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Play, Eye, X, ArrowRight } from 'lucide-react';
 import { api } from '@/api/api';
 import { BASE_IMG } from '@/config';
+import { getYouTubeId, youTubeThumb, youTubeEmbed } from '@/lib/media';
 
 interface ReelProduct {
   id: number;
@@ -106,6 +107,13 @@ const ReelsSection = ({
                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     loading="lazy"
                   />
+                ) : getYouTubeId(reel.video_url) ? (
+                  <img
+                    src={youTubeThumb(getYouTubeId(reel.video_url) as string)}
+                    alt={reel.caption}
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    loading="lazy"
+                  />
                 ) : (
                   <video
                     src={mediaUrl(reel.video_url)}
@@ -164,14 +172,24 @@ const ReelsSection = ({
             className="relative w-full max-w-[380px] aspect-[9/16] bg-black rounded overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
-            <video
-              src={mediaUrl(active.video_url)}
-              poster={active.poster_url ? mediaUrl(active.poster_url) : undefined}
-              className="w-full h-full object-contain"
-              autoPlay
-              controls
-              playsInline
-            />
+            {getYouTubeId(active.video_url) ? (
+              <iframe
+                src={youTubeEmbed(getYouTubeId(active.video_url) as string)}
+                title={active.caption}
+                className="w-full h-full"
+                allow="autoplay; encrypted-media; picture-in-picture"
+                allowFullScreen
+              />
+            ) : (
+              <video
+                src={mediaUrl(active.video_url)}
+                poster={active.poster_url ? mediaUrl(active.poster_url) : undefined}
+                className="w-full h-full object-contain"
+                autoPlay
+                controls
+                playsInline
+              />
+            )}
             <button
               type="button"
               aria-label="Close video"

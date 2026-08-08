@@ -117,12 +117,26 @@ def create_reel(
     show_on_home: bool = Form(True),
     show_on_pdp: bool = Form(True),
     is_published: bool = Form(True),
-    video_file: UploadFile = File(...),
+    video_file: Optional[UploadFile] = File(None),
+    video_link: Optional[str] = Form(None),
     poster_file: Optional[UploadFile] = File(None),
     db: Session = Depends(get_db),
     admin: User = Depends(get_current_admin_user),
 ):
-    if video_file.content_type not in ALLOWED_VIDEO_TYPES:
+    """Create a reel from either an uploaded video file OR an external
+    video link (YouTube / direct MP4 URL) — exactly one is required."""
+    video_link = (video_link or "").strip()
+
+    if not video_file and not video_link:
+        raise HTTPException(
+            status_code=400,
+            detail="Provide a video file or a video link (YouTube / MP4 URL).",
+        )
+    if video_link and not video_link.lower().startswith(("http://", "https://")):
+        raise HTTPException(status_code=400, detail="Video link must start with http(s)://")
+    if len(video_link) > 255:
+        raise HTTPException(status_code=400, detail="Video link is too long (max 255 chars).")
+    if video_file and video_file.content_type not in ALLOWED_VIDEO_TYPES:
         raise HTTPException(status_code=400, detail="Unsupported video type. Use MP4/WebM.")
     if poster_file and poster_file.content_type not in ALLOWED_IMAGE_TYPES:
         raise HTTPException(status_code=400, detail="Unsupported poster type. Use JPG/PNG/WebP.")
@@ -132,7 +146,8 @@ def create_reel(
         if not product:
             raise HTTPException(status_code=404, detail="Linked product not found")
 
-    video_url = _save_upload(video_file, "reel")
+    # Uploaded file wins when both are somehow sent
+    video_url = _save_upload(video_file, "reel") if video_file else video_link
     poster_url = _save_upload(poster_file, "poster") if poster_file else None
 
     reel = Reel(
