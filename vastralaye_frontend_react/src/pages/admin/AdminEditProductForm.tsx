@@ -599,7 +599,7 @@ export default function AdminEditProductForm({
                     <h3 className="text-[12px] uppercase tracking-[0.16em] font-semibold text-espresso">Product Images</h3>
                   </div>
                   {existingImagesLabel && (
-                    <span className="text-sm text-gray-600 bg-gray-200 px-3 py-1 rounded-full">
+                    <span className="text-[11px] font-semibold text-muted-foreground bg-espresso/5 px-2.5 py-0.5 rounded-full">
                       {existingImagesLabel}
                     </span>
                   )}
@@ -914,30 +914,30 @@ export default function AdminEditProductForm({
         </div>
 
         {/* Sticky Footer */}
-        <div className="sticky bottom-0 bg-white border-t border-gray-200 px-8 py-5 shadow-lg">
+        <div className="sticky bottom-0 bg-white border-t border-border px-8 py-5">
           <DialogFooter className="flex flex-row gap-3 sm:gap-4">
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={() => onOpenChange(false)} 
-              className="flex-1 h-11 border-gray-300 hover:bg-gray-50 font-medium"
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              className="flex-1 h-11 rounded-sm uppercase text-[11px] tracking-[0.12em]"
               disabled={loading}
             >
               Cancel
             </Button>
-            <Button 
+            <Button
               onClick={submit}
-              disabled={loading} 
-              className="flex-1 h-11 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold shadow-md hover:shadow-lg transition-all"
+              disabled={loading}
+              className="flex-1 h-11 bg-maroon text-ivory uppercase text-[11px] tracking-[0.12em] rounded-sm hover:bg-terracotta transition-colors"
             >
               {loading ? (
                 <>
-                  <RefreshCw className="animate-spin -ml-1 mr-2 h-5 w-5" />
+                  <RefreshCw className="animate-spin -ml-1 mr-2 h-4 w-4" />
                   Updating Product...
                 </>
               ) : (
                 <>
-                  <Check className="-ml-1 mr-2 h-5 w-5" />
+                  <Check className="-ml-1 mr-2 h-4 w-4" />
                   Update Product
                 </>
               )}
