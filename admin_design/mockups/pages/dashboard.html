@@ -1,0 +1,108 @@
+<!-- KPI ROW -->
+<div class="grid cols-4">
+  <div class="kpi">
+    <span class="ic m"><svg class="i" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 9v6M10 10.5h3a1.5 1.5 0 0 1 0 3h-2l3 1.5"/></svg></span>
+    <span class="spark"><svg viewBox="0 0 74 34" preserveAspectRatio="none"><polyline points="0,26 12,22 24,25 36,16 48,18 60,9 74,6" fill="none" stroke="#7A1F2B" stroke-width="2"/></svg></span>
+    <label>Total Revenue</label>
+    <div class="num">₹12.4L</div>
+    <div class="delta"><b class="up">▲ 18.2%</b> vs last month</div>
+  </div>
+  <div class="kpi">
+    <span class="ic g"><svg class="i" viewBox="0 0 24 24"><path d="M12 2l9 5v10l-9 5-9-5V7l9-5z"/><path d="M3 7l9 5 9-5M12 12v10"/></svg></span>
+    <span class="spark"><svg viewBox="0 0 74 34" preserveAspectRatio="none"><polyline points="0,24 12,20 24,22 36,14 48,17 60,10 74,8" fill="none" stroke="#C99A45" stroke-width="2"/></svg></span>
+    <label>Orders</label>
+    <div class="num">1,284</div>
+    <div class="delta"><b class="up">▲ 12.4%</b> vs last month</div>
+  </div>
+  <div class="kpi">
+    <span class="ic o"><svg class="i" viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="3.5"/><path d="M2.5 20c0-3.6 3-5.5 6.5-5.5s6.5 1.9 6.5 5.5"/><path d="M16 5.6a3.5 3.5 0 0 1 0 5.8M18.5 14.7c2 .8 3 2.5 3 5.3"/></svg></span>
+    <span class="spark"><svg viewBox="0 0 74 34" preserveAspectRatio="none"><polyline points="0,25 12,23 24,20 36,19 48,14 60,12 74,7" fill="none" stroke="#3E6B4F" stroke-width="2"/></svg></span>
+    <label>Customers</label>
+    <div class="num">8,214</div>
+    <div class="delta"><b class="up">▲ 5.1%</b> vs last month</div>
+  </div>
+  <div class="kpi">
+    <span class="ic i"><svg class="i" viewBox="0 0 24 24"><path d="M4 19V5M4 19h16"/><path d="M8 15l4-5 3 3 5-7"/></svg></span>
+    <span class="spark"><svg viewBox="0 0 74 34" preserveAspectRatio="none"><polyline points="0,14 12,16 24,13 36,18 48,16 60,20 74,18" fill="none" stroke="#C62828" stroke-width="2"/></svg></span>
+    <label>Avg. Order Value</label>
+    <div class="num">₹2,412</div>
+    <div class="delta"><b class="down">▼ 2.3%</b> vs last month</div>
+  </div>
+</div>
+
+<!-- CHARTS ROW -->
+<div class="grid cols-8-4">
+  <div class="card">
+    <div class="card-head">
+      <h3>Revenue Overview</h3>
+      <div style="display:flex;gap:12px;align-items:center">
+        <div class="legend"><span><i style="background:#7A1F2B"></i>Revenue</span><span><i style="background:#C99A45"></i>Prev. period</span></div>
+        <span class="range">Last 12 months ▾</span>
+      </div>
+    </div>
+    <svg class="areachart" viewBox="0 0 720 230" preserveAspectRatio="none">
+      <line x1="0" y1="45" x2="720" y2="45" stroke="#EFE7DB"/><line x1="0" y1="90" x2="720" y2="90" stroke="#EFE7DB"/>
+      <line x1="0" y1="135" x2="720" y2="135" stroke="#EFE7DB"/><line x1="0" y1="180" x2="720" y2="180" stroke="#EFE7DB"/>
+      <defs><linearGradient id="rev" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#7A1F2B" stop-opacity=".16"/><stop offset="1" stop-color="#7A1F2B" stop-opacity="0"/>
+      </linearGradient></defs>
+      <path d="M0,196 C40,186 70,178 110,168 C160,156 190,164 240,150 C290,136 320,108 370,112 C420,116 450,132 500,110 C550,88 580,60 630,56 C670,53 700,42 720,38 L720,230 L0,230 Z" fill="url(#rev)"/>
+      <path d="M0,196 C40,186 70,178 110,168 C160,156 190,164 240,150 C290,136 320,108 370,112 C420,116 450,132 500,110 C550,88 580,60 630,56 C670,53 700,42 720,38" fill="none" stroke="#7A1F2B" stroke-width="2.5"/>
+      <path d="M0,206 C50,198 90,196 140,186 C200,174 240,178 290,168 C340,158 380,140 430,142 C480,144 520,128 570,118 C620,108 670,96 720,90" fill="none" stroke="#C99A45" stroke-width="2" stroke-dasharray="5 5"/>
+      <circle cx="720" cy="38" r="4.5" fill="#7A1F2B" stroke="#fff" stroke-width="2"/>
+    </svg>
+    <div class="axis-x"><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span><span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span><span>Jul</span><span>Aug</span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h3>Orders by Category</h3><span class="range">30d ▾</span></div>
+    <div class="donut-wrap" style="flex-direction:column; gap:20px">
+      <div class="donut"><span class="c"><b>1,284</b><small>orders</small></span></div>
+      <ul class="dleg" style="width:100%">
+        <li><i style="background:#7A1F2B"></i>Sarees <span class="v">488</span><span class="s">38%</span></li>
+        <li><i style="background:#C99A45"></i>Suit Sets <span class="v">308</span><span class="s">24%</span></li>
+        <li><i style="background:#5C6B8A"></i>Kurtas <span class="v">205</span><span class="s">16%</span></li>
+        <li><i style="background:#B85C38"></i>Men <span class="v">154</span><span class="s">12%</span></li>
+        <li><i style="background:#3E6B4F"></i>Kids &amp; Other <span class="v">129</span><span class="s">10%</span></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- TABLES ROW -->
+<div class="grid cols-7-5">
+  <div class="card" style="padding:0">
+    <div class="card-head" style="padding:18px 22px 0; margin-bottom:12px">
+      <h3>Recent Orders</h3><a class="abtn ghost sm" href="#">View all →</a>
+    </div>
+    <table class="table">
+      <tr><th>Order</th><th>Customer</th><th class="num">Items</th><th class="num">Total</th><th>Payment</th><th>Status</th><th></th></tr>
+      <tr><td><b>#VL-1042</b><br><small style="color:var(--muted)">8 Aug, 10:24</small></td><td><div class="tcell"><span class="av2 tone-wine">AS</span><div>Ananya Sharma<small>Jaipur</small></div></div></td><td class="num">3</td><td class="num"><b>₹10,076</b></td><td><span class="chip ok">Paid · UPI</span></td><td><span class="chip warn">Pending</span></td><td><span class="dots">⋯</span></td></tr>
+      <tr><td><b>#VL-1041</b><br><small style="color:var(--muted)">8 Aug, 09:12</small></td><td><div class="tcell"><span class="av2 tone-indigo">RM</span><div>Ritika Mehta<small>Bengaluru</small></div></div></td><td class="num">1</td><td class="num"><b>₹4,999</b></td><td><span class="chip ok">Paid · Card</span></td><td><span class="chip info">Shipped</span></td><td><span class="dots">⋯</span></td></tr>
+      <tr><td><b>#VL-1040</b><br><small style="color:var(--muted)">7 Aug, 21:44</small></td><td><div class="tcell"><span class="av2 tone-teal">FK</span><div>Farhan Khan<small>Delhi</small></div></div></td><td class="num">2</td><td class="num"><b>₹3,798</b></td><td><span class="chip warn">COD</span></td><td><span class="chip info">In transit</span></td><td><span class="dots">⋯</span></td></tr>
+      <tr><td><b>#VL-1039</b><br><small style="color:var(--muted)">7 Aug, 18:03</small></td><td><div class="tcell"><span class="av2 tone-plum">MR</span><div>Meera Rao<small>Hyderabad</small></div></div></td><td class="num">4</td><td class="num"><b>₹12,396</b></td><td><span class="chip ok">Paid · UPI</span></td><td><span class="chip ok">Delivered</span></td><td><span class="dots">⋯</span></td></tr>
+      <tr><td><b>#VL-1038</b><br><small style="color:var(--muted)">7 Aug, 15:37</small></td><td><div class="tcell"><span class="av2 tone-rust">VP</span><div>Vikram Patel<small>Ahmedabad</small></div></div></td><td class="num">1</td><td class="num"><b>₹1,999</b></td><td><span class="chip err">Failed</span></td><td><span class="chip err">Cancelled</span></td><td><span class="dots">⋯</span></td></tr>
+      <tr><td><b>#VL-1037</b><br><small style="color:var(--muted)">7 Aug, 12:20</small></td><td><div class="tcell"><span class="av2 tone-sage">SN</span><div>Shalini Nair<small>Kochi</small></div></div></td><td class="num">2</td><td class="num"><b>₹5,698</b></td><td><span class="chip ok">Paid · UPI</span></td><td><span class="chip ok">Delivered</span></td><td><span class="dots">⋯</span></td></tr>
+    </table>
+  </div>
+
+  <div class="grid" style="gap:20px">
+    <div class="card">
+      <div class="card-head"><h3>Top Products</h3><span class="range">30d ▾</span></div>
+      <ul class="rowlist">
+        <li><span class="thumb tone-wine"></span><div class="t">Sindoor Banarasi Silk Saree<small>Sarees · ₹4,999</small></div><div class="v">212<small>sold · ₹10.6L</small></div></li>
+        <li><span class="thumb tone-plum"></span><div class="t">Jamun Designer Anarkali<small>Suit Sets · ₹2,799</small></div><div class="v">186<small>sold · ₹5.2L</small></div></li>
+        <li><span class="thumb tone-mustard"></span><div class="t">Haldi Hand-Block Kurta Set<small>Kurtas · ₹1,999</small></div><div class="v">154<small>sold · ₹3.1L</small></div></li>
+        <li><span class="thumb tone-teal"></span><div class="t">Peacock Cotton-Silk Saree<small>Sarees · ₹3,499</small></div><div class="v">121<small>sold · ₹4.2L</small></div></li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3>Low Stock Alerts</h3><span class="chip warn">6 items</span></div>
+      <ul class="rowlist">
+        <li><span class="alert-dot"></span><div class="t">Rosewood Chanderi Suit Set — M<small>SKU VL-CH-104</small></div><div class="v" style="color:var(--err)">3 left<small><a href="#" style="color:var(--maroon);text-decoration:underline">Restock</a></small></div></li>
+        <li><span class="alert-dot"></span><div class="t">Indigo Jamdani Cotton Saree<small>SKU VL-JM-052</small></div><div class="v" style="color:var(--err)">5 left<small><a href="#" style="color:var(--maroon);text-decoration:underline">Restock</a></small></div></li>
+        <li><span class="alert-dot"></span><div class="t">Terracotta Oxford Shirt — L<small>SKU VL-MN-311</small></div><div class="v" style="color:var(--warn)">8 left<small><a href="#" style="color:var(--maroon);text-decoration:underline">Restock</a></small></div></li>
+      </ul>
+    </div>
+  </div>
+</div>
