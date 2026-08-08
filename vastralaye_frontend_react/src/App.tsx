@@ -43,6 +43,9 @@ const AdminCoupons = lazy(() => import("@/pages/admin/AdminCoupons"));
 const AdminAnalytics = lazy(() => import("@/pages/admin/AdminAnalytics"));
 const AdminOrder = lazy(() => import("@/pages/admin/AdminOrder"));
 const AdminReels = lazy(() => import("@/pages/admin/AdminReels"));
+const AdminBanners = lazy(() => import("@/pages/admin/AdminBanners"));
+const AdminTestimonials = lazy(() => import("@/pages/admin/AdminTestimonials"));
+const AdminSettings = lazy(() => import("@/pages/admin/AdminSettings"));
 const Reviews = lazy(() => import("@/pages/admin/CustomerReviews"));
 import PrivacyPolicy from "@/pages/policy/PrivacyPolicy";
 import TermsAndConditions from "@/pages/policy/TermsConditions";
@@ -86,6 +89,9 @@ const AppContent = () => {
         <Route path="/admin/orders" element={<AdminLayout><AdminOrder /></AdminLayout>} />
         <Route path="/admin/reviews" element={<AdminLayout><Reviews /></AdminLayout>} />
         <Route path="/admin/reels" element={<AdminLayout><AdminReels /></AdminLayout>} />
+        <Route path="/admin/banners" element={<AdminLayout><AdminBanners /></AdminLayout>} />
+        <Route path="/admin/testimonials" element={<AdminLayout><AdminTestimonials /></AdminLayout>} />
+        <Route path="/admin/settings" element={<AdminLayout><AdminSettings /></AdminLayout>} />
 
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />

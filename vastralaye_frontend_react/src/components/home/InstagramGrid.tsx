@@ -2,8 +2,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { Instagram } from 'lucide-react';
 import { listProducts } from '@/api/apihelper';
 import { BASE_IMG, BASE_URL } from '@/config';
+import { useSiteSettings } from '@/hooks/use-site-settings';
 
-const INSTAGRAM_URL = 'https://instagram.com';
+const FALLBACK_INSTAGRAM_URL = 'https://instagram.com';
 
 const normalize = (img: any): string => {
   if (!img) return '';
@@ -23,6 +24,8 @@ const normalize = (img: any): string => {
  */
 const InstagramGrid = () => {
   const [products, setProducts] = useState<any[]>([]);
+  const settings = useSiteSettings();
+  const instagramUrl = settings.instagram_url || FALLBACK_INSTAGRAM_URL;
 
   useEffect(() => {
     let cancelled = false;
@@ -61,7 +64,7 @@ const InstagramGrid = () => {
           {tiles.map((src) => (
             <a
               key={src}
-              href={INSTAGRAM_URL}
+              href={instagramUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="group relative block aspect-square overflow-hidden rounded-sm bg-sand"

@@ -1,0 +1,49 @@
+from sqlalchemy import Column, Integer, String, Boolean, Float, Text, DateTime
+from sqlalchemy.sql import func
+from app.database import Base
+
+
+class HeroBanner(Base):
+    """Homepage hero slide managed from the admin panel."""
+
+    __tablename__ = "hero_banners"
+
+    id = Column(Integer, primary_key=True, index=True)
+    image_url = Column(String(255), nullable=False)
+    overline = Column(String(120), nullable=True)
+    title_line_1 = Column(String(160), nullable=False)
+    title_line_2 = Column(String(160), nullable=True)   # italic maroon accent line
+    description = Column(Text, nullable=True)
+    cta_primary_label = Column(String(60), nullable=True)
+    cta_primary_link = Column(String(255), nullable=True)
+    cta_secondary_label = Column(String(60), nullable=True)
+    cta_secondary_link = Column(String(255), nullable=True)
+    sort_order = Column(Integer, default=0)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+class Testimonial(Base):
+    """Homepage customer testimonial managed from the admin panel."""
+
+    __tablename__ = "testimonials"
+
+    id = Column(Integer, primary_key=True, index=True)
+    quote = Column(Text, nullable=False)
+    customer_name = Column(String(120), nullable=False)
+    city = Column(String(120), nullable=True)
+    rating = Column(Float, default=5.0)
+    image_url = Column(String(255), nullable=True)   # optional customer photo
+    sort_order = Column(Integer, default=0)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+class SiteSetting(Base):
+    """Key–value store for site-wide settings (social links, WhatsApp…)."""
+
+    __tablename__ = "site_settings"
+
+    id = Column(Integer, primary_key=True, index=True)
+    key = Column(String(80), unique=True, nullable=False, index=True)
+    value = Column(String(500), nullable=True)

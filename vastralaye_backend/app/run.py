@@ -115,6 +115,9 @@ app.include_router(reels.router)
 from app.routers import newsletter
 app.include_router(newsletter.router)
 
+from app.routers import site_content
+app.include_router(site_content.router)
+
 
 # ---------------------- Run the Server ----------------------
 if __name__ == "__main__":

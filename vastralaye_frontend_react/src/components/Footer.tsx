@@ -1,11 +1,14 @@
 import { Link } from 'react-router-dom';
-import { Instagram, Facebook, Twitter, MapPin, Phone, Mail } from 'lucide-react';
+import { Instagram, Facebook, Twitter, Youtube, MapPin, Phone, Mail } from 'lucide-react';
+import { useSiteSettings } from '@/hooks/use-site-settings';
 
 /**
  * Editorial dark footer (design.md §5.13) — espresso background,
  * gold accents, link columns covering all existing routes.
  */
 const Footer = () => {
+  const settings = useSiteSettings();
+
   const shopLinks = [
     { label: 'All Products', to: '/products' },
     { label: 'New Arrivals', to: '/new-arrivals' },
@@ -49,10 +52,14 @@ const Footer = () => {
               celebration — and every day in between.
             </p>
             <div className="flex gap-3.5">
+              {/* Links managed from Admin → Store Settings; defaults until configured */}
               {[
-                { icon: Instagram, href: 'https://instagram.com', label: 'Instagram' },
-                { icon: Facebook, href: 'https://facebook.com', label: 'Facebook' },
-                { icon: Twitter, href: 'https://twitter.com', label: 'Twitter' },
+                { icon: Instagram, href: settings.instagram_url || 'https://instagram.com', label: 'Instagram' },
+                { icon: Facebook, href: settings.facebook_url || 'https://facebook.com', label: 'Facebook' },
+                { icon: Twitter, href: settings.twitter_url || 'https://twitter.com', label: 'Twitter' },
+                ...(settings.youtube_url
+                  ? [{ icon: Youtube, href: settings.youtube_url, label: 'YouTube' }]
+                  : []),
               ].map(({ icon: Icon, href, label }) => (
                 <a
                   key={label}

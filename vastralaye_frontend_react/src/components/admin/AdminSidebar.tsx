@@ -11,6 +11,9 @@ import {
   MessageSquare,
   Clapperboard,
   ExternalLink,
+  GalleryHorizontal,
+  Quote,
+  Settings,
 } from 'lucide-react';
 import { useStore } from '@/contexts/StoreContext';
 import { cn } from '@/lib/utils';
@@ -50,6 +53,13 @@ const AdminSidebar = () => {
         { name: 'Categories', path: '/admin/categories', icon: <FolderTree className={ICON_CLASS} /> },
         { name: 'Coupons', path: '/admin/coupons', icon: <Tag className={ICON_CLASS} /> },
         { name: 'Reels', path: '/admin/reels', icon: <Clapperboard className={ICON_CLASS} /> },
+      ],
+    },
+    {
+      label: 'Content',
+      items: [
+        { name: 'Banners', path: '/admin/banners', icon: <GalleryHorizontal className={ICON_CLASS} /> },
+        { name: 'Testimonials', path: '/admin/testimonials', icon: <Quote className={ICON_CLASS} /> },
       ],
     },
     {
@@ -129,6 +139,10 @@ const AdminSidebar = () => {
 
       {/* Footer */}
       <div className="border-t border-ivory/10 pb-4 pt-2">
+        <Link to="/admin/settings" className={itemClass(isActive('/admin/settings'))}>
+          <Settings className={ICON_CLASS} />
+          <span>Store Settings</span>
+        </Link>
         <Link to="/" className={itemClass(false)}>
           <ExternalLink className={ICON_CLASS} />
           <span>View store</span>
