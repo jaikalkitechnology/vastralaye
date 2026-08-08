@@ -971,69 +971,58 @@ const AdminCoupons = () => {
                       {paginatedCoupons.length > 0 ? (
                         paginatedCoupons.map((coupon) => {
                           const status = getCouponStatus(coupon);
-                          const StatusIcon = status.icon;
+                          const isMuted = status.label === 'Expired' || status.label === 'Inactive';
                           return (
-                            <TableRow key={coupon.id} className="hover:bg-purple-50/50 transition-colors border-b border-gray-100">
-                              <TableCell>
-                                <div className="flex items-center gap-3">
-                                  <code className="font-mono font-bold text-purple-700 text-base bg-purple-50 px-3 py-1.5 rounded-lg">
+                            <TableRow key={coupon.id} className={`hover:bg-[#FBF8F3] transition-colors border-border ${isMuted ? 'opacity-60' : ''}`}>
+                              <TableCell className="px-3 py-3 text-[13px]">
+                                <div className="flex items-center gap-2">
+                                  <code className="font-mono text-[12px] font-semibold text-espresso bg-[#F7F4EF] border border-border px-2 py-0.5 rounded">
                                     {coupon.code}
                                   </code>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-8 w-8 hover:bg-purple-100"
+                                  <button
+                                    type="button"
+                                    className="w-6 h-6 inline-flex items-center justify-center rounded text-muted-foreground hover:text-maroon transition-colors"
                                     onClick={() => handleCopyCode(coupon.code)}
                                     title="Copy code"
                                   >
-                                    <Copy className="h-4 w-4 text-purple-600" />
-                                  </Button>
+                                    <Copy className="h-3.5 w-3.5" />
+                                  </button>
                                 </div>
                               </TableCell>
-                              <TableCell className="max-w-[250px]">
-                                <p className="text-gray-700 truncate">{coupon.description}</p>
+                              <TableCell className="px-3 py-3 text-[13px] max-w-[250px]">
+                                <p className="text-espresso truncate">{coupon.description}</p>
                               </TableCell>
-                              <TableCell>
-                                <div className="flex items-center gap-2">
-                                  <div className={`p-2 rounded-lg ${
-                                    coupon.discountType === 'percentage' 
-                                      ? 'bg-green-100' 
-                                      : 'bg-blue-100'
-                                  }`}>
-                                    {coupon.discountType === 'percentage' ? (
-                                      <Percent className="h-4 w-4 text-green-600" />
-                                    ) : (
-                                      <DollarSign className="h-4 w-4 text-blue-600" />
-                                    )}
-                                  </div>
-                                  <span className="font-bold text-gray-900">
-                                    {coupon.discountValue}
-                                    {coupon.discountType === 'percentage' ? '%' : '₹'}
-                                  </span>
-                                </div>
+                              <TableCell className="px-3 py-3 text-[13px] text-right">
+                                <span className="font-semibold text-espresso inline-flex items-center gap-1 justify-end">
+                                  {coupon.discountType === 'percentage' ? (
+                                    <Percent className="h-3 w-3 text-muted-foreground" />
+                                  ) : (
+                                    <span className="text-muted-foreground">₹</span>
+                                  )}
+                                  {coupon.discountValue}
+                                  {coupon.discountType === 'percentage' ? '%' : ''}
+                                </span>
                               </TableCell>
-                              <TableCell>
-                                <span className="text-gray-700">
+                              <TableCell className="px-3 py-3 text-[13px] text-right">
+                                <span className="text-espresso">
                                   {coupon.minimumPurchase > 0 ? `₹${coupon.minimumPurchase.toLocaleString()}` : '—'}
                                 </span>
                               </TableCell>
-                              <TableCell>
+                              <TableCell className="px-3 py-3 text-[13px]">
                                 <div className="flex items-center gap-2">
-                                  <Calendar className="h-4 w-4 text-gray-400" />
-                                  <span className="text-gray-700">
+                                  <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
+                                  <span className="text-espresso whitespace-nowrap">
                                     {new Date(coupon.validTo).toLocaleDateString()}
                                   </span>
                                 </div>
                               </TableCell>
-                              <TableCell>
+                              <TableCell className="px-3 py-3 text-[13px]">
                                 <div className="flex items-center gap-2">
-                                  <div className="flex-1">
-                                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                                  <div className="w-[110px]">
+                                    <div className="h-1.5 bg-sand rounded-full overflow-hidden">
                                       <div
-                                        className={`h-full transition-all ${
-                                          coupon.usedCount >= coupon.maxUses
-                                            ? 'bg-red-500'
-                                            : 'bg-gradient-to-r from-purple-500 to-pink-500'
+                                        className={`h-full rounded-full transition-all ${
+                                          coupon.usedCount >= coupon.maxUses ? 'bg-sale' : 'bg-gold'
                                         }`}
                                         style={{
                                           width: `${Math.min((coupon.usedCount / coupon.maxUses) * 100, 100)}%`,
@@ -1041,40 +1030,32 @@ const AdminCoupons = () => {
                                       />
                                     </div>
                                   </div>
-                                  <span className="text-sm font-medium text-gray-700 min-w-[60px]">
+                                  <span className="text-[11.5px] text-muted-foreground min-w-[52px]">
                                     {coupon.usedCount}/{coupon.maxUses}
                                   </span>
                                 </div>
                               </TableCell>
-                              <TableCell>
-                                <Badge
-                                  variant={status.variant}
-                                  className="flex items-center gap-1 w-fit font-semibold"
-                                >
-                                  <StatusIcon className="h-3 w-3" />
-                                  {status.label}
-                                </Badge>
+                              <TableCell className="px-3 py-3 text-[13px]">
+                                <StatusChip tint={status.tint} label={status.label} />
                               </TableCell>
-                              <TableCell className="text-right">
-                                <div className="flex gap-2 justify-end">
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
+                              <TableCell className="px-3 py-3 text-[13px] text-right">
+                                <div className="flex gap-1.5 justify-end">
+                                  <button
+                                    type="button"
+                                    title="Edit coupon"
                                     onClick={() => handleEditClick(coupon)}
-                                    className="hover:bg-purple-50 hover:text-purple-600 hover:border-purple-300"
+                                    className="w-7 h-7 border border-border rounded-[5px] inline-flex items-center justify-center text-muted-foreground bg-white hover:text-espresso hover:border-espresso transition-colors"
                                   >
-                                    <Pencil className="h-3 w-3 mr-1" />
-                                    Edit
-                                  </Button>
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
+                                    <Pencil className="h-3.5 w-3.5" />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    title="Delete coupon"
                                     onClick={() => handleDeleteClick(coupon)}
-                                    className="hover:bg-red-50 hover:text-red-600 hover:border-red-300"
+                                    className="w-7 h-7 border border-sale/35 rounded-[5px] inline-flex items-center justify-center text-sale bg-white hover:bg-sale/5 transition-colors"
                                   >
-                                    <Trash2 className="h-3 w-3 mr-1" />
-                                    Delete
-                                  </Button>
+                                    <Trash2 className="h-3.5 w-3.5" />
+                                  </button>
                                 </div>
                               </TableCell>
                             </TableRow>
@@ -1084,12 +1065,12 @@ const AdminCoupons = () => {
                         <TableRow>
                           <TableCell colSpan={8} className="text-center py-16">
                             <div className="flex flex-col items-center justify-center gap-4">
-                              <div className="bg-gradient-to-br from-purple-100 to-pink-100 p-6 rounded-full">
-                                <Tag className="h-16 w-16 text-purple-600" />
+                              <div className="bg-espresso/5 p-6 rounded-full">
+                                <Tag className="h-10 w-10 text-muted-foreground" />
                               </div>
                               <div>
-                                <p className="text-lg font-semibold text-gray-900 mb-1">No coupons found</p>
-                                <p className="text-sm text-gray-500">
+                                <p className="font-serif text-lg font-medium text-espresso mb-1">No coupons found</p>
+                                <p className="text-[13px] text-muted-foreground">
                                   {searchTerm || filterType !== 'all'
                                     ? 'Try adjusting your search or filters'
                                     : 'Get started by creating your first coupon'}
@@ -1098,7 +1079,7 @@ const AdminCoupons = () => {
                               {!searchTerm && filterType === 'all' && (
                                 <Button
                                   onClick={() => setIsAddDialogOpen(true)}
-                                  className="mt-2 bg-gradient-to-r from-purple-600 to-pink-600"
+                                  className="mt-2 bg-maroon text-ivory uppercase text-[11px] tracking-[0.12em] px-5 py-2.5 rounded-sm hover:bg-terracotta"
                                 >
                                   <Plus className="mr-2 h-4 w-4" /> Create First Coupon
                                 </Button>
@@ -1113,7 +1094,7 @@ const AdminCoupons = () => {
 
                 {/* Pagination */}
                 {totalPages > 1 && (
-                  <div className="border-t p-4 bg-gray-50">
+                  <div className="border-t border-border p-4 bg-[#FBF8F3]">
                     <Pagination>
                       <PaginationContent>
                         <PaginationItem>
@@ -1150,27 +1131,27 @@ const AdminCoupons = () => {
                 )}
               </>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
 
       {/* Add Coupon Dialog */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
         <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-              <Sparkles className="h-6 w-6 text-purple-600" />
+            <DialogTitle className="font-serif text-xl font-medium text-espresso flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-maroon" />
               Create New Coupon
             </DialogTitle>
-            <p className="text-sm text-gray-600">Add a new discount coupon for your customers. All fields marked with * are required.</p>
+            <p className="text-[13px] text-muted-foreground">Add a new discount coupon for your customers. All fields marked with * are required.</p>
           </DialogHeader>
 
           {error && (
-            <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4 flex items-start gap-3">
-              <AlertCircle className="h-5 w-5 text-red-600 mt-0.5 flex-shrink-0" />
+            <div className="bg-sale/5 border border-sale/30 rounded-md p-4 flex items-start gap-3">
+              <AlertCircle className="h-5 w-5 text-sale mt-0.5 flex-shrink-0" />
               <div>
-                <p className="text-sm font-semibold text-red-800">Error</p>
-                <p className="text-sm text-red-600">{error}</p>
+                <p className="text-sm font-semibold text-sale">Error</p>
+                <p className="text-sm text-sale/90">{error}</p>
               </div>
             </div>
           )}
@@ -1184,19 +1165,19 @@ const AdminCoupons = () => {
                   name="code"
                   render={({ field }) => (
                     <FormItem className="flex-1">
-                      <FormLabel className="text-sm font-semibold text-gray-700">Coupon Code *</FormLabel>
+                      <FormLabel className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">Coupon Code *</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="SUMMER2024"
                           {...field}
-                          className={`h-11 font-mono ${validationErrors.code ? 'border-red-500' : ''}`}
+                          className={`h-10 bg-white rounded-sm border-border text-[13px] focus:border-maroon focus-visible:ring-0 focus-visible:ring-offset-0 font-mono ${validationErrors.code ? 'border-sale' : ''}`}
                           onChange={(e) => {
                             field.onChange(e.target.value.toUpperCase());
                           }}
                         />
                       </FormControl>
                       {validationErrors.code && (
-                        <div className="flex items-center gap-2 text-red-600 text-sm">
+                        <div className="flex items-center gap-2 text-sale text-sm">
                           <AlertCircle className="h-4 w-4" />
                           {validationErrors.code}
                         </div>
@@ -1209,7 +1190,7 @@ const AdminCoupons = () => {
                   type="button"
                   variant="outline"
                   onClick={generateCouponCode}
-                  className="mt-8 h-11 bg-gradient-to-r from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 border-purple-200"
+                  className="mt-8 h-10 rounded-sm"
                   title="Generate random code"
                 >
                   <Sparkles className="h-4 w-4" />
@@ -1222,9 +1203,9 @@ const AdminCoupons = () => {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-sm font-semibold text-gray-700">Description *</FormLabel>
+                    <FormLabel className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">Description *</FormLabel>
                     <FormControl>
-                      <Input placeholder="Summer sale discount" {...field} className="h-11" />
+                      <Input placeholder="Summer sale discount" {...field} className="h-10 bg-white rounded-sm border-border text-[13px] focus:border-maroon focus-visible:ring-0 focus-visible:ring-offset-0" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -1238,10 +1219,10 @@ const AdminCoupons = () => {
                   name="discount_type"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-semibold text-gray-700">Discount Type *</FormLabel>
+                      <FormLabel className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">Discount Type *</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
-                          <SelectTrigger className="h-11">
+                          <SelectTrigger className="h-10 bg-white rounded-sm border-border text-[13px] focus:border-maroon focus-visible:ring-0 focus-visible:ring-offset-0 focus:ring-0 focus:ring-offset-0">
                             <SelectValue placeholder="Select type" />
                           </SelectTrigger>
                         </FormControl>
@@ -1270,18 +1251,18 @@ const AdminCoupons = () => {
                   name="discount_value"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-semibold text-gray-700">Discount Value *</FormLabel>
+                      <FormLabel className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">Discount Value *</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
                           placeholder="20"
                           {...field}
-                          className={`h-11 ${validationErrors.discount_value ? 'border-red-500' : ''}`}
+                          className={`h-10 bg-white rounded-sm border-border text-[13px] focus:border-maroon focus-visible:ring-0 focus-visible:ring-offset-0 ${validationErrors.discount_value ? 'border-sale' : ''}`}
                           onChange={(e) => field.onChange(e.target.value === '' ? '' : Number(e.target.value))}
                         />
                       </FormControl>
                       {validationErrors.discount_value && (
-                        <div className="flex items-center gap-2 text-red-600 text-sm">
+                        <div className="flex items-center gap-2 text-sale text-sm">
                           <AlertCircle className="h-4 w-4" />
                           {validationErrors.discount_value}
                         </div>
@@ -1299,18 +1280,18 @@ const AdminCoupons = () => {
                   name="minimum_purchase"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-semibold text-gray-700">Minimum Purchase (₹)</FormLabel>
+                      <FormLabel className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">Minimum Purchase (₹)</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
                           placeholder="0"
                           {...field}
-                          className={`h-11 ${validationErrors.minimum_purchase ? 'border-red-500' : ''}`}
+                          className={`h-10 bg-white rounded-sm border-border text-[13px] focus:border-maroon focus-visible:ring-0 focus-visible:ring-offset-0 ${validationErrors.minimum_purchase ? 'border-sale' : ''}`}
                           onChange={(e) => field.onChange(e.target.value === '' ? '' : Number(e.target.value))}
                         />
                       </FormControl>
                       {validationErrors.minimum_purchase && (
-                        <div className="flex items-center gap-2 text-red-600 text-sm">
+                        <div className="flex items-center gap-2 text-sale text-sm">
                           <AlertCircle className="h-4 w-4" />
                           {validationErrors.minimum_purchase}
                         </div>
@@ -1325,13 +1306,13 @@ const AdminCoupons = () => {
                   name="max_uses"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-semibold text-gray-700">Max Uses *</FormLabel>
+                      <FormLabel className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">Max Uses *</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
                           placeholder="100"
                           {...field}
-                          className="h-11"
+                          className="h-10 bg-white rounded-sm border-border text-[13px] focus:border-maroon focus-visible:ring-0 focus-visible:ring-offset-0"
                           onChange={(e) => field.onChange(e.target.value === '' ? '' : Number(e.target.value))}
                         />
                       </FormControl>
@@ -1348,12 +1329,12 @@ const AdminCoupons = () => {
                   name="valid_from"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-semibold text-gray-700">Valid From *</FormLabel>
+                      <FormLabel className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">Valid From *</FormLabel>
                       <FormControl>
                         <Input
                           type="date"
                           {...field}
-                          className="h-11"
+                          className="h-10 bg-white rounded-sm border-border text-[13px] focus:border-maroon focus-visible:ring-0 focus-visible:ring-offset-0"
                           min={new Date().toISOString().split('T')[0]}
                         />
                       </FormControl>
@@ -1367,12 +1348,12 @@ const AdminCoupons = () => {
                   name="valid_to"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-semibold text-gray-700">Valid To *</FormLabel>
+                      <FormLabel className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">Valid To *</FormLabel>
                       <FormControl>
                         <Input
                           type="date"
                           {...field}
-                          className="h-11"
+                          className="h-10 bg-white rounded-sm border-border text-[13px] focus:border-maroon focus-visible:ring-0 focus-visible:ring-offset-0"
                           min={addForm.watch('valid_from') || new Date().toISOString().split('T')[0]}
                         />
                       </FormControl>
@@ -1387,10 +1368,10 @@ const AdminCoupons = () => {
                 control={addForm.control}
                 name="active"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-xl border-2 p-4 bg-gray-50">
+                  <FormItem className="flex flex-row items-center justify-between rounded-md border border-border p-4 bg-[#FBF8F3]">
                     <div className="space-y-0.5">
-                      <FormLabel className="text-base font-semibold">Active</FormLabel>
-                      <p className="text-sm text-gray-500">Enable this coupon for immediate use</p>
+                      <FormLabel className="text-[13px] font-semibold text-espresso">Active</FormLabel>
+                      <p className="text-[12px] text-muted-foreground">Enable this coupon for immediate use</p>
                     </div>
                     <FormControl>
                       <Switch
@@ -1408,14 +1389,14 @@ const AdminCoupons = () => {
                   variant="outline"
                   onClick={() => setIsAddDialogOpen(false)}
                   disabled={isSubmitting}
-                  className="h-11"
+                  className="h-10 rounded-sm"
                 >
                   Cancel
                 </Button>
                 <Button 
                   type="submit" 
                   disabled={isSubmitting}
-                  className="h-11 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                  className="h-10 bg-maroon text-ivory uppercase text-[11px] tracking-[0.12em] rounded-sm hover:bg-terracotta"
                 >
                   {isSubmitting ? (
                     <>
@@ -1439,19 +1420,19 @@ const AdminCoupons = () => {
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-              <Pencil className="h-6 w-6 text-purple-600" />
+            <DialogTitle className="font-serif text-xl font-medium text-espresso flex items-center gap-2">
+              <Pencil className="h-5 w-5 text-maroon" />
               Edit Coupon
             </DialogTitle>
-            <p className="text-sm text-gray-600">Modify the coupon details below.</p>
+            <p className="text-[13px] text-muted-foreground">Modify the coupon details below.</p>
           </DialogHeader>
 
           {error && (
-            <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4 flex items-start gap-3">
-              <AlertCircle className="h-5 w-5 text-red-600 mt-0.5 flex-shrink-0" />
+            <div className="bg-sale/5 border border-sale/30 rounded-md p-4 flex items-start gap-3">
+              <AlertCircle className="h-5 w-5 text-sale mt-0.5 flex-shrink-0" />
               <div>
-                <p className="text-sm font-semibold text-red-800">Error</p>
-                <p className="text-sm text-red-600">{error}</p>
+                <p className="text-sm font-semibold text-sale">Error</p>
+                <p className="text-sm text-sale/90">{error}</p>
               </div>
             </div>
           )}
@@ -1463,19 +1444,19 @@ const AdminCoupons = () => {
                 name="code"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-sm font-semibold text-gray-700">Coupon Code *</FormLabel>
+                    <FormLabel className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">Coupon Code *</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="SUMMER2024"
                         {...field}
-                        className={`h-11 font-mono ${validationErrors.code ? 'border-red-500' : ''}`}
+                        className={`h-10 bg-white rounded-sm border-border text-[13px] focus:border-maroon focus-visible:ring-0 focus-visible:ring-offset-0 font-mono ${validationErrors.code ? 'border-sale' : ''}`}
                         onChange={(e) => {
                           field.onChange(e.target.value.toUpperCase());
                         }}
                       />
                     </FormControl>
                     {validationErrors.code && (
-                      <div className="flex items-center gap-2 text-red-600 text-sm">
+                      <div className="flex items-center gap-2 text-sale text-sm">
                         <AlertCircle className="h-4 w-4" />
                         {validationErrors.code}
                       </div>
@@ -1490,9 +1471,9 @@ const AdminCoupons = () => {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-sm font-semibold text-gray-700">Description *</FormLabel>
+                    <FormLabel className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">Description *</FormLabel>
                     <FormControl>
-                      <Input placeholder="Summer sale discount" {...field} className="h-11" />
+                      <Input placeholder="Summer sale discount" {...field} className="h-10 bg-white rounded-sm border-border text-[13px] focus:border-maroon focus-visible:ring-0 focus-visible:ring-offset-0" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -1505,10 +1486,10 @@ const AdminCoupons = () => {
                   name="discount_type"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-semibold text-gray-700">Discount Type *</FormLabel>
+                      <FormLabel className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">Discount Type *</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
-                          <SelectTrigger className="h-11">
+                          <SelectTrigger className="h-10 bg-white rounded-sm border-border text-[13px] focus:border-maroon focus-visible:ring-0 focus-visible:ring-offset-0 focus:ring-0 focus:ring-offset-0">
                             <SelectValue placeholder="Select type" />
                           </SelectTrigger>
                         </FormControl>
@@ -1537,18 +1518,18 @@ const AdminCoupons = () => {
                   name="discount_value"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-semibold text-gray-700">Discount Value *</FormLabel>
+                      <FormLabel className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">Discount Value *</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
                           placeholder="20"
                           {...field}
-                          className={`h-11 ${validationErrors.discount_value ? 'border-red-500' : ''}`}
+                          className={`h-10 bg-white rounded-sm border-border text-[13px] focus:border-maroon focus-visible:ring-0 focus-visible:ring-offset-0 ${validationErrors.discount_value ? 'border-sale' : ''}`}
                           onChange={(e) => field.onChange(e.target.value === '' ? '' : Number(e.target.value))}
                         />
                       </FormControl>
                       {validationErrors.discount_value && (
-                        <div className="flex items-center gap-2 text-red-600 text-sm">
+                        <div className="flex items-center gap-2 text-sale text-sm">
                           <AlertCircle className="h-4 w-4" />
                           {validationErrors.discount_value}
                         </div>
@@ -1565,18 +1546,18 @@ const AdminCoupons = () => {
                   name="minimum_purchase"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-semibold text-gray-700">Minimum Purchase (₹)</FormLabel>
+                      <FormLabel className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">Minimum Purchase (₹)</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
                           placeholder="0"
                           {...field}
-                          className={`h-11 ${validationErrors.minimum_purchase ? 'border-red-500' : ''}`}
+                          className={`h-10 bg-white rounded-sm border-border text-[13px] focus:border-maroon focus-visible:ring-0 focus-visible:ring-offset-0 ${validationErrors.minimum_purchase ? 'border-sale' : ''}`}
                           onChange={(e) => field.onChange(e.target.value === '' ? '' : Number(e.target.value))}
                         />
                       </FormControl>
                       {validationErrors.minimum_purchase && (
-                        <div className="flex items-center gap-2 text-red-600 text-sm">
+                        <div className="flex items-center gap-2 text-sale text-sm">
                           <AlertCircle className="h-4 w-4" />
                           {validationErrors.minimum_purchase}
                         </div>
@@ -1591,13 +1572,13 @@ const AdminCoupons = () => {
                   name="max_uses"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-semibold text-gray-700">Max Uses *</FormLabel>
+                      <FormLabel className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">Max Uses *</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
                           placeholder="100"
                           {...field}
-                          className="h-11"
+                          className="h-10 bg-white rounded-sm border-border text-[13px] focus:border-maroon focus-visible:ring-0 focus-visible:ring-offset-0"
                           onChange={(e) => field.onChange(e.target.value === '' ? '' : Number(e.target.value))}
                         />
                       </FormControl>
@@ -1613,9 +1594,9 @@ const AdminCoupons = () => {
                   name="valid_from"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-semibold text-gray-700">Valid From *</FormLabel>
+                      <FormLabel className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">Valid From *</FormLabel>
                       <FormControl>
-                        <Input type="date" {...field} className="h-11" />
+                        <Input type="date" {...field} className="h-10 bg-white rounded-sm border-border text-[13px] focus:border-maroon focus-visible:ring-0 focus-visible:ring-offset-0" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -1627,12 +1608,12 @@ const AdminCoupons = () => {
                   name="valid_to"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-semibold text-gray-700">Valid To *</FormLabel>
+                      <FormLabel className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">Valid To *</FormLabel>
                       <FormControl>
                         <Input
                           type="date"
                           {...field}
-                          className="h-11"
+                          className="h-10 bg-white rounded-sm border-border text-[13px] focus:border-maroon focus-visible:ring-0 focus-visible:ring-offset-0"
                           min={editForm.watch('valid_from')}
                         />
                       </FormControl>
@@ -1646,10 +1627,10 @@ const AdminCoupons = () => {
                 control={editForm.control}
                 name="active"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-xl border-2 p-4 bg-gray-50">
+                  <FormItem className="flex flex-row items-center justify-between rounded-md border border-border p-4 bg-[#FBF8F3]">
                     <div className="space-y-0.5">
-                      <FormLabel className="text-base font-semibold">Active</FormLabel>
-                      <p className="text-sm text-gray-500">Enable this coupon for immediate use</p>
+                      <FormLabel className="text-[13px] font-semibold text-espresso">Active</FormLabel>
+                      <p className="text-[12px] text-muted-foreground">Enable this coupon for immediate use</p>
                     </div>
                     <FormControl>
                       <Switch
@@ -1667,14 +1648,14 @@ const AdminCoupons = () => {
                   variant="outline"
                   onClick={() => setIsEditDialogOpen(false)}
                   disabled={isSubmitting}
-                  className="h-11"
+                  className="h-10 rounded-sm"
                 >
                   Cancel
                 </Button>
                 <Button 
                   type="submit" 
                   disabled={isSubmitting}
-                  className="h-11 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                  className="h-10 bg-maroon text-ivory uppercase text-[11px] tracking-[0.12em] rounded-sm hover:bg-terracotta"
                 >
                   {isSubmitting ? (
                     <>
@@ -1698,12 +1679,12 @@ const AdminCoupons = () => {
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="flex items-center gap-2 text-xl">
-              <AlertCircle className="h-6 w-6 text-red-600" />
+            <AlertDialogTitle className="flex items-center gap-2 font-serif text-xl font-medium text-espresso">
+              <AlertCircle className="h-5 w-5 text-sale" />
               Delete Coupon?
             </AlertDialogTitle>
-            <p className="text-sm text-gray-600 pt-2">
-              This action cannot be undone. This will permanently delete the coupon <span className="font-mono font-bold text-purple-700">"{currentCoupon?.code}"</span> and remove it from our servers.
+            <p className="text-[13px] text-muted-foreground pt-2">
+              This action cannot be undone. This will permanently delete the coupon <span className="font-mono font-semibold text-maroon">"{currentCoupon?.code}"</span> and remove it from our servers.
             </p>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -1711,7 +1692,7 @@ const AdminCoupons = () => {
             <AlertDialogAction
               onClick={handleDeleteCoupon}
               disabled={isSubmitting}
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-sale text-ivory uppercase text-[11px] tracking-[0.12em] rounded-sm hover:bg-sale/90"
             >
               {isSubmitting ? (
                 <>

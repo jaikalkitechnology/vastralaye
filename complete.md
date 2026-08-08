@@ -1,5 +1,24 @@
 # complete.md — Design Implementation: What's Done
 
+## Round 3 — Full pending-list implementation (8 parallel restyle passes)
+
+All remaining `design.md` / `admin_design.md` page work has been implemented. Every pass was
+visual-only (data fetching, handlers, state and API logic preserved), verified with
+`tsc` (zero new errors; project total dropped 109 → 88) and a passing production build.
+
+| Workstream | What shipped |
+|---|---|
+| **NavBar (full)** | Logo block with gold "Handcrafted India" subtitle, uppercase tracked links with gold underlines, restyled mega menu/search/mobile drawer, maroon count badges |
+| **Product detail page** | Serif title + price block, bordered gallery with **product-video thumbnail** (plays `video_url`), square size/colour swatches, quantity stepper, maroon CTAs, 3-cell trust row, accordion detail rows, restyled related products + reviews, **sticky mobile add-to-cart bar** |
+| **Listing pages** | ProductsPage / CategoryPage / AllCategoriesPage / ProductGrid / FilterSidebar: serif page heads + breadcrumbs, flat accordion filters with maroon checkboxes and espresso active-filter pills, arch category cards, roomy 2/3/4-col grid, minimal pagination |
+| **Purchase flow** | CartPage (flat rows, sticky summary, restyled coupon/payment/QR/success modals), WishlistPage cards in the product-card language, Checkout with maroon-numbered sections, "Shukriya!" OrderConfirmation, token TrackOrder timeline |
+| **Auth + account** | Login/Register **split maroon brand-panel layout** (3-step register wizard preserved), forgot/reset, profile/orders/settings/invoices with status chips (invoice PDF template byte-identical), user sidebar with gold active rail |
+| **Admin Phases A+B** | Espresso sidebar with grouped gold sections (**Analytics re-enabled**), new `AdminTopbar`, ivory-canvas `AdminLayout` (with nest-guard fixing legacy double-wrapping), redesigned `StatsCard`, shared Recharts brand theme, **dashboard + analytics wired to the real admin endpoints** (`admin_stats`, monthly/daily orders, top customers, recent orders) with mock data as automatic fallback |
+| **Admin Phases C+D** | Orders/Products/EditProductForm/Categories/Coupons/Users/Reviews: §3.4 status-chip system everywhere, spec tables (thumbs, right-aligned numerics, icon actions), coupons usage bars, categories image-card grid, review moderation cards with gold-bordered admin replies, all dialogs restyled; fixed broken dynamic Tailwind classes in the product form |
+| **Static pages + backend hardening** | About/Contact/FAQ + six policy pages on the editorial typography system (MUI → tokens, content verbatim, EmailJS untouched); backend `DATABASE_URL`, PhonePe keys, SMTP creds and `CORS_ALLOW_ORIGINS` now **env-overridable** with current values as non-breaking defaults; SQL echo off by default |
+
+---
+
 Implementation of [`design.md`](design.md) / [`admin_design.md`](admin_design.md) in the actual codebase.
 Status: ✅ shipped in this branch · verified with `npm run build` (passes) and Python syntax checks.
 Remaining work is tracked in [`pending.md`](pending.md).
