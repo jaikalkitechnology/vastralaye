@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { api } from '@/api/api';
 import { mediaUrl, getYouTubeId, youTubeThumb, youTubeEmbed } from '@/lib/media';
 import { Play, X } from 'lucide-react';
@@ -9,22 +9,25 @@ interface StickyReelVideoProps {
   fallbackVideoUrl?: string | null;
 }
 
-/** Page scroll depth after which the mini player appears. */
-const SHOW_AFTER_PX = 480;
-
 /**
  * Sticky floating reel on the product page — a small 9:16 player
- * (bottom-left) that appears when the shopper scrolls down past the
- * gallery and slides away when they scroll back up. Tap to expand into
- * the full player; ✕ dismisses it for this page view.
+ * (bottom-left). Visible while browsing; hides when the shopper scrolls
+ * DOWN and reappears when they scroll UP. Tapping expands into the full
+ * player and the video CONTINUES from the same position (and continues
+ * again in the mini player after closing). ✕ dismisses for this page view.
  */
 const StickyReelVideo = ({ productId, fallbackVideoUrl }: StickyReelVideoProps) => {
   const [videoUrl, setVideoUrl] = useState('');
   const [posterUrl, setPosterUrl] = useState('');
   const [caption, setCaption] = useState('');
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(true);
   const [dismissed, setDismissed] = useState(false);
   const [expanded, setExpanded] = useState(false);
+
+  const miniVideoRef = useRef<HTMLVideoElement>(null);
+  const fullVideoRef = useRef<HTMLVideoElement>(null);
+  /** Playback position carried between the mini and expanded players. */
+  const resumeAtRef = useRef(0);
 
   /* Pick the product's first reel; fall back to the product's own video. */
   useEffect(() => {
@@ -50,13 +53,43 @@ const StickyReelVideo = ({ productId, fallbackVideoUrl }: StickyReelVideoProps) 
     };
   }, [productId, fallbackVideoUrl]);
 
-  /* Show when scrolled down past the gallery; hide when scrolled back up. */
+  /* Direction-aware visibility: scrolling DOWN hides the reel,
+     scrolling UP shows it again (always shown near the top). */
   useEffect(() => {
-    const onScroll = () => setVisible(window.scrollY > SHOW_AFTER_PX);
-    onScroll();
+    let lastY = window.scrollY;
+    const onScroll = () => {
+      const y = window.scrollY;
+      const delta = y - lastY;
+      if (Math.abs(delta) < 8) return; // ignore jitter
+      if (y < 120) setVisible(true);
+      else setVisible(delta < 0);
+      lastY = y;
+    };
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
+
+  const openExpanded = () => {
+    resumeAtRef.current = miniVideoRef.current?.currentTime || 0;
+    setExpanded(true);
+  };
+
+  const closeExpanded = () => {
+    resumeAtRef.current = fullVideoRef.current?.currentTime || resumeAtRef.current;
+    setExpanded(false);
+  };
+
+  /* When collapsing, continue the mini player from where the full player was. */
+  useEffect(() => {
+    if (!expanded && miniVideoRef.current && resumeAtRef.current > 0) {
+      try {
+        miniVideoRef.current.currentTime = resumeAtRef.current;
+        miniVideoRef.current.play().catch(() => {});
+      } catch {
+        /* ignore seek errors */
+      }
+    }
+  }, [expanded]);
 
   if (!videoUrl || dismissed) return null;
   const ytId = getYouTubeId(videoUrl);
@@ -80,6 +113,7 @@ const StickyReelVideo = ({ productId, fallbackVideoUrl }: StickyReelVideoProps) 
             />
           ) : (
             <video
+              ref={miniVideoRef}
               src={mediaUrl(videoUrl)}
               poster={posterUrl ? mediaUrl(posterUrl) : undefined}
               className="absolute inset-0 w-full h-full object-cover"
@@ -93,7 +127,7 @@ const StickyReelVideo = ({ productId, fallbackVideoUrl }: StickyReelVideoProps) 
           <button
             type="button"
             aria-label="Play product reel"
-            onClick={() => setExpanded(true)}
+            onClick={openExpanded}
             className="absolute inset-0 flex items-center justify-center"
           >
             <span className="w-9 h-9 rounded-full bg-ivory/95 flex items-center justify-center shadow">
@@ -121,7 +155,7 @@ const StickyReelVideo = ({ productId, fallbackVideoUrl }: StickyReelVideoProps) 
       {expanded && (
         <div
           className="fixed inset-0 z-[100] bg-espresso/85 backdrop-blur-sm flex items-center justify-center p-4"
-          onClick={() => setExpanded(false)}
+          onClick={closeExpanded}
         >
           <div
             className="relative w-full max-w-[380px] aspect-[9/16] bg-black rounded overflow-hidden"
@@ -137,17 +171,26 @@ const StickyReelVideo = ({ productId, fallbackVideoUrl }: StickyReelVideoProps) 
               />
             ) : (
               <video
+                ref={fullVideoRef}
                 src={mediaUrl(videoUrl)}
                 className="w-full h-full object-contain"
                 autoPlay
                 controls
                 playsInline
+                onLoadedMetadata={(e) => {
+                  /* Continue from where the mini player was */
+                  try {
+                    e.currentTarget.currentTime = resumeAtRef.current;
+                  } catch {
+                    /* ignore seek errors */
+                  }
+                }}
               />
             )}
             <button
               type="button"
               aria-label="Close"
-              onClick={() => setExpanded(false)}
+              onClick={closeExpanded}
               className="absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-ivory/90 flex items-center justify-center text-espresso hover:bg-ivory"
             >
               <X className="h-5 w-5" />

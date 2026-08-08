@@ -59,8 +59,10 @@ When a reel is opened, the viewer is now a **carousel**, matching the marked moc
 
 A small floating reel player on the product detail page that **follows the scroll**:
 
-- **Appears** (slides up, bottom-left) once the shopper scrolls down past the gallery (~480px);
-  **hides** again when they scroll back up to where the product media is visible.
+- **Direction-aware:** scrolling **down hides** it (never blocks reading); scrolling **up shows**
+  it again, and it's always visible near the top of the page (8px jitter filter so it doesn't flicker).
+- **Continuous playback:** expanding continues the video from the mini player's position, and
+  closing hands the position back to the mini player — one uninterrupted reel.
 - Shows the product's **first PDP reel** (poster/autoplaying muted loop for uploads, YouTube
   thumbnail for links); falls back to the product's own `video/video_url` when no reel exists;
   renders nothing when there's no video at all.
