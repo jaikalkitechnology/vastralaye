@@ -58,6 +58,12 @@ When a reel is opened, the viewer is now a **carousel**, matching the marked moc
   each fades out at its end of the list.
 - **Position counter** ("2 / 8") on the top-left of the player.
 - **Keyboard**: ← / → navigate, Esc closes. Every reel viewed registers a view count.
+- **Smooth slide between reels:** clicking an arrow (or preview / keyboard) no longer swaps the
+  video instantly — the current reel **glides out and the next glides in from the arrow's
+  direction** (directional slide + fade + subtle scale, 380ms, soft ease-out; Instagram-style).
+  The shoppable product strip travels with its video; the counter and close button stay fixed.
+  Reduced-motion visitors get an instant swap. Viewer arrows also gained the hover-grow /
+  press-squash feedback matching the row arrows.
 - Videos re-mount on navigation (keyed by reel id) so uploaded MP4s autoplay and YouTube embeds
   reload correctly; the shoppable product strip updates per reel.
 

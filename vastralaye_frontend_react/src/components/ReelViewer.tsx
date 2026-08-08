@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { api } from '@/api/api';
 import { mediaUrl, getYouTubeId, youTubeThumb, youTubeEmbed } from '@/lib/media';
@@ -60,6 +61,21 @@ const ReelViewer = ({ reels, index, onIndexChange, onClose, initialSeek = 0 }: R
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const initialIndexRef = useRef(index);
+
+  /* Slide direction for the smooth transition between reels */
+  const prevIndexRef = useRef(index);
+  const direction = index >= prevIndexRef.current ? 1 : -1;
+  useEffect(() => {
+    prevIndexRef.current = index;
+  }, [index]);
+
+  const reduceMotion = useReducedMotion();
+  const dist = reduceMotion ? 0 : 70;
+  const slideVariants = {
+    enter: (d: number) => ({ x: d * dist, opacity: 0, scale: 0.97 }),
+    center: { x: 0, opacity: 1, scale: 1 },
+    exit: (d: number) => ({ x: -d * dist, opacity: 0, scale: 0.97 }),
+  };
 
   /* Register a view for each reel shown (skip pseudo reels with id <= 0) */
   useEffect(() => {
@@ -122,7 +138,7 @@ const ReelViewer = ({ reels, index, onIndexChange, onClose, initialSeek = 0 }: R
         e.stopPropagation();
         go(index + dir);
       }}
-      className={`flex-none w-10 h-10 ${dir === -1 ? 'mr-2 md:mr-4' : 'ml-2 md:ml-4'} rounded-full bg-ivory/90 flex items-center justify-center text-espresso hover:bg-ivory transition-opacity ${
+      className={`flex-none w-10 h-10 ${dir === -1 ? 'mr-2 md:mr-4' : 'ml-2 md:ml-4'} rounded-full bg-ivory/90 flex items-center justify-center text-espresso hover:bg-ivory hover:scale-105 active:scale-90 transition-all duration-200 ${
         enabled ? '' : 'opacity-0 pointer-events-none'
       }`}
     >
@@ -142,41 +158,77 @@ const ReelViewer = ({ reels, index, onIndexChange, onClose, initialSeek = 0 }: R
         className="relative w-full max-w-[380px] aspect-[9/16] bg-black rounded overflow-hidden flex-none"
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Smooth directional slide between reels */}
+        <AnimatePresence initial={false} custom={direction} mode="popLayout">
+          <motion.div
+            key={active.id || active.video_url}
+            custom={direction}
+            variants={slideVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ duration: reduceMotion ? 0 : 0.38, ease: [0.22, 0.61, 0.36, 1] }}
+            className="absolute inset-0"
+          >
+            {getYouTubeId(active.video_url) ? (
+              <iframe
+                src={youTubeEmbed(getYouTubeId(active.video_url) as string)}
+                title={active.caption}
+                className="w-full h-full"
+                allow="autoplay; encrypted-media; picture-in-picture"
+                allowFullScreen
+              />
+            ) : (
+              <video
+                ref={videoRef}
+                src={mediaUrl(active.video_url)}
+                poster={active.poster_url ? mediaUrl(active.poster_url) : undefined}
+                className="w-full h-full object-contain"
+                autoPlay
+                controls
+                playsInline
+                onLoadedMetadata={(e) => {
+                  if (initialSeek > 0 && index === initialIndexRef.current) {
+                    try {
+                      e.currentTarget.currentTime = initialSeek;
+                    } catch {
+                      /* ignore seek errors */
+                    }
+                  }
+                }}
+              />
+            )}
+
+            {active.product && (
+              <Link
+                to={`/product/${active.product.id}`}
+                className="absolute bottom-3 left-3 right-3 flex items-center gap-2.5 bg-ivory/95 rounded px-3 py-2.5"
+              >
+                {active.product.image && (
+                  <img
+                    src={mediaUrl(active.product.image)}
+                    alt={active.product.name}
+                    className="w-8 h-10 object-cover rounded-[3px]"
+                  />
+                )}
+                <span className="min-w-0">
+                  <span className="block text-xs text-espresso truncate">{active.product.name}</span>
+                  <span className="block text-sm font-semibold text-espresso">
+                    {INR(active.product.discount_price || active.product.price)}
+                  </span>
+                </span>
+                <span className="ml-auto text-[11px] font-semibold uppercase tracking-[0.12em] text-maroon shrink-0">
+                  Shop →
+                </span>
+              </Link>
+            )}
+          </motion.div>
+        </AnimatePresence>
+
         {reels.length > 1 && (
           <span className="absolute top-3 left-3 z-10 text-[11px] font-semibold text-ivory bg-espresso/60 px-2.5 py-0.5 rounded-full">
             {index + 1} / {reels.length}
           </span>
-        )}
-
-        {getYouTubeId(active.video_url) ? (
-          <iframe
-            key={active.id || active.video_url}
-            src={youTubeEmbed(getYouTubeId(active.video_url) as string)}
-            title={active.caption}
-            className="w-full h-full"
-            allow="autoplay; encrypted-media; picture-in-picture"
-            allowFullScreen
-          />
-        ) : (
-          <video
-            key={active.id || active.video_url}
-            ref={videoRef}
-            src={mediaUrl(active.video_url)}
-            poster={active.poster_url ? mediaUrl(active.poster_url) : undefined}
-            className="w-full h-full object-contain"
-            autoPlay
-            controls
-            playsInline
-            onLoadedMetadata={(e) => {
-              if (initialSeek > 0 && index === initialIndexRef.current) {
-                try {
-                  e.currentTarget.currentTime = initialSeek;
-                } catch {
-                  /* ignore seek errors */
-                }
-              }
-            }}
-          />
         )}
 
         <button
@@ -187,30 +239,6 @@ const ReelViewer = ({ reels, index, onIndexChange, onClose, initialSeek = 0 }: R
         >
           <X className="h-5 w-5" />
         </button>
-
-        {active.product && (
-          <Link
-            to={`/product/${active.product.id}`}
-            className="absolute bottom-3 left-3 right-3 flex items-center gap-2.5 bg-ivory/95 rounded px-3 py-2.5"
-          >
-            {active.product.image && (
-              <img
-                src={mediaUrl(active.product.image)}
-                alt={active.product.name}
-                className="w-8 h-10 object-cover rounded-[3px]"
-              />
-            )}
-            <span className="min-w-0">
-              <span className="block text-xs text-espresso truncate">{active.product.name}</span>
-              <span className="block text-sm font-semibold text-espresso">
-                {INR(active.product.discount_price || active.product.price)}
-              </span>
-            </span>
-            <span className="ml-auto text-[11px] font-semibold uppercase tracking-[0.12em] text-maroon shrink-0">
-              Shop →
-            </span>
-          </Link>
-        )}
       </div>
 
       {arrow(1, !!nextReel)}
