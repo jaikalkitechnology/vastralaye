@@ -21,6 +21,16 @@
 
 ## Design details
 
+- **Buttery paging animation:** arrow clicks glide the row with a custom eased scroll
+  (requestAnimationFrame, ease-in-out cubic, 650ms) instead of the browser's abrupt native
+  smooth-scroll; scroll-snap is paused during the glide and restored after so touch swiping keeps
+  its snap. Reduced-motion visitors jump instantly. Clamped at row ends.
+- **Staggered card entrance:** each reel card animates in individually (fade + 26px rise + subtle
+  0.97→1 scale, 70ms stagger, capped at 6 steps) — and because visibility is per-card, reels that
+  slide in from off-screen **animate on arrival** too. Applies to the homepage row **and the
+  product page's "Watch It Styled" strip** automatically (shared component).
+- **Arrow feedback:** hover grows the button 5% and turns it maroon; press squashes to 90% — a
+  tactile click feel (200ms).
 - Arrows: 40px round white buttons, 1px `border-border`, soft shadow, espresso chevron → **maroon on hover** — the "minimal round-bordered arrow buttons" pattern from `design.md` §5.5.
 - Positioned at the vertical center of the video posters (not the product strips), overlapping the row edges by 12px.
 - Row: `snap-x snap-mandatory` + `scroll-smooth`, native scrollbar hidden on all engines.

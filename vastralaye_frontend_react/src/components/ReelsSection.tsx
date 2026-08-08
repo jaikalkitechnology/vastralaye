@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { motion, useReducedMotion } from 'framer-motion';
 import { Play, Eye, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { api } from '@/api/api';
 import { BASE_IMG } from '@/config';
@@ -24,6 +25,28 @@ const INR = (n?: number | null) =>
 
 const formatViews = (n: number) =>
   n >= 1000 ? `${(n / 1000).toFixed(n >= 10000 ? 0 : 1)}k` : `${n}`;
+
+/** Buttery arrow paging: eased rAF scroll (snap paused during the glide). */
+const animateScroll = (el: HTMLElement, target: number, duration = 650) => {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    el.scrollLeft = target;
+    return;
+  }
+  const start = el.scrollLeft;
+  const change = target - start;
+  if (change === 0) return;
+  const prevSnap = el.style.scrollSnapType;
+  el.style.scrollSnapType = 'none';
+  const t0 = performance.now();
+  const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+  const step = (now: number) => {
+    const p = Math.min(1, (now - t0) / duration);
+    el.scrollLeft = start + change * ease(p);
+    if (p < 1) requestAnimationFrame(step);
+    else el.style.scrollSnapType = prevSnap;
+  };
+  requestAnimationFrame(step);
+};
 
 interface ReelsSectionProps {
   placement?: 'home' | 'pdp';
@@ -67,10 +90,16 @@ const ReelsSection = ({
     return () => window.removeEventListener('resize', updateArrows);
   }, [reels, updateArrows]);
 
+  const reduceMotion = useReducedMotion();
+
   const slide = (dir: 1 | -1) => {
     const el = rowRef.current;
     if (!el) return;
-    el.scrollBy({ left: dir * el.clientWidth * 0.85, behavior: 'smooth' });
+    const target = Math.max(
+      0,
+      Math.min(el.scrollWidth - el.clientWidth, el.scrollLeft + dir * el.clientWidth * 0.85)
+    );
+    animateScroll(el, target);
   };
 
   useEffect(() => {
@@ -106,7 +135,6 @@ const ReelsSection = ({
           </p>
         </Reveal>
 
-        <Reveal delay={0.1}>
         <div className="relative">
           {/* Slider arrows — shown only when there are more videos than fit */}
           {canLeft && (
@@ -114,7 +142,7 @@ const ReelsSection = ({
               type="button"
               aria-label="Previous reels"
               onClick={() => slide(-1)}
-              className="hidden md:flex absolute -left-3 top-[36%] -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white border border-border shadow-md items-center justify-center text-espresso hover:text-maroon hover:border-maroon transition-colors"
+              className="hidden md:flex absolute -left-3 top-[36%] -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white border border-border shadow-md items-center justify-center text-espresso hover:text-maroon hover:border-maroon hover:scale-105 active:scale-90 transition-all duration-200"
             >
               <ChevronLeft className="h-5 w-5" strokeWidth={1.8} />
             </button>
@@ -124,7 +152,7 @@ const ReelsSection = ({
               type="button"
               aria-label="More reels"
               onClick={() => slide(1)}
-              className="hidden md:flex absolute -right-3 top-[36%] -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white border border-border shadow-md items-center justify-center text-espresso hover:text-maroon hover:border-maroon transition-colors"
+              className="hidden md:flex absolute -right-3 top-[36%] -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white border border-border shadow-md items-center justify-center text-espresso hover:text-maroon hover:border-maroon hover:scale-105 active:scale-90 transition-all duration-200"
             >
               <ChevronRight className="h-5 w-5" strokeWidth={1.8} />
             </button>
@@ -133,11 +161,15 @@ const ReelsSection = ({
           <div
             ref={rowRef}
             onScroll={updateArrows}
-            className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory scroll-smooth [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+            className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
           >
           {reels.map((reel, i) => (
-            <div
+            <motion.div
               key={reel.id}
+              initial={reduceMotion ? false : { opacity: 0, y: 26, scale: 0.97 }}
+              whileInView={reduceMotion ? undefined : { opacity: 1, y: 0, scale: 1 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.5, delay: Math.min(i, 5) * 0.07, ease: [0.22, 0.61, 0.36, 1] }}
               className="min-w-[56%] xs:min-w-[46%] sm:min-w-[36%] md:min-w-[calc((100%-2rem)/3)] lg:min-w-[calc((100%-4rem)/5)] snap-start"
             >
               <button
@@ -202,11 +234,10 @@ const ReelsSection = ({
                   <ArrowRight className="h-4 w-4 text-terracotta ml-auto shrink-0" />
                 </Link>
               )}
-            </div>
+            </motion.div>
           ))}
           </div>
         </div>
-        </Reveal>
       </div>
 
       {/* Full-screen reel viewer (shared carousel component) */}
