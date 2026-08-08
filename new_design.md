@@ -88,6 +88,32 @@ A small floating reel player on the product detail page that **follows the scrol
 
 ---
 
+## 4. Floating contact hub — middle-right, admin-controlled, multi-link
+
+The old fixed WhatsApp button is now a **contact hub pinned to the middle of the right edge**:
+
+- A round espresso/gold button (chat icon) sits at the **vertical center of the right side**;
+  tapping it **expands a cascade of link buttons** upward (40ms stagger, scale+slide in):
+  **WhatsApp** (green), **Call** (maroon, `tel:`), **Instagram / Facebook / YouTube** (white with
+  gold hover) — the icon flips to ✕ while open.
+- **Fully admin-controlled** from *Admin → Store Settings*:
+  - every link comes from settings (`whatsapp_number`, new `call_number`, `instagram_url`,
+    `facebook_url`, `youtube_url`) — an **empty field hides that button** from the hub;
+  - a new **"Show the floating contact button" toggle** (`float_enabled`) switches the whole hub
+    off storefront-wide;
+  - new fields validated (call number format) and served through the same public settings API.
+- Closed-state links are unfocusable (`tabIndex -1`) and hidden from pointer events; labels via
+  `aria-label`/`title`. The sticky PDP reel (bottom-left) and this hub (middle-right) never collide.
+
+| File | Change |
+|---|---|
+| `src/components/WhatsAppFloat.tsx` | Rebuilt as the expandable middle-right contact hub |
+| `src/pages/admin/AdminSettings.tsx` | New Call-number field + floating-button toggle |
+| `src/hooks/use-site-settings.ts` | `call_number` / `float_enabled` in the settings shape |
+| `vastralaye_backend/app/routers/site_content.py` | `call_number` + `float_enabled` setting keys accepted & served |
+
+---
+
 ## Verification
 
 - `tsc --noEmit` — no errors in any changed file.

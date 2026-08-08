@@ -7,6 +7,9 @@ export interface SiteSettings {
   twitter_url?: string;
   youtube_url?: string;
   whatsapp_number?: string;
+  call_number?: string;
+  /** "true" / "false" — controls the floating contact hub. */
+  float_enabled?: string;
 }
 
 /* Module-level cache so Footer / WhatsAppFloat / InstagramGrid share one request. */

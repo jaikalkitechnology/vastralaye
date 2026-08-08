@@ -28,6 +28,8 @@ SETTING_KEYS = [
     "twitter_url",
     "youtube_url",
     "whatsapp_number",
+    "call_number",
+    "float_enabled",
 ]
 
 
@@ -340,6 +342,8 @@ class SettingsIn(BaseModel):
     twitter_url: Optional[str] = None
     youtube_url: Optional[str] = None
     whatsapp_number: Optional[str] = None
+    call_number: Optional[str] = None
+    float_enabled: Optional[str] = None  # "true" / "false"
 
 
 def _settings_dict(db: Session) -> Dict[str, str]:

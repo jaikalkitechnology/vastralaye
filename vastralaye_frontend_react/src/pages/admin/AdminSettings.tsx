@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { api } from '@/api/api';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/use-toast';
-import { Settings, Instagram, Facebook, Twitter, Youtube, MessageCircle, RefreshCw } from 'lucide-react';
+import { Settings, Instagram, Facebook, Twitter, Youtube, MessageCircle, Phone, RefreshCw } from 'lucide-react';
 
 interface SettingsForm {
   instagram_url: string;
@@ -10,6 +10,8 @@ interface SettingsForm {
   twitter_url: string;
   youtube_url: string;
   whatsapp_number: string;
+  call_number: string;
+  float_enabled: string;
 }
 
 const empty: SettingsForm = {
@@ -18,6 +20,8 @@ const empty: SettingsForm = {
   twitter_url: '',
   youtube_url: '',
   whatsapp_number: '',
+  call_number: '',
+  float_enabled: 'true',
 };
 
 const isValidUrl = (v: string) => !v || /^https?:\/\/.+\..+/.test(v);
@@ -61,6 +65,9 @@ const AdminSettings = () => {
     if (form.whatsapp_number && !/^[\d+\s-]{8,18}$/.test(form.whatsapp_number)) {
       return toast({ title: 'WhatsApp number should be digits with country code, e.g. 918527596413' });
     }
+    if (form.call_number && !/^[\d+\s-]{8,18}$/.test(form.call_number)) {
+      return toast({ title: 'Call number should be digits with country code, e.g. 918527596413' });
+    }
     setSaving(true);
     try {
       await api.put('/admin/settings', form);
@@ -78,6 +85,7 @@ const AdminSettings = () => {
     { key: 'twitter_url', label: 'Twitter / X URL', placeholder: 'https://x.com/vastralaye', icon: Twitter },
     { key: 'youtube_url', label: 'YouTube URL (optional)', placeholder: 'https://youtube.com/@vastralaye', icon: Youtube },
     { key: 'whatsapp_number', label: 'WhatsApp number (with country code)', placeholder: '918527596413', icon: MessageCircle },
+    { key: 'call_number', label: 'Call number (optional, with country code)', placeholder: '918527596413', icon: Phone },
   ];
 
   return (
@@ -117,8 +125,21 @@ const AdminSettings = () => {
           </div>
         ))}
 
+        <label className="flex items-center gap-2.5 text-sm cursor-pointer mb-4">
+          <input
+            type="checkbox"
+            checked={form.float_enabled !== 'false'}
+            onChange={(e) => set('float_enabled', e.target.checked ? 'true' : 'false')}
+            className="accent-[#7A1F2B]"
+            disabled={loading}
+          />
+          Show the floating contact button on the storefront (middle-right; expands into WhatsApp,
+          Call and your social links)
+        </label>
+
         <p className="text-xs text-muted-foreground mb-5">
-          Leave a field empty to keep the storefront's built-in default for it.
+          Leave a field empty to keep the storefront's built-in default for it — an empty link hides
+          that button from the floating contact hub.
         </p>
 
         <Button type="submit" disabled={saving || loading} className="w-full">
