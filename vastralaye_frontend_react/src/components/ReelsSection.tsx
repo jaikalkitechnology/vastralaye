@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Play, Eye, X, ArrowRight } from 'lucide-react';
+import { Play, Eye, X, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { api } from '@/api/api';
 import { BASE_IMG } from '@/config';
 import { getYouTubeId, youTubeThumb, youTubeEmbed } from '@/lib/media';
@@ -59,10 +59,34 @@ const ReelsSection = ({
   const [reels, setReels] = useState<Reel[]>([]);
   const [active, setActive] = useState<Reel | null>(null);
 
+  /* Slider state — arrows appear only when the row overflows */
+  const rowRef = useRef<HTMLDivElement>(null);
+  const [canLeft, setCanLeft] = useState(false);
+  const [canRight, setCanRight] = useState(false);
+
+  const updateArrows = useCallback(() => {
+    const el = rowRef.current;
+    if (!el) return;
+    setCanLeft(el.scrollLeft > 4);
+    setCanRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
+  }, []);
+
+  useEffect(() => {
+    updateArrows();
+    window.addEventListener('resize', updateArrows);
+    return () => window.removeEventListener('resize', updateArrows);
+  }, [reels, updateArrows]);
+
+  const slide = (dir: 1 | -1) => {
+    const el = rowRef.current;
+    if (!el) return;
+    el.scrollBy({ left: dir * el.clientWidth * 0.85, behavior: 'smooth' });
+  };
+
   useEffect(() => {
     let cancelled = false;
     api
-      .get('/fronted/reels', { params: { placement, product_id: productId } })
+      .get('/fronted/reels', { params: { placement, product_id: productId, limit: 20 } })
       .then((res) => {
         if (!cancelled && Array.isArray(res.data)) setReels(res.data);
       })
@@ -92,9 +116,39 @@ const ReelsSection = ({
           </p>
         </div>
 
-        <div className="flex gap-4 overflow-x-auto pb-2 md:grid md:grid-cols-3 lg:grid-cols-5 md:overflow-visible snap-x">
-          {reels.slice(0, 5).map((reel) => (
-            <div key={reel.id} className="min-w-[56%] xs:min-w-[46%] sm:min-w-[36%] md:min-w-0 snap-start">
+        <div className="relative">
+          {/* Slider arrows — shown only when there are more videos than fit */}
+          {canLeft && (
+            <button
+              type="button"
+              aria-label="Previous reels"
+              onClick={() => slide(-1)}
+              className="hidden md:flex absolute -left-3 top-[36%] -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white border border-border shadow-md items-center justify-center text-espresso hover:text-maroon hover:border-maroon transition-colors"
+            >
+              <ChevronLeft className="h-5 w-5" strokeWidth={1.8} />
+            </button>
+          )}
+          {canRight && (
+            <button
+              type="button"
+              aria-label="More reels"
+              onClick={() => slide(1)}
+              className="hidden md:flex absolute -right-3 top-[36%] -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white border border-border shadow-md items-center justify-center text-espresso hover:text-maroon hover:border-maroon transition-colors"
+            >
+              <ChevronRight className="h-5 w-5" strokeWidth={1.8} />
+            </button>
+          )}
+
+          <div
+            ref={rowRef}
+            onScroll={updateArrows}
+            className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory scroll-smooth [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+          >
+          {reels.map((reel) => (
+            <div
+              key={reel.id}
+              className="min-w-[56%] xs:min-w-[46%] sm:min-w-[36%] md:min-w-[calc((100%-2rem)/3)] lg:min-w-[calc((100%-4rem)/5)] snap-start"
+            >
               <button
                 type="button"
                 onClick={() => openReel(reel)}
@@ -159,6 +213,7 @@ const ReelsSection = ({
               )}
             </div>
           ))}
+          </div>
         </div>
       </div>
 
