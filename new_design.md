@@ -1,10 +1,13 @@
-# new_design.md — Reels Slider Enhancement
+# new_design.md — Reels Experience Enhancements
 
-> **Status: ✅ IMPLEMENTED** — the shoppable reels row is now a slider wherever more videos exist
-> than fit on screen. Applies to both placements automatically: the homepage **"Vastralaye in
-> Motion"** row and the product-page **"Watch It Styled"** strip (shared `ReelsSection` component).
+> **Status: ✅ ALL IMPLEMENTED** — three upgrades to the reels experience:
+> **1)** the reels row becomes a slider when more videos exist, **2)** the reel viewer shows
+> prev/next video previews with slider navigation, **3)** the product page gets a sticky floating
+> reel that follows the shopper on scroll.
 
 ---
+
+## 1. Reels row slider (when more videos than fit)
 
 ## Behavior spec
 
@@ -32,8 +35,48 @@
 
 No backend changes required (the public reels endpoint already supported `limit` up to 50).
 
+---
+
+## 2. Reel viewer — prev/next previews + slider (per marked screenshot)
+
+When a reel is opened, the viewer is now a **carousel**, matching the marked mockup:
+
+- **Side previews (desktop ≥768px):** dimmed 9:16 posters of the **previous and next videos**
+  appear on the left/right of the playing reel (40% opacity, brighten on hover, clickable) —
+  the Instagram-desktop-style layout from the screenshot.
+- **Slider arrows:** round ivory prev/next buttons beside the player on **all** screen sizes;
+  each fades out at its end of the list.
+- **Position counter** ("2 / 8") on the top-left of the player.
+- **Keyboard**: ← / → navigate, Esc closes. Every reel viewed registers a view count.
+- Videos re-mount on navigation (keyed by reel id) so uploaded MP4s autoplay and YouTube embeds
+  reload correctly; the shoppable product strip updates per reel.
+
+| File | Change |
+|---|---|
+| `src/components/ReelsSection.tsx` | Viewer refactored from single-reel state to indexed carousel: `activeIndex` + `prevReel`/`nextReel`, side preview buttons, arrow buttons, counter, keyboard handler, keyed player, shared `posterSrc()` (poster → YouTube thumb → video frame) |
+
+## 3. Product page — sticky floating reel (per marked screenshot)
+
+A small floating reel player on the product detail page that **follows the scroll**:
+
+- **Appears** (slides up, bottom-left) once the shopper scrolls down past the gallery (~480px);
+  **hides** again when they scroll back up to where the product media is visible.
+- Shows the product's **first PDP reel** (poster/autoplaying muted loop for uploads, YouTube
+  thumbnail for links); falls back to the product's own `video/video_url` when no reel exists;
+  renders nothing when there's no video at all.
+- **Tap → expands** to the full-screen player (native video with controls, or embedded YouTube).
+- **✕ dismisses** it for that page view. Positioned bottom-left so it never collides with the
+  WhatsApp button (bottom-right). Caption shown along the bottom edge.
+
+| File | Change |
+|---|---|
+| `src/components/StickyReelVideo.tsx` | New component: reel/fallback fetch, scroll-linked visibility, mini player, expanded player, dismiss |
+| `src/pages/ProductDetailPage.tsx` | Renders `<StickyReelVideo productId fallbackVideoUrl>` alongside the "Watch It Styled" strip |
+
+---
+
 ## Verification
 
-- `tsc --noEmit` — no errors in the changed file.
+- `tsc --noEmit` — no errors in any changed file.
 - `npm run build` — production build passes.
-- With ≤3 reels on desktop the section renders exactly as before (no arrows) — zero regression for small catalogs.
+- Zero-regression paths: ≤1 reel → no arrows/previews anywhere; no reels and no product video → no sticky player; small catalogs render exactly as before.
