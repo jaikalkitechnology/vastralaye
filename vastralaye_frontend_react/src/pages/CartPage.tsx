@@ -2397,25 +2397,25 @@ const CartPage: React.FC = () => {
                 </div>
 
                 {/* Coupons Section */}
-                <div className="border-t pt-6">
+                <div className="border-t border-border mt-6 pt-6">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
-                      <Gift className="w-4 h-4 text-[#E97A48]" />
-                      <span className="text-sm font-medium text-gray-700">
+                      <Gift className="w-4 h-4 text-terracotta" strokeWidth={1.5} />
+                      <span className="text-xs font-semibold uppercase tracking-[0.12em] text-espresso">
                         Available Coupons
                       </span>
                     </div>
                     {displayCoupons.length > 0 && (
-                      <Badge variant="outline" className="text-xs">
+                      <Badge variant="outline" className="text-xs rounded-sm border-border text-muted-foreground font-normal">
                         {displayCoupons.length} available
                       </Badge>
                     )}
                   </div>
 
                   {loadingCoupons ? (
-                    <div className="text-center py-6 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-                      <Loader2 className="h-5 w-5 animate-spin mx-auto mb-2 text-[#5E9F50]" />
-                      <span className="text-xs text-gray-500">
+                    <div className="text-center py-6 bg-ivory rounded-sm border border-dashed border-border">
+                      <Loader2 className="h-5 w-5 animate-spin mx-auto mb-2 text-maroon" />
+                      <span className="text-xs text-muted-foreground">
                         Loading coupons...
                       </span>
                     </div>
@@ -2427,37 +2427,37 @@ const CartPage: React.FC = () => {
                         return (
                           <div
                             key={coupon.id || index}
-                            className={`p-3 rounded-lg border-2 transition-all duration-200 ${
+                            className={`p-3 rounded-sm border transition-colors duration-200 ${
                               isApplied
-                                ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-400 shadow-sm'
+                                ? 'bg-ivory border-maroon'
                                 : eligible
-                                ? 'bg-gradient-to-r from-gray-50 to-white border-gray-200 hover:border-[#E97A48] hover:shadow-sm'
-                                : 'bg-gray-50 border-gray-200 opacity-70'
+                                ? 'bg-white border-border hover:border-maroon/50'
+                                : 'bg-ivory border-border opacity-60'
                             }`}
                           >
                             <div className="flex items-start justify-between gap-2">
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 mb-1 flex-wrap">
-                                  <span className="font-mono font-bold text-sm bg-white px-3 py-1 rounded-lg border border-gray-300 select-all">
+                                  <span className="font-mono font-semibold text-[13px] text-espresso bg-white px-2.5 py-1 rounded-sm border border-border select-all">
                                     {coupon.code}
                                   </span>
                                   <Badge
                                     className={`${
                                       String(coupon.discount_type).includes('percent')
-                                        ? 'bg-[#5E9F50]'
-                                        : 'bg-[#E97A48]'
-                                    } text-white border-0 text-xs`}
+                                        ? 'bg-blush text-maroon hover:bg-blush'
+                                        : 'bg-espresso text-ivory hover:bg-espresso'
+                                    } border-0 text-[11px] rounded-sm`}
                                   >
                                     {String(coupon.discount_type).includes('percent')
                                       ? `${coupon.discount_value}% OFF`
                                       : `₹${coupon.discount_value} OFF`}
                                   </Badge>
                                   {isApplied && (
-                                    <CheckCircle className="h-4 w-4 text-green-600 flex-shrink-0" />
+                                    <CheckCircle className="h-4 w-4 text-green-700 flex-shrink-0" />
                                   )}
                                 </div>
                                 {coupon.description && (
-                                  <p className="text-xs text-gray-600 mt-1">
+                                  <p className="text-xs text-muted-foreground mt-1">
                                     {coupon.description}
                                   </p>
                                 )}
@@ -2466,8 +2466,8 @@ const CartPage: React.FC = () => {
                                     <p
                                       className={`text-xs ${
                                         eligible
-                                          ? 'text-gray-500'
-                                          : 'text-red-500 font-medium'
+                                          ? 'text-muted-foreground'
+                                          : 'text-sale font-medium'
                                       }`}
                                     >
                                       {eligible ? '✓' : '✗'} Min: ₹
@@ -2477,7 +2477,7 @@ const CartPage: React.FC = () => {
                                     </p>
                                   )}
                                   {coupon.valid_to && (
-                                    <p className="text-xs text-gray-400">
+                                    <p className="text-xs text-muted-foreground/70">
                                       Expires:{' '}
                                       {new Date(
                                         coupon.valid_to
@@ -2486,7 +2486,7 @@ const CartPage: React.FC = () => {
                                   )}
                                 </div>
                                 {!eligible && (
-                                  <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                                  <p className="text-xs text-sale mt-1 flex items-center gap-1">
                                     <AlertCircle className="h-3 w-3" />
                                     Add ₹
                                     {(
@@ -2497,7 +2497,7 @@ const CartPage: React.FC = () => {
                                 )}
                                 {!isLoggedIn && eligible && (
                                   <p
-                                    className="text-xs text-amber-600 mt-1 flex items-center gap-1 cursor-pointer hover:underline"
+                                    className="text-xs text-terracotta mt-1 flex items-center gap-1 cursor-pointer hover:underline"
                                     onClick={() => navigate('/login')}
                                   >
                                     <Lock className="h-3 w-3" /> Sign in to
@@ -2509,25 +2509,25 @@ const CartPage: React.FC = () => {
                                 <Button
                                   size="sm"
                                   variant="outline"
-                                  className="h-7 px-2 text-xs border-gray-300"
+                                  className="h-7 px-2 text-xs rounded-sm border-border text-muted-foreground hover:bg-ivory hover:text-espresso"
                                   onClick={() => handleCopyCoupon(coupon.code)}
                                 >
                                   {copiedCoupon === coupon.code ? (
-                                    <CheckCheck className="w-3 h-3 text-[#5E9F50]" />
+                                    <CheckCheck className="w-3 h-3 text-green-700" />
                                   ) : (
                                     <Copy className="w-3 h-3" />
                                   )}
                                 </Button>
                                 <Button
                                   size="sm"
-                                  className={`h-7 px-3 text-xs text-white ${
+                                  className={`h-7 px-3 text-xs rounded-sm transition-colors ${
                                     isApplied
-                                      ? 'bg-red-500 hover:bg-red-600'
+                                      ? 'bg-espresso hover:bg-sale text-ivory'
                                       : !isLoggedIn
-                                      ? 'bg-amber-500 hover:bg-amber-600'
+                                      ? 'bg-espresso hover:bg-maroon text-ivory'
                                       : eligible
-                                      ? 'bg-[#E97A48] hover:bg-[#d86a38]'
-                                      : 'bg-gray-400 cursor-not-allowed'
+                                      ? 'bg-maroon hover:bg-terracotta text-ivory'
+                                      : 'bg-sand text-muted-foreground cursor-not-allowed'
                                   }`}
                                   onClick={() => {
                                     if (!isLoggedIn) {
@@ -2560,14 +2560,14 @@ const CartPage: React.FC = () => {
                       })}
                     </div>
                   ) : (
-                    <div className="text-center py-6 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-                      <Gift className="h-6 w-6 text-gray-400 mx-auto mb-2" />
-                      <p className="text-xs text-gray-500">
+                    <div className="text-center py-6 bg-ivory rounded-sm border border-dashed border-border">
+                      <Gift className="h-6 w-6 text-muted-foreground/60 mx-auto mb-2" strokeWidth={1.5} />
+                      <p className="text-xs text-muted-foreground">
                         {couponError || 'No coupons available right now'}
                       </p>
                       {!isLoggedIn && (
                         <p
-                          className="text-xs text-[#E97A48] mt-1 cursor-pointer hover:underline font-medium"
+                          className="text-xs text-maroon mt-1 cursor-pointer hover:underline font-medium"
                           onClick={() => navigate('/login')}
                         >
                           🔓 Sign in to see exclusive coupons
@@ -2576,117 +2576,39 @@ const CartPage: React.FC = () => {
                     </div>
                   )}
 
-                  {/* Manual coupon input */}
-                  <div className="space-y-3 mt-4">
-                    <p className="text-xs text-gray-500 font-medium">
-                      Have a coupon code?
-                    </p>
-                    <div className="flex gap-2">
-                      <Input
-                        placeholder={
-                          isLoggedIn
-                            ? 'Enter coupon code'
-                            : 'Sign in to apply coupons'
-                        }
-                        value={couponCode}
-                        onChange={(e) =>
-                          setCouponCode(e.target.value.toUpperCase())
-                        }
-                        className="flex-1 text-sm h-10 border-gray-300 font-mono"
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') handleApplyCoupon();
-                        }}
-                        disabled={isApplyingCoupon || !isLoggedIn}
-                      />
-                      <Button
-                        onClick={() => {
-                          if (!isLoggedIn) { navigate('/login'); return; }
-                          handleApplyCoupon();
-                        }}
-                        disabled={
-                          isApplyingCoupon || (!couponCode.trim() && isLoggedIn)
-                        }
-                        className={`h-10 px-4 text-white whitespace-nowrap ${
-                          isLoggedIn
-                            ? 'bg-[#5E9F50] hover:bg-[#4d8f40]'
-                            : 'bg-amber-500 hover:bg-amber-600'
-                        }`}
-                      >
-                        {isApplyingCoupon ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : !isLoggedIn ? (
-                          <>
-                            <LogIn className="h-4 w-4 mr-1" /> Login
-                          </>
-                        ) : (
-                          'Apply'
-                        )}
-                      </Button>
-                    </div>
-
-                    {appliedCoupon && (
-                      <div className="mt-3 p-3 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <CheckCircle className="w-4 h-4 text-[#5E9F50]" />
-                            <span className="text-sm font-medium text-green-800">
-                              "{appliedCoupon.code}" applied
-                            </span>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-6 w-6 p-0 hover:bg-green-100"
-                            onClick={handleRemoveDiscount}
-                          >
-                            <X className="h-3 w-3" />
-                          </Button>
-                        </div>
-                        <p className="text-xs text-green-600 mt-1">
-                          {discount > 0
-                            ? `You saved ₹${discount.toLocaleString('en-IN')}!`
-                            : 'Coupon applied successfully'}
-                        </p>
-                      </div>
-                    )}
-                  </div>
                 </div>
-              </CardContent>
-            </Card>
+            </aside>
           </div>
         </div>
 
         {/* Trust Badges */}
-        <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="mt-12 bg-white border border-border rounded-sm grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-border">
           {[
-            { icon: Package, gradient: 'from-[#5E9F50] to-[#4d8f40]', title: 'Free Shipping', subtitle: 'On orders over ₹999' },
-            { icon: Shield, gradient: 'from-[#E97A48] to-[#d86a38]', title: 'Secure Payment', subtitle: '100% secure encryption' },
-            { icon: Truck, gradient: 'from-[#5E9F50] to-[#E97A48]', title: 'Easy Returns', subtitle: '30-day return policy' },
-          ].map(({ icon: Icon, gradient, title, subtitle }) => (
+            { icon: Package, title: 'Free Shipping', subtitle: 'On orders over ₹999' },
+            { icon: Shield, title: 'Secure Payment', subtitle: '100% secure encryption' },
+            { icon: Truck, title: 'Easy Returns', subtitle: '30-day return policy' },
+          ].map(({ icon: Icon, title, subtitle }) => (
             <div
               key={title}
-              className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200"
+              className="flex items-center justify-center gap-3 p-5"
             >
-              <div
-                className={`w-12 h-12 bg-gradient-to-br ${gradient} rounded-full flex items-center justify-center`}
-              >
-                <Icon className="h-6 w-6 text-white" />
-              </div>
+              <Icon className="h-6 w-6 text-terracotta flex-shrink-0" strokeWidth={1.5} />
               <div>
-                <h4 className="font-semibold text-gray-900">{title}</h4>
-                <p className="text-sm text-gray-600">{subtitle}</p>
+                <h4 className="text-xs font-semibold uppercase tracking-[0.08em] text-espresso">{title}</h4>
+                <p className="text-[13px] text-muted-foreground">{subtitle}</p>
               </div>
             </div>
           ))}
         </div>
 
         {recommendedProducts.length > 0 && (
-          <div className="mt-16 pt-8 border-t border-gray-200">
+          <div className="mt-16 pt-10 border-t border-border">
             <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-3">
+              <span className="overline-label mb-2">Complete the look</span>
+              <h2 className="font-serif text-2xl md:text-3xl font-medium text-espresso mb-2">
                 You Might Also Like
               </h2>
-              <p className="text-gray-600">
+              <p className="text-sm text-muted-foreground">
                 Complete your collection with these picks
               </p>
             </div>
