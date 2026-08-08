@@ -114,6 +114,35 @@ The old fixed WhatsApp button is now a **contact hub pinned to the middle of the
 
 ---
 
+## 5. Footer payment badges — logos instead of text
+
+The footer's payment row (`UPI · VISA · MASTERCARD · RUPAY · COD`) no longer uses plain text chips —
+each method now renders as a **white badge chip with its brand mark**:
+
+| Method | Mark |
+|---|---|
+| UPI | Orange/green chevrons + wordmark |
+| Visa | Blue italic wordmark |
+| Mastercard | Interlocking red/orange circles |
+| RuPay | Wordmark + orange/green chevrons |
+| COD | Banknote icon + "COD" |
+
+- Drawn as **inline SVGs** in a new reusable `PaymentBadges` component — zero external image
+  assets (nothing to host, hotlink or break), crisp at any resolution, each chip carries an
+  accessible `aria-label`/`title`.
+- White chips on the espresso footer read like the standard payment-trust row on major stores.
+- Reusable anywhere with one line (`<PaymentBadges />`) — **also used in the cart's Order Summary**
+  (below the Proceed to Checkout button), replacing its text chips; chips carry a subtle border so
+  they read on white cards as well as the dark footer.
+
+| File | Change |
+|---|---|
+| `src/components/PaymentBadges.tsx` | New — the five SVG badge chips (bordered for light surfaces) |
+| `src/components/Footer.tsx` | Bottom bar renders `<PaymentBadges />` instead of text chips |
+| `src/pages/CartPage.tsx` | Order Summary payment row now renders `<PaymentBadges />` |
+
+---
+
 ## Verification
 
 - `tsc --noEmit` — no errors in any changed file.
