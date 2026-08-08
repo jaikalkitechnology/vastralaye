@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { api } from '@/api/api';
-import { mediaUrl, getYouTubeId, youTubeThumb, youTubeEmbed } from '@/lib/media';
+import { mediaUrl, getYouTubeId, youTubeThumb } from '@/lib/media';
 import { Play, X } from 'lucide-react';
+import ReelViewer, { Reel } from '@/components/ReelViewer';
 
 interface StickyReelVideoProps {
   productId?: number;
@@ -12,41 +13,39 @@ interface StickyReelVideoProps {
 /**
  * Sticky floating reel on the product page — a small 9:16 player
  * (bottom-left). Visible while browsing; hides when the shopper scrolls
- * DOWN and reappears when they scroll UP. Tapping expands into the full
- * player and the video CONTINUES from the same position (and continues
- * again in the mini player after closing). ✕ dismisses for this page view.
+ * DOWN and reappears when they scroll UP. Tapping opens the shared
+ * ReelViewer carousel (prev/next previews + slider) over ALL of the
+ * product's reels, continuing the video from the same position — and
+ * the mini player continues where the viewer stopped after closing.
+ * ✕ dismisses for this page view.
  */
 const StickyReelVideo = ({ productId, fallbackVideoUrl }: StickyReelVideoProps) => {
-  const [videoUrl, setVideoUrl] = useState('');
-  const [posterUrl, setPosterUrl] = useState('');
-  const [caption, setCaption] = useState('');
+  const [reels, setReels] = useState<Reel[]>([]);
   const [visible, setVisible] = useState(true);
   const [dismissed, setDismissed] = useState(false);
   const [expanded, setExpanded] = useState(false);
+  const [viewerIndex, setViewerIndex] = useState(0);
 
   const miniVideoRef = useRef<HTMLVideoElement>(null);
-  const fullVideoRef = useRef<HTMLVideoElement>(null);
-  /** Playback position carried between the mini and expanded players. */
+  /** Playback position carried between the mini player and the viewer. */
   const resumeAtRef = useRef(0);
 
-  /* Pick the product's first reel; fall back to the product's own video. */
+  /* Load ALL of this product's reels; fall back to the product's own video. */
   useEffect(() => {
     let cancelled = false;
+    const fallback = (): Reel[] =>
+      fallbackVideoUrl
+        ? [{ id: 0, caption: '', video_url: fallbackVideoUrl, poster_url: null, views: 0, product: null }]
+        : [];
     api
-      .get('/fronted/reels', { params: { placement: 'pdp', product_id: productId, limit: 1 } })
+      .get('/fronted/reels', { params: { placement: 'pdp', product_id: productId, limit: 20 } })
       .then((res) => {
         if (cancelled) return;
-        const reel = Array.isArray(res.data) ? res.data[0] : null;
-        if (reel) {
-          setVideoUrl(reel.video_url || '');
-          setPosterUrl(reel.poster_url || '');
-          setCaption(reel.caption || '');
-        } else if (fallbackVideoUrl) {
-          setVideoUrl(fallbackVideoUrl);
-        }
+        const list = Array.isArray(res.data) ? res.data : [];
+        setReels(list.length > 0 ? list : fallback());
       })
       .catch(() => {
-        if (!cancelled && fallbackVideoUrl) setVideoUrl(fallbackVideoUrl);
+        if (!cancelled) setReels(fallback());
       });
     return () => {
       cancelled = true;
@@ -69,17 +68,13 @@ const StickyReelVideo = ({ productId, fallbackVideoUrl }: StickyReelVideoProps) 
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  const openExpanded = () => {
+  const openViewer = () => {
     resumeAtRef.current = miniVideoRef.current?.currentTime || 0;
+    setViewerIndex(0);
     setExpanded(true);
   };
 
-  const closeExpanded = () => {
-    resumeAtRef.current = fullVideoRef.current?.currentTime || resumeAtRef.current;
-    setExpanded(false);
-  };
-
-  /* When collapsing, continue the mini player from where the full player was. */
+  /* When the viewer closes on the mini's reel, continue the mini from there. */
   useEffect(() => {
     if (!expanded && miniVideoRef.current && resumeAtRef.current > 0) {
       try {
@@ -91,8 +86,9 @@ const StickyReelVideo = ({ productId, fallbackVideoUrl }: StickyReelVideoProps) 
     }
   }, [expanded]);
 
-  if (!videoUrl || dismissed) return null;
-  const ytId = getYouTubeId(videoUrl);
+  const reel = reels[0];
+  if (!reel || dismissed) return null;
+  const ytId = getYouTubeId(reel.video_url);
 
   return (
     <>
@@ -107,15 +103,15 @@ const StickyReelVideo = ({ productId, fallbackVideoUrl }: StickyReelVideoProps) 
         <div className="relative aspect-[9/16] rounded-md overflow-hidden border border-border shadow-xl bg-espresso">
           {ytId ? (
             <img
-              src={posterUrl ? mediaUrl(posterUrl) : youTubeThumb(ytId)}
-              alt={caption || 'Product reel'}
+              src={reel.poster_url ? mediaUrl(reel.poster_url) : youTubeThumb(ytId)}
+              alt={reel.caption || 'Product reel'}
               className="absolute inset-0 w-full h-full object-cover"
             />
           ) : (
             <video
               ref={miniVideoRef}
-              src={mediaUrl(videoUrl)}
-              poster={posterUrl ? mediaUrl(posterUrl) : undefined}
+              src={mediaUrl(reel.video_url)}
+              poster={reel.poster_url ? mediaUrl(reel.poster_url) : undefined}
               className="absolute inset-0 w-full h-full object-cover"
               muted
               loop
@@ -127,13 +123,18 @@ const StickyReelVideo = ({ productId, fallbackVideoUrl }: StickyReelVideoProps) 
           <button
             type="button"
             aria-label="Play product reel"
-            onClick={openExpanded}
+            onClick={openViewer}
             className="absolute inset-0 flex items-center justify-center"
           >
             <span className="w-9 h-9 rounded-full bg-ivory/95 flex items-center justify-center shadow">
               <Play className="h-4 w-4 text-maroon fill-maroon ml-0.5" />
             </span>
           </button>
+          {reels.length > 1 && (
+            <span className="absolute top-1.5 left-1.5 z-10 text-[9px] font-semibold text-ivory bg-espresso/70 px-1.5 py-0.5 rounded-full pointer-events-none">
+              {reels.length} reels
+            </span>
+          )}
           <button
             type="button"
             aria-label="Hide reel"
@@ -146,57 +147,23 @@ const StickyReelVideo = ({ productId, fallbackVideoUrl }: StickyReelVideoProps) 
             <X className="h-3.5 w-3.5" />
           </button>
           <span className="absolute bottom-1.5 left-1.5 right-1.5 text-[9px] leading-tight text-ivory/90 truncate pointer-events-none">
-            {caption || 'Watch reel'}
+            {reel.caption || 'Watch reel'}
           </span>
         </div>
       </div>
 
-      {/* Expanded player */}
+      {/* Expanded — shared carousel viewer with prev/next previews & slider */}
       {expanded && (
-        <div
-          className="fixed inset-0 z-[100] bg-espresso/85 backdrop-blur-sm flex items-center justify-center p-4"
-          onClick={closeExpanded}
-        >
-          <div
-            className="relative w-full max-w-[380px] aspect-[9/16] bg-black rounded overflow-hidden"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {ytId ? (
-              <iframe
-                src={youTubeEmbed(ytId)}
-                title={caption || 'Product reel'}
-                className="w-full h-full"
-                allow="autoplay; encrypted-media; picture-in-picture"
-                allowFullScreen
-              />
-            ) : (
-              <video
-                ref={fullVideoRef}
-                src={mediaUrl(videoUrl)}
-                className="w-full h-full object-contain"
-                autoPlay
-                controls
-                playsInline
-                onLoadedMetadata={(e) => {
-                  /* Continue from where the mini player was */
-                  try {
-                    e.currentTarget.currentTime = resumeAtRef.current;
-                  } catch {
-                    /* ignore seek errors */
-                  }
-                }}
-              />
-            )}
-            <button
-              type="button"
-              aria-label="Close"
-              onClick={closeExpanded}
-              className="absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-ivory/90 flex items-center justify-center text-espresso hover:bg-ivory"
-            >
-              <X className="h-5 w-5" />
-            </button>
-          </div>
-        </div>
+        <ReelViewer
+          reels={reels}
+          index={viewerIndex}
+          onIndexChange={setViewerIndex}
+          initialSeek={resumeAtRef.current}
+          onClose={(info) => {
+            if (info.index === 0) resumeAtRef.current = info.time;
+            setExpanded(false);
+          }}
+        />
       )}
     </>
   );

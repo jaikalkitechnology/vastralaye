@@ -63,6 +63,11 @@ A small floating reel player on the product detail page that **follows the scrol
   it again, and it's always visible near the top of the page (8px jitter filter so it doesn't flicker).
 - **Continuous playback:** expanding continues the video from the mini player's position, and
   closing hands the position back to the mini player — one uninterrupted reel.
+- **Opens the full carousel viewer:** tapping the sticky reel opens the same viewer as the reels
+  row — **prev/next previews on the sides, slider arrows, counter, keyboard navigation** — loaded
+  with **all** of the product's reels (a "N reels" chip on the mini player shows when more than one
+  exists). The viewer is now a shared component (`ReelViewer.tsx`) used by both the reels row and
+  the sticky player, so both always behave identically.
 - Shows the product's **first PDP reel** (poster/autoplaying muted loop for uploads, YouTube
   thumbnail for links); falls back to the product's own `video/video_url` when no reel exists;
   renders nothing when there's no video at all.
@@ -72,7 +77,9 @@ A small floating reel player on the product detail page that **follows the scrol
 
 | File | Change |
 |---|---|
-| `src/components/StickyReelVideo.tsx` | New component: reel/fallback fetch, scroll-linked visibility, mini player, expanded player, dismiss |
+| `src/components/ReelViewer.tsx` | **New shared viewer component** — extracted carousel (previews, arrows, counter, keyboard, view tracking, shoppable strip, `initialSeek` continuity) used by both surfaces |
+| `src/components/StickyReelVideo.tsx` | Fetches **all** product reels (fallback to the product's own video), direction-aware visibility, mini player with "N reels" chip, opens `ReelViewer` with playback continuity both ways |
+| `src/components/ReelsSection.tsx` | Now delegates its lightbox to `ReelViewer` (behavior unchanged, ~150 lines slimmer) |
 | `src/pages/ProductDetailPage.tsx` | Renders `<StickyReelVideo productId fallbackVideoUrl>` alongside the "Watch It Styled" strip |
 
 ---
