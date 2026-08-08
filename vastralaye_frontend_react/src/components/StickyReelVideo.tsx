@@ -22,6 +22,7 @@ interface StickyReelVideoProps {
 const StickyReelVideo = ({ productId, fallbackVideoUrl }: StickyReelVideoProps) => {
   const [reels, setReels] = useState<Reel[]>([]);
   const [visible, setVisible] = useState(true);
+  const [overReels, setOverReels] = useState(false);
   const [dismissed, setDismissed] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [viewerIndex, setViewerIndex] = useState(0);
@@ -68,6 +69,35 @@ const StickyReelVideo = ({ productId, fallbackVideoUrl }: StickyReelVideoProps) 
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  /* Hide while the "Watch It Styled" reels section is on screen —
+     the reels are right there, so the mini player steps aside. */
+  useEffect(() => {
+    let observer: IntersectionObserver | null = null;
+    let cancelled = false;
+    let attempts = 0;
+
+    const attach = () => {
+      if (cancelled) return;
+      const el = document.getElementById('watch-it-styled');
+      if (!el) {
+        /* The section mounts only after its reels load — retry briefly. */
+        if (attempts++ < 15) setTimeout(attach, 800);
+        return;
+      }
+      observer = new IntersectionObserver(
+        (entries) => setOverReels(entries[0]?.isIntersecting ?? false),
+        { threshold: 0.15 }
+      );
+      observer.observe(el);
+    };
+
+    attach();
+    return () => {
+      cancelled = true;
+      observer?.disconnect();
+    };
+  }, [productId]);
+
   const openViewer = () => {
     resumeAtRef.current = miniVideoRef.current?.currentTime || 0;
     setViewerIndex(0);
@@ -95,7 +125,7 @@ const StickyReelVideo = ({ productId, fallbackVideoUrl }: StickyReelVideoProps) 
       {/* Mini floating player */}
       <div
         className={`fixed bottom-5 left-4 z-40 w-[110px] md:w-[132px] transition-all duration-300 ${
-          visible && !expanded
+          visible && !expanded && !overReels
             ? 'opacity-100 translate-y-0'
             : 'opacity-0 translate-y-6 pointer-events-none'
         }`}

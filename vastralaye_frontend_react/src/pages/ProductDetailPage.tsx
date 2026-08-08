@@ -1161,6 +1161,7 @@ return (
 
     {/* Watch It Styled — related product reels (design.md §5.11) */}
     <ReelsSection
+      id="watch-it-styled"
       placement="pdp"
       productId={id ? Number(id) : undefined}
       title="Watch It Styled"
