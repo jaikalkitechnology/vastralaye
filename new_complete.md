@@ -66,6 +66,20 @@ loads the reel into the form for editing in place, same flow as Banners/Testimon
 | Backend | New `PUT /api/v1/admin/reels/{id}` — updates caption, linked product, Home/PDP placements and publish state; **video and poster are optional on edit** (omitted = keep the current media; a new upload or link replaces it, with old local files cleaned up and external links left alone); same validation as create | `vastralaye_backend/app/routers/reels.py` |
 | Admin UI | Edit-in-place: form header switches to "Edit Reel #id" with a *Cancel edit* action; all fields prefill (caption, product, placements, publish); the video source auto-detects — an external link opens in **Video Link** mode with the URL prefilled, an uploaded video opens in **Upload File** mode with a "current one is kept" hint; submit becomes *Update Reel* (PUT); deleting the reel being edited resets the form | `src/pages/admin/AdminReels.tsx` |
 
+## 6. Sticky product-page reel — continuous playback + scroll behavior ✅
+
+The floating reel on the product detail page now behaves exactly as requested:
+
+| Behavior | Detail |
+|---|---|
+| **Continuous video** | Tapping the mini reel opens the full player **continuing from the same position** (no restart); closing the full player hands the position back so the mini reel **continues** where the big one stopped. (YouTube-linked reels show a thumbnail in mini mode, so continuity applies to uploaded/direct videos.) |
+| **Scroll down → hide** | Scrolling down the page slides the mini reel away so it never blocks reading |
+| **Scroll up → show** | Any upward scroll brings it back; it's always visible near the top of the page |
+| Other | Small jitter filter (8px) so tiny scroll wiggles don't flicker it; ✕ still dismisses for the page view; falls back to the product's own video when no reel exists; renders nothing with no video at all |
+
+Files: `src/components/StickyReelVideo.tsx` (direction-aware scroll listener, shared
+playback-position ref between mini and expanded players, seek-on-open and seek-on-close).
+
 ---
 
 ## Shared infrastructure added
