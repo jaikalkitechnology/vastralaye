@@ -199,6 +199,16 @@ interface Coupon {
 }
 
 type FilterType = 'all' | 'active' | 'inactive' | 'expired' | 'upcoming';
+
+// Status chip pill (admin_design.md §3.4)
+const StatusChip = ({ tint, label }: { tint: string; label: string }) => (
+  <span
+    className={`inline-flex items-center gap-1.5 text-[11px] font-semibold rounded-full px-2.5 py-0.5 whitespace-nowrap ${tint}`}
+  >
+    <span className="h-1.5 w-1.5 rounded-full bg-current" />
+    {label}
+  </span>
+);
 type SortField = 'code' | 'validTo' | 'discountValue' | 'usedCount' | 'createdAt';
 type SortOrder = 'asc' | 'desc';
 
@@ -466,22 +476,22 @@ const AdminCoupons = () => {
     validTo.setHours(0, 0, 0, 0);
 
     if (!coupon.active) {
-      return { label: "Inactive", variant: "secondary" as const, icon: XCircle };
+      return { label: "Inactive", variant: "secondary" as const, icon: XCircle, tint: "bg-espresso/5 text-muted-foreground" };
     }
 
     if (validTo < today) {
-      return { label: "Expired", variant: "destructive" as const, icon: Clock };
+      return { label: "Expired", variant: "destructive" as const, icon: Clock, tint: "bg-espresso/5 text-muted-foreground" };
     }
 
     if (validFrom > today) {
-      return { label: "Upcoming", variant: "outline" as const, icon: Calendar };
+      return { label: "Upcoming", variant: "outline" as const, icon: Calendar, tint: "bg-[#5C6B8A]/10 text-[#5C6B8A]" };
     }
 
     if (coupon.usedCount >= coupon.maxUses) {
-      return { label: "Used Up", variant: "secondary" as const, icon: XCircle };
+      return { label: "Used Up", variant: "secondary" as const, icon: XCircle, tint: "bg-amber-500/10 text-amber-700" };
     }
 
-    return { label: "Active", variant: "default" as const, icon: CheckCircle2 };
+    return { label: "Active", variant: "default" as const, icon: CheckCircle2, tint: "bg-green-700/10 text-green-800" };
   };
 
   // ----------------- Forms -----------------
@@ -814,162 +824,108 @@ const AdminCoupons = () => {
   return (
     <AdminLayout>
       <div className="space-y-6 p-6">
-        {/* Modern Header with Gradient */}
-        <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-red-600 rounded-2xl p-8 text-white shadow-xl">
-          <div className="flex justify-between items-center">
-            <div>
-              <div className="flex items-center gap-3 mb-2">
-                <div className="bg-white/20 backdrop-blur-sm p-3 rounded-xl">
-                  <Sparkles className="h-8 w-8" />
-                </div>
-                <h1 className="text-3xl font-bold">Coupon Management</h1>
-              </div>
-              <p className="text-pink-100 text-lg">
-                Create and manage discount coupons to boost sales
-              </p>
-              <div className="flex items-center gap-6 mt-4">
-                <div className="flex items-center gap-2">
-                  <div className="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-lg">
-                    <span className="font-semibold text-lg">{coupons.length}</span>
-                  </div>
-                  <span className="text-pink-100">Total Coupons</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-lg">
-                    <span className="font-semibold text-lg">
-                      {coupons.filter(c => getCouponStatus(c).label === 'Active').length}
-                    </span>
-                  </div>
-                  <span className="text-pink-100">Active</span>
-                </div>
-              </div>
-            </div>
-            <Button
-              onClick={() => setIsAddDialogOpen(true)}
-              size="lg"
-              className="bg-white text-purple-600 hover:bg-pink-50 shadow-lg hover:shadow-xl transition-all"
-            >
-              <Plus className="mr-2 h-5 w-5" /> Add Coupon
-            </Button>
+        {/* Header */}
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h1 className="font-serif text-xl md:text-2xl font-medium text-espresso">Coupons</h1>
+            <p className="text-[13px] text-muted-foreground mt-1">
+              Create and manage discount coupons to boost sales
+            </p>
           </div>
+          <Button
+            onClick={() => setIsAddDialogOpen(true)}
+            className="bg-maroon text-ivory uppercase text-[11px] tracking-[0.12em] px-5 py-2.5 rounded-sm hover:bg-terracotta"
+          >
+            <Plus className="mr-2 h-4 w-4" /> Create Coupon
+          </Button>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 mb-1">Total Coupons</p>
-                  <p className="text-3xl font-bold text-gray-900">{coupons.length}</p>
-                </div>
-                <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-4 rounded-xl">
-                  <Tag className="h-6 w-6 text-white" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
+          <div className="bg-white border border-border rounded-md p-5">
+            <div className="w-9 h-9 rounded-md bg-maroon/10 text-maroon flex items-center justify-center mb-3">
+              <Tag className="h-4 w-4" />
+            </div>
+            <p className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground font-semibold mb-1">Total Coupons</p>
+            <p className="font-serif text-2xl md:text-[27px] font-medium text-espresso">{coupons.length}</p>
+          </div>
 
-          <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 mb-1">Active Coupons</p>
-                  <p className="text-3xl font-bold text-green-600">
-                    {coupons.filter(c => getCouponStatus(c).label === 'Active').length}
-                  </p>
-                </div>
-                <div className="bg-gradient-to-br from-green-500 to-green-600 p-4 rounded-xl">
-                  <CheckCircle2 className="h-6 w-6 text-white" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="bg-white border border-border rounded-md p-5">
+            <div className="w-9 h-9 rounded-md bg-green-700/10 text-green-800 flex items-center justify-center mb-3">
+              <CheckCircle2 className="h-4 w-4" />
+            </div>
+            <p className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground font-semibold mb-1">Active Coupons</p>
+            <p className="font-serif text-2xl md:text-[27px] font-medium text-espresso">
+              {coupons.filter(c => getCouponStatus(c).label === 'Active').length}
+            </p>
+          </div>
 
-          <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 mb-1">Expired</p>
-                  <p className="text-3xl font-bold text-red-600">
-                    {coupons.filter(c => getCouponStatus(c).label === 'Expired').length}
-                  </p>
-                </div>
-                <div className="bg-gradient-to-br from-red-500 to-red-600 p-4 rounded-xl">
-                  <Clock className="h-6 w-6 text-white" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="bg-white border border-border rounded-md p-5">
+            <div className="w-9 h-9 rounded-md bg-amber-500/10 text-amber-700 flex items-center justify-center mb-3">
+              <Clock className="h-4 w-4" />
+            </div>
+            <p className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground font-semibold mb-1">Expired</p>
+            <p className="font-serif text-2xl md:text-[27px] font-medium text-espresso">
+              {coupons.filter(c => getCouponStatus(c).label === 'Expired').length}
+            </p>
+          </div>
 
-          <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 mb-1">Total Usage</p>
-                  <p className="text-3xl font-bold text-purple-600">
-                    {coupons.reduce((sum, coupon) => sum + coupon.usedCount, 0)}
-                  </p>
-                </div>
-                <div className="bg-gradient-to-br from-purple-500 to-purple-600 p-4 rounded-xl">
-                  <TrendingUp className="h-6 w-6 text-white" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="bg-white border border-border rounded-md p-5">
+            <div className="w-9 h-9 rounded-md bg-[#5C6B8A]/10 text-[#5C6B8A] flex items-center justify-center mb-3">
+              <TrendingUp className="h-4 w-4" />
+            </div>
+            <p className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground font-semibold mb-1">Total Usage</p>
+            <p className="font-serif text-2xl md:text-[27px] font-medium text-espresso">
+              {coupons.reduce((sum, coupon) => sum + coupon.usedCount, 0)}
+            </p>
+          </div>
         </div>
 
-        {/* Search and Filter Card */}
-        <Card className="border-0 shadow-lg">
-          <CardContent className="p-6">
-            <div className="flex flex-col lg:flex-row justify-between gap-4">
-              <div className="flex flex-col sm:flex-row gap-4 flex-1">
-                <div className="relative flex-1 max-w-md">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
-                  <Input
-                    placeholder="Search coupons by code or description..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-12 h-12 text-base border-gray-200 focus:border-purple-500 focus:ring-purple-500"
-                  />
-                </div>
+        {/* Search and Filter */}
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
+            <Input
+              placeholder="Search coupons by code or description..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-9 h-10 bg-white rounded-sm border-border text-[13px] focus:border-maroon focus-visible:ring-0 focus-visible:ring-offset-0"
+            />
+          </div>
 
-                <Select value={filterType} onValueChange={(value: FilterType) => { setFilterType(value); setCurrentPage(1); }}>
-                  <SelectTrigger className="w-[200px] h-12">
-                    <Filter className="h-4 w-4 mr-2" />
-                    <SelectValue placeholder="Filter by status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Coupons</SelectItem>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="inactive">Inactive</SelectItem>
-                    <SelectItem value="expired">Expired</SelectItem>
-                    <SelectItem value="upcoming">Upcoming</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+          <Select value={filterType} onValueChange={(value: FilterType) => { setFilterType(value); setCurrentPage(1); }}>
+            <SelectTrigger className="w-[200px] h-10 bg-white rounded-sm border-border text-[13px] focus:border-maroon focus:ring-0 focus:ring-offset-0">
+              <Filter className="h-4 w-4 mr-2 text-muted-foreground" />
+              <SelectValue placeholder="Filter by status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Coupons</SelectItem>
+              <SelectItem value="active">Active</SelectItem>
+              <SelectItem value="inactive">Inactive</SelectItem>
+              <SelectItem value="expired">Expired</SelectItem>
+              <SelectItem value="upcoming">Upcoming</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
         {/* Results Count */}
         {!isLoading && (
           <div className="flex justify-between items-center">
-            <p className="text-sm text-gray-600 font-medium">
-              Showing <span className="text-purple-600 font-bold">{paginatedCoupons.length}</span> of{' '}
-              <span className="text-purple-600 font-bold">{filteredAndSortedCoupons.length}</span> coupons
+            <p className="text-[12.5px] text-muted-foreground">
+              Showing <span className="text-espresso font-semibold">{paginatedCoupons.length}</span> of{' '}
+              <span className="text-espresso font-semibold">{filteredAndSortedCoupons.length}</span> coupons
             </p>
           </div>
         )}
 
         {/* Coupons Table */}
-        <Card className="border-0 shadow-lg overflow-hidden">
-          <CardContent className="p-0">
+        <div className="bg-white border border-border rounded-md overflow-hidden">
+          <div>
             {isLoading ? (
               <div className="p-8 space-y-4">
                 {[...Array(5)].map((_, i) => (
                   <div key={i} className="flex items-center space-x-4">
-                    <Skeleton className="h-16 flex-1 rounded-lg" />
+                    <Skeleton className="h-12 flex-1 rounded-md" />
                   </div>
                 ))}
               </div>
@@ -978,36 +934,36 @@ const AdminCoupons = () => {
                 <div className="overflow-x-auto">
                   <Table>
                     <TableHeader>
-                      <TableRow className="bg-gray-50 border-b-2 border-gray-200">
+                      <TableRow className="bg-[#FBF8F3] hover:bg-[#FBF8F3] border-border">
                         <TableHead
-                          className="cursor-pointer hover:bg-gray-100 font-semibold text-gray-700 transition-colors"
+                          className="h-auto px-3 py-2.5 text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground font-semibold whitespace-nowrap cursor-pointer hover:text-espresso transition-colors"
                           onClick={() => handleSort('code')}
                         >
                           <div className="flex items-center gap-2">
                             Code {sortField === 'code' && (sortOrder === 'asc' ? '↑' : '↓')}
                           </div>
                         </TableHead>
-                        <TableHead className="font-semibold text-gray-700">Description</TableHead>
+                        <TableHead className="h-auto px-3 py-2.5 text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground font-semibold whitespace-nowrap">Description</TableHead>
                         <TableHead
-                          className="cursor-pointer hover:bg-gray-100 font-semibold text-gray-700 transition-colors"
+                          className="h-auto px-3 py-2.5 text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground font-semibold whitespace-nowrap cursor-pointer hover:text-espresso transition-colors"
                           onClick={() => handleSort('discountValue')}
                         >
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 justify-end">
                             Discount {sortField === 'discountValue' && (sortOrder === 'asc' ? '↑' : '↓')}
                           </div>
                         </TableHead>
-                        <TableHead className="font-semibold text-gray-700">Min. Purchase</TableHead>
+                        <TableHead className="h-auto px-3 py-2.5 text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground font-semibold whitespace-nowrap text-right">Min. Purchase</TableHead>
                         <TableHead
-                          className="cursor-pointer hover:bg-gray-100 font-semibold text-gray-700 transition-colors"
+                          className="h-auto px-3 py-2.5 text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground font-semibold whitespace-nowrap cursor-pointer hover:text-espresso transition-colors"
                           onClick={() => handleSort('validTo')}
                         >
                           <div className="flex items-center gap-2">
                             Valid Until {sortField === 'validTo' && (sortOrder === 'asc' ? '↑' : '↓')}
                           </div>
                         </TableHead>
-                        <TableHead className="font-semibold text-gray-700">Usage</TableHead>
-                        <TableHead className="font-semibold text-gray-700">Status</TableHead>
-                        <TableHead className="text-right font-semibold text-gray-700">Actions</TableHead>
+                        <TableHead className="h-auto px-3 py-2.5 text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground font-semibold whitespace-nowrap">Usage</TableHead>
+                        <TableHead className="h-auto px-3 py-2.5 text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground font-semibold whitespace-nowrap">Status</TableHead>
+                        <TableHead className="h-auto px-3 py-2.5 text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground font-semibold whitespace-nowrap text-right">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
 

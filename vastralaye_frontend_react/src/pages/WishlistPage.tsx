@@ -44,7 +44,7 @@ const WishlistPage = () => {
 
   // Wishlist product mapping
   const wishlistProducts = wishlist
-    .map((item) => {
+    .map((item: any) => {
       if (item.product) return item.product;
       return products.find((p) => Number(p.id) === Number(item.product_id));
     })
@@ -58,7 +58,7 @@ const WishlistPage = () => {
   const updateWishlist = async (productId: string) => {
     try {
       setIsLoading(true);
-      const exists = wishlist.some((w) => Number(w.product_id) === Number(productId));
+      const exists = wishlist.some((w: any) => Number(w.product_id) === Number(productId));
 
       if (exists) {
         await removeFromWishlist(productId);
@@ -76,7 +76,7 @@ const WishlistPage = () => {
 
   // Check if product is in cart
   const isInCart = (productId: string) => {
-    return cart.some(item => Number(item.product_id) === Number(productId));
+    return cart.some((item: any) => Number(item.product_id) === Number(productId));
   };
 
   // Fetch reviews for all wishlist products
@@ -89,7 +89,7 @@ useEffect(() => {
       if (!product.id) continue;
       
       try {
-        const response = await axios.get(`${BASE_URL}/users/product/${product.id}/reviews?page=1&page_size=100`);
+        const response = await axios.get<any>(`${BASE_URL}/users/product/${product.id}/reviews?page=1&page_size=100`);
         let reviewsData: Review[] = [];
 
         // Handle paginated response
@@ -151,7 +151,7 @@ useEffect(() => {
         return product.in_stock;
       }
       if (typeof product.in_stock === 'string') {
-        const lowerValue = product.in_stock.toLowerCase().trim();
+        const lowerValue = (product.in_stock as any).toLowerCase().trim();
         if (lowerValue === 'true' || lowerValue === 'yes' || lowerValue === '1') {
           return true;
         }

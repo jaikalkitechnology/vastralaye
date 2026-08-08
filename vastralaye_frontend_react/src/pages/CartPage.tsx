@@ -224,7 +224,7 @@ const QRCodeModal: React.FC<QRCodeModalProps> = ({
   const [copied, setCopied] = useState(false);
   const [generatedQR, setGeneratedQR] = useState<string>('');
   const [isGeneratingQR, setIsGeneratingQR] = useState(true);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const canvasRef = useRef<HTMLImageElement>(null);
 
   // Generate QR code from UPI URL if not provided
   useEffect(() => {
