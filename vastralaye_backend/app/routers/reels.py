@@ -33,6 +33,17 @@ def _save_upload(upload: UploadFile, prefix: str) -> str:
     return f"/static/uploads/reels/{filename}"
 
 
+def _remove_local(url: Optional[str]) -> None:
+    """Delete a locally stored /static file; external links are left alone."""
+    if url and url.startswith("/static/"):
+        path = url.lstrip("/")
+        if os.path.exists(path):
+            try:
+                os.remove(path)
+            except OSError:
+                pass
+
+
 def _first_image(product: Optional[Product]) -> Optional[str]:
     if not product:
         return None
@@ -160,6 +171,62 @@ def create_reel(
         is_published=is_published,
     )
     db.add(reel)
+    db.commit()
+    db.refresh(reel)
+    return _reel_out(reel)
+
+
+@router.put("/api/v1/admin/reels/{reel_id}")
+def update_reel(
+    reel_id: int,
+    caption: str = Form(...),
+    product_id: Optional[int] = Form(None),
+    show_on_home: bool = Form(True),
+    show_on_pdp: bool = Form(True),
+    is_published: bool = Form(True),
+    video_file: Optional[UploadFile] = File(None),
+    video_link: Optional[str] = Form(None),
+    poster_file: Optional[UploadFile] = File(None),
+    db: Session = Depends(get_db),
+    admin: User = Depends(get_current_admin_user),
+):
+    """Edit a reel. Video/poster are optional — omitted means keep the
+    existing media; a new upload or link replaces it (local files cleaned up)."""
+    reel = db.query(Reel).filter(Reel.id == reel_id).first()
+    if not reel:
+        raise HTTPException(status_code=404, detail="Reel not found")
+
+    video_link = (video_link or "").strip()
+    if video_link and not video_link.lower().startswith(("http://", "https://")):
+        raise HTTPException(status_code=400, detail="Video link must start with http(s)://")
+    if len(video_link) > 255:
+        raise HTTPException(status_code=400, detail="Video link is too long (max 255 chars).")
+    if video_file and video_file.content_type not in ALLOWED_VIDEO_TYPES:
+        raise HTTPException(status_code=400, detail="Unsupported video type. Use MP4/WebM.")
+    if poster_file and poster_file.content_type not in ALLOWED_IMAGE_TYPES:
+        raise HTTPException(status_code=400, detail="Unsupported poster type. Use JPG/PNG/WebP.")
+
+    if product_id is not None:
+        product = db.query(Product).filter(Product.id == product_id).first()
+        if not product:
+            raise HTTPException(status_code=404, detail="Linked product not found")
+
+    if video_file:
+        _remove_local(reel.video_url)
+        reel.video_url = _save_upload(video_file, "reel")
+    elif video_link and video_link != reel.video_url:
+        _remove_local(reel.video_url)
+        reel.video_url = video_link
+
+    if poster_file:
+        _remove_local(reel.poster_url)
+        reel.poster_url = _save_upload(poster_file, "poster")
+
+    reel.caption = caption.strip()
+    reel.product_id = product_id
+    reel.show_on_home = show_on_home
+    reel.show_on_pdp = show_on_pdp
+    reel.is_published = is_published
     db.commit()
     db.refresh(reel)
     return _reel_out(reel)
