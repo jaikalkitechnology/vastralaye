@@ -599,26 +599,24 @@ const InvoicesPage: React.FC = () => {
     return (
       <UserLayout>
         <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4 px-4">
-          <div className="bg-red-50 rounded-full p-4">
-            <AlertCircle className="h-16 w-16 text-red-400" />
-          </div>
-          <h2 className="text-2xl font-bold text-gray-800 text-center">
+          <AlertCircle className="h-14 w-14 text-sale/60" />
+          <h2 className="font-serif text-2xl font-medium text-espresso text-center">
             {error || "Invoice Not Found"}
           </h2>
-          <p className="text-gray-600 text-center max-w-md">
-            {error === "Invoice not found for this order" 
+          <p className="text-muted-foreground text-center max-w-md">
+            {error === "Invoice not found for this order"
               ? "No invoice has been generated for this order yet. Please check back later."
               : "We couldn't find the invoice you're looking for. It might have been removed or you don't have permission to view it."}
           </p>
           <div className="flex gap-3 mt-4 flex-wrap justify-center">
-            <Button onClick={handleRetry} variant="outline" className="gap-2">
-              <RefreshCw className="w-4 h-4" />Retry
+            <Button onClick={handleRetry} variant="outline" className="h-auto gap-2 rounded-sm px-5 py-2.5 text-[11px] font-medium uppercase tracking-[0.12em]">
+              <RefreshCw className="w-3.5 h-3.5" />Retry
             </Button>
-            <Button onClick={() => navigate("/orders")} variant="outline" className="gap-2">
-              <Package className="w-4 h-4" />My Orders
+            <Button onClick={() => navigate("/orders")} variant="outline" className="h-auto gap-2 rounded-sm px-5 py-2.5 text-[11px] font-medium uppercase tracking-[0.12em]">
+              <Package className="w-3.5 h-3.5" />My Orders
             </Button>
-            <Button onClick={() => navigate("/")} variant="outline" className="gap-2">
-              <Home className="w-4 h-4" />Home
+            <Button onClick={() => navigate("/")} variant="outline" className="h-auto gap-2 rounded-sm px-5 py-2.5 text-[11px] font-medium uppercase tracking-[0.12em]">
+              <Home className="w-3.5 h-3.5" />Home
             </Button>
           </div>
         </div>
@@ -641,59 +639,57 @@ const InvoicesPage: React.FC = () => {
         </div>
 
         {/* Header */}
-        <div className="bg-gradient-to-r from-[#7A1F2B]/10 via-[#B85C38]/5 to-[#7A1F2B]/10 rounded-2xl p-6 border border-[#7A1F2B]/20">
+        <div className="rounded-sm border border-border bg-white p-5 md:p-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div className="flex items-center gap-4">
               <Button
                 variant="outline"
                 size="icon"
                 onClick={() => navigate("/invoices")}
-                className="h-12 w-12 rounded-xl border-[#7A1F2B]/30 hover:bg-[#7A1F2B]/5"
+                className="h-10 w-10 rounded-sm"
               >
-                <ArrowLeft className="h-5 w-5 text-[#7A1F2B]" />
+                <ArrowLeft className="h-4 w-4" />
               </Button>
               <div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] bg-clip-text text-transparent">
+                <h1 className="font-serif text-2xl font-medium text-espresso">
                   {invoice.invoice_number}
                 </h1>
-                <div className="flex items-center gap-2 text-sm text-gray-600 mt-1">
+                <div className="flex items-center gap-2 text-[13px] text-muted-foreground mt-1">
                   <Calendar className="w-3 h-3" />
                   {formatDate(invoice.invoice_date)}
-                  <span className="text-gray-400">•</span>
+                  <span>·</span>
                   <span>Order #{invoice.order_id}</span>
                 </div>
               </div>
             </div>
 
             <div className="flex items-center gap-2 flex-wrap">
-              <Badge variant="outline" className={`${statusCfg.bg} ${statusCfg.color} ${statusCfg.border} px-3 py-1.5 rounded-full`}>
+              <Badge variant="outline" className={`${statusCfg.bg} ${statusCfg.color} ${statusCfg.border} px-3 py-1 rounded-full text-[11px] font-semibold uppercase tracking-[0.12em]`}>
                 <StatusIcon className="w-3 h-3 mr-1" />{statusCfg.label}
               </Badge>
-              <Badge variant="outline" className={`${payInfo.badge} px-3 py-1 rounded-full text-xs`}>
+              <Badge variant="outline" className={`${payInfo.badge} px-2.5 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-[0.1em]`}>
                 <PayIcon className="w-3 h-3 mr-1" />{payInfo.short}
               </Badge>
-              
+
               {/* Action Buttons */}
               <div className="flex gap-2">
                 <Button
-                  size="sm"
                   variant="outline"
-                  className="border-[#7A1F2B] text-[#7A1F2B]"
+                  className="h-auto rounded-sm px-4 py-2 text-[11px] font-medium uppercase tracking-[0.12em]"
                   onClick={handlePrintInvoice}
                 >
-                  <Printer className="w-4 h-4 mr-1" />Print
+                  <Printer className="w-3.5 h-3.5 mr-1" />Print
                 </Button>
-                
+
                 <Button
-                  size="sm"
-                  className="bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] text-white hover:opacity-90"
+                  className="h-auto rounded-sm bg-maroon px-4 py-2 text-[11px] font-medium uppercase tracking-[0.12em] text-ivory hover:bg-terracotta"
                   onClick={() => handleDownloadPDF('pdf')}
                   disabled={generatingPDF}
                 >
                   {generatingPDF ? (
-                    <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                    <Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" />
                   ) : (
-                    <Download className="w-4 h-4 mr-1" />
+                    <Download className="w-3.5 h-3.5 mr-1" />
                   )}
                   Download
                 </Button>
@@ -701,24 +697,23 @@ const InvoicesPage: React.FC = () => {
                 {/* Share Dropdown */}
                 <div className="relative">
                   <Button
-                    size="sm"
                     variant="outline"
-                    className="border-[#7A1F2B] text-[#7A1F2B]"
+                    className="h-auto rounded-sm px-4 py-2 text-[11px] font-medium uppercase tracking-[0.12em]"
                     onClick={handleShare}
                   >
-                    <Share2 className="w-4 h-4 mr-1" />Share
+                    <Share2 className="w-3.5 h-3.5 mr-1" />Share
                     <ChevronDown className="w-3 h-3 ml-1" />
                   </Button>
-                  
+
                   {showShareOptions && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
+                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-sm border border-border shadow-[0_10px_30px_-12px_rgba(43,27,18,0.18)] z-50">
                       <div className="p-2 space-y-1">
                         <button
                           onClick={() => {
                             handleEmailInvoice();
                             setShowShareOptions(false);
                           }}
-                          className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 rounded-lg flex items-center gap-2"
+                          className="w-full text-left px-3 py-2 text-sm text-espresso hover:bg-ivory rounded-sm flex items-center gap-2"
                         >
                           <Mail className="w-4 h-4" /> Email
                         </button>
@@ -727,7 +722,7 @@ const InvoicesPage: React.FC = () => {
                             handleWhatsAppShare();
                             setShowShareOptions(false);
                           }}
-                          className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 rounded-lg flex items-center gap-2"
+                          className="w-full text-left px-3 py-2 text-sm text-espresso hover:bg-ivory rounded-sm flex items-center gap-2"
                         >
                           <Send className="w-4 h-4" /> WhatsApp
                         </button>
@@ -736,7 +731,7 @@ const InvoicesPage: React.FC = () => {
                             handleCopyLink();
                             setShowShareOptions(false);
                           }}
-                          className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 rounded-lg flex items-center gap-2"
+                          className="w-full text-left px-3 py-2 text-sm text-espresso hover:bg-ivory rounded-sm flex items-center gap-2"
                         >
                           {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                           {copied ? "Copied!" : "Copy Link"}

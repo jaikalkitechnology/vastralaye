@@ -1177,17 +1177,17 @@ const PaymentMethodModal: React.FC<PaymentMethodModalProps> = ({
 
           {/* Shipping Address - Read Only */}
           <div className="space-y-3">
-            <Label className="text-sm font-medium text-gray-700 flex items-center gap-2 justify-between">
+            <Label className="text-xs font-semibold uppercase tracking-[0.12em] text-espresso flex items-center gap-2 justify-between">
               <span className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-gray-500" /> Shipping Address
+                <MapPin className="w-4 h-4 text-muted-foreground" /> Shipping Address
               </span>
               <div className="flex items-center gap-2">
                 {(addressLine1 || city || addressState || zipCode) && (
-                  <span className="text-[10px] text-green-600 flex items-center gap-1 bg-green-50 px-2 py-0.5 rounded-full">
+                  <span className="text-[10px] normal-case tracking-normal text-green-700 flex items-center gap-1 bg-green-50 px-2 py-0.5 rounded-sm">
                     <Sparkles className="w-3 h-3" /> Auto-filled
                   </span>
                 )}
-                <span className="text-[10px] text-gray-400 flex items-center gap-1 bg-gray-100 px-2 py-0.5 rounded-full">
+                <span className="text-[10px] normal-case tracking-normal text-muted-foreground flex items-center gap-1 bg-sand px-2 py-0.5 rounded-sm">
                   <Lock className="w-3 h-3" /> Read only
                 </span>
               </div>
@@ -1201,13 +1201,13 @@ const PaymentMethodModal: React.FC<PaymentMethodModalProps> = ({
                   <input
                     type="text"
                     placeholder={placeholder}
-                    className="w-full p-3 border rounded-lg text-sm bg-gray-50 border-gray-200 text-gray-700 cursor-not-allowed"
+                    className="w-full p-3 border border-input rounded-sm text-sm bg-ivory text-muted-foreground cursor-not-allowed"
                     value={value}
                     readOnly
                     disabled
                     tabIndex={-1}
                   />
-                  <Lock className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-300" />
+                  <Lock className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/50" />
                 </div>
               ))}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -1219,13 +1219,13 @@ const PaymentMethodModal: React.FC<PaymentMethodModalProps> = ({
                     <input
                       type="text"
                       placeholder={placeholder}
-                      className="w-full p-3 border rounded-lg text-sm bg-gray-50 border-gray-200 text-gray-700 cursor-not-allowed"
+                      className="w-full p-3 border border-input rounded-sm text-sm bg-ivory text-muted-foreground cursor-not-allowed"
                       value={value}
                       readOnly
                       disabled
                       tabIndex={-1}
                     />
-                    <Lock className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-300" />
+                    <Lock className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/50" />
                   </div>
                 ))}
               </div>
@@ -1238,20 +1238,20 @@ const PaymentMethodModal: React.FC<PaymentMethodModalProps> = ({
                     <input
                       type="text"
                       placeholder={placeholder}
-                      className="w-full p-3 border rounded-lg text-sm bg-gray-50 border-gray-200 text-gray-700 cursor-not-allowed"
+                      className="w-full p-3 border border-input rounded-sm text-sm bg-ivory text-muted-foreground cursor-not-allowed"
                       value={value}
                       readOnly
                       disabled
                       tabIndex={-1}
                     />
-                    <Lock className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-300" />
+                    <Lock className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/50" />
                   </div>
                 ))}
               </div>
               {isLoadingProfile &&
                 !(addressLine1 || city || addressState || zipCode) && (
                   <div className="flex items-center justify-center py-2">
-                    <Loader2 className="w-5 h-5 animate-spin text-green-600" />
+                    <Loader2 className="w-5 h-5 animate-spin text-maroon" />
                   </div>
                 )}
             </div>

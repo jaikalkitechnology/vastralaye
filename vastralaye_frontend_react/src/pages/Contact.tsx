@@ -310,7 +310,7 @@ const Contact = () => {
     if (hasError) {
       return `${baseClass} border-red-300 focus:ring-red-200 bg-red-50`;
     }
-    return `${baseClass} border-gray-300 focus:ring-blue-200 focus:border-blue-500`;
+    return `${baseClass} border-border focus:ring-gold/40 focus:border-gold`;
   };
 
   return (
@@ -336,12 +336,12 @@ const Contact = () => {
 
             <div className="space-y-6 pb-5">
               <div className="flex items-start space-x-4">
-                <div className="bg-blue-50 p-3 rounded-lg">
-                  <Store className="w-6 h-6 text-blue-600" />
+                <div className="bg-blush p-3 rounded-lg">
+                  <Store className="w-6 h-6 text-maroon" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900">Legal Company Name</h3>
-                  <p className="text-sm text-gray-900">
+                  <h3 className="font-medium text-espresso">Legal Company Name</h3>
+                  <p className="text-sm text-muted-foreground">
                     MIZORPAY SOLUTION<br />(OPC) PRIVATE LIMITED
                   </p>
                 </div>
@@ -351,50 +351,50 @@ const Contact = () => {
 
             <div className="space-y-6">
               <div className="flex items-start space-x-4">
-                <div className="bg-blue-50 p-3 rounded-lg">
-                  <Phone className="w-6 h-6 text-blue-600" />
+                <div className="bg-blush p-3 rounded-lg">
+                  <Phone className="w-6 h-6 text-maroon" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900">Phone Support</h3>
-                  <p className="text-gray-600">+91 85275 96413</p>
-                  <p className="text-sm text-gray-500">Mon-Fri 9am-6pm</p>
+                  <h3 className="font-medium text-espresso">Phone Support</h3>
+                  <p className="text-muted-foreground">+91 85275 96413</p>
+                  <p className="text-sm text-muted-foreground">Mon-Fri 9am-6pm</p>
                 </div>
               </div>
 
               <div className="flex items-start space-x-4">
-                <div className="bg-green-50 p-3 rounded-lg">
-                  <Mail className="w-6 h-6 text-green-600" />
+                <div className="bg-blush p-3 rounded-lg">
+                  <Mail className="w-6 h-6 text-maroon" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900">Department Emails</h3>
+                  <h3 className="font-medium text-espresso">Department Emails</h3>
                   <div className="space-y-2">
                     <div>
-                      <p className="text-xs font-medium text-gray-500 mb-1">General Inquiries</p>
-                      <a href="mailto:info@mizorpaymart.in" className="block text-sm text-gray-600 hover:text-blue-600 transition-colors">
+                      <p className="text-xs font-medium text-muted-foreground mb-1">General Inquiries</p>
+                      <a href="mailto:info@mizorpaymart.in" className="block text-sm text-muted-foreground hover:text-maroon transition-colors">
                         info@mizorpaymart.com
                       </a>
                     </div>
                     <div>
-                      <p className="text-xs font-medium text-gray-500 mb-1">Support</p>
-                      <a href="mailto:support@mizorpaymart.in" className="block text-sm text-gray-600 hover:text-blue-600 transition-colors">
+                      <p className="text-xs font-medium text-muted-foreground mb-1">Support</p>
+                      <a href="mailto:support@mizorpaymart.in" className="block text-sm text-muted-foreground hover:text-maroon transition-colors">
                         support@mizorpaymart.com
                       </a>
                     </div>
                     <div>
-                      <p className="text-xs font-medium text-gray-500 mb-1">Complaints</p>
-                      <a href="mailto:complaints@mizorpaymart.in" className="block text-sm text-gray-600 hover:text-blue-600 transition-colors">
+                      <p className="text-xs font-medium text-muted-foreground mb-1">Complaints</p>
+                      <a href="mailto:complaints@mizorpaymart.in" className="block text-sm text-muted-foreground hover:text-maroon transition-colors">
                         complaints@mizorpaymart.com
                       </a>
                     </div>
                     <div>
-                      <p className="text-xs font-medium text-gray-500 mb-1">Refunds</p>
-                      <a href="mailto:refund@mizorpaymart.in" className="block text-sm text-gray-600 hover:text-blue-600 transition-colors">
+                      <p className="text-xs font-medium text-muted-foreground mb-1">Refunds</p>
+                      <a href="mailto:refund@mizorpaymart.in" className="block text-sm text-muted-foreground hover:text-maroon transition-colors">
                         refund@mizorpaymart.com
                       </a>
                     </div>
                     <div>
-                      <p className="text-xs font-medium text-gray-500 mb-1">Legal</p>
-                      <a href="mailto:legal@mizorpaymart.in" className="block text-sm text-gray-600 hover:text-blue-600 transition-colors">
+                      <p className="text-xs font-medium text-muted-foreground mb-1">Legal</p>
+                      <a href="mailto:legal@mizorpaymart.in" className="block text-sm text-muted-foreground hover:text-maroon transition-colors">
                         legal@mizorpaymart.com
                       </a>
                     </div>
@@ -403,16 +403,16 @@ const Contact = () => {
               </div>
 
               <div className="flex items-start space-x-4">
-                <div className="bg-blue-50 p-3 rounded-lg">
-                  <MapPin className="w-6 h-6 text-blue-600" />
+                <div className="bg-blush p-3 rounded-lg">
+                  <MapPin className="w-6 h-6 text-maroon" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900">Address</h3>
-                  <p className="text-gray-600"> PLOT NO 69-71, <br />OM SHUBHAM TOWER, BP, </p> <p className="text-gray-600"> Faridabad, Faridabad, </p> <p className="text-gray-600"> Haryana – 121001 </p>
+                  <h3 className="font-medium text-espresso">Address</h3>
+                  <p className="text-muted-foreground"> PLOT NO 69-71, <br />OM SHUBHAM TOWER, BP, </p> <p className="text-muted-foreground"> Faridabad, Faridabad, </p> <p className="text-muted-foreground"> Haryana – 121001 </p>
                 </div>
               </div>
 
-              <div className="mt-6 w-full h-[300px] rounded-xl overflow-hidden border">
+              <div className="mt-6 w-full h-[300px] rounded-lg overflow-hidden border border-border">
                 <iframe
                   title="Mizorpay Mart Location"
                   src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d112306.01439054766!2d77.31907425!3d28.40226565!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390cdc15f5a424b1%3A0xe4f50576c850e0f2!2sFaridabad%2C%20Haryana!5e0!3m2!1sen!2sin!4v1769501410330!5m2!1sen!2sin"
@@ -425,28 +425,28 @@ const Contact = () => {
           </div>
 
           {/* Contact Form */}
-          <div className="bg-white rounded-2xl shadow-lg p-8">
+          <div className="bg-white rounded-lg border border-border p-8">
             {isSubmitted ? (
               <div className="text-center py-12">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-6">
-                  <CheckCircle className="w-8 h-8 text-green-600" />
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-blush rounded-full mb-6">
+                  <CheckCircle className="w-8 h-8 text-maroon" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                <h3 className="font-serif text-xl font-medium text-espresso mb-3">
                   Message Sent Successfully!
                 </h3>
-                <p className="text-gray-600 mb-4">
+                <p className="text-muted-foreground mb-4">
                   Thank you for contacting us. We'll get back to you shortly.
                 </p>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-muted-foreground">
                   Your message has been sent to: {getRelevantEmail(formData.type)}
                 </p>
               </div>
             ) : (
               <>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                <h2 className="font-serif text-xl font-medium text-espresso mb-2">
                   Send us a Message
                 </h2>
-                <p className="text-gray-500 mb-8">
+                <p className="text-muted-foreground mb-8">
                   All fields are required. Please fill in all details.
                 </p>
 
@@ -462,7 +462,7 @@ const Contact = () => {
                 <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
                   {/* Name */}
                   <div>
-                    <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                    <label className="flex items-center text-sm font-medium text-espresso mb-2">
                       <User className="w-4 h-4 mr-2" />
                       Name *
                     </label>
@@ -494,7 +494,7 @@ const Contact = () => {
                   <div className="grid md:grid-cols-2 gap-6">
                     {/* Phone */}
                     <div>
-                      <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                      <label className="flex items-center text-sm font-medium text-espresso mb-2">
                         <Phone className="w-4 h-4 mr-2" />
                         Phone Number *
                       </label>
@@ -518,7 +518,7 @@ const Contact = () => {
 
                     {/* Email */}
                     <div>
-                      <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                      <label className="flex items-center text-sm font-medium text-espresso mb-2">
                         <Mail className="w-4 h-4 mr-2" />
                         Email Address *
                       </label>
@@ -577,7 +577,7 @@ const Contact = () => {
 
                   {/* Message */}
                   <div>
-                    <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                    <label className="flex items-center text-sm font-medium text-espresso mb-2">
                       <MessageSquare className="w-4 h-4 mr-2" />
                       Message *
                     </label>

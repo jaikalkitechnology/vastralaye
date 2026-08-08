@@ -704,51 +704,46 @@ export default function AdminProductsPage(): JSX.Element {
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 tracking-tight mb-2">Product Management</h1>
-            <p className="text-gray-600 text-base">Manage your product catalog</p>
+            <h1 className="font-serif text-xl md:text-2xl font-medium text-espresso">Products</h1>
+            <p className="text-[13px] text-muted-foreground mt-1">Manage your product catalog</p>
           </div>
           <div className="flex gap-3">
-            <Button variant="outline" onClick={() => { fetchProducts(); fetchCategories(); }} disabled={loading} className="hover:bg-gray-50">
+            <Button variant="outline" onClick={() => { fetchProducts(); fetchCategories(); }} disabled={loading} className="uppercase text-[11px] tracking-[0.12em] px-5 py-2.5 rounded-sm">
               <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />Refresh
             </Button>
-            <Button onClick={openCreate} className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-sm" disabled={loading}>
-              <Plus className="h-4 w-4 mr-2" />Add New Product
+            <Button onClick={openCreate} className="bg-maroon text-ivory uppercase text-[11px] tracking-[0.12em] px-5 py-2.5 rounded-sm hover:bg-terracotta" disabled={loading}>
+              <Plus className="h-4 w-4 mr-2" />Add Product
             </Button>
           </div>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
           {[
-            { label: "Total Products", value: totalProducts, icon: Package, gradient: "from-blue-500 via-blue-600 to-blue-700", lightText: "text-blue-100", corner: TrendingUp },
-            { label: "In Stock", value: stats.inStock, icon: ShoppingBag, gradient: "from-emerald-500 via-emerald-600 to-emerald-700", lightText: "text-emerald-100", corner: BarChart3 },
-            { label: "Featured", value: stats.featured, icon: Star, gradient: "from-violet-500 via-violet-600 to-violet-700", lightText: "text-violet-100", corner: Sparkles },
-            { label: "Best Sellers", value: stats.bestSellers, icon: Award, gradient: "from-amber-500 via-amber-600 to-amber-700", lightText: "text-amber-100", corner: DollarSign },
+            { label: "Total Products", value: totalProducts, icon: Package, tint: "bg-maroon/10 text-maroon" },
+            { label: "In Stock", value: stats.inStock, icon: ShoppingBag, tint: "bg-green-700/10 text-green-800" },
+            { label: "Featured", value: stats.featured, icon: Star, tint: "bg-gold/15 text-[#8a6414]" },
+            { label: "Best Sellers", value: stats.bestSellers, icon: Award, tint: "bg-[#5C6B8A]/10 text-[#5C6B8A]" },
           ].map((s) => (
-            <Card key={s.label} className={`relative overflow-hidden border-none shadow-lg bg-gradient-to-br ${s.gradient} text-white transform hover:scale-105 transition-transform duration-300`}>
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16" />
-              <CardContent className="p-6 relative z-10">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl"><s.icon className="h-6 w-6" /></div>
-                  <s.corner className="h-5 w-5 opacity-70" />
-                </div>
-                <p className={`text-sm font-medium ${s.lightText} mb-1`}>{s.label}</p>
-                <p className="text-4xl font-bold tracking-tight">{s.value}</p>
-              </CardContent>
-            </Card>
+            <div key={s.label} className="bg-white border border-border rounded-md p-5">
+              <div className={`w-9 h-9 rounded-md ${s.tint} flex items-center justify-center mb-3`}>
+                <s.icon className="h-4 w-4" />
+              </div>
+              <p className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground font-semibold mb-1">{s.label}</p>
+              <p className="font-serif text-2xl md:text-[27px] font-medium text-espresso">{s.value}</p>
+            </div>
           ))}
         </div>
 
         {/* Filters */}
-        <Card className="border-gray-200 shadow-sm">
-          <CardContent className="p-6">
+        <div className="bg-white border border-border rounded-md p-5">
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                 <div className="relative md:col-span-2">
-                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     placeholder="Search products..."
-                    className="pl-11 h-11 border-gray-300"
+                    className="pl-9 h-10 bg-white rounded-sm border-border text-[13px] focus:border-maroon focus-visible:ring-0 focus-visible:ring-offset-0"
                     value={filters.search}
                     onChange={(e) => updateFilter("search", e.target.value)}
                   />
@@ -767,7 +762,7 @@ export default function AdminProductsPage(): JSX.Element {
                     setCurrentPage(1);
                   }}
                 >
-                  <SelectTrigger className="h-11 border-gray-300">
+                  <SelectTrigger className="h-10 bg-white rounded-sm border-border text-[13px] focus:border-maroon focus:ring-0 focus:ring-offset-0">
                     <SelectValue placeholder="All Categories" />
                   </SelectTrigger>
                   <SelectContent>
@@ -784,7 +779,7 @@ export default function AdminProductsPage(): JSX.Element {
                   onValueChange={(v) => updateFilter("subcategory_id", v === "all" ? "" : v)}
                   disabled={!filters.category_id || filters.category_id === "all"}
                 >
-                  <SelectTrigger className="h-11 border-gray-300">
+                  <SelectTrigger className="h-10 bg-white rounded-sm border-border text-[13px] focus:border-maroon focus:ring-0 focus:ring-offset-0">
                     <SelectValue placeholder={
                       !filters.category_id || filters.category_id === "all"
                         ? "Select category first"
@@ -805,7 +800,7 @@ export default function AdminProductsPage(): JSX.Element {
                   </SelectContent>
                 </Select>
 
-                <Button variant="outline" onClick={() => setShowAdvancedFilters(!showAdvancedFilters)} className="w-full h-11 border-gray-300">
+                <Button variant="outline" onClick={() => setShowAdvancedFilters(!showAdvancedFilters)} className="w-full h-10 rounded-sm text-[12.5px]">
                   <SlidersHorizontal className="h-4 w-4 mr-2" />
                   {showAdvancedFilters ? "Hide" : "Show"} Filters
                 </Button>
@@ -813,17 +808,17 @@ export default function AdminProductsPage(): JSX.Element {
 
               {/* Advanced Filters */}
               {showAdvancedFilters && (
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-6 bg-gradient-to-br from-gray-50 to-blue-50 rounded-xl border border-gray-200">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-5 bg-[#FBF8F3] rounded-md border border-border">
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold text-gray-700 uppercase tracking-wide">Min Price (₹)</Label>
+                    <Label className="text-[10.5px] font-semibold text-muted-foreground uppercase tracking-[0.14em]">Min Price (₹)</Label>
                     <Input type="number" placeholder="0" value={filters.min_price} onChange={(e) => updateFilter("min_price", e.target.value)} min="0" step="0.01" className="border-gray-300" />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold text-gray-700 uppercase tracking-wide">Max Price (₹)</Label>
+                    <Label className="text-[10.5px] font-semibold text-muted-foreground uppercase tracking-[0.14em]">Max Price (₹)</Label>
                     <Input type="number" placeholder="No limit" value={filters.max_price} onChange={(e) => updateFilter("max_price", e.target.value)} min="0" step="0.01" className="border-gray-300" />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold text-gray-700 uppercase tracking-wide">Stock Status</Label>
+                    <Label className="text-[10.5px] font-semibold text-muted-foreground uppercase tracking-[0.14em]">Stock Status</Label>
                     <Select value={filters.in_stock} onValueChange={(v) => updateFilter("in_stock", v)}>
                       <SelectTrigger className="border-gray-300"><SelectValue /></SelectTrigger>
                       <SelectContent>
@@ -834,7 +829,7 @@ export default function AdminProductsPage(): JSX.Element {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold text-gray-700 uppercase tracking-wide">Min Rating</Label>
+                    <Label className="text-[10.5px] font-semibold text-muted-foreground uppercase tracking-[0.14em]">Min Rating</Label>
                     <Select value={filters.min_rating || "all"} onValueChange={(v) => updateFilter("min_rating", v === "all" ? "" : v)}>
                       <SelectTrigger className="border-gray-300"><SelectValue placeholder="Any rating" /></SelectTrigger>
                       <SelectContent>
@@ -847,7 +842,7 @@ export default function AdminProductsPage(): JSX.Element {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold text-gray-700 uppercase tracking-wide">Featured</Label>
+                    <Label className="text-[10.5px] font-semibold text-muted-foreground uppercase tracking-[0.14em]">Featured</Label>
                     <Select value={filters.featured} onValueChange={(v) => updateFilter("featured", v)}>
                       <SelectTrigger className="border-gray-300"><SelectValue /></SelectTrigger>
                       <SelectContent>
@@ -858,7 +853,7 @@ export default function AdminProductsPage(): JSX.Element {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold text-gray-700 uppercase tracking-wide">Best Seller</Label>
+                    <Label className="text-[10.5px] font-semibold text-muted-foreground uppercase tracking-[0.14em]">Best Seller</Label>
                     <Select value={filters.best_seller} onValueChange={(v) => updateFilter("best_seller", v)}>
                       <SelectTrigger className="border-gray-300"><SelectValue /></SelectTrigger>
                       <SelectContent>
@@ -869,7 +864,7 @@ export default function AdminProductsPage(): JSX.Element {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold text-gray-700 uppercase tracking-wide">New Arrival</Label>
+                    <Label className="text-[10.5px] font-semibold text-muted-foreground uppercase tracking-[0.14em]">New Arrival</Label>
                     <Select value={filters.new_arrival} onValueChange={(v) => updateFilter("new_arrival", v)}>
                       <SelectTrigger className="border-gray-300"><SelectValue /></SelectTrigger>
                       <SelectContent>
@@ -880,7 +875,7 @@ export default function AdminProductsPage(): JSX.Element {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold text-gray-700 uppercase tracking-wide">Sort By</Label>
+                    <Label className="text-[10.5px] font-semibold text-muted-foreground uppercase tracking-[0.14em]">Sort By</Label>
                     <Select value={filters.sort_by} onValueChange={(v) => updateFilter("sort_by", v)}>
                       <SelectTrigger className="border-gray-300"><SelectValue /></SelectTrigger>
                       <SelectContent>
@@ -894,12 +889,12 @@ export default function AdminProductsPage(): JSX.Element {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold text-gray-700 uppercase tracking-wide">Filter by Sizes</Label>
+                    <Label className="text-[10.5px] font-semibold text-muted-foreground uppercase tracking-[0.14em]">Filter by Sizes</Label>
                     <Input placeholder="e.g., S, M, L" value={filters.sizes} onChange={(e) => updateFilter("sizes", e.target.value)} className="border-gray-300" />
                     <p className="text-xs text-gray-500">Comma-separated</p>
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold text-gray-700 uppercase tracking-wide">Filter by Colors</Label>
+                    <Label className="text-[10.5px] font-semibold text-muted-foreground uppercase tracking-[0.14em]">Filter by Colors</Label>
                     <Input placeholder="e.g., Red, Blue" value={filters.colors} onChange={(e) => updateFilter("colors", e.target.value)} className="border-gray-300" />
                     <p className="text-xs text-gray-500">Comma-separated</p>
                   </div>
