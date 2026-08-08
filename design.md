@@ -48,6 +48,7 @@ What the reference sites do, and what we adopt:
 | Instagram / UGC grid | ✅ | ✅ | ✅ new section |
 | Newsletter band | ✅ | ✅ | ✅ new section |
 | Product card: 3:4 image, hover image‑swap, quick add | ✅ subtle | ✅ + % badges & stars | ✅ combined |
+| Shoppable video reels (watch & shop) | ✅ | ✅ (video commerce widgets) | ✅ home reels row + PDP video strip |
 | Serif display headings + clean sans body | ✅ | ✅ | ✅ Fraunces + Jost |
 | Scallop/arch/block‑print ornament | ➖ | ✅ | ✅ used sparingly |
 | Dark, link‑rich footer + payment icons | ✅ | ✅ | ✅ espresso footer |
@@ -237,6 +238,7 @@ Thin band directly under the hero, blush bg, 4 items (2×2 on mobile): `Free Shi
 | Component | Content |
 |---|---|
 | `BrandStory.tsx` | Split band on blush + faint block‑print bg: image left (artisan/detail shot), right: overline `OUR CRAFT`, serif H2, 2 short paragraphs, 3 inline stats in serif (e.g. `40+ crafts · 900+ styles · 50k+ customers`), `outline` CTA → `/about` |
+| `ReelsSection.tsx` | **Shoppable video reels** — overline `WATCH & SHOP`, H2 "Vastralaye in Motion"; horizontal row of 9:16 reel cards (5 desktop / peek-scroll mobile). Each card: video poster with play button + "Reel" chip + view count, and an attached mini product strip (thumb, name, price, →) linking to the PDP. Tap opens an inline `<video>` lightbox (muted autoplay, tap for sound). Serve `.mp4` posters+clips from the backend's existing `/static/uploads/product_videos/` storage; lazy-load posters, never autoplay in the row |
 | `Testimonials.tsx` | Carousel of quote cards: 5 gold stars, 2–3 line quote (serif italic), customer name + city; ivory cards, 1px border; static seed data first |
 | `InstagramGrid.tsx` | Overline `@vastralaye` + H2 "As Worn By You"; 6 square tiles (hover: espresso scrim + Instagram glyph) linking to the profile; static images first |
 | `NewsletterBand.tsx` | Maroon band, ivory block‑print pattern at 5%: serif H2 "Stay in the Loop", sub‑line, email input + gold `Subscribe` button (front‑end only; toast on submit) |
@@ -264,9 +266,9 @@ Assemble per §6.1; **remove** the logged‑in "My Account" card block (those li
 
 ### 5.11 Product detail — `src/pages/ProductDetailPage.tsx`
 
-- Layout: **left** vertical thumbnail rail + main 3:4 image (click zoom / pinch on mobile, swipeable); **right** sticky info column:
+- Layout: **left** vertical thumbnail rail + main 3:4 image (click zoom / pinch on mobile, swipeable); the rail's **last thumb is the product video** (poster + small play badge) when the product has one — selecting it plays the video in the main frame (muted, loop, tap for sound); **right** sticky info column:
   title (serif 26–30px) → rating link → price block (final + struck MRP + % off) → tax/shipping microcopy → **size selector as square outline swatches** (selected = espresso fill) + "Size guide" link → quantity stepper → full‑width `primary` ADD TO CART + heart `outline` square → trust icon row (COD · Easy returns · Secure payments) → accordions (Description · Fabric & Care · Shipping & Returns) instead of tabs.
-- Below: `ReviewSection` restyled (summary: big serif average + gold star bars; review cards flat with 1px dividers) → "You may also like" `ProductCarousel`.
+- Below: `ReviewSection` restyled (summary: big serif average + gold star bars; review cards flat with 1px dividers) → **"Watch It Styled" related-video strip** (blush band reusing the `ReelsSection` card: styling reels, fabric close-ups and customer videos for this product, each with its shoppable product strip) → "You may also like" `ProductCarousel`.
 - **Mobile:** sticky bottom bar with price + ADD TO CART after scrolling past the fold.
 
 ### 5.12 Cart, wishlist, checkout, auth, account
@@ -312,16 +314,17 @@ Assemble per §6.1; **remove** the logged‑in "My Account" card block (those li
 06 New Arrivals carousel                          — ivory
 07 Editorial banners       (2-up: Festive / Everyday)
 08 Bestsellers carousel                           — blush + scallop edges
-09 Brand story band        (craft + stats)        — blush/pattern
-10 Testimonials carousel                          — ivory
-11 Instagram / UGC grid                           — ivory
-12 Newsletter band                                — maroon
-13 Footer                                         — espresso
+09 Shoppable reels         ("Vastralaye in Motion", 9:16 video cards)
+10 Brand story band        (craft + stats)        — blush/pattern
+11 Testimonials carousel                          — ivory
+12 Instagram / UGC grid                           — ivory
+13 Newsletter band                                — maroon
+14 Footer                                         — espresso
 ```
 
 ### 6.2 Listing page: breadcrumb → serif title + count → toolbar → sidebar (desktop) / drawer (mobile) → 2–4 col grid → pagination ("Load more" `outline` button preferred) → footer.
 
-### 6.3 PDP: breadcrumb → gallery + sticky buy column → accordions → reviews → related carousel → (mobile) sticky ATC bar.
+### 6.3 PDP: breadcrumb → gallery (last thumb = product video) + sticky buy column → accordions → reviews → "Watch It Styled" video strip → related carousel → (mobile) sticky ATC bar.
 
 ### 6.4 Checkout/auth pages stay **distraction‑light**: header simplified (logo + secure badge), no mega menu needed.
 
@@ -360,6 +363,7 @@ To be produced/collected before Phase 2 (all our own or licensed — nothing fro
 - [ ] Category images (one per live category), consistent warm background, subject centered for the **arch crop** (min 900×1200).
 - [ ] 2 editorial banner images (1200×1500) + 1 seasonal campaign banner (2400×1000).
 - [ ] Brand‑story image (artisan/fabric detail) + 6 UGC squares (≥800×800).
+- [ ] **Reel videos:** 5+ vertical 9:16 clips (15–30s, ≤8MB `.mp4`, muted-friendly) with poster frames — styling reels, fabric close‑ups, customer videos; per‑product videos upload to the backend's existing `/static/uploads/product_videos/`.
 - [ ] Block‑print SVG tile + ornament SVG (commission or draw in‑house).
 - [ ] Payment method icon set (SVG, monochrome ivory).
 - [ ] Every product ideally has ≥2 images (enables card hover‑swap; card must degrade gracefully with 1).
@@ -390,6 +394,7 @@ Ship phase‑by‑phase — the site stays usable after every phase. Each phase 
 - [ ] `CategorySection.tsx` arch cards
 - [ ] `ProductCarousel` extraction + New Arrivals/Bestsellers sections
 - [ ] `PromoSection.tsx` rewrite + re‑enable
+- [ ] New `ReelsSection` (shoppable reels row + video lightbox)
 - [ ] New `BrandStory` / `Testimonials` / `InstagramGrid` / `NewsletterBand`
 - [ ] `Index.tsx` reassembled per §6.1 (account card block removed)
 
@@ -400,7 +405,8 @@ Ship phase‑by‑phase — the site stays usable after every phase. Each phase 
 - [ ] Skeletons updated to new ratios
 
 ### Phase 4 — Product detail *(≈ 1–2 days)*
-- [ ] Gallery (thumb rail, zoom, swipe) + sticky buy column
+- [ ] Gallery (thumb rail, zoom, swipe) + sticky buy column; product-video thumb plays in main frame
+- [ ] "Watch It Styled" related-video strip (reuse `ReelsSection` card)
 - [ ] Size swatches, qty stepper, trust row, accordions
 - [ ] `ReviewSection` restyle; related‑products carousel
 - [ ] Mobile sticky ATC bar
