@@ -29,6 +29,8 @@ interface ReelsSectionProps {
   productId?: number;
   title?: string;
   overline?: string;
+  /** DOM id for the section (lets other components observe its visibility). */
+  id?: string;
 }
 
 /**
@@ -41,6 +43,7 @@ const ReelsSection = ({
   productId,
   title = 'Vastralaye in Motion',
   overline = 'Watch & Shop',
+  id,
 }: ReelsSectionProps) => {
   const [reels, setReels] = useState<Reel[]>([]);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
@@ -92,7 +95,7 @@ const ReelsSection = ({
   if (reels.length === 0) return null;
 
   return (
-    <section className="py-14 md:py-20">
+    <section id={id} className="py-14 md:py-20">
       <div className="container mx-auto px-4">
         <div className="text-center mb-10">
           <span className="overline-label mb-2">{overline}</span>

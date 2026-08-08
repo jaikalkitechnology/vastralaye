@@ -61,6 +61,10 @@ A small floating reel player on the product detail page that **follows the scrol
 
 - **Direction-aware:** scrolling **down hides** it (never blocks reading); scrolling **up shows**
   it again, and it's always visible near the top of the page (8px jitter filter so it doesn't flicker).
+- **Steps aside at "Watch It Styled":** while the product page's reels section is on screen, the
+  sticky mini reel hides automatically (the reels are right there) and returns once you scroll past
+  it — implemented with an IntersectionObserver on the section (`id="watch-it-styled"`), with a
+  short retry so it still attaches when the section mounts after its reels load.
 - **Continuous playback:** expanding continues the video from the mini player's position, and
   closing hands the position back to the mini player — one uninterrupted reel.
 - **Opens the full carousel viewer:** tapping the sticky reel opens the same viewer as the reels
