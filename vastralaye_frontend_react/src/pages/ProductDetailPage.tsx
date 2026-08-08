@@ -32,6 +32,7 @@ import { toast } from "@/components/ui/use-toast";
 import { BASE_IMG, BASE_URL } from "@/config";
 import ReviewSection from "@/pages/ReviewSection";
 import ReelsSection from "@/components/ReelsSection";
+import StickyReelVideo from "@/components/StickyReelVideo";
 import ProductGrid from "@/components/ProductGrid";
 import { adminMe } from "@/api/apihelper";
 
@@ -1164,6 +1165,12 @@ return (
       productId={id ? Number(id) : undefined}
       title="Watch It Styled"
       overline="Watch & Shop"
+    />
+
+    {/* Sticky floating reel — appears on scroll-down, hides on scroll-up */}
+    <StickyReelVideo
+      productId={id ? Number(id) : undefined}
+      fallbackVideoUrl={(product as any)?.video || (product as any)?.video_url}
     />
 
     {/* Sticky mobile add-to-cart bar */}
