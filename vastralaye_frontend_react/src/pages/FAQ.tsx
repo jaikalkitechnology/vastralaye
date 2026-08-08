@@ -53,38 +53,34 @@ const FAQ = () => {
     setOpenIndex(openIndex === index ? null : index);
   };
 
-  const filteredFaqs = activeCategory === "all" 
-    ? faqs 
+  const filteredFaqs = activeCategory === "all"
+    ? faqs
     : faqs.filter(faq => faq.category === activeCategory);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-ivory py-12 md:py-16 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-3xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-blue-100 rounded-2xl mb-6">
-            <svg className="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+        <div className="text-center mb-10 md:mb-12">
+          <span className="overline-label mb-2">Support</span>
+          <h1 className="font-serif text-3xl md:text-4xl font-medium text-espresso mb-4">
             Frequently Asked Questions
           </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          <p className="text-[15px] leading-relaxed text-muted-foreground max-w-2xl mx-auto">
             Find quick answers to common questions about our services and policies
           </p>
         </div>
 
         {/* Category Filters */}
-        <div className="flex flex-wrap justify-center gap-3 mb-8">
+        <div className="flex flex-wrap justify-center gap-2 mb-8">
           {categories.map((category) => (
             <button
               key={category}
               onClick={() => setActiveCategory(category)}
-              className={`px-4 py-2 rounded-full font-medium transition-all duration-200 capitalize ${
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200 capitalize ${
                 activeCategory === category
-                  ? 'bg-blue-600 text-white shadow-lg transform -translate-y-0.5'
-                  : 'bg-white text-gray-700 hover:bg-gray-50 shadow-sm'
+                  ? 'bg-maroon text-ivory'
+                  : 'bg-white text-muted-foreground border border-border hover:border-gold hover:text-espresso'
               }`}
             >
               {category}
@@ -93,29 +89,29 @@ const FAQ = () => {
         </div>
 
         {/* FAQ List */}
-        <div className="space-y-4">
+        <div className="space-y-3">
           {filteredFaqs.map((faq, index) => (
             <div
               key={index}
-              className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden"
+              className="bg-white rounded-lg border border-border transition-colors duration-300 overflow-hidden"
             >
               <button
                 onClick={() => toggleFAQ(index)}
-                className="w-full flex justify-between items-center p-6 text-left hover:bg-gray-50 transition-colors duration-200"
+                className="w-full flex justify-between items-center p-6 text-left hover:bg-ivory transition-colors duration-200"
               >
                 <div className="flex items-start space-x-4">
-                  <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mt-1">
-                    <span className="text-blue-600 font-semibold text-sm">Q</span>
+                  <div className="flex-shrink-0 w-8 h-8 bg-blush rounded-lg flex items-center justify-center mt-1">
+                    <span className="text-maroon font-serif font-semibold text-sm">Q</span>
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900 pr-4">{faq.question}</h3>
+                  <h3 className="text-espresso font-medium pr-4">{faq.question}</h3>
                 </div>
-                <div className="flex-shrink-0 w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center transition-transform duration-300">
-                  <svg 
-                    className={`w-5 h-5 text-gray-600 transition-transform duration-300 ${
+                <div className="flex-shrink-0 w-8 h-8 bg-sand rounded-full flex items-center justify-center transition-transform duration-300">
+                  <svg
+                    className={`w-5 h-5 text-espresso transition-transform duration-300 ${
                       openIndex === index ? 'rotate-180' : ''
                     }`}
-                    fill="none" 
-                    stroke="currentColor" 
+                    fill="none"
+                    stroke="currentColor"
                     viewBox="0 0 24 24"
                   >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -123,17 +119,17 @@ const FAQ = () => {
                 </div>
               </button>
 
-              <div 
+              <div
                 className={`transition-all duration-300 ease-in-out ${
                   openIndex === index ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
                 } overflow-hidden`}
               >
                 <div className="px-6 pb-6">
                   <div className="flex items-start space-x-4">
-                    <div className="flex-shrink-0 w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mt-1">
-                      <span className="text-green-600 font-semibold text-sm">A</span>
+                    <div className="flex-shrink-0 w-8 h-8 bg-sand rounded-lg flex items-center justify-center mt-1">
+                      <span className="text-maroon font-serif font-semibold text-sm">A</span>
                     </div>
-                    <p className="text-gray-700 leading-relaxed pt-1">{faq.answer}</p>
+                    <p className="text-[15px] leading-relaxed text-muted-foreground pt-1">{faq.answer}</p>
                   </div>
                 </div>
               </div>
@@ -141,7 +137,7 @@ const FAQ = () => {
           ))}
         </div>
 
-       
+
       </div>
     </div>
   );

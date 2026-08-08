@@ -1,6 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { User, ShoppingBag, Settings, LogOut } from "lucide-react";
-import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { useStore } from "@/contexts/StoreContext";
 
@@ -20,17 +19,17 @@ const UserSidebar = () => {
     {
       name: "My Profile",
       path: "/account/profile",
-      icon: <User className="h-5 w-5" />,
+      icon: <User className="h-4 w-4" />,
     },
     {
       name: "My Orders",
       path: "/account/orders",
-      icon: <ShoppingBag className="h-5 w-5" />,
+      icon: <ShoppingBag className="h-4 w-4" />,
     },
     {
       name: "Account Settings",
       path: "/account/settings",
-      icon: <Settings className="h-5 w-5" />,
+      icon: <Settings className="h-4 w-4" />,
     },
   ];
 
@@ -62,15 +61,11 @@ const UserSidebar = () => {
   };
 
   return (
-    <Card className="w-full md:w-72 p-6 border-0 shadow-lg rounded-2xl bg-white">
-
+    <aside className="w-full self-start rounded-sm border border-border bg-white md:w-60">
       {/* HEADER */}
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] bg-clip-text text-transparent">
-          My Account
-        </h2>
-
-        <p className="text-gray-500 text-sm mt-2">
+      <div className="border-b border-border px-5 py-5">
+        <h2 className="font-serif text-xl font-medium text-espresso">My Account</h2>
+        <p className="mt-1 text-[13px] text-muted-foreground">
           {state.user?.name
             ? `Welcome, ${state.user.name}`
             : "Manage your account settings"}
@@ -78,74 +73,34 @@ const UserSidebar = () => {
       </div>
 
       {/* NAVIGATION */}
-      <nav className="space-y-2">
+      <nav className="py-2.5">
         {navItems.map((item) => (
           <Link
             key={item.path}
             to={item.path}
-            className={`
-              relative flex items-center px-4 py-3.5 rounded-xl
-              transition-all duration-300 group
-              ${
-                isActive(item.path)
-                  ? "bg-gradient-to-r from-[#7A1F2B]/10 to-[#B85C38]/10 border-l-4 border-[#7A1F2B]"
-                  : "hover:bg-gradient-to-r hover:from-[#7A1F2B]/5 hover:to-[#B85C38]/5 border-l-4 border-transparent"
-              }
-            `}
+            className={`flex items-center gap-3 border-l-2 px-5 py-3 text-[13px] uppercase tracking-[0.1em] transition-colors ${
+              isActive(item.path)
+                ? "border-gold bg-ivory font-semibold text-espresso"
+                : "border-transparent text-muted-foreground hover:bg-ivory hover:text-espresso"
+            }`}
           >
-            {/* ICON */}
-            <div
-              className={`
-                w-10 h-10 rounded-lg flex items-center justify-center mr-3
-                transition-all duration-300
-                ${
-                  isActive(item.path)
-                    ? "bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] text-white"
-                    : "bg-gray-100 text-gray-600 group-hover:text-[#7A1F2B]"
-                }
-              `}
-            >
+            <span className={isActive(item.path) ? "text-maroon" : "text-muted-foreground"}>
               {item.icon}
-            </div>
-
-            {/* TEXT */}
-            <span
-              className={`
-                font-medium
-                ${
-                  isActive(item.path)
-                    ? "text-gray-900"
-                    : "text-gray-700 group-hover:text-gray-900"
-                }
-              `}
-            >
-              {item.name}
             </span>
+            {item.name}
           </Link>
         ))}
-      </nav>
 
-      {/* LOGOUT BUTTON */}
-      <div className="mt-8 pt-6 border-t border-gray-100">
+        {/* SIGN OUT */}
         <button
           onClick={handleSignOut}
-          className="
-            w-full flex items-center px-4 py-3.5 rounded-xl
-            bg-gradient-to-r from-red-50 to-red-50/50
-            hover:from-red-100 hover:to-red-100/50
-            text-red-600 hover:text-red-700
-            transition-all duration-300
-            group
-          "
+          className="flex w-full items-center gap-3 border-l-2 border-transparent px-5 py-3 text-left text-[13px] uppercase tracking-[0.1em] text-sale transition-colors hover:bg-sale/5"
         >
-          <div className="w-10 h-10 rounded-lg flex items-center justify-center mr-3 bg-red-100 group-hover:bg-red-200 transition-colors">
-            <LogOut className="h-5 w-5" />
-          </div>
-
-          <span className="font-medium">Sign Out</span>
+          <LogOut className="h-4 w-4" />
+          Sign Out
         </button>
-      </div>
-    </Card>
+      </nav>
+    </aside>
   );
 };
 

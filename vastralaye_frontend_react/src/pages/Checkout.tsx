@@ -206,45 +206,46 @@ const CheckoutPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-background py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-10">
-          <h1 className="text-3xl font-bold text-gray-900">Checkout</h1>
-          <p className="mt-2 text-gray-600">Complete your purchase securely</p>
+          <span className="overline-label mb-2">Almost there</span>
+          <h1 className="font-serif text-3xl md:text-4xl font-medium text-espresso">Checkout</h1>
+          <p className="mt-2 text-muted-foreground">Complete your purchase securely</p>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Left Column - Form */}
           <div className="lg:w-2/3">
-            <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+            <div className="bg-white border border-border rounded-sm p-6 md:p-8 mb-6">
               {/* Progress Steps */}
               <div className="flex items-center justify-between mb-8">
                 {['shipping', 'payment', 'review'].map((step, index) => (
                   <div key={step} className="flex items-center">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${
+                    <div className={`w-9 h-9 rounded-full flex items-center justify-center border ${
                       (step === 'shipping' && currentStep === 'shipping') ||
                       (step === 'payment' && currentStep === 'payment') ||
                       (step === 'review' && currentStep === 'review')
-                        ? 'bg-blue-600 border-blue-600 text-white'
+                        ? 'bg-maroon border-maroon text-ivory'
                         : step === 'review'
                         ? currentStep === 'review'
-                          ? 'bg-blue-600 border-blue-600 text-white'
-                          : 'border-gray-300 text-gray-300'
-                        : 'bg-green-500 border-green-500 text-white'
+                          ? 'bg-maroon border-maroon text-ivory'
+                          : 'border-border text-muted-foreground/60'
+                        : 'bg-espresso border-espresso text-ivory'
                     }`}>
                       {step === 'review' ? (
-                        <CheckCircle className="w-5 h-5" />
+                        <CheckCircle className="w-4 h-4" />
                       ) : (
-                        <span className="font-semibold">{index + 1}</span>
+                        <span className="text-[13px] font-medium">{index + 1}</span>
                       )}
                     </div>
-                    <span className="ml-3 font-medium text-gray-700 capitalize">{step}</span>
+                    <span className="ml-3 text-xs font-semibold uppercase tracking-[0.12em] text-espresso capitalize">{step}</span>
                     {index < 2 && (
-                      <div className={`h-1 w-16 mx-4 ${
+                      <div className={`h-px w-10 sm:w-16 mx-3 sm:mx-4 ${
                         (step === 'shipping' && currentStep === 'shipping') ||
                         (step === 'payment' && currentStep === 'payment')
-                          ? 'bg-gray-300'
-                          : 'bg-green-500'
+                          ? 'bg-border'
+                          : 'bg-gold'
                       }`} />
                     )}
                   </div>
@@ -255,26 +256,26 @@ const CheckoutPage: React.FC = () => {
                 {/* Shipping Information */}
                 {currentStep === 'shipping' && (
                   <div className="space-y-6">
-                    <div className="flex items-center mb-4">
-                      <Truck className="w-6 h-6 text-blue-600 mr-2" />
-                      <h2 className="text-xl font-semibold">Shipping Information</h2>
+                    <div className="flex items-center gap-3 mb-4">
+                      <span className="w-7 h-7 rounded-full bg-maroon text-ivory font-sans text-[13px] font-medium inline-flex items-center justify-center flex-shrink-0">1</span>
+                      <h2 className="font-serif text-xl font-medium text-espresso">Shipping Information</h2>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-[11px] font-semibold uppercase tracking-[0.16em] text-espresso mb-2">
                           Full Name *
                         </label>
                         <input
                           type="text"
                           value={formData.shippingAddress.fullName}
                           onChange={(e) => handleInputChange(e, 'shippingAddress', 'fullName')}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                          className="w-full px-4 py-3 bg-white border border-input rounded-sm text-sm text-espresso placeholder:text-muted-foreground focus:outline-none focus:border-maroon transition-colors"
                           required
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-[11px] font-semibold uppercase tracking-[0.16em] text-espresso mb-2">
                           Email Address *
                         </label>
                         <input
@@ -282,66 +283,66 @@ const CheckoutPage: React.FC = () => {
                           name="email"
                           value={formData.email}
                           onChange={(e) => handleInputChange(e, 'email')}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                          className="w-full px-4 py-3 bg-white border border-input rounded-sm text-sm text-espresso placeholder:text-muted-foreground focus:outline-none focus:border-maroon transition-colors"
                           required
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-[11px] font-semibold uppercase tracking-[0.16em] text-espresso mb-2">
                         Shipping Address *
                       </label>
                       <input
                         type="text"
                         value={formData.shippingAddress.address}
                         onChange={(e) => handleInputChange(e, 'shippingAddress', 'address')}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                        className="w-full px-4 py-3 bg-white border border-input rounded-sm text-sm text-espresso placeholder:text-muted-foreground focus:outline-none focus:border-maroon transition-colors"
                         required
                       />
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-[11px] font-semibold uppercase tracking-[0.16em] text-espresso mb-2">
                           City *
                         </label>
                         <input
                           type="text"
                           value={formData.shippingAddress.city}
                           onChange={(e) => handleInputChange(e, 'shippingAddress', 'city')}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                          className="w-full px-4 py-3 bg-white border border-input rounded-sm text-sm text-espresso placeholder:text-muted-foreground focus:outline-none focus:border-maroon transition-colors"
                           required
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-[11px] font-semibold uppercase tracking-[0.16em] text-espresso mb-2">
                           State *
                         </label>
                         <input
                           type="text"
                           value={formData.shippingAddress.state}
                           onChange={(e) => handleInputChange(e, 'shippingAddress', 'state')}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                          className="w-full px-4 py-3 bg-white border border-input rounded-sm text-sm text-espresso placeholder:text-muted-foreground focus:outline-none focus:border-maroon transition-colors"
                           required
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-[11px] font-semibold uppercase tracking-[0.16em] text-espresso mb-2">
                           ZIP Code *
                         </label>
                         <input
                           type="text"
                           value={formData.shippingAddress.zipCode}
                           onChange={(e) => handleInputChange(e, 'shippingAddress', 'zipCode')}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                          className="w-full px-4 py-3 bg-white border border-input rounded-sm text-sm text-espresso placeholder:text-muted-foreground focus:outline-none focus:border-maroon transition-colors"
                           required
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-[11px] font-semibold uppercase tracking-[0.16em] text-espresso mb-2">
                         Phone Number *
                       </label>
                       <input
@@ -349,22 +350,22 @@ const CheckoutPage: React.FC = () => {
                         name="phone"
                         value={formData.phone}
                         onChange={(e) => handleInputChange(e, 'phone')}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                        className="w-full px-4 py-3 bg-white border border-input rounded-sm text-sm text-espresso placeholder:text-muted-foreground focus:outline-none focus:border-maroon transition-colors"
                         required
                       />
                     </div>
 
                     {/* Shipping Method */}
                     <div className="mt-8">
-                      <h3 className="text-lg font-semibold mb-4">Shipping Method</h3>
+                      <h3 className="font-serif text-lg font-medium text-espresso mb-4">Shipping Method</h3>
                       <div className="space-y-3">
                         {shippingMethods.map((method) => (
                           <label
                             key={method.id}
-                            className={`flex items-center justify-between p-4 border-2 rounded-lg cursor-pointer transition ${
+                            className={`flex items-center justify-between p-4 border rounded-sm cursor-pointer transition-colors ${
                               formData.shippingMethod === method.id
-                                ? 'border-blue-500 bg-blue-50'
-                                : 'border-gray-200 hover:border-gray-300'
+                                ? 'border-maroon bg-ivory'
+                                : 'border-border hover:border-espresso/40'
                             }`}
                           >
                             <div className="flex items-center">
@@ -374,14 +375,14 @@ const CheckoutPage: React.FC = () => {
                                 value={method.id}
                                 checked={formData.shippingMethod === method.id}
                                 onChange={(e) => handleInputChange(e, 'shippingMethod')}
-                                className="w-4 h-4 text-blue-600"
+                                className="w-4 h-4 accent-maroon"
                               />
                               <div className="ml-3">
-                                <span className="font-medium">{method.name}</span>
-                                <p className="text-sm text-gray-600">{method.estDays}</p>
+                                <span className="font-medium text-espresso">{method.name}</span>
+                                <p className="text-[13px] text-muted-foreground">{method.estDays}</p>
                               </div>
                             </div>
-                            <span className="font-semibold">
+                            <span className="font-semibold text-espresso">
                               {method.price === 0 ? 'FREE' : `$${method.price.toFixed(2)}`}
                             </span>
                           </label>
@@ -392,15 +393,15 @@ const CheckoutPage: React.FC = () => {
                     {/* Billing Address */}
                     <div className="mt-8">
                       <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-lg font-semibold">Billing Address</h3>
+                        <h3 className="font-serif text-lg font-medium text-espresso">Billing Address</h3>
                         <label className="flex items-center">
                           <input
                             type="checkbox"
                             checked={useSameAddress}
                             onChange={(e) => handleUseSameAddressChange(e.target.checked)}
-                            className="w-4 h-4 text-blue-600"
+                            className="w-4 h-4 accent-maroon"
                           />
-                          <span className="ml-2">Same as shipping address</span>
+                          <span className="ml-2 text-sm text-muted-foreground">Same as shipping address</span>
                         </label>
                       </div>
 
@@ -411,35 +412,35 @@ const CheckoutPage: React.FC = () => {
                             placeholder="Full Name"
                             value={formData.billingAddress.fullName}
                             onChange={(e) => handleInputChange(e, 'billingAddress', 'fullName')}
-                            className="px-4 py-3 border border-gray-300 rounded-lg"
+                            className="px-4 py-3 bg-white border border-input rounded-sm text-sm text-espresso placeholder:text-muted-foreground focus:outline-none focus:border-maroon transition-colors"
                           />
                           <input
                             type="text"
                             placeholder="Address"
                             value={formData.billingAddress.address}
                             onChange={(e) => handleInputChange(e, 'billingAddress', 'address')}
-                            className="px-4 py-3 border border-gray-300 rounded-lg"
+                            className="px-4 py-3 bg-white border border-input rounded-sm text-sm text-espresso placeholder:text-muted-foreground focus:outline-none focus:border-maroon transition-colors"
                           />
                           <input
                             type="text"
                             placeholder="City"
                             value={formData.billingAddress.city}
                             onChange={(e) => handleInputChange(e, 'billingAddress', 'city')}
-                            className="px-4 py-3 border border-gray-300 rounded-lg"
+                            className="px-4 py-3 bg-white border border-input rounded-sm text-sm text-espresso placeholder:text-muted-foreground focus:outline-none focus:border-maroon transition-colors"
                           />
                           <input
                             type="text"
                             placeholder="State"
                             value={formData.billingAddress.state}
                             onChange={(e) => handleInputChange(e, 'billingAddress', 'state')}
-                            className="px-4 py-3 border border-gray-300 rounded-lg"
+                            className="px-4 py-3 bg-white border border-input rounded-sm text-sm text-espresso placeholder:text-muted-foreground focus:outline-none focus:border-maroon transition-colors"
                           />
                           <input
                             type="text"
                             placeholder="ZIP Code"
                             value={formData.billingAddress.zipCode}
                             onChange={(e) => handleInputChange(e, 'billingAddress', 'zipCode')}
-                            className="px-4 py-3 border border-gray-300 rounded-lg"
+                            className="px-4 py-3 bg-white border border-input rounded-sm text-sm text-espresso placeholder:text-muted-foreground focus:outline-none focus:border-maroon transition-colors"
                           />
                         </div>
                       )}
@@ -450,15 +451,15 @@ const CheckoutPage: React.FC = () => {
                 {/* Payment Information */}
                 {currentStep === 'payment' && (
                   <div className="space-y-6">
-                    <div className="flex items-center mb-4">
-                      <CreditCard className="w-6 h-6 text-blue-600 mr-2" />
-                      <h2 className="text-xl font-semibold">Payment Information</h2>
+                    <div className="flex items-center gap-3 mb-4">
+                      <span className="w-7 h-7 rounded-full bg-maroon text-ivory font-sans text-[13px] font-medium inline-flex items-center justify-center flex-shrink-0">2</span>
+                      <h2 className="font-serif text-xl font-medium text-espresso">Payment Information</h2>
                     </div>
 
-                    <div className="p-4 bg-blue-50 rounded-lg mb-6">
+                    <div className="p-4 bg-blush rounded-sm mb-6">
                       <div className="flex items-center">
-                        <Lock className="w-5 h-5 text-blue-600 mr-2" />
-                        <span className="font-medium text-blue-900">
+                        <Lock className="w-4 h-4 text-maroon mr-2.5" />
+                        <span className="text-sm font-medium text-espresso">
                           Your payment is secured with 256-bit SSL encryption
                         </span>
                       </div>
@@ -466,21 +467,21 @@ const CheckoutPage: React.FC = () => {
 
                     <div className="space-y-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-[11px] font-semibold uppercase tracking-[0.16em] text-espresso mb-2">
                           Name on Card *
                         </label>
                         <input
                           type="text"
                           value={formData.paymentInfo.cardName}
                           onChange={(e) => handleInputChange(e, 'paymentInfo', 'cardName')}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                          className="w-full px-4 py-3 bg-white border border-input rounded-sm text-sm text-espresso placeholder:text-muted-foreground focus:outline-none focus:border-maroon transition-colors"
                           placeholder="John Doe"
                           required
                         />
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-[11px] font-semibold uppercase tracking-[0.16em] text-espresso mb-2">
                           Card Number *
                         </label>
                         <input
@@ -493,7 +494,7 @@ const CheckoutPage: React.FC = () => {
                               target: { ...e.target, value: formatted }
                             } as React.ChangeEvent<HTMLInputElement>, 'paymentInfo', 'cardNumber');
                           }}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                          className="w-full px-4 py-3 bg-white border border-input rounded-sm text-sm text-espresso placeholder:text-muted-foreground focus:outline-none focus:border-maroon transition-colors"
                           placeholder="1234 5678 9012 3456"
                           maxLength={19}
                           required
@@ -502,27 +503,27 @@ const CheckoutPage: React.FC = () => {
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <label className="block text-[11px] font-semibold uppercase tracking-[0.16em] text-espresso mb-2">
                             Expiry Date *
                           </label>
                           <input
                             type="text"
                             value={formData.paymentInfo.expiryDate}
                             onChange={(e) => handleInputChange(e, 'paymentInfo', 'expiryDate')}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                            className="w-full px-4 py-3 bg-white border border-input rounded-sm text-sm text-espresso placeholder:text-muted-foreground focus:outline-none focus:border-maroon transition-colors"
                             placeholder="MM/YY"
                             required
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <label className="block text-[11px] font-semibold uppercase tracking-[0.16em] text-espresso mb-2">
                             CVV *
                           </label>
                           <input
                             type="text"
                             value={formData.paymentInfo.cvv}
                             onChange={(e) => handleInputChange(e, 'paymentInfo', 'cvv')}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                            className="w-full px-4 py-3 bg-white border border-input rounded-sm text-sm text-espresso placeholder:text-muted-foreground focus:outline-none focus:border-maroon transition-colors"
                             placeholder="123"
                             maxLength={4}
                             required
@@ -538,9 +539,9 @@ const CheckoutPage: React.FC = () => {
                         name="saveInfo"
                         checked={formData.saveInfo}
                         onChange={(e) => handleInputChange(e, 'saveInfo')}
-                        className="w-4 h-4 text-blue-600"
+                        className="w-4 h-4 accent-maroon"
                       />
-                      <label htmlFor="saveInfo" className="ml-2 text-gray-700">
+                      <label htmlFor="saveInfo" className="ml-2 text-sm text-muted-foreground">
                         Save payment information for next time
                       </label>
                     </div>
@@ -550,27 +551,27 @@ const CheckoutPage: React.FC = () => {
                 {/* Order Review */}
                 {currentStep === 'review' && (
                   <div className="space-y-6">
-                    <div className="flex items-center mb-4">
-                      <CheckCircle className="w-6 h-6 text-green-600 mr-2" />
-                      <h2 className="text-xl font-semibold">Review Your Order</h2>
+                    <div className="flex items-center gap-3 mb-4">
+                      <span className="w-7 h-7 rounded-full bg-maroon text-ivory font-sans text-[13px] font-medium inline-flex items-center justify-center flex-shrink-0">3</span>
+                      <h2 className="font-serif text-xl font-medium text-espresso">Review Your Order</h2>
                     </div>
 
                     {/* Order Summary */}
-                    <div className="border rounded-lg overflow-hidden">
+                    <div className="border border-border rounded-sm overflow-hidden">
                       {cartItems.map((item) => (
-                        <div key={item.id} className="flex items-center p-4 border-b last:border-b-0">
+                        <div key={item.id} className="flex items-center p-4 border-b border-border last:border-b-0">
                           <img
                             src={item.image}
                             alt={item.name}
-                            className="w-16 h-16 object-cover rounded-lg"
+                            className="w-14 aspect-[3/4] object-cover rounded-sm bg-sand"
                           />
                           <div className="ml-4 flex-1">
-                            <h4 className="font-medium">{item.name}</h4>
-                            <p className="text-gray-600">Quantity: {item.quantity}</p>
+                            <h4 className="text-[15px] font-medium text-espresso">{item.name}</h4>
+                            <p className="text-[13px] text-muted-foreground">Quantity: {item.quantity}</p>
                           </div>
                           <div className="text-right">
-                            <p className="font-semibold">${(item.price * item.quantity).toFixed(2)}</p>
-                            <p className="text-sm text-gray-600">${item.price.toFixed(2)} each</p>
+                            <p className="font-semibold text-espresso">${(item.price * item.quantity).toFixed(2)}</p>
+                            <p className="text-[13px] text-muted-foreground">${item.price.toFixed(2)} each</p>
                           </div>
                         </div>
                       ))}
@@ -578,44 +579,44 @@ const CheckoutPage: React.FC = () => {
 
                     {/* Shipping & Payment Details */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="border rounded-lg p-4">
-                        <h4 className="font-semibold mb-3">Shipping Details</h4>
-                        <p className="font-medium">{formData.shippingAddress.fullName}</p>
-                        <p className="text-gray-600">{formData.shippingAddress.address}</p>
-                        <p className="text-gray-600">
+                      <div className="border border-border rounded-sm p-4 text-sm">
+                        <h4 className="font-serif text-base font-medium text-espresso mb-3">Shipping Details</h4>
+                        <p className="font-medium text-espresso">{formData.shippingAddress.fullName}</p>
+                        <p className="text-muted-foreground">{formData.shippingAddress.address}</p>
+                        <p className="text-muted-foreground">
                           {formData.shippingAddress.city}, {formData.shippingAddress.state} {formData.shippingAddress.zipCode}
                         </p>
-                        <p className="text-gray-600">{formData.shippingAddress.country}</p>
-                        <p className="mt-2 text-gray-600">{formData.email}</p>
-                        <p className="text-gray-600">{formData.phone}</p>
+                        <p className="text-muted-foreground">{formData.shippingAddress.country}</p>
+                        <p className="mt-2 text-muted-foreground">{formData.email}</p>
+                        <p className="text-muted-foreground">{formData.phone}</p>
                       </div>
 
-                      <div className="border rounded-lg p-4">
-                        <h4 className="font-semibold mb-3">Payment Details</h4>
+                      <div className="border border-border rounded-sm p-4 text-sm">
+                        <h4 className="font-serif text-base font-medium text-espresso mb-3">Payment Details</h4>
                         <div className="flex items-center justify-between">
-                          <span className="text-gray-600">Payment Method:</span>
-                          <span className="font-medium">Credit Card</span>
+                          <span className="text-muted-foreground">Payment Method:</span>
+                          <span className="font-medium text-espresso">Credit Card</span>
                         </div>
                         <div className="mt-2 flex items-center justify-between">
-                          <span className="text-gray-600">Card Number:</span>
-                          <span className="font-medium">
+                          <span className="text-muted-foreground">Card Number:</span>
+                          <span className="font-medium text-espresso">
                             **** **** **** {formData.paymentInfo.cardNumber.slice(-4)}
                           </span>
                         </div>
                         <div className="mt-2 flex items-center justify-between">
-                          <span className="text-gray-600">Name on Card:</span>
-                          <span className="font-medium">{formData.paymentInfo.cardName}</span>
+                          <span className="text-muted-foreground">Name on Card:</span>
+                          <span className="font-medium text-espresso">{formData.paymentInfo.cardName}</span>
                         </div>
                       </div>
                     </div>
 
                     {/* Terms and Conditions */}
-                    <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <div className="p-4 bg-ivory border border-gold/50 rounded-sm">
                       <div className="flex items-start">
-                        <AlertCircle className="w-5 h-5 text-yellow-600 mr-2 mt-0.5" />
+                        <AlertCircle className="w-5 h-5 text-gold mr-2.5 mt-0.5" />
                         <div>
-                          <p className="text-yellow-800 font-medium">Important Information</p>
-                          <p className="text-yellow-700 text-sm mt-1">
+                          <p className="text-espresso font-medium">Important Information</p>
+                          <p className="text-muted-foreground text-sm mt-1">
                             By placing this order, you agree to our Terms of Service and Privacy Policy. 
                             Your card will be charged ${total.toFixed(2)}. You can cancel within 24 hours for a full refund.
                           </p>
@@ -626,30 +627,30 @@ const CheckoutPage: React.FC = () => {
                 )}
 
                 {/* Navigation Buttons */}
-                <div className="flex justify-between mt-8 pt-6 border-t">
+                <div className="flex justify-between mt-8 pt-6 border-t border-border">
                   {currentStep !== 'shipping' && (
                     <button
                       type="button"
                       onClick={handleBack}
-                      className="flex items-center px-6 py-3 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition"
+                      className="flex items-center px-6 py-3 border border-espresso text-espresso text-xs font-semibold uppercase tracking-[0.16em] rounded-sm hover:bg-espresso hover:text-ivory transition-colors"
                     >
                       <ArrowLeft className="w-4 h-4 mr-2" />
                       Back
                     </button>
                   )}
-                  
+
                   <button
                     type="submit"
                     disabled={isProcessing || !validateForm()}
-                    className={`flex items-center px-8 py-3 rounded-lg transition ${
+                    className={`flex items-center px-8 py-3.5 rounded-sm text-xs font-semibold uppercase tracking-[0.16em] transition-colors ${
                       isProcessing || !validateForm()
-                        ? 'bg-gray-400 cursor-not-allowed'
-                        : 'bg-blue-600 hover:bg-blue-700'
-                    } text-white font-medium ml-auto`}
+                        ? 'bg-sand text-muted-foreground cursor-not-allowed'
+                        : 'bg-maroon text-ivory hover:bg-terracotta'
+                    } ml-auto`}
                   >
                     {isProcessing ? (
                       <>
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                        <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2"></div>
                         Processing...
                       </>
                     ) : currentStep === 'review' ? (
@@ -666,22 +667,22 @@ const CheckoutPage: React.FC = () => {
             </div>
 
             {/* Security Assurance */}
-            <div className="bg-white rounded-2xl shadow-lg p-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-                <div className="flex flex-col items-center">
-                  <Shield className="w-8 h-8 text-green-600 mb-2" />
-                  <h4 className="font-semibold">Secure Payment</h4>
-                  <p className="text-sm text-gray-600 mt-1">256-bit SSL encryption</p>
+            <div className="bg-white border border-border rounded-sm">
+              <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-border text-center">
+                <div className="flex flex-col items-center p-6">
+                  <Shield className="w-6 h-6 text-terracotta mb-2" strokeWidth={1.5} />
+                  <h4 className="text-xs font-semibold uppercase tracking-[0.08em] text-espresso">Secure Payment</h4>
+                  <p className="text-[13px] text-muted-foreground mt-1">256-bit SSL encryption</p>
                 </div>
-                <div className="flex flex-col items-center">
-                  <Truck className="w-8 h-8 text-blue-600 mb-2" />
-                  <h4 className="font-semibold">Free Returns</h4>
-                  <p className="text-sm text-gray-600 mt-1">30-day return policy</p>
+                <div className="flex flex-col items-center p-6">
+                  <Truck className="w-6 h-6 text-terracotta mb-2" strokeWidth={1.5} />
+                  <h4 className="text-xs font-semibold uppercase tracking-[0.08em] text-espresso">Free Returns</h4>
+                  <p className="text-[13px] text-muted-foreground mt-1">30-day return policy</p>
                 </div>
-                <div className="flex flex-col items-center">
-                  <Info className="w-8 h-8 text-purple-600 mb-2" />
-                  <h4 className="font-semibold">24/7 Support</h4>
-                  <p className="text-sm text-gray-600 mt-1">Customer service available</p>
+                <div className="flex flex-col items-center p-6">
+                  <Info className="w-6 h-6 text-terracotta mb-2" strokeWidth={1.5} />
+                  <h4 className="text-xs font-semibold uppercase tracking-[0.08em] text-espresso">24/7 Support</h4>
+                  <p className="text-[13px] text-muted-foreground mt-1">Customer service available</p>
                 </div>
               </div>
             </div>
@@ -689,9 +690,9 @@ const CheckoutPage: React.FC = () => {
 
           {/* Right Column - Order Summary */}
           <div className="lg:w-1/3">
-            <div className="bg-white rounded-2xl shadow-lg p-6 sticky top-6">
-              <h3 className="text-lg font-semibold mb-6">Order Summary</h3>
-              
+            <div className="bg-white border border-border rounded-sm p-6 sticky top-24">
+              <h3 className="font-serif text-xl font-medium text-espresso mb-6">Order Summary</h3>
+
               {/* Cart Items Preview */}
               <div className="space-y-4 mb-6">
                 {cartItems.map((item) => (
@@ -700,45 +701,45 @@ const CheckoutPage: React.FC = () => {
                       <img
                         src={item.image}
                         alt={item.name}
-                        className="w-12 h-12 object-cover rounded-lg"
+                        className="w-12 aspect-[3/4] object-cover rounded-sm bg-sand"
                       />
-                      <div className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                      <div className="absolute -top-2 -right-2 bg-maroon text-ivory text-[11px] w-5 h-5 rounded-full flex items-center justify-center">
                         {item.quantity}
                       </div>
                     </div>
-                    <div className="ml-3 flex-1">
-                      <p className="text-sm font-medium truncate">{item.name}</p>
-                      <p className="text-xs text-gray-600">${item.price.toFixed(2)} each</p>
+                    <div className="ml-3 flex-1 min-w-0">
+                      <p className="text-sm font-medium text-espresso truncate">{item.name}</p>
+                      <p className="text-xs text-muted-foreground">${item.price.toFixed(2)} each</p>
                     </div>
-                    <p className="font-semibold">${(item.price * item.quantity).toFixed(2)}</p>
+                    <p className="text-sm font-semibold text-espresso">${(item.price * item.quantity).toFixed(2)}</p>
                   </div>
                 ))}
               </div>
 
               {/* Price Breakdown */}
-              <div className="space-y-3 border-t border-b py-4">
+              <div className="space-y-2.5 border-t border-b border-border py-4 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Subtotal</span>
-                  <span>${subtotal.toFixed(2)}</span>
+                  <span className="text-muted-foreground">Subtotal</span>
+                  <span className="text-espresso">${subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Shipping</span>
-                  <span>
+                  <span className="text-muted-foreground">Shipping</span>
+                  <span className={shippingCost === 0 ? 'text-green-700' : 'text-espresso'}>
                     {shippingCost === 0 ? 'FREE' : `$${shippingCost.toFixed(2)}`}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Tax</span>
-                  <span>${tax.toFixed(2)}</span>
+                  <span className="text-muted-foreground">Tax</span>
+                  <span className="text-espresso">${tax.toFixed(2)}</span>
                 </div>
               </div>
 
               {/* Total */}
-              <div className="flex justify-between items-center mt-6 mb-8">
-                <span className="text-lg font-semibold">Total</span>
+              <div className="flex justify-between items-center mt-5 mb-8">
+                <span className="text-base font-semibold text-espresso">Total</span>
                 <div>
-                  <div className="text-2xl font-bold">${total.toFixed(2)}</div>
-                  <div className="text-sm text-gray-600 text-right">
+                  <div className="font-serif text-2xl font-medium text-espresso text-right">${total.toFixed(2)}</div>
+                  <div className="text-xs text-muted-foreground text-right">
                     {total / 4 > 0 && `or 4 payments of $${(total / 4).toFixed(2)}`}
                   </div>
                 </div>
@@ -746,18 +747,18 @@ const CheckoutPage: React.FC = () => {
 
               {/* Promo Code */}
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-[11px] font-semibold uppercase tracking-[0.16em] text-espresso mb-2">
                   Promo Code
                 </label>
                 <div className="flex">
                   <input
                     type="text"
                     placeholder="Enter code"
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="flex-1 min-w-0 px-4 py-2.5 bg-white border border-input border-r-0 rounded-sm rounded-r-none text-sm text-espresso placeholder:text-muted-foreground focus:outline-none focus:border-maroon transition-colors"
                   />
                   <button
                     type="button"
-                    className="px-4 py-2 bg-gray-800 text-white rounded-r-lg hover:bg-gray-900 transition"
+                    className="px-5 py-2.5 bg-maroon text-ivory text-xs font-semibold uppercase tracking-[0.16em] rounded-sm rounded-l-none hover:bg-terracotta transition-colors"
                   >
                     Apply
                   </button>
@@ -765,13 +766,13 @@ const CheckoutPage: React.FC = () => {
               </div>
 
               {/* Estimated Delivery */}
-              <div className="p-4 bg-blue-50 rounded-lg">
+              <div className="p-4 bg-blush rounded-sm">
                 <div className="flex items-center">
-                  <Truck className="w-5 h-5 text-blue-600 mr-2" />
+                  <Truck className="w-5 h-5 text-maroon mr-3" strokeWidth={1.5} />
                   <div>
-                    <p className="font-medium text-blue-900">Estimated Delivery</p>
-                    <p className="text-sm text-blue-800">
-                      {formData.shippingMethod === 'express' 
+                    <p className="text-sm font-medium text-espresso">Estimated Delivery</p>
+                    <p className="text-[13px] text-muted-foreground">
+                      {formData.shippingMethod === 'express'
                         ? '1-2 business days'
                         : formData.shippingMethod === 'standard'
                         ? '3-5 business days'
@@ -783,9 +784,9 @@ const CheckoutPage: React.FC = () => {
 
               {/* Need Help */}
               <div className="mt-6 text-center">
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-muted-foreground">
                   Need help?{' '}
-                  <a href="#" className="text-blue-600 hover:underline">
+                  <a href="#" className="text-maroon underline underline-offset-4 hover:text-terracotta transition-colors">
                     Contact Support
                   </a>
                 </p>

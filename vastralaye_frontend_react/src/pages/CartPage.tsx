@@ -306,13 +306,13 @@ const QRCodeModal: React.FC<QRCodeModalProps> = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <div className="mx-auto mb-4 w-16 h-16 bg-gradient-to-br from-purple-100 to-purple-50 rounded-full flex items-center justify-center border-2 border-purple-200">
-            <QrCode className="h-8 w-8 text-purple-600" />
+          <div className="mx-auto mb-4 w-16 h-16 bg-blush rounded-full flex items-center justify-center">
+            <QrCode className="h-8 w-8 text-maroon" strokeWidth={1.5} />
           </div>
-          <DialogTitle className="text-2xl font-bold text-center text-gray-900">
+          <DialogTitle className="font-serif text-2xl font-medium text-center text-espresso">
             Scan to Pay
           </DialogTitle>
-          <DialogDescription className="text-center text-gray-600 pt-2">
+          <DialogDescription className="text-center text-muted-foreground pt-2">
             Quick payment via UPI
           </DialogDescription>
         </DialogHeader>

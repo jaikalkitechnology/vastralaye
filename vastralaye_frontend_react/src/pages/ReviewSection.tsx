@@ -588,12 +588,12 @@ export default function ReviewSection({ productId, isAdmin, user, onReviewAdded 
         </defs>
         <path
           d="M12 .587l3.668 7.431L23.4 9.75l-5.7 5.556L19.34 24 12 20.201 4.66 24l1.64-8.694L.6 9.75l7.733-1.732L12 .587z"
-          fill="#E5E7EB"
+          fill="#E7DFD2"
         />
         <g clipPath={`url(#${clipId})`}>
           <path
             d="M12 .587l3.668 7.431L23.4 9.75l-5.7 5.556L19.34 24 12 20.201 4.66 24l1.64-8.694L.6 9.75l7.733-1.732L12 .587z"
-            fill="#FBBF24"
+            fill="#C99A45"
           />
         </g>
       </svg>
@@ -625,23 +625,19 @@ export default function ReviewSection({ productId, isAdmin, user, onReviewAdded 
   // ... (include all your JSX return statement here - it's the same as before)
   
     return (
-    <div className="mt-16 border-t pt-12">
+    <div className="mt-16 border-t border-border pt-12">
       <div className="max-w-4xl mx-auto">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-end justify-between mb-8 gap-4 flex-wrap">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Customer Reviews</h2>
-            <div className="flex items-center gap-4 mt-2">
-              <div className="flex items-center gap-2">
-                <span className="text-lg font-semibold">Reviews</span>
-              </div>
-              <span className="text-gray-600">
-                {totalReviews} {totalReviews === 1 ? 'review' : 'reviews'}
-              </span>
+            <span className="overline-label mb-2">What customers say</span>
+            <h2 className="font-serif text-2xl md:text-3xl font-medium text-espresso">Ratings &amp; Reviews</h2>
+            <div className="mt-2 text-sm text-muted-foreground">
+              {totalReviews} verified {totalReviews === 1 ? 'review' : 'reviews'}
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            <Button onClick={handleWriteReviewClick} className="bg-navy hover:bg-navy/90">
+            <Button onClick={handleWriteReviewClick} variant="outline" className="rounded-sm border-espresso bg-transparent text-espresso uppercase tracking-[0.16em] text-xs hover:bg-espresso hover:text-ivory">
               <Send className="w-4 h-4 mr-2" /> Write a Review
             </Button>
 
@@ -661,32 +657,32 @@ export default function ReviewSection({ productId, isAdmin, user, onReviewAdded 
 
         {/* Login Prompt Modal */}
         {showLoginPrompt && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl">
+          <div className="fixed inset-0 bg-espresso/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white border border-border rounded-sm max-w-md w-full p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-semibold text-gray-900">Login Required</h3>
-                <button onClick={() => setShowLoginPrompt(false)} className="text-gray-400 hover:text-gray-600 transition-colors">
+                <h3 className="font-serif text-xl font-medium text-espresso">Login Required</h3>
+                <button onClick={() => setShowLoginPrompt(false)} className="text-muted-foreground hover:text-espresso transition-colors">
                   <X className="w-6 h-6" />
                 </button>
               </div>
 
               <div className="text-center mb-6">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <LogIn className="w-8 h-8 text-blue-600" />
+                <div className="w-16 h-16 bg-blush rounded-full flex items-center justify-center mx-auto mb-4">
+                  <LogIn className="w-8 h-8 text-maroon" />
                 </div>
-                <h4 className="text-lg font-medium text-gray-900 mb-2">Join the Conversation!</h4>
-                <p className="text-gray-600 text-sm">Please login to share your experience and help other shoppers make better decisions.</p>
+                <h4 className="text-lg font-medium text-espresso mb-2">Join the Conversation!</h4>
+                <p className="text-muted-foreground text-sm">Please login to share your experience and help other shoppers make better decisions.</p>
               </div>
 
               <div className="flex gap-3">
-                <Button onClick={handleLogin} className="flex-1 bg-navy hover:bg-navy/90" size="lg">
+                <Button onClick={handleLogin} className="flex-1 bg-maroon hover:bg-terracotta text-ivory uppercase tracking-[0.16em] text-xs rounded-sm" size="lg">
                   <LogIn className="w-4 h-4 mr-2" /> Login Now
                 </Button>
-                <Button onClick={() => setShowLoginPrompt(false)} variant="outline" className="flex-1" size="lg">Maybe Later</Button>
+                <Button onClick={() => setShowLoginPrompt(false)} variant="outline" className="flex-1 rounded-sm border-espresso text-espresso hover:bg-blush" size="lg">Maybe Later</Button>
               </div>
 
-              <p className="text-xs text-gray-500 text-center mt-4">
-                Don't have an account? <a className="text-navy hover:underline" href="/register">Sign up here</a>
+              <p className="text-xs text-muted-foreground text-center mt-4">
+                Don't have an account? <a className="text-terracotta underline underline-offset-[3px]" href="/register">Sign up here</a>
               </p>
             </div>
           </div>
@@ -694,8 +690,8 @@ export default function ReviewSection({ productId, isAdmin, user, onReviewAdded 
 
         {/* Review Form */}
         {showReviewForm && (
-          <div className="bg-white border rounded-xl p-6 mb-8 shadow-sm">
-            <h3 className="text-xl font-semibold mb-6">Write Your Review</h3>
+          <div className="bg-white border border-border rounded-sm p-6 mb-8">
+            <h3 className="font-serif text-xl font-medium text-espresso mb-6">Write Your Review</h3>
             <form onSubmit={handleReviewSubmit} className="space-y-6">
               <div>
                 <label className="block text-sm font-medium mb-3">Your Rating <span className="text-red-500">*</span></label>
@@ -719,7 +715,7 @@ export default function ReviewSection({ productId, isAdmin, user, onReviewAdded 
                       </button>
                     );
                   })}
-                  <div className="ml-3 text-sm text-gray-600">{displayFormRating.toFixed(1)} / 5</div>
+                  <div className="ml-3 text-sm text-muted-foreground">{displayFormRating.toFixed(1)} / 5</div>
                 </div>
 
                 <ErrorMessage message={touched.rating ? errors.rating : undefined} />
@@ -734,11 +730,11 @@ export default function ReviewSection({ productId, isAdmin, user, onReviewAdded 
                   placeholder="Enter your name" 
                 />
                 <ErrorMessage message={errors.name} />
-                {user && <p className="text-xs text-gray-500">Using: {user.name || user.username || 'Not set in profile'}</p>}
+                {user && <p className="text-xs text-muted-foreground">Using: {user.name || user.username || 'Not set in profile'}</p>}
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">Your Review <span className="text-gray-500">(Optional)</span></label>
+                <label className="text-sm font-medium">Your Review <span className="text-muted-foreground">(Optional)</span></label>
                 <Textarea 
                   rows={5} 
                   value={reviewForm.comment} 
@@ -748,14 +744,14 @@ export default function ReviewSection({ productId, isAdmin, user, onReviewAdded 
                 />
                 <div className="flex justify-between items-center">
                   <ErrorMessage message={errors.comment} />
-                  <span className={`text-xs ${reviewForm.comment.length > 1000 ? 'text-red-500' : 'text-gray-500'}`}>
+                  <span className={`text-xs ${reviewForm.comment.length > 1000 ? 'text-sale' : 'text-muted-foreground'}`}>
                     {reviewForm.comment.length}/1000
                   </span>
                 </div>
               </div>
 
               <div className="flex gap-3">
-                <Button type="submit" disabled={reviewLoading || !isFormValid()} className="bg-navy hover:bg-navy/90">
+                <Button type="submit" disabled={reviewLoading || !isFormValid()} className="bg-maroon hover:bg-terracotta text-ivory uppercase tracking-[0.16em] text-xs rounded-sm">
                   {reviewLoading ? (
                     <>
                       <RefreshCw className="w-4 h-4 mr-2 animate-spin" /> Submitting...
@@ -787,15 +783,15 @@ export default function ReviewSection({ productId, isAdmin, user, onReviewAdded 
           {reviews.length > 0 ? (
             <>
               {reviews.map((review) => (
-                <div key={review.id} className="border-b pb-6 last:border-b-0">
+                <div key={review.id} className="border-b border-border pb-6 last:border-b-0">
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
-                        <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
-                          <User className="w-5 h-5 text-gray-400" />
+                        <div className="w-10 h-10 bg-sand rounded-full flex items-center justify-center">
+                          <User className="w-5 h-5 text-muted-foreground" />
                         </div>
                         <div className="flex-1">
-                          <h4 className="font-semibold text-gray-900">
+                          <h4 className="font-medium text-espresso">
                             {(review as any).user_name || review.name || 'Anonymous User'}
                           </h4>
                           <div className="flex items-center gap-2 mt-1">
@@ -811,7 +807,7 @@ export default function ReviewSection({ productId, isAdmin, user, onReviewAdded 
                                 );
                               })}
                             </div>
-                            <div className="flex items-center gap-1 text-sm text-gray-500">
+                            <div className="flex items-center gap-1 text-sm text-muted-foreground">
                               <Clock className="w-3 h-3" />
                               <span>
                                 {review.isTemp ? 'Just now (Pending...)' : formatDateTime(review.created_at)}
@@ -821,36 +817,36 @@ export default function ReviewSection({ productId, isAdmin, user, onReviewAdded 
                         </div>
                       </div>
 
-                      <p className="text-gray-700 leading-relaxed">{review.comment}</p>
+                      <p className="text-muted-foreground leading-relaxed">{review.comment}</p>
 
                       {review.reply && (
-                        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4 mt-4">
+                        <div className="bg-blush/60 border border-border rounded-sm p-4 mt-4">
                           <div className="flex items-start gap-3">
                             <div className="flex-shrink-0">
-                              <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                                <UserCog className="w-4 h-4 text-white" />
+                              <div className="w-8 h-8 bg-maroon rounded-full flex items-center justify-center">
+                                <UserCog className="w-4 h-4 text-ivory" />
                               </div>
                             </div>
                             <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-1">
-                                <span className="text-sm font-semibold text-blue-900">Official Store Reply</span>
-                                <span className="text-xs text-blue-600 bg-blue-100 px-2 py-0.5 rounded">Official Response</span>
-                                <div className="flex items-center gap-1 text-xs text-blue-500">
+                              <div className="flex items-center gap-2 mb-1 flex-wrap">
+                                <span className="text-sm font-semibold text-espresso">Official Store Reply</span>
+                                <span className="text-[11px] uppercase tracking-[0.08em] text-maroon bg-white border border-border px-2 py-0.5 rounded-[1px]">Official Response</span>
+                                <div className="flex items-center gap-1 text-xs text-muted-foreground">
                                   <Clock className="w-3 h-3" />
                                   <span>{formatDateTime(review.reply.created_at)}</span>
                                 </div>
                               </div>
-                              <p className="text-blue-800 text-sm leading-relaxed">{review.reply.comment}</p>
-                              <p className="text-xs text-blue-600 mt-1">Posted by {review.reply.admin_name || 'Store Admin'}</p>
+                              <p className="text-espresso/85 text-sm leading-relaxed">{review.reply.comment}</p>
+                              <p className="text-xs text-muted-foreground mt-1">Posted by {review.reply.admin_name || 'Store Admin'}</p>
                             </div>
 
                             {isAdmin && (
                               <div className="flex gap-2">
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm" 
-                                  onClick={() => startEditReply(review.id, review.reply!.id, review.reply!.comment)} 
-                                  className="h-8 px-2 text-blue-600 hover:text-blue-800"
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => startEditReply(review.id, review.reply!.id, review.reply!.comment)}
+                                  className="h-8 px-2 text-espresso hover:text-maroon"
                                 >
                                   <Edit className="w-3 h-3" />
                                 </Button>
@@ -871,8 +867,8 @@ export default function ReviewSection({ productId, isAdmin, user, onReviewAdded 
                       {isAdmin && (
                         <div className="mt-4">
                           {replyingToReview === review.id ? (
-                            <div className="bg-gray-50 border rounded-lg p-4">
-                              <h5 className="font-medium text-gray-900 mb-3">Post a Reply</h5>
+                            <div className="bg-sand/40 border border-border rounded-sm p-4">
+                              <h5 className="font-medium text-espresso mb-3">Post a Reply</h5>
                               <Textarea 
                                 value={replyText} 
                                 onChange={(e) => setReplyText(e.target.value)} 
@@ -893,8 +889,8 @@ export default function ReviewSection({ productId, isAdmin, user, onReviewAdded 
                               </div>
                             </div>
                           ) : editingReply?.reviewId === review.id ? (
-                            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                              <h5 className="font-medium text-gray-900 mb-3">Edit Reply</h5>
+                            <div className="bg-blush/50 border border-border rounded-sm p-4">
+                              <h5 className="font-medium text-espresso mb-3">Edit Reply</h5>
                               <Textarea 
                                 value={replyText} 
                                 onChange={(e) => setReplyText(e.target.value)} 
@@ -919,8 +915,8 @@ export default function ReviewSection({ productId, isAdmin, user, onReviewAdded 
                               </div>
                             </div>
                           ) : !review.reply ? (
-                            <Button onClick={() => startReply(review.id)} variant="outline" size="sm" className="mt-2">
-                              <UserCog className="w-4 h-4 mr-2 text-blue-700" /> Reply as Admin
+                            <Button onClick={() => startReply(review.id)} variant="outline" size="sm" className="mt-2 rounded-sm border-espresso text-espresso hover:bg-blush">
+                              <UserCog className="w-4 h-4 mr-2 text-maroon" /> Reply as Admin
                             </Button>
                           ) : null}
                         </div>
@@ -933,13 +929,13 @@ export default function ReviewSection({ productId, isAdmin, user, onReviewAdded 
 
               {/* Load More Button */}
               {currentPage < totalPages && (
-                <div className="flex justify-center pt-6 border-t">
+                <div className="flex justify-center pt-6 border-t border-border">
                   <Button
                     onClick={handleLoadMore}
                     disabled={loadingMore}
                     variant="outline"
                     size="lg"
-                    className="w-full sm:w-auto min-w-[200px] hover:bg-navy hover:text-white transition-colors"
+                    className="w-full sm:w-auto min-w-[200px] rounded-sm border-espresso text-espresso uppercase tracking-[0.16em] text-xs hover:bg-espresso hover:text-ivory transition-colors"
                   >
                     {loadingMore ? (
                       <>
@@ -958,18 +954,18 @@ export default function ReviewSection({ productId, isAdmin, user, onReviewAdded 
 
               {/* Pagination Info */}
               {totalPages > 1 && (
-                <div className="text-center text-sm text-gray-500 pt-2">
+                <div className="text-center text-sm text-muted-foreground pt-2">
                   Showing {reviews.length} of {totalReviews} reviews
                   {currentPage >= totalPages && ' (All loaded)'}
                 </div>
               )}
             </>
           ) : (
-            <div className="text-center py-12">
-              <User className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No Reviews Yet</h3>
-              <p className="text-gray-500 mb-6">Be the first to share your thoughts about this product!</p>
-              <Button onClick={handleWriteReviewClick} className="bg-navy hover:bg-navy/90">
+            <div className="text-center py-12 border border-border rounded-sm bg-sand/40">
+              <User className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+              <h3 className="font-serif text-lg font-medium text-espresso mb-2">No Reviews Yet</h3>
+              <p className="text-muted-foreground mb-6">Be the first to share your thoughts about this product!</p>
+              <Button onClick={handleWriteReviewClick} className="bg-maroon hover:bg-terracotta text-ivory uppercase tracking-[0.16em] text-xs rounded-sm">
                 Write First Review
               </Button>
             </div>
@@ -979,20 +975,20 @@ export default function ReviewSection({ productId, isAdmin, user, onReviewAdded 
 
       {/* Delete Confirmation Modal */}
       {deleteConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl">
+        <div className="fixed inset-0 bg-espresso/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white border border-border rounded-sm max-w-md w-full p-6">
             <div className="text-center">
-              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Trash2 className="w-8 h-8 text-red-600" />
+              <div className="w-16 h-16 bg-blush rounded-full flex items-center justify-center mx-auto mb-4">
+                <Trash2 className="w-8 h-8 text-sale" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Delete Reply?</h3>
-              <p className="text-gray-600 mb-6">Are you sure you want to delete this reply? This action cannot be undone.</p>
+              <h3 className="font-serif text-xl font-medium text-espresso mb-2">Delete Reply?</h3>
+              <p className="text-muted-foreground mb-6">Are you sure you want to delete this reply? This action cannot be undone.</p>
               <div className="flex gap-3">
-                <Button onClick={() => setDeleteConfirm(null)} variant="outline" className="flex-1">Cancel</Button>
-                <Button 
-                  onClick={() => handleDeleteReply(deleteConfirm.reviewId, deleteConfirm.replyId)} 
-                  disabled={replyLoading} 
-                  className="flex-1 bg-red-600 hover:bg-red-700"
+                <Button onClick={() => setDeleteConfirm(null)} variant="outline" className="flex-1 rounded-sm border-espresso text-espresso hover:bg-blush">Cancel</Button>
+                <Button
+                  onClick={() => handleDeleteReply(deleteConfirm.reviewId, deleteConfirm.replyId)}
+                  disabled={replyLoading}
+                  className="flex-1 bg-sale hover:bg-sale/90 text-white rounded-sm"
                 >
                   {replyLoading ? (
                     <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
