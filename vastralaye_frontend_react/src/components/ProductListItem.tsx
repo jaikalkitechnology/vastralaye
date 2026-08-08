@@ -45,7 +45,7 @@ const ProductListItem = ({ product }: ProductListItemProps) => {
     const fetchReviews = async () => {
       if (!product.id) return;
       try {
-        const response = await axios.get(`${BASE_URL}/users/product/${product.id}/reviews`);
+        const response = await axios.get<any>(`${BASE_URL}/users/product/${product.id}/reviews`);
 
         let reviewsData: Review[] = [];
         if (Array.isArray(response.data)) {
