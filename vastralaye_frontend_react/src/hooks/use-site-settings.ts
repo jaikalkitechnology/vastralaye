@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import { api } from '@/api/api';
 
+/** Store WhatsApp number used until the admin sets one (digits only, with country code). */
+export const FALLBACK_WHATSAPP = '918527596413';
+
 export interface SiteSettings {
   instagram_url?: string;
   facebook_url?: string;

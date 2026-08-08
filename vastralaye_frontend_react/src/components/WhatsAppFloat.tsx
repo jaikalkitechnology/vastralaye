@@ -1,25 +1,26 @@
 import { useState } from 'react';
-import { MessageCircle, X, Phone, Instagram, Facebook, Youtube } from 'lucide-react';
-import { useSiteSettings } from '@/hooks/use-site-settings';
+import { MessageCircle, X, Phone } from 'lucide-react';
+import { useSiteSettings, FALLBACK_WHATSAPP } from '@/hooks/use-site-settings';
+import {
+  WhatsAppLogo,
+  InstagramLogo,
+  FacebookLogo,
+  YouTubeLogo,
+  XLogo,
+  INSTAGRAM_GRADIENT,
+} from '@/components/icons/SocialIcons';
 
 /**
  * Floating contact hub — a round button pinned to the MIDDLE of the
  * right edge that expands into the store's contact/social links
- * (WhatsApp, Call, Instagram, Facebook, YouTube).
+ * (WhatsApp, Call, Instagram, Facebook, X, YouTube), each drawn with
+ * the brand's original logo on its official color.
  *
  * Fully controlled from Admin → Store Settings: each link appears only
  * when its value is set (WhatsApp keeps a fallback number), and the
  * whole hub can be switched off with the "floating contact button"
  * toggle (`float_enabled`).
  */
-const FALLBACK_WHATSAPP = '918527596413';
-
-const WhatsAppIcon = () => (
-  <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current" aria-hidden="true">
-    <path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2zm0 2a8 8 0 1 1-4.1 14.9l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 0 1 12 4zm-3 4.2c-.2 0-.5 0-.7.3-.2.3-.9.9-.9 2.1s.9 2.5 1 2.6c.1.2 1.8 2.9 4.5 3.9 2.2.9 2.7.7 3.2.7.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.2-.2-.5-.3l-1.7-.8c-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.6 6.6 0 0 1-3.3-2.9c-.1-.2 0-.4.1-.5l.6-.7c.2-.2.2-.4.1-.6L10 8.7c-.1-.3-.3-.4-.5-.4z" />
-  </svg>
-);
-
 const WhatsAppFloat = () => {
   const settings = useSiteSettings();
   const [open, setOpen] = useState(false);
@@ -34,8 +35,8 @@ const WhatsAppFloat = () => {
       key: 'whatsapp',
       label: 'Chat on WhatsApp',
       href: `https://wa.me/${whatsappNumber}`,
-      icon: <WhatsAppIcon />,
-      className: 'bg-[#25D366] text-white border-transparent',
+      icon: <WhatsAppLogo className="w-5 h-5" />,
+      className: 'bg-[#25D366] text-white',
     },
     settings.call_number
       ? {
@@ -43,7 +44,7 @@ const WhatsAppFloat = () => {
           label: 'Call us',
           href: `tel:${settings.call_number.replace(/[^\d+]/g, '')}`,
           icon: <Phone className="w-[18px] h-[18px]" strokeWidth={1.8} />,
-          className: 'bg-maroon text-ivory border-transparent',
+          className: 'bg-maroon text-ivory',
         }
       : null,
     settings.instagram_url
@@ -51,8 +52,9 @@ const WhatsAppFloat = () => {
           key: 'instagram',
           label: 'Instagram',
           href: settings.instagram_url,
-          icon: <Instagram className="w-[18px] h-[18px]" strokeWidth={1.8} />,
-          className: 'bg-white text-espresso border-border hover:border-gold',
+          icon: <InstagramLogo className="w-5 h-5" />,
+          className: 'text-white',
+          style: { background: INSTAGRAM_GRADIENT },
         }
       : null,
     settings.facebook_url
@@ -60,8 +62,17 @@ const WhatsAppFloat = () => {
           key: 'facebook',
           label: 'Facebook',
           href: settings.facebook_url,
-          icon: <Facebook className="w-[18px] h-[18px]" strokeWidth={1.8} />,
-          className: 'bg-white text-espresso border-border hover:border-gold',
+          icon: <FacebookLogo className="w-5 h-5" />,
+          className: 'bg-[#1877F2] text-white',
+        }
+      : null,
+    settings.twitter_url
+      ? {
+          key: 'twitter',
+          label: 'X (Twitter)',
+          href: settings.twitter_url,
+          icon: <XLogo className="w-4 h-4" />,
+          className: 'bg-black text-white',
         }
       : null,
     settings.youtube_url
@@ -69,8 +80,8 @@ const WhatsAppFloat = () => {
           key: 'youtube',
           label: 'YouTube',
           href: settings.youtube_url,
-          icon: <Youtube className="w-[18px] h-[18px]" strokeWidth={1.8} />,
-          className: 'bg-white text-espresso border-border hover:border-gold',
+          icon: <YouTubeLogo className="w-5 h-5" />,
+          className: 'bg-[#FF0000] text-white',
         }
       : null,
   ].filter(Boolean) as {
@@ -79,6 +90,7 @@ const WhatsAppFloat = () => {
     href: string;
     icon: JSX.Element;
     className: string;
+    style?: React.CSSProperties;
   }[];
 
   return (
@@ -94,8 +106,8 @@ const WhatsAppFloat = () => {
             aria-label={link.label}
             title={link.label}
             tabIndex={open ? 0 : -1}
-            style={{ transitionDelay: open ? `${i * 40}ms` : '0ms' }}
-            className={`w-11 h-11 rounded-full border shadow-md flex items-center justify-center transition-all duration-300 ${link.className} ${
+            style={{ ...link.style, transitionDelay: open ? `${i * 40}ms` : '0ms' }}
+            className={`w-11 h-11 rounded-full shadow-md flex items-center justify-center transition-all duration-300 hover:scale-110 ${link.className} ${
               open
                 ? 'opacity-100 translate-x-0 scale-100'
                 : 'opacity-0 translate-x-4 scale-75 pointer-events-none'

@@ -1,7 +1,14 @@
 import { Link } from 'react-router-dom';
-import { Instagram, Facebook, Twitter, Youtube, MapPin, Phone, Mail } from 'lucide-react';
-import { useSiteSettings } from '@/hooks/use-site-settings';
+import { MapPin, Phone, Mail } from 'lucide-react';
+import { useSiteSettings, FALLBACK_WHATSAPP } from '@/hooks/use-site-settings';
 import PaymentBadges from '@/components/PaymentBadges';
+import {
+  WhatsAppLogo,
+  InstagramLogo,
+  FacebookLogo,
+  YouTubeLogo,
+  XLogo,
+} from '@/components/icons/SocialIcons';
 
 /**
  * Editorial dark footer (design.md §5.13) — espresso background,
@@ -52,25 +59,49 @@ const Footer = () => {
               Woven with love by artisans across India. Timeless ethnic wear for every
               celebration — and every day in between.
             </p>
-            <div className="flex gap-3.5">
-              {/* Links managed from Admin → Store Settings; defaults until configured */}
+            <div className="flex flex-wrap gap-3">
+              {/* Original brand logos on ivory chips; links managed from Admin → Store Settings */}
               {[
-                { icon: Instagram, href: settings.instagram_url || 'https://instagram.com', label: 'Instagram' },
-                { icon: Facebook, href: settings.facebook_url || 'https://facebook.com', label: 'Facebook' },
-                { icon: Twitter, href: settings.twitter_url || 'https://twitter.com', label: 'Twitter' },
+                {
+                  label: 'Chat on WhatsApp',
+                  href: `https://wa.me/${(settings.whatsapp_number || FALLBACK_WHATSAPP).replace(/[^\d]/g, '')}`,
+                  glyph: <WhatsAppLogo className="w-[18px] h-[18px] text-[#25D366]" />,
+                },
+                {
+                  label: 'Instagram',
+                  href: settings.instagram_url || 'https://instagram.com',
+                  glyph: <InstagramLogo gradient className="w-[18px] h-[18px]" />,
+                },
+                {
+                  label: 'Facebook',
+                  href: settings.facebook_url || 'https://facebook.com',
+                  glyph: <FacebookLogo className="w-[18px] h-[18px] text-[#1877F2]" />,
+                },
+                {
+                  label: 'X (Twitter)',
+                  href: settings.twitter_url || 'https://twitter.com',
+                  glyph: <XLogo className="w-4 h-4 text-black" />,
+                },
                 ...(settings.youtube_url
-                  ? [{ icon: Youtube, href: settings.youtube_url, label: 'YouTube' }]
+                  ? [
+                      {
+                        label: 'YouTube',
+                        href: settings.youtube_url,
+                        glyph: <YouTubeLogo className="w-[18px] h-[18px] text-[#FF0000]" />,
+                      },
+                    ]
                   : []),
-              ].map(({ icon: Icon, href, label }) => (
+              ].map(({ href, label, glyph }) => (
                 <a
                   key={label}
                   href={href}
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={label}
-                  className="w-9 h-9 rounded-full border border-ivory/30 flex items-center justify-center hover:border-gold hover:text-gold transition-colors"
+                  title={label}
+                  className="w-9 h-9 rounded-full bg-ivory flex items-center justify-center shadow-sm transition-all duration-200 hover:scale-110 hover:bg-white"
                 >
-                  <Icon className="h-4 w-4" strokeWidth={1.5} />
+                  {glyph}
                 </a>
               ))}
             </div>
