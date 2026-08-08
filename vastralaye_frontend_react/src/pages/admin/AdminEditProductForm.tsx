@@ -832,38 +832,38 @@ export default function AdminEditProductForm({
               <div className="p-6">
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                   {[
-                    { key: "in_stock", label: "In Stock", icon: Package, color: "emerald" },
-                    { key: "featured", label: "Featured", icon: Star, color: "amber" },
-                    { key: "best_seller", label: "Best Seller", icon: TrendingUp, color: "red" },
-                    { key: "new_arrival", label: "New Arrival", icon: Sparkles, color: "blue" }
-                  ].map(({ key, label, icon: Icon, color }) => (
-                    <label 
-                      key={key} 
-                      className={`relative flex items-center gap-3 p-4 rounded-xl border-2 transition-all cursor-pointer ${
-                        form[key] 
-                          ? `bg-${color}-50 border-${color}-300` 
-                          : 'bg-gray-50 border-gray-200 hover:border-gray-300'
+                    { key: "in_stock", label: "In Stock", icon: Package },
+                    { key: "featured", label: "Featured", icon: Star },
+                    { key: "best_seller", label: "Best Seller", icon: TrendingUp },
+                    { key: "new_arrival", label: "New Arrival", icon: Sparkles }
+                  ].map(({ key, label, icon: Icon }) => (
+                    <label
+                      key={key}
+                      className={`relative flex items-center gap-3 p-4 rounded-md border transition-all cursor-pointer ${
+                        form[key]
+                          ? 'bg-maroon/5 border-maroon/40'
+                          : 'bg-[#FBF8F3] border-border hover:border-espresso/30'
                       }`}
                     >
-                      <input 
-                        type="checkbox" 
-                        checked={!!form[key]} 
-                        onChange={(e) => updateForm(key, e.target.checked)} 
+                      <input
+                        type="checkbox"
+                        checked={!!form[key]}
+                        onChange={(e) => updateForm(key, e.target.checked)}
                         className="sr-only"
                       />
-                      <div className={`flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center ${
-                        form[key] ? `bg-${color}-100` : 'bg-gray-200'
+                      <div className={`flex-shrink-0 w-10 h-10 rounded-md flex items-center justify-center ${
+                        form[key] ? 'bg-maroon/10' : 'bg-sand'
                       }`}>
-                        <Icon className={`h-5 w-5 ${form[key] ? `text-${color}-600` : 'text-gray-500'}`} />
+                        <Icon className={`h-5 w-5 ${form[key] ? 'text-maroon' : 'text-muted-foreground'}`} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className={`text-sm font-semibold ${form[key] ? `text-${color}-900` : 'text-gray-700'}`}>
+                        <p className={`text-sm font-semibold ${form[key] ? 'text-espresso' : 'text-muted-foreground'}`}>
                           {label}
                         </p>
                       </div>
                       {form[key] && (
-                        <div className={`absolute top-2 right-2 w-5 h-5 bg-${color}-500 rounded-full flex items-center justify-center`}>
-                          <Check className="h-3 w-3 text-white" />
+                        <div className="absolute top-2 right-2 w-5 h-5 bg-maroon rounded-full flex items-center justify-center">
+                          <Check className="h-3 w-3 text-ivory" />
                         </div>
                       )}
                     </label>
