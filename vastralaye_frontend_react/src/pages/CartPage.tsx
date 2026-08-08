@@ -320,11 +320,11 @@ const QRCodeModal: React.FC<QRCodeModalProps> = ({
         <div className="space-y-4 py-4">
           {/* Time Remaining */}
           <div
-            className={`p-4 rounded-lg border-2 flex items-center justify-between ${
+            className={`p-4 rounded-sm border flex items-center justify-between ${
               isExpired
                 ? 'bg-red-50 border-red-200'
                 : timeRemaining < 60
-                ? 'bg-orange-50 border-orange-200'
+                ? 'bg-ivory border-gold/50'
                 : 'bg-green-50 border-green-200'
             }`}
           >
@@ -332,23 +332,23 @@ const QRCodeModal: React.FC<QRCodeModalProps> = ({
               <Clock
                 className={`h-5 w-5 ${
                   isExpired
-                    ? 'text-red-600'
+                    ? 'text-sale'
                     : timeRemaining < 60
-                    ? 'text-orange-600'
-                    : 'text-green-600'
+                    ? 'text-gold'
+                    : 'text-green-700'
                 }`}
               />
               <div>
-                <p className="text-xs font-medium text-gray-600">
+                <p className="text-xs font-medium text-muted-foreground">
                   Time Remaining
                 </p>
                 <p
-                  className={`text-lg font-bold ${
+                  className={`text-lg font-semibold ${
                     isExpired
-                      ? 'text-red-600'
+                      ? 'text-sale'
                       : timeRemaining < 60
-                      ? 'text-orange-600'
-                      : 'text-green-600'
+                      ? 'text-espresso'
+                      : 'text-green-700'
                   }`}
                 >
                   {Math.floor(timeRemaining / 60)}:
@@ -360,7 +360,7 @@ const QRCodeModal: React.FC<QRCodeModalProps> = ({
               <Button
                 size="sm"
                 onClick={onClose}
-                className="bg-red-500 hover:bg-red-600 text-white"
+                className="bg-maroon hover:bg-terracotta text-ivory text-xs font-semibold uppercase tracking-[0.12em] rounded-sm transition-colors"
               >
                 Request New QR
               </Button>
@@ -369,12 +369,12 @@ const QRCodeModal: React.FC<QRCodeModalProps> = ({
 
           {/* QR Code Display */}
           {!isExpired ? (
-            <div className="p-6 bg-gradient-to-br from-gray-50 to-white rounded-lg border-2 border-dashed border-gray-300 flex flex-col items-center">
-              <div className="w-64 h-64 bg-white rounded-lg p-4 border-4 border-gray-200 flex items-center justify-center overflow-hidden shadow-lg">
+            <div className="p-6 bg-ivory rounded-sm border border-dashed border-border flex flex-col items-center">
+              <div className="w-64 h-64 bg-white rounded-sm p-4 border border-border flex items-center justify-center overflow-hidden">
                 {isGeneratingQR ? (
-                  <div className="flex flex-col items-center justify-center text-gray-400">
-                    <Loader2 className="h-8 w-8 animate-spin mb-2 text-purple-600" />
-                    <p className="text-xs text-gray-600">Generating QR code...</p>
+                  <div className="flex flex-col items-center justify-center text-muted-foreground">
+                    <Loader2 className="h-8 w-8 animate-spin mb-2 text-maroon" />
+                    <p className="text-xs text-muted-foreground">Generating QR code...</p>
                   </div>
                 ) : displayQR ? (
                   <img
@@ -388,33 +388,33 @@ const QRCodeModal: React.FC<QRCodeModalProps> = ({
                   />
                 ) : (
                   <div className="flex flex-col items-center justify-center text-center">
-                    <AlertCircle className="h-8 w-8 text-red-500 mb-2" />
-                    <p className="text-xs text-red-600">Failed to load QR code</p>
-                    <p className="text-xs text-gray-500 mt-1">Use the link below</p>
+                    <AlertCircle className="h-8 w-8 text-sale mb-2" />
+                    <p className="text-xs text-sale">Failed to load QR code</p>
+                    <p className="text-xs text-muted-foreground mt-1">Use the link below</p>
                   </div>
                 )}
               </div>
 
-              <p className="text-xs text-gray-600 mt-4 text-center font-medium">
+              <p className="text-xs text-muted-foreground mt-4 text-center font-medium">
                 📱 Scan with any UPI app to pay
               </p>
-              <p className="text-sm font-bold text-gray-900 mt-1">
+              <p className="text-sm font-semibold text-espresso mt-1">
                 {formatPrice(amount)}
               </p>
             </div>
           ) : (
-            <div className="p-6 bg-gradient-to-br from-red-50 to-orange-50 rounded-lg border-2 border-red-200 flex flex-col items-center text-center">
-              <AlertCircle className="h-12 w-12 text-red-500 mb-3" />
-              <h4 className="font-semibold text-gray-900 mb-2">
+            <div className="p-6 bg-red-50 rounded-sm border border-red-200 flex flex-col items-center text-center">
+              <AlertCircle className="h-12 w-12 text-sale mb-3" />
+              <h4 className="font-serif text-lg font-medium text-espresso mb-2">
                 QR Code Expired
               </h4>
-              <p className="text-sm text-gray-600 mb-4">
+              <p className="text-sm text-muted-foreground mb-4">
                 The QR code has expired. Please request a new one to complete
                 your payment.
               </p>
               <Button
                 onClick={onClose}
-                className="bg-red-500 hover:bg-red-600 text-white w-full"
+                className="bg-maroon hover:bg-terracotta text-ivory text-xs font-semibold uppercase tracking-[0.16em] rounded-sm w-full transition-colors"
               >
                 Request New QR
               </Button>
@@ -422,26 +422,26 @@ const QRCodeModal: React.FC<QRCodeModalProps> = ({
           )}
 
           {/* Payment Details */}
-          <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 space-y-3">
-            <h4 className="text-sm font-semibold text-gray-800">
+          <div className="p-4 bg-ivory rounded-sm border border-border space-y-3">
+            <h4 className="text-xs font-semibold uppercase tracking-[0.12em] text-espresso">
               Payment Details
             </h4>
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Amount</span>
-                <span className="font-semibold text-gray-900">
+                <span className="text-muted-foreground">Amount</span>
+                <span className="font-semibold text-espresso">
                   {formatPrice(amount)}
                 </span>
               </div>
               <div className="flex justify-between text-sm gap-2">
-                <span className="text-gray-600">Order ID</span>
-                <span className="font-mono text-xs text-gray-700 bg-white px-2 py-1 rounded border border-gray-200 break-all text-right max-w-[150px]">
+                <span className="text-muted-foreground">Order ID</span>
+                <span className="font-mono text-xs text-espresso bg-white px-2 py-1 rounded-sm border border-border break-all text-right max-w-[150px]">
                   {orderId}
                 </span>
               </div>
               <div className="flex justify-between text-sm gap-2">
-                <span className="text-gray-600">Transaction ID</span>
-                <span className="font-mono text-xs text-gray-700 bg-white px-2 py-1 rounded border border-gray-200 break-all text-right max-w-[150px]">
+                <span className="text-muted-foreground">Transaction ID</span>
+                <span className="font-mono text-xs text-espresso bg-white px-2 py-1 rounded-sm border border-border break-all text-right max-w-[150px]">
                   {transactionId}
                 </span>
               </div>
@@ -450,29 +450,29 @@ const QRCodeModal: React.FC<QRCodeModalProps> = ({
 
           {/* Alternative Payment Methods */}
           <div className="space-y-2">
-            <p className="text-xs font-medium text-gray-700">
+            <p className="text-xs font-medium text-espresso">
               💡 Alternative Payment Methods
             </p>
 
             {/* Copy UPI URL */}
             <button
               onClick={handleCopyUPI}
-              className="w-full p-3 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition-colors text-left"
+              className="w-full p-3 rounded-sm border border-border bg-white hover:bg-ivory transition-colors text-left"
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Smartphone className="h-4 w-4 text-purple-600" />
-                  <span className="text-sm font-medium text-gray-900">
+                  <Smartphone className="h-4 w-4 text-terracotta" />
+                  <span className="text-sm font-medium text-espresso">
                     {copied ? '✅ Copied!' : '📋 Copy UPI Link'}
                   </span>
                 </div>
                 {copied ? (
-                  <CheckCheck className="h-4 w-4 text-green-600" />
+                  <CheckCheck className="h-4 w-4 text-green-700" />
                 ) : (
-                  <Copy className="h-4 w-4 text-gray-400" />
+                  <Copy className="h-4 w-4 text-muted-foreground" />
                 )}
               </div>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 Paste in UPI app or browser
               </p>
             </button>
@@ -482,18 +482,18 @@ const QRCodeModal: React.FC<QRCodeModalProps> = ({
               onClick={() => {
                 window.location.href = upiUrl;
               }}
-              className="w-full p-3 rounded-lg border border-green-300 bg-green-50 hover:bg-green-100 transition-colors text-left"
+              className="w-full p-3 rounded-sm border border-maroon bg-ivory hover:bg-blush transition-colors text-left"
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <ExternalLink className="h-4 w-4 text-green-600" />
-                  <span className="text-sm font-medium text-green-900">
+                  <ExternalLink className="h-4 w-4 text-maroon" />
+                  <span className="text-sm font-medium text-maroon">
                     🚀 Open in UPI App
                   </span>
                 </div>
-                <ArrowRight className="h-4 w-4 text-green-600" />
+                <ArrowRight className="h-4 w-4 text-maroon" />
               </div>
-              <p className="text-xs text-green-700 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 Direct payment via installed UPI app
               </p>
             </button>
@@ -502,18 +502,18 @@ const QRCodeModal: React.FC<QRCodeModalProps> = ({
             {displayQR && (
               <button
                 onClick={handleDownloadQR}
-                className="w-full p-3 rounded-lg border border-blue-300 bg-blue-50 hover:bg-blue-100 transition-colors text-left"
+                className="w-full p-3 rounded-sm border border-border bg-white hover:bg-ivory transition-colors text-left"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Download className="h-4 w-4 text-blue-600" />
-                    <span className="text-sm font-medium text-blue-900">
+                    <Download className="h-4 w-4 text-terracotta" />
+                    <span className="text-sm font-medium text-espresso">
                       💾 Download QR Code
                     </span>
                   </div>
-                  <ArrowRight className="h-4 w-4 text-blue-600" />
+                  <ArrowRight className="h-4 w-4 text-terracotta" />
                 </div>
-                <p className="text-xs text-blue-700 mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   Save QR code to pay later
                 </p>
               </button>
@@ -521,8 +521,8 @@ const QRCodeModal: React.FC<QRCodeModalProps> = ({
           </div>
 
           {/* Info Box */}
-          <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
-            <p className="text-xs text-blue-800 leading-relaxed">
+          <div className="p-3 bg-blush rounded-sm border border-border">
+            <p className="text-xs text-espresso leading-relaxed">
               <strong>💡 How to Pay:</strong>
               <br />
               1. Open any UPI app (Google Pay, PhonePe, Paytm, etc.)
@@ -539,7 +539,7 @@ const QRCodeModal: React.FC<QRCodeModalProps> = ({
           <Button
             onClick={onClose}
             variant="outline"
-            className="flex-1 border-gray-300"
+            className="flex-1 text-xs font-semibold uppercase tracking-[0.16em] rounded-sm"
           >
             Close
           </Button>
@@ -547,7 +547,7 @@ const QRCodeModal: React.FC<QRCodeModalProps> = ({
             onClick={() => {
               window.location.href = upiUrl;
             }}
-            className="flex-1 bg-gradient-to-r from-[#5E9F50] to-[#4d8f40] hover:from-[#4d8f40] hover:to-[#3d7f30] text-white"
+            className="flex-1 bg-maroon hover:bg-terracotta text-ivory text-xs font-semibold uppercase tracking-[0.16em] rounded-sm transition-colors"
           >
             <Smartphone className="h-4 w-4 mr-2" />
             Pay Now
@@ -571,21 +571,21 @@ const LoginRequiredBanner: React.FC<LoginRequiredBannerProps> = ({
   onRegisterClick,
 }) => {
   return (
-    <div className="mb-6 overflow-hidden rounded-xl border-2 border-amber-300 bg-gradient-to-r from-amber-50 via-yellow-50 to-orange-50 shadow-lg">
-      <div className="h-1.5 bg-gradient-to-r from-amber-400 via-orange-400 to-red-400" />
+    <div className="mb-8 overflow-hidden rounded-sm border border-border bg-white">
+      <div className="h-1 bg-gold" />
       <div className="p-5 sm:p-6">
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
           <div className="flex-shrink-0">
-            <div className="w-14 h-14 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center shadow-md">
-              <ShieldAlert className="h-7 w-7 text-white" />
+            <div className="w-12 h-12 bg-blush rounded-full flex items-center justify-center">
+              <ShieldAlert className="h-6 w-6 text-maroon" strokeWidth={1.5} />
             </div>
           </div>
           <div className="flex-1">
-            <h3 className="text-lg font-bold text-gray-900 mb-1 flex items-center gap-2">
-              <Lock className="h-4 w-4 text-amber-600" />
+            <h3 className="font-serif text-lg font-medium text-espresso mb-1 flex items-center gap-2">
+              <Lock className="h-4 w-4 text-gold" />
               Login Required to Purchase
             </h3>
-            <p className="text-sm text-gray-600 leading-relaxed">
+            <p className="text-sm text-muted-foreground leading-relaxed">
               You need to <strong>sign in</strong> or{' '}
               <strong>create an account</strong> before you
               can checkout and place an order.
@@ -595,7 +595,7 @@ const LoginRequiredBanner: React.FC<LoginRequiredBannerProps> = ({
           <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
             <Button
               onClick={onLoginClick}
-              className="bg-gradient-to-r from-[#5E9F50] to-[#4d8f40] hover:from-[#4d8f40] hover:to-[#3d7f30] text-white shadow-md"
+              className="bg-maroon hover:bg-terracotta text-ivory text-xs font-semibold uppercase tracking-[0.16em] rounded-sm transition-colors"
               size="lg"
             >
               <LogIn className="h-4 w-4 mr-2" />
@@ -604,7 +604,7 @@ const LoginRequiredBanner: React.FC<LoginRequiredBannerProps> = ({
             <Button
               onClick={onRegisterClick}
               variant="outline"
-              className="border-amber-400 text-amber-700 hover:bg-amber-50"
+              className="text-xs font-semibold uppercase tracking-[0.16em] rounded-sm"
               size="lg"
             >
               <UserPlus className="h-4 w-4 mr-2" />
@@ -613,16 +613,16 @@ const LoginRequiredBanner: React.FC<LoginRequiredBannerProps> = ({
           </div>
         </div>
 
-        <div className="mt-4 pt-4 border-t border-amber-200/60">
+        <div className="mt-4 pt-4 border-t border-border">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {[
               { icon: Shield, color: 'green', label: 'Secure checkout' },
               { icon: Package, color: 'blue', label: 'Track your orders' },
               { icon: Gift, color: 'purple', label: 'Exclusive coupons' },
-            ].map(({ icon: Icon, color, label }) => (
-              <div key={label} className="flex items-center gap-2 text-xs text-gray-600">
-                <div className={`w-6 h-6 bg-${color}-100 rounded-full flex items-center justify-center flex-shrink-0`}>
-                  <Icon className={`h-3 w-3 text-${color}-600`} />
+            ].map(({ icon: Icon, label }) => (
+              <div key={label} className="flex items-center gap-2 text-xs text-muted-foreground">
+                <div className="w-6 h-6 bg-blush rounded-full flex items-center justify-center flex-shrink-0">
+                  <Icon className="h-3 w-3 text-terracotta" />
                 </div>
                 <span>{label}</span>
               </div>
@@ -818,10 +818,10 @@ const PaymentMethodModal: React.FC<PaymentMethodModalProps> = ({
       description: 'Pay when you receive your order',
       icon: Package,
       active: true,
-      gradient: 'from-green-500 to-green-600',
-      bgGradient: 'from-green-50 to-emerald-50',
-      borderColor: 'border-green-300',
-      selectedBorder: 'border-green-500 ring-2 ring-green-200',
+      gradient: 'bg-espresso',
+      bgGradient: 'bg-ivory',
+      borderColor: 'border-border',
+      selectedBorder: 'border-maroon',
     },
     {
       id: 'online',
@@ -829,10 +829,10 @@ const PaymentMethodModal: React.FC<PaymentMethodModalProps> = ({
       description: 'UPI, Credit Card, Debit Card, Net Banking',
       icon: Smartphone,
       active: true,
-      gradient: 'from-purple-500 to-purple-600',
-      bgGradient: 'from-purple-50 to-violet-50',
-      borderColor: 'border-purple-200',
-      selectedBorder: 'border-purple-500 ring-2 ring-purple-200',
+      gradient: 'bg-maroon',
+      bgGradient: 'bg-ivory',
+      borderColor: 'border-border',
+      selectedBorder: 'border-maroon',
     },
   ];
 
@@ -1057,53 +1057,53 @@ const PaymentMethodModal: React.FC<PaymentMethodModalProps> = ({
       <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <div className="mx-auto mb-4 w-16 h-16 bg-gradient-to-br from-green-100 to-green-50 rounded-full flex items-center justify-center border-2 border-green-200">
-              <Shield className="h-8 w-8 text-green-600" />
+            <div className="mx-auto mb-4 w-16 h-16 bg-blush rounded-full flex items-center justify-center">
+              <Shield className="h-8 w-8 text-maroon" strokeWidth={1.5} />
             </div>
-            <DialogTitle className="text-2xl font-bold text-center text-gray-900">
+            <DialogTitle className="font-serif text-2xl font-medium text-center text-espresso">
               Select Payment Method
             </DialogTitle>
-            <DialogDescription className="text-center text-gray-600 pt-2">
+            <DialogDescription className="text-center text-muted-foreground pt-2">
               Choose how you'd like to pay
             </DialogDescription>
           </DialogHeader>
 
           {/* Contact Details */}
-          <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-2">
-            <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+          <div className="bg-ivory p-4 rounded-sm border border-border mb-2">
+            <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-[0.12em] mb-3 flex items-center gap-1.5">
               <User className="w-3.5 h-3.5" /> Contact Details
             </h4>
             {isLoadingProfile && !detectedUser ? (
-              <div className="flex items-center justify-center gap-2 text-xs text-gray-500 py-2">
+              <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground py-2">
                 <Loader2 className="w-4 h-4 animate-spin" /> Detecting user info...
               </div>
             ) : detectedUser ? (
               <div className="space-y-2.5">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-gradient-to-br from-[#5E9F50] to-[#4d8f40] rounded-full flex items-center justify-center flex-shrink-0">
-                    <span className="text-white text-xs font-bold">
+                  <div className="w-8 h-8 bg-maroon rounded-full flex items-center justify-center flex-shrink-0">
+                    <span className="text-ivory text-xs font-semibold">
                       {detectedUser.name?.charAt(0)?.toUpperCase() || 'U'}
                     </span>
                   </div>
-                  <span className="font-bold text-gray-900 text-sm">
+                  <span className="font-semibold text-espresso text-sm">
                     {detectedUser.name}
                   </span>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pl-11">
-                  <div className="flex items-center gap-2 text-xs text-gray-600">
-                    <Mail className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Mail className="w-3.5 h-3.5 text-muted-foreground/70 flex-shrink-0" />
                     <span className="truncate">{detectedUser.email}</span>
                   </div>
                   {detectedUser.phone && (
-                    <div className="flex items-center gap-2 text-xs text-gray-600">
-                      <Phone className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <Phone className="w-3.5 h-3.5 text-muted-foreground/70 flex-shrink-0" />
                       <span>{detectedUser.phone}</span>
                     </div>
                   )}
                 </div>
               </div>
             ) : (
-              <div className="flex items-center justify-center gap-2 text-xs text-red-500 italic py-2">
+              <div className="flex items-center justify-center gap-2 text-xs text-sale italic py-2">
                 <AlertCircle className="w-3.5 h-3.5" /> Could not load user details.
               </div>
             )}
@@ -1121,36 +1121,36 @@ const PaymentMethodModal: React.FC<PaymentMethodModalProps> = ({
                     if (method.active) setSelectedMethod(method.id);
                   }}
                   disabled={!method.active || isPlacingOrder}
-                  className={`w-full p-4 rounded-lg border-2 transition-all duration-200 text-left ${
+                  className={`w-full p-4 rounded-sm border transition-colors duration-200 text-left ${
                     method.active
                       ? isSelected
-                        ? `bg-gradient-to-r ${method.bgGradient} ${method.selectedBorder}`
-                        : `bg-white hover:bg-gray-50 ${method.borderColor} hover:border-gray-300 cursor-pointer`
-                      : 'bg-gray-50 border-gray-200 cursor-not-allowed opacity-60'
+                        ? `${method.bgGradient} ${method.selectedBorder}`
+                        : `bg-white hover:bg-ivory ${method.borderColor} hover:border-espresso/40 cursor-pointer`
+                      : 'bg-ivory border-border cursor-not-allowed opacity-60'
                   }`}
                 >
                   <div className="flex items-center gap-4">
                     <div
-                      className={`w-10 h-10 bg-gradient-to-br ${method.gradient} rounded-lg flex items-center justify-center flex-shrink-0`}
+                      className={`w-10 h-10 ${method.gradient} rounded-sm flex items-center justify-center flex-shrink-0`}
                     >
-                      <IconComponent className="h-5 w-5 text-white" />
+                      <IconComponent className="h-5 w-5 text-ivory" strokeWidth={1.5} />
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
                         <p
-                          className={`font-semibold ${
-                            method.active ? 'text-gray-900' : 'text-gray-500'
+                          className={`font-medium ${
+                            method.active ? 'text-espresso' : 'text-muted-foreground'
                           }`}
                         >
                           {method.name}
                         </p>
                         {method.active && isSelected && (
-                          <CheckCircle className="h-5 w-5 text-green-600" />
+                          <CheckCircle className="h-5 w-5 text-maroon" />
                         )}
                       </div>
                       <p
-                        className={`text-sm ${
-                          method.active ? 'text-gray-600' : 'text-gray-400'
+                        className={`text-[13px] ${
+                          method.active ? 'text-muted-foreground' : 'text-muted-foreground/60'
                         }`}
                       >
                         {method.description}
@@ -1158,14 +1158,14 @@ const PaymentMethodModal: React.FC<PaymentMethodModalProps> = ({
                     </div>
                     {method.active && (
                       <div
-                        className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
+                        className={`w-4 h-4 rounded-full border flex items-center justify-center transition-colors ${
                           isSelected
-                            ? 'border-green-500 bg-green-500'
-                            : 'border-gray-300'
+                            ? 'border-maroon bg-maroon'
+                            : 'border-border'
                         }`}
                       >
                         {isSelected && (
-                          <div className="w-2 h-2 bg-white rounded-full" />
+                          <div className="w-1.5 h-1.5 bg-ivory rounded-full" />
                         )}
                       </div>
                     )}

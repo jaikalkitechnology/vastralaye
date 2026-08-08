@@ -33,22 +33,22 @@ import html2pdf from 'html2pdf.js';
 
 const getPaymentInfo = (method: string) => {
   const map: Record<string, any> = {
-    cod: { label: "Cash on Delivery", short: "COD", icon: Banknote, gradient: "from-green-500 to-emerald-600", bg: "from-green-50 to-emerald-50", border: "border-green-200", text: "text-green-700", badge: "bg-green-100 text-green-800 border-green-200" },
-    card: { label: "Credit/Debit Card", short: "Card", icon: CreditCard, gradient: "from-blue-500 to-indigo-600", bg: "from-blue-50 to-indigo-50", border: "border-blue-200", text: "text-blue-700", badge: "bg-blue-100 text-blue-800 border-blue-200" },
-    upi: { label: "UPI Payment", short: "UPI", icon: Wallet, gradient: "from-purple-500 to-violet-600", bg: "from-purple-50 to-violet-50", border: "border-purple-200", text: "text-purple-700", badge: "bg-purple-100 text-purple-800 border-purple-200" },
-    netbanking: { label: "Net Banking", short: "NetBanking", icon: Shield, gradient: "from-orange-500 to-amber-600", bg: "from-orange-50 to-amber-50", border: "border-orange-200", text: "text-orange-700", badge: "bg-orange-100 text-orange-800 border-orange-200" },
+    cod: { label: "Cash on Delivery", short: "COD", icon: Banknote, bg: "bg-ivory", border: "border-border", text: "text-espresso", badge: "bg-sand/60 text-muted-foreground border-border" },
+    card: { label: "Credit/Debit Card", short: "Card", icon: CreditCard, bg: "bg-ivory", border: "border-border", text: "text-espresso", badge: "bg-sand/60 text-muted-foreground border-border" },
+    upi: { label: "UPI Payment", short: "UPI", icon: Wallet, bg: "bg-ivory", border: "border-border", text: "text-espresso", badge: "bg-sand/60 text-muted-foreground border-border" },
+    netbanking: { label: "Net Banking", short: "NetBanking", icon: Shield, bg: "bg-ivory", border: "border-border", text: "text-espresso", badge: "bg-sand/60 text-muted-foreground border-border" },
   };
   return map[(method || "cod").toLowerCase()] || map["cod"];
 };
 
 const getStatusConfig = (status: string) => {
   const map: Record<string, any> = {
-    generated: { label: "Generated", icon: FileText, color: "text-blue-700", bg: "bg-blue-100", border: "border-blue-200" },
-    sent: { label: "Sent", icon: CheckCircle, color: "text-green-700", bg: "bg-green-100", border: "border-green-200" },
-    paid: { label: "Paid", icon: CheckCircle, color: "text-green-700", bg: "bg-green-100", border: "border-green-200" },
-    unpaid: { label: "Unpaid", icon: AlertCircle, color: "text-red-700", bg: "bg-red-100", border: "border-red-200" },
-    cancelled: { label: "Cancelled", icon: XCircle, color: "text-red-700", bg: "bg-red-100", border: "border-red-200" },
-    overdue: { label: "Overdue", icon: Clock, color: "text-orange-700", bg: "bg-orange-100", border: "border-orange-200" },
+    generated: { label: "Generated", icon: FileText, color: "text-muted-foreground", bg: "bg-sand/60", border: "border-border" },
+    sent: { label: "Sent", icon: CheckCircle, color: "text-[#3E6B4F]", bg: "bg-[#3E6B4F]/10", border: "border-[#3E6B4F]/25" },
+    paid: { label: "Paid", icon: CheckCircle, color: "text-[#3E6B4F]", bg: "bg-[#3E6B4F]/10", border: "border-[#3E6B4F]/25" },
+    unpaid: { label: "Unpaid", icon: AlertCircle, color: "text-sale", bg: "bg-sale/10", border: "border-sale/25" },
+    cancelled: { label: "Cancelled", icon: XCircle, color: "text-sale", bg: "bg-sale/10", border: "border-sale/25" },
+    overdue: { label: "Overdue", icon: Clock, color: "text-[#8A6414]", bg: "bg-gold/15", border: "border-gold/30" },
   };
   return map[(status || "generated").toLowerCase()] || map["generated"];
 };
@@ -587,8 +587,8 @@ const InvoicesPage: React.FC = () => {
     return (
       <UserLayout>
         <div className="flex flex-col justify-center items-center h-64 gap-4">
-          <Loader2 className="h-8 w-8 animate-spin text-[#7A1F2B]" />
-          <p className="text-gray-600">Loading invoice...</p>
+          <Loader2 className="h-8 w-8 animate-spin text-maroon" />
+          <p className="text-muted-foreground">Loading invoice...</p>
         </div>
       </UserLayout>
     );

@@ -314,22 +314,23 @@ const Contact = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-ivory py-12 md:py-16 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-3xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+        <div className="text-center mb-10 md:mb-12">
+          <span className="overline-label mb-2">Contact</span>
+          <h1 className="font-serif text-3xl md:text-4xl font-medium text-espresso mb-4">
             Get in Touch
           </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-[15px] leading-relaxed text-muted-foreground max-w-2xl mx-auto">
             All fields are required. Fill out the form below and our team will get back to you within 24 hours.
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-12">
+        <div className="grid gap-8">
           {/* Contact Information */}
-          <div className="bg-white rounded-2xl shadow-lg p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-8">
+          <div className="bg-white rounded-lg border border-border p-8">
+            <h2 className="font-serif text-xl font-medium text-espresso mb-8">
               Contact Information
             </h2>
 

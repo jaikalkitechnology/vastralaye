@@ -443,7 +443,7 @@ const FilterSidebar = ({
       className={`fixed inset-y-0 left-0 z-50 w-[85vw] max-w-[320px]
                   bg-background transition-transform duration-300 ease-out
                   ${isOpen ? "translate-x-0 shadow-xl" : "-translate-x-full"}
-                  lg:sticky lg:top-24 lg:z-0 lg:w-auto lg:max-w-none
+                  lg:sticky lg:top-24 lg:z-0
                   lg:max-h-[calc(100vh-7rem)] lg:translate-x-0 lg:shadow-none
                   lg:bg-transparent overflow-y-auto
                   ${className || ""}`}

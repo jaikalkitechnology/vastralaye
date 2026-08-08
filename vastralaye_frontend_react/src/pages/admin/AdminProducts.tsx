@@ -225,6 +225,16 @@ const normalizeProduct = (p: any): ProductType => ({
   subcategory_id: toNumOrNull(p?.subcategory_id) ?? undefined,
 });
 
+/* ======================== Status chip (admin_design.md §3.4) ======================== */
+const StatusChip = ({ tint, label }: { tint: string; label: string }) => (
+  <span
+    className={`inline-flex items-center gap-1.5 text-[11px] font-semibold rounded-full px-2.5 py-0.5 whitespace-nowrap ${tint}`}
+  >
+    <span className="h-1.5 w-1.5 rounded-full bg-current" />
+    {label}
+  </span>
+);
+
 /* ======================== API endpoints ======================== */
 const ENDPOINTS = {
   productsList: `${BASE_URL}/admin/products`,
@@ -675,9 +685,9 @@ export default function AdminProductsPage(): JSX.Element {
       <AdminLayout>
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center">
-            <ShieldAlert className="h-16 w-16 text-red-500 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h2>
-            <p className="text-gray-600">Admin privileges required.</p>
+            <ShieldAlert className="h-16 w-16 text-sale mx-auto mb-4" />
+            <h2 className="font-serif text-2xl font-medium text-espresso mb-2">Access Denied</h2>
+            <p className="text-[13px] text-muted-foreground">Admin privileges required.</p>
           </div>
         </div>
       </AdminLayout>
