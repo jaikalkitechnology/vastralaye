@@ -33,8 +33,6 @@ import {
 
 import { listCategories } from "@/api/apihelper";
 
-import logo from "../../public/logo.png"
-
 const NavBar = () => {
   const { state, dispatch, logout } = useStore();
   const { cart = [], isLoggedIn, currentUser } = state;
@@ -155,12 +153,10 @@ const NavBar = () => {
       <div className="container flex items-center h-16 px-4">
         {/* LOGO */}
         <Link to="/" className="flex flex-col items-start shrink-0">
-          <img
-            src={logo}
-            alt="Vastralaye logo"
-            className="w-40 sm:w-36 md:w-44 lg:w-52 h-auto object-contain"
-          />
-          <span className="text-[9px] uppercase tracking-[0.42em] text-gold font-medium leading-none mt-1">
+          <span className="font-serif text-2xl md:text-[26px] font-semibold leading-none text-espresso">
+            Vastra<span className="text-maroon">laye</span>
+          </span>
+          <span className="text-[9px] uppercase tracking-[0.42em] text-gold font-medium leading-none mt-1.5">
             Handcrafted India
           </span>
         </Link>
