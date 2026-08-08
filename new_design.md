@@ -183,6 +183,27 @@ The list row is now a clean **editorial horizontal card**:
 
 ---
 
+## 7. Scroll-to-top button — brought onto the theme
+
+The back-to-top button was the last off-theme element — an orange→green **gradient circle**
+(legacy hexes the color migration didn't catch) with a looping bounce and ping ripple, both
+banned by the motion rules. Now per `design.md` §5.14:
+
+- **Square espresso chip with a gold chevron** and a 1px gold border — matching the WhatsApp-hub /
+  sticky-reel floating family; deepens to **maroon on hover** with the 5% grow / 90% press-squash
+  feedback used across the site; the chevron nudges up 2px on hover (single transition, no loops).
+- Same slide-in behavior (appears after 300px of scroll, slides away near the top), scroll listener
+  now passive.
+- **Position fixed for mobile PDP:** `bottom-20` on small screens so it clears the sticky
+  add-to-cart bar, `bottom-6` from `md:` up; bottom-right, clear of the middle-right contact hub
+  and the bottom-left sticky reel — the three floating elements each own a corner.
+
+| File | Change |
+|---|---|
+| `src/pages/ScrollToTopButton.tsx` | Restyled to the espresso/gold theme; bounce + ripple removed; mobile offset added |
+
+---
+
 ## Verification
 
 - `tsc --noEmit` — no errors in any changed file.
