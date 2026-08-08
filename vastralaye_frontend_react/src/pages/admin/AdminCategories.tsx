@@ -530,61 +530,33 @@ const AdminCategories: React.FC = () => {
   return (
     <AdminLayout>
       <div className="space-y-6 p-6">
-        {/* Modern Header with Gradient */}
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-8 text-white shadow-xl">
-          <div className="flex justify-between items-center">
-            <div>
-              <div className="flex items-center gap-3 mb-2">
-                <div className="bg-white/20 backdrop-blur-sm p-3 rounded-xl">
-                  <MdFolder className="h-8 w-8" />
-                </div>
-                <h1 className="text-3xl font-bold">Categories Management</h1>
-              </div>
-              <p className="text-blue-100 text-lg">
-                Organize your products with categories and subcategories
-              </p>
-              <div className="flex items-center gap-6 mt-4">
-                <div className="flex items-center gap-2">
-                  <div className="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-lg">
-                    <span className="font-semibold text-lg">{categories.length}</span>
-                  </div>
-                  <span className="text-blue-100">Categories</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-lg">
-                    <span className="font-semibold text-lg">
-                      {categories.reduce((acc, cat) => acc + (cat.subcategories?.length || 0), 0)}
-                    </span>
-                  </div>
-                  <span className="text-blue-100">Subcategories</span>
-                </div>
-              </div>
-            </div>
-            <Button
-              onClick={openAddCategory}
-              disabled={loading}
-              size="lg"
-              className="bg-white text-blue-600 hover:bg-blue-50 shadow-lg hover:shadow-xl transition-all"
-            >
-              <IoAdd className="mr-2 h-5 w-5" /> Add Category
-            </Button>
+        {/* Header */}
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h1 className="font-serif text-xl md:text-2xl font-medium text-espresso">Categories</h1>
+            <p className="text-[13px] text-muted-foreground mt-1">
+              {categories.length} categories · {categories.reduce((acc, cat) => acc + (cat.subcategories?.length || 0), 0)} subcategories
+            </p>
           </div>
+          <Button
+            onClick={openAddCategory}
+            disabled={loading}
+            className="bg-maroon text-ivory uppercase text-[11px] tracking-[0.12em] px-5 py-2.5 rounded-sm hover:bg-terracotta"
+          >
+            <IoAdd className="mr-2 h-4 w-4" /> Add Category
+          </Button>
         </div>
 
-        {/* Search Card */}
-        <Card className="border-0 shadow-lg">
-          <CardContent className="p-6">
-            <div className="relative">
-              <IoSearchSharp className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
-              <Input
-                placeholder="Search categories by name or slug..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-12 h-12 text-base border-gray-200 focus:border-blue-500 focus:ring-blue-500"
-              />
-            </div>
-          </CardContent>
-        </Card>
+        {/* Search */}
+        <div className="relative max-w-md">
+          <IoSearchSharp className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
+          <Input
+            placeholder="Search categories by name or slug..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-9 h-10 bg-white rounded-sm border-border text-[13px] focus:border-maroon focus-visible:ring-0 focus-visible:ring-offset-0"
+          />
+        </div>
 
         {/* Categories Table */}
         <Card className="border-0 shadow-lg overflow-hidden">
