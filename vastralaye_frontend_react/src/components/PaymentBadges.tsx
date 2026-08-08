@@ -8,7 +8,7 @@ const Chip = ({ label, children }: { label: string; children: React.ReactNode })
   <span
     title={label}
     aria-label={label}
-    className="h-7 px-2 bg-white rounded-[3px] inline-flex items-center justify-center shadow-sm"
+    className="h-7 px-2 bg-white border border-espresso/10 rounded-[3px] inline-flex items-center justify-center shadow-sm"
   >
     {children}
   </span>

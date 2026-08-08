@@ -131,12 +131,15 @@ each method now renders as a **white badge chip with its brand mark**:
   assets (nothing to host, hotlink or break), crisp at any resolution, each chip carries an
   accessible `aria-label`/`title`.
 - White chips on the espresso footer read like the standard payment-trust row on major stores.
-- Reusable anywhere with one line (`<PaymentBadges />`) — e.g. the cart order summary and checkout.
+- Reusable anywhere with one line (`<PaymentBadges />`) — **also used in the cart's Order Summary**
+  (below the Proceed to Checkout button), replacing its text chips; chips carry a subtle border so
+  they read on white cards as well as the dark footer.
 
 | File | Change |
 |---|---|
-| `src/components/PaymentBadges.tsx` | New — the five SVG badge chips |
+| `src/components/PaymentBadges.tsx` | New — the five SVG badge chips (bordered for light surfaces) |
 | `src/components/Footer.tsx` | Bottom bar renders `<PaymentBadges />` instead of text chips |
+| `src/pages/CartPage.tsx` | Order Summary payment row now renders `<PaymentBadges />` |
 
 ---
 

@@ -23,6 +23,7 @@ import {
   Clock, Download, ExternalLink
 } from 'lucide-react';
 import { toast } from 'sonner';
+import PaymentBadges from '@/components/PaymentBadges';
 import ProductGrid from '@/components/ProductGrid';
 import { BASE_URL } from '../config';
 import QRCode from 'qrcode';
@@ -2384,16 +2385,9 @@ const CartPage: React.FC = () => {
                   </div>
                 )}
 
-                {/* Payment chips */}
-                <div className="mt-4 flex justify-center gap-2">
-                  {['UPI', 'VISA', 'RUPAY', 'COD'].map((chip) => (
-                    <span
-                      key={chip}
-                      className="border border-border rounded-sm px-2.5 py-1 text-[11px] tracking-[0.08em] text-muted-foreground"
-                    >
-                      {chip}
-                    </span>
-                  ))}
+                {/* Payment method badges */}
+                <div className="mt-4 flex justify-center">
+                  <PaymentBadges />
                 </div>
 
                 {/* Coupons Section */}
