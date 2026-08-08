@@ -102,6 +102,9 @@ app.include_router(product_excel.router)
 app.include_router(category_excel.router)
 app.include_router(reels.router)   # ✅ shoppable product reels
 
+from app.routers import newsletter
+app.include_router(newsletter.router)   # ✅ newsletter signups
+
 
 # ---------------------- Run the Server ----------------------
 if __name__ == "__main__":

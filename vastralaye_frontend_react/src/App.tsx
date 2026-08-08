@@ -2,9 +2,11 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { StoreProvider, useStore } from "@/contexts/StoreContext";
+import { lazy, Suspense } from "react";
 import GlobalLoader from "@/components/GlobalLoader";
+import WhatsAppFloat from "@/components/WhatsAppFloat";
 
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
@@ -30,16 +32,18 @@ import OrdersPage from "@/pages/user/OrdersPage";
 import AccountSettingsPage from "@/pages/user/AccountSettingsPage";
 import Newarrival from "@/components/user/Newarrival";
 import BestSellers from "@/components/user/BestSeller";
-import AdminDashboard from "@/pages/admin/AdminDashboard";
-import AdminUsers from "@/pages/admin/AdminUsers";
-import AdminProducts from "@/pages/admin/AdminProducts";
-import AdminCategories from "@/pages/admin/AdminCategories";
-import AdminCoupons from "@/pages/admin/AdminCoupons";
-import AdminAnalytics from "@/pages/admin/AdminAnalytics";
 import AdminLayout from "@/components/admin/AdminLayout";
-import AdminOrder from "@/pages/admin/AdminOrder";
-import AdminReels from "@/pages/admin/AdminReels";
-import Reviews from "@/pages/admin/CustomerReviews";
+
+/* Admin pages are code-split — they load only when an admin visits /admin/* */
+const AdminDashboard = lazy(() => import("@/pages/admin/AdminDashboard"));
+const AdminUsers = lazy(() => import("@/pages/admin/AdminUsers"));
+const AdminProducts = lazy(() => import("@/pages/admin/AdminProducts"));
+const AdminCategories = lazy(() => import("@/pages/admin/AdminCategories"));
+const AdminCoupons = lazy(() => import("@/pages/admin/AdminCoupons"));
+const AdminAnalytics = lazy(() => import("@/pages/admin/AdminAnalytics"));
+const AdminOrder = lazy(() => import("@/pages/admin/AdminOrder"));
+const AdminReels = lazy(() => import("@/pages/admin/AdminReels"));
+const Reviews = lazy(() => import("@/pages/admin/CustomerReviews"));
 import PrivacyPolicy from "@/pages/policy/PrivacyPolicy";
 import TermsAndConditions from "@/pages/policy/TermsConditions";
 import RefundPolicy from "@/pages/policy/RefundPolicy";
@@ -63,11 +67,14 @@ const queryClient = new QueryClient();
 /* 🔹 THIS WRAPPER READS STORE LOADING */
 const AppContent = () => {
   const { state } = useStore();
+  const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith("/admin");
 
   return (
     <>
       {state.loading && <GlobalLoader />}
 
+      <Suspense fallback={<GlobalLoader />}>
       <Routes>
         {/* 🔥 YOUR EXISTING ROUTES — UNCHANGED */}
         <Route path="/admin" element={<AdminLayout><AdminDashboard /></AdminLayout>} />
@@ -241,7 +248,9 @@ const AppContent = () => {
                <Route path="/order-confirmation" element={<OrderConfirmation />} />
 
       </Routes>
+      </Suspense>
 
+      {!isAdminRoute && <WhatsAppFloat />}
       <ScrollToTop />
       <ScrollToTopButton />
     </>

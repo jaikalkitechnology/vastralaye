@@ -31,6 +31,7 @@ import axios from "axios";
 import { toast } from "@/components/ui/use-toast";
 import { BASE_IMG, BASE_URL } from "@/config";
 import ReviewSection from "@/pages/ReviewSection";
+import ReelsSection from "@/components/ReelsSection";
 import ProductGrid from "@/components/ProductGrid";
 import { adminMe } from "@/api/apihelper";
 
@@ -1170,6 +1171,14 @@ return (
         loadMoreCount={5}
       />
     </div>
+
+    {/* Watch It Styled — related product reels (design.md §5.11) */}
+    <ReelsSection
+      placement="pdp"
+      productId={id ? Number(id) : undefined}
+      title="Watch It Styled"
+      overline="Watch & Shop"
+    />
   </div>
 );
 

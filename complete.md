@@ -6,6 +6,13 @@ Remaining work is tracked in [`pending.md`](pending.md).
 
 ---
 
+## Backend (FastAPI) — Newsletter (new, round 2)
+
+| Item | File(s) |
+|---|---|
+| `NewsletterSubscriber` model (unique email, timestamp; table auto-creates) | `app/models/newsletter.py`, registered in `app/models/__init__.py` |
+| `POST /api/v1/fronted/newsletter/subscribe` (validated, dedupes politely) + admin `GET /api/v1/admin/newsletter` | `app/routers/newsletter.py`, mounted in both entrypoints |
+
 ## Backend (FastAPI) — Reels feature (new)
 
 | Item | File(s) |
@@ -36,7 +43,12 @@ Remaining work is tracked in [`pending.md`](pending.md).
 | **Shop by Category** — **arch cards** with gold inner ring on hover, serif names, "Shop now →", scroll-snap peek on mobile, arch-shaped skeletons; original API fetching preserved | ✅ rewritten | `src/components/CategorySection.tsx` |
 | **Product carousels** — de-gradiented to brand tokens (maroon tabs/CTAs/loader) | ✅ restyled | `src/components/FeaturedProducts.tsx` |
 | **Shoppable reels — "Vastralaye in Motion"** — 9:16 cards from `GET /fronted/reels?placement=home`: poster, play button, view count, attached shoppable product strip; click opens a **video lightbox** (autoplay + controls + shop link) and registers a view; renders nothing when no reels exist | ✅ new | `src/components/ReelsSection.tsx` |
-| **Homepage assembly** — hero → USP → categories → products → reels; logged-in "My Account" card block removed | ✅ | `src/pages/Index.tsx` |
+| **Editorial banners** — 2-up "Festive Edit / Everyday Cottons" image cards with espresso scrim, gold overline, serif titles (replaces the old navy promo block) | ✅ rewritten | `src/components/PromoSection.tsx` |
+| **Brand story band** — blush section with arch image, craft copy, serif maroon stats (40+/900+/50k+), outline CTA | ✅ new | `src/components/home/BrandStory.tsx` |
+| **Testimonials** — three serif-italic quote cards with gold stars | ✅ new | `src/components/home/Testimonials.tsx` |
+| **Instagram grid** — "As Worn By You" 6-tile grid reusing live product imagery, hover Instagram overlay (hides itself when too few images) | ✅ new | `src/components/home/InstagramGrid.tsx` |
+| **Newsletter band** — maroon "Letters from the Loom" band posting to the new newsletter API with client validation + toasts | ✅ new | `src/components/home/NewsletterBand.tsx` |
+| **Homepage assembly** — hero → USP → categories → products → editorial banners → reels → brand story → scallop divider → testimonials → Instagram → newsletter; logged-in "My Account" card block removed | ✅ | `src/pages/Index.tsx` |
 
 ## Frontend — Global components
 
@@ -45,6 +57,12 @@ Remaining work is tracked in [`pending.md`](pending.md).
 | **Announcement bar** — maroon, ivory tracked text, gold highlight, above the header | ✅ | `src/components/NavBar.tsx` |
 | **Footer** — espresso editorial rewrite: gold top rule, serif brand block, Shop/Company/Help & Policies columns (all real routes), contact block, social circles, payment chips (UPI/VISA/MC/RuPay/COD) | ✅ rewritten | `src/components/Footer.tsx` |
 | **Product card** — 3:4 image on sand, **hover second-image crossfade** + scale, flat badges (gold `NEW`, espresso `BESTSELLER`, red `-x%`, out-of-stock), white wishlist circle (maroon-filled when active), **quick-add bar** sliding up on hover (always visible on mobile), quiet title + price row (struck MRP + % off) + gold stars; all cart/wishlist logic & image normalization preserved | ✅ rewritten | `src/components/ProductCard.tsx` |
+| **PDP "Watch It Styled"** — related product reels strip on every product page via `<ReelsSection placement="pdp" productId=…/>` (hidden until reels exist) | ✅ | `src/pages/ProductDetailPage.tsx` |
+| **WhatsApp float** — espresso/gold chat button on all storefront routes (hidden on `/admin`) | ✅ new | `src/components/WhatsAppFloat.tsx`, `src/App.tsx` |
+| **Branded `GlobalLoader`** (ivory veil, spinning gold ring, serif wordmark) and **serif 404 page** with ornament | ✅ rewritten | `src/components/GlobalLoader.tsx`, `src/pages/NotFound.tsx` |
+| Reusable `<Ornament />` gold divider | ✅ new | `src/components/decor/Ornament.tsx` |
+| **Admin code-splitting** — all 9 admin pages now `React.lazy` behind `Suspense` (main bundle 2,670 kB → 2,293 kB) | ✅ | `src/App.tsx` |
+| NavBar type fixes — removed stray `pro` import, fixed effect cleanup (project TS errors 109 → 106) | ✅ | `src/components/NavBar.tsx` |
 
 ## Frontend — Admin
 
