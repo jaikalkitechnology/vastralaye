@@ -616,7 +616,7 @@ const Contact = () => {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-lg font-medium hover:from-blue-700 hover:to-blue-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shadow-md hover:shadow-lg"
+                    className="w-full bg-maroon text-ivory py-4 rounded-lg font-medium hover:bg-terracotta transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                   >
                     {isSubmitting ? (
                       <>
@@ -631,13 +631,13 @@ const Contact = () => {
                     )}
                   </button>
 
-                  <p className="text-center text-sm text-gray-500">
+                  <p className="text-center text-sm text-muted-foreground">
                     By submitting this form, you agree to our{" "}
-                    <a href="/privacy-policy" className="text-blue-600 hover:underline">
+                    <a href="/privacy-policy" className="text-maroon hover:underline">
                       Privacy Policy
                     </a>
                     {" "}and{" "}
-                    <a href="/terms-conditions" className="text-blue-600 hover:underline">
+                    <a href="/terms-conditions" className="text-maroon hover:underline">
                       Terms of Service
                     </a>
                   </p>

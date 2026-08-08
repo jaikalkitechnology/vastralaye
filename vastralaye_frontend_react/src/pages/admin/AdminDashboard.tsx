@@ -74,6 +74,28 @@ interface ProductLite {
   in_stock?: boolean;
 }
 
+/** GET /admin/admin_stats response */
+interface AdminStatsResponse {
+  total_users: number;
+  total_orders: number;
+  total_revenue: number;
+  average_order_value: number;
+}
+
+/** GET /admin/analytics/monthly-orders response row */
+interface MonthlyOrdersRow {
+  year: number;
+  month: number;
+  orders: number;
+}
+
+/** GET /admin/analytics/top-customers response row */
+interface TopCustomerRow {
+  id: number;
+  name: string;
+  orders: number;
+}
+
 /* ============================================================
  * Formatting & chip helpers (admin_design.md §3)
  * ============================================================ */
@@ -297,11 +319,13 @@ const AdminDashboard = () => {
     setLoading(true);
 
     const [statsRes, monthlyRes, ordersRes, customersRes, productsRes] = await Promise.allSettled([
-      api.get('/admin/admin_stats'),
-      api.get('/admin/analytics/monthly-orders'),
-      api.get('/admin/admin_orders', { params: { page: 1, page_size: 6 } }),
-      api.get('/admin/analytics/top-customers'),
-      api.get('/admin/products', { params: { page: 1, limit: 100 } }),
+      api.get<AdminStatsResponse>('/admin/admin_stats'),
+      api.get<MonthlyOrdersRow[]>('/admin/analytics/monthly-orders'),
+      api.get<{ data: unknown[]; total: number }>('/admin/admin_orders', {
+        params: { page: 1, page_size: 6 },
+      }),
+      api.get<TopCustomerRow[]>('/admin/analytics/top-customers'),
+      api.get<ProductLite[]>('/admin/products', { params: { page: 1, limit: 100 } }),
     ]);
 
     let fallback = false;

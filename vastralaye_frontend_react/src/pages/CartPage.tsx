@@ -1412,33 +1412,33 @@ const OrderSuccessModal: React.FC<OrderSuccessModalProps> = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <div className="mx-auto mb-4 w-20 h-20 bg-gradient-to-br from-green-100 to-green-50 rounded-full flex items-center justify-center border-2 border-green-200">
-            <CheckCircle className="h-10 w-10 text-green-600" />
+          <div className="mx-auto mb-4 w-20 h-20 bg-green-700 rounded-full flex items-center justify-center">
+            <CheckCircle className="h-10 w-10 text-ivory" strokeWidth={1.5} />
           </div>
-          <DialogTitle className="text-2xl font-bold text-center text-gray-900">
+          <DialogTitle className="font-serif text-2xl font-medium text-center text-espresso">
             Order Placed Successfully! 🎉
           </DialogTitle>
-          <DialogDescription className="text-center text-gray-600 pt-2">
+          <DialogDescription className="text-center text-muted-foreground pt-2">
             Your order has been confirmed
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-4">
           {(orderData?.id || orderData?.order_id) && (
-            <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200 text-center">
-              <p className="text-sm text-gray-600">Order Number</p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">
+            <div className="p-4 bg-ivory rounded-sm border border-border text-center">
+              <p className="text-xs uppercase tracking-[0.12em] text-muted-foreground">Order Number</p>
+              <p className="font-serif text-2xl font-medium text-espresso mt-1">
                 #{orderData.id || orderData.order_id}
               </p>
             </div>
           )}
-          <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200">
+          <div className="p-4 bg-green-50 rounded-sm border border-green-200">
             <div className="flex items-start gap-3">
-              <Package className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+              <Package className="h-5 w-5 text-green-700 flex-shrink-0 mt-0.5" strokeWidth={1.5} />
               <div className="flex-1">
-                <h4 className="font-semibold text-gray-900 mb-1">
+                <h4 className="font-medium text-espresso mb-1">
                   {paymentLabels[paymentMethod] || 'Cash on Delivery'}
                 </h4>
-                <p className="text-sm text-gray-700 leading-relaxed">
+                <p className="text-sm text-muted-foreground leading-relaxed">
                   {paymentMethod === 'cod' ? (
                     <>
                       Your order will be delivered soon. Please keep{' '}
@@ -1458,29 +1458,29 @@ const OrderSuccessModal: React.FC<OrderSuccessModalProps> = ({
           </div>
           <div className="space-y-2 px-2">
             {orderData?.total_amount && (
-              <div className="flex items-center justify-between text-sm text-gray-600">
+              <div className="flex items-center justify-between text-sm text-muted-foreground">
                 <span className="flex items-center gap-2">
-                  <Receipt className="h-4 w-4 text-[#5E9F50]" /> Total Amount
+                  <Receipt className="h-4 w-4 text-terracotta" strokeWidth={1.5} /> Total Amount
                 </span>
-                <span className="font-bold text-gray-900">
+                <span className="font-semibold text-espresso">
                   {formatPrice(orderData.total_amount)}
                 </span>
               </div>
             )}
-            <div className="flex items-center gap-3 text-sm text-gray-600">
-              <Truck className="h-4 w-4 text-[#5E9F50]" />
+            <div className="flex items-center gap-3 text-sm text-muted-foreground">
+              <Truck className="h-4 w-4 text-terracotta" strokeWidth={1.5} />
               <span>Estimated delivery: 3-5 business days</span>
             </div>
-            <div className="flex items-center gap-3 text-sm text-gray-600">
-              <Mail className="h-4 w-4 text-[#5E9F50]" />
+            <div className="flex items-center gap-3 text-sm text-muted-foreground">
+              <Mail className="h-4 w-4 text-terracotta" strokeWidth={1.5} />
               <span>Order confirmation sent to your email</span>
             </div>
             {orderData?.status && (
-              <div className="flex items-center gap-3 text-sm text-gray-600">
-                <Package className="h-4 w-4 text-[#5E9F50]" />
+              <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                <Package className="h-4 w-4 text-terracotta" strokeWidth={1.5} />
                 <span>
                   Status:{' '}
-                  <Badge className="bg-green-100 text-green-800 border-0 capitalize">
+                  <Badge className="bg-green-50 text-green-700 border border-green-200 rounded-sm capitalize hover:bg-green-50">
                     {orderData.status}
                   </Badge>
                 </span>
@@ -1491,7 +1491,7 @@ const OrderSuccessModal: React.FC<OrderSuccessModalProps> = ({
         <div className="flex gap-3">
           <Button
             onClick={() => { onClose(); navigate('/'); }}
-            className="flex-1 bg-gradient-to-r from-[#5E9F50] to-[#4d8f40] hover:from-[#4d8f40] hover:to-[#3d7f30] text-white"
+            className="flex-1 bg-maroon hover:bg-terracotta text-ivory text-xs font-semibold uppercase tracking-[0.16em] rounded-sm transition-colors"
           >
             Continue Shopping
           </Button>
@@ -1507,7 +1507,7 @@ const OrderSuccessModal: React.FC<OrderSuccessModalProps> = ({
               );
             }}
             variant="outline"
-            className="flex-1 border-gray-300"
+            className="flex-1 text-xs font-semibold uppercase tracking-[0.16em] rounded-sm"
           >
             View Order
           </Button>
@@ -1928,32 +1928,32 @@ const CartPage: React.FC = () => {
   // ═══════════════════════════════════════════════════
   if (cartItems.length === 0) {
     return (
-      <div className="min-h-screen bg-white py-12">
+      <div className="min-h-screen bg-background py-16">
         <div className="container px-4 mx-auto max-w-6xl">
           <div className="max-w-2xl mx-auto text-center">
             <div className="mb-8">
-              <div className="w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-50 rounded-full flex items-center justify-center mx-auto border-2 border-gray-200">
-                <ShoppingCart className="h-12 w-12 text-gray-400" />
+              <div className="w-24 h-24 bg-blush rounded-full flex items-center justify-center mx-auto">
+                <ShoppingCart className="h-10 w-10 text-maroon" strokeWidth={1.5} />
               </div>
             </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">
-              Your Cart is Empty
+            <h1 className="font-serif text-3xl md:text-4xl font-medium text-espresso mb-4">
+              Your bag is empty
             </h1>
-            <p className="text-gray-600 mb-8 max-w-md mx-auto">
-              Add items you love to your cart and start shopping
+            <p className="text-muted-foreground mb-8 max-w-md mx-auto">
+              Add items you love to your bag and start shopping
             </p>
 
             {!isLoggedIn && (
-              <div className="mb-8 p-5 bg-gradient-to-r from-amber-50 via-yellow-50 to-orange-50 rounded-xl border-2 border-amber-200 max-w-md mx-auto">
+              <div className="mb-8 p-5 bg-white rounded-sm border border-border max-w-md mx-auto">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center">
-                    <LogIn className="h-5 w-5 text-white" />
+                  <div className="w-10 h-10 bg-blush rounded-full flex items-center justify-center">
+                    <LogIn className="h-5 w-5 text-maroon" strokeWidth={1.5} />
                   </div>
                   <div className="text-left">
-                    <p className="font-semibold text-gray-900 text-sm">
+                    <p className="font-medium text-espresso text-sm">
                       Not signed in
                     </p>
-                    <p className="text-xs text-gray-600">
+                    <p className="text-xs text-muted-foreground">
                       Sign in to track orders & get exclusive deals
                     </p>
                   </div>
@@ -1961,7 +1961,7 @@ const CartPage: React.FC = () => {
                 <div className="flex gap-2">
                   <Button
                     onClick={() => navigate('/login')}
-                    className="flex-1 bg-gradient-to-r from-[#5E9F50] to-[#4d8f40] text-white"
+                    className="flex-1 bg-maroon hover:bg-terracotta text-ivory text-[11px] font-semibold uppercase tracking-[0.12em] rounded-sm transition-colors"
                     size="sm"
                   >
                     <LogIn className="h-4 w-4 mr-2" /> Sign In
@@ -1969,7 +1969,7 @@ const CartPage: React.FC = () => {
                   <Button
                     onClick={() => navigate('/register')}
                     variant="outline"
-                    className="flex-1 border-amber-400 text-amber-700 hover:bg-amber-50"
+                    className="flex-1 text-[11px] font-semibold uppercase tracking-[0.12em] rounded-sm"
                     size="sm"
                   >
                     <UserPlus className="h-4 w-4 mr-2" /> Sign Up
@@ -1982,7 +1982,7 @@ const CartPage: React.FC = () => {
               <Button
                 asChild
                 size="lg"
-                className="bg-[#5E9F50] hover:bg-[#4d8f40] text-white"
+                className="bg-maroon hover:bg-terracotta text-ivory text-xs font-semibold uppercase tracking-[0.16em] px-8 rounded-sm transition-colors"
               >
                 <Link to="/products" className="flex items-center gap-2">
                   <ShoppingCart className="w-4 h-4" /> Start Shopping
@@ -1992,7 +1992,7 @@ const CartPage: React.FC = () => {
                 asChild
                 variant="outline"
                 size="lg"
-                className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                className="text-xs font-semibold uppercase tracking-[0.16em] px-8 rounded-sm"
               >
                 <Link to="/">
                   <ArrowLeft className="w-4 h-4 mr-2" />
@@ -2005,10 +2005,11 @@ const CartPage: React.FC = () => {
           {recommendedProducts.length > 0 && (
             <div className="mt-16">
               <div className="text-center mb-8">
-                <h2 className="text-2xl font-bold text-gray-900">
+                <span className="overline-label mb-2">Handpicked for you</span>
+                <h2 className="font-serif text-2xl md:text-3xl font-medium text-espresso">
                   Recommended for You
                 </h2>
-                <p className="text-gray-600 mt-2">
+                <p className="text-sm text-muted-foreground mt-2">
                   Discover products you might like
                 </p>
               </div>
@@ -2031,7 +2032,7 @@ const CartPage: React.FC = () => {
   //  CART WITH ITEMS VIEW
   // ═══════════════════════════════════════════════
   return (
-    <div className="min-h-screen bg-white py-8">
+    <div className="min-h-screen bg-background py-8">
       <div className="container px-4 mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-8">
@@ -2039,7 +2040,7 @@ const CartPage: React.FC = () => {
             <Button
               variant="ghost"
               size="sm"
-              className="text-gray-600 hover:text-gray-900"
+              className="text-muted-foreground hover:text-espresso text-xs font-semibold uppercase tracking-[0.12em]"
               asChild
             >
               <Link to="/">
@@ -2048,20 +2049,20 @@ const CartPage: React.FC = () => {
               </Link>
             </Button>
           </div>
-          <div className="flex flex-col md:flex-row md:items-center justify-between">
+          <div className="flex flex-col md:flex-row md:items-end justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                Shopping Cart
+              <h1 className="font-serif text-3xl md:text-4xl font-medium text-espresso mb-2">
+                Your Shopping Bag
               </h1>
-              <p className="text-gray-600">
+              <p className="text-sm text-muted-foreground">
                 {cartItems.length}{' '}
-                {cartItems.length === 1 ? 'item' : 'items'} in your cart
+                {cartItems.length === 1 ? 'item' : 'items'} in your bag
               </p>
             </div>
             <Button
               asChild
               variant="outline"
-              className="mt-4 md:mt-0 border-gray-300 text-gray-700 hover:bg-gray-50"
+              className="mt-4 md:mt-0 text-xs font-semibold uppercase tracking-[0.12em] rounded-sm"
             >
               <Link to="/products" className="flex items-center gap-2">
                 Continue Shopping
@@ -2080,140 +2081,127 @@ const CartPage: React.FC = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Cart Items */}
-          <div className="lg:col-span-2 space-y-4">
-            {cartItems.map((item) => {
-              const product = item.product as Product;
-              const price = product.discountPrice || product.price;
-              const itemTotal = price * item.quantity;
-              const hasDiscount = !!product.discountPrice;
-              const discountPercent = hasDiscount
-                ? Math.round(
-                    ((product.price - product.discountPrice) /
-                      product.price) *
-                      100
-                  )
-                : 0;
+          <div className="lg:col-span-2">
+            <div className="border-t border-border">
+              {cartItems.map((item) => {
+                const product = item.product as Product;
+                const price = product.discountPrice || product.price;
+                const itemTotal = price * item.quantity;
+                const hasDiscount = !!product.discountPrice;
+                const discountPercent = hasDiscount
+                  ? Math.round(
+                      ((product.price - product.discountPrice) /
+                        product.price) *
+                        100
+                    )
+                  : 0;
 
-              return (
-                <Card
-                  key={item.id}
-                  className="overflow-hidden border border-gray-200 hover:shadow-sm transition-shadow"
-                >
-                  <CardContent className="p-0">
-                    <div className="flex flex-col sm:flex-row">
-                      <Link
-                        to={`/product/${product.id}`}
-                        className="flex-shrink-0 w-full sm:w-32 h-32"
-                      >
+                return (
+                  <div
+                    key={item.id}
+                    className="flex gap-4 sm:gap-6 py-6 border-b border-border"
+                  >
+                    <Link
+                      to={`/product/${product.id}`}
+                      className="flex-shrink-0 w-20 sm:w-24"
+                    >
+                      <div className="aspect-[3/4] overflow-hidden rounded-sm bg-sand">
                         <img
                           src={getImageUrl(product)}
                           alt={product.name}
                           className="w-full h-full object-cover"
                         />
+                      </div>
+                    </Link>
+
+                    <div className="flex-1 min-w-0 flex flex-col">
+                      <Link
+                        to={`/product/${product.id}`}
+                        className="text-[15px] font-medium text-espresso hover:text-maroon transition-colors line-clamp-2"
+                      >
+                        {product.name}
                       </Link>
-                      <div className="flex-1 p-5">
-                        <div className="flex flex-col h-full">
-                          <div className="flex-1">
-                            <div className="flex justify-between items-start mb-3">
-                              <Link
-                                to={`/product/${product.id}`}
-                                className="font-semibold text-lg text-gray-900 hover:text-[#E97A48] transition-colors line-clamp-2"
-                              >
-                                {product.name}
-                              </Link>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => handleRemoveItem(item.id)}
-                                className="h-8 w-8 text-gray-400 hover:text-red-500"
-                              >
-                                <X className="h-4 w-4" />
-                              </Button>
-                            </div>
-                            <div className="flex items-center gap-4 mb-4">
-                              {hasDiscount && (
-                                <Badge className="bg-[#E97A48] text-white border-0">
-                                  <Tag className="h-3 w-3 mr-1" />{' '}
-                                  {discountPercent}% OFF
-                                </Badge>
-                              )}
-                              {(item.color || item.size) && (
-                                <span className="text-sm text-gray-500">
-                                  {item.color && (
-                                    <span className="capitalize">
-                                      {item.color}
-                                    </span>
-                                  )}
-                                  {item.color && item.size && ' • '}
-                                  {item.size && <span>{item.size}</span>}
-                                </span>
-                              )}
-                            </div>
-                            <div className="flex items-center gap-2 mb-4">
-                              <span className="text-xl font-bold text-gray-900">
-                                {formatPrice(price)}
+                      <div className="mt-1 text-[13px] text-muted-foreground">
+                        {(item.color || item.size) && (
+                          <span>
+                            {item.color && (
+                              <span className="capitalize">
+                                Colour: {item.color}
                               </span>
-                              {hasDiscount && (
-                                <span className="text-sm text-gray-500 line-through">
-                                  {formatPrice(product.price)}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                          <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                            <div className="flex items-center border border-gray-300 rounded-lg">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8"
-                                onClick={() =>
-                                  handleQuantityChange(
-                                    item.id,
-                                    item.quantity - 1
-                                  )
-                                }
-                                disabled={item.quantity <= 1}
-                              >
-                                <Minus className="h-3 w-3" />
-                              </Button>
-                              <span className="w-8 text-center font-medium">
-                                {item.quantity}
-                              </span>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8"
-                                onClick={() =>
-                                  handleQuantityChange(
-                                    item.id,
-                                    item.quantity + 1
-                                  )
-                                }
-                              >
-                                <Plus className="h-3 w-3" />
-                              </Button>
-                            </div>
-                            <div className="text-right">
-                              <div className="text-sm text-gray-500">
-                                Item Total
-                              </div>
-                              <div className="text-lg font-bold text-gray-900">
-                                {formatPrice(itemTotal)}
-                              </div>
-                            </div>
-                          </div>
+                            )}
+                            {item.color && item.size && ' · '}
+                            {item.size && <span>Size: {item.size}</span>}
+                          </span>
+                        )}
+                        {hasDiscount && (
+                          <span className={item.color || item.size ? 'ml-2 text-sale font-medium' : 'text-sale font-medium'}>
+                            {discountPercent}% off
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="mt-auto pt-4">
+                        <div className="inline-flex items-center border border-border rounded-sm bg-white">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-9 w-9 rounded-none text-muted-foreground hover:text-espresso hover:bg-ivory"
+                            onClick={() =>
+                              handleQuantityChange(
+                                item.id,
+                                item.quantity - 1
+                              )
+                            }
+                            disabled={item.quantity <= 1}
+                          >
+                            <Minus className="h-3 w-3" />
+                          </Button>
+                          <span className="w-10 text-center text-sm font-medium text-espresso">
+                            {item.quantity}
+                          </span>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-9 w-9 rounded-none text-muted-foreground hover:text-espresso hover:bg-ivory"
+                            onClick={() =>
+                              handleQuantityChange(
+                                item.id,
+                                item.quantity + 1
+                              )
+                            }
+                          >
+                            <Plus className="h-3 w-3" />
+                          </Button>
                         </div>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
 
-            <div className="flex flex-wrap gap-3 pt-4">
+                    <div className="flex-shrink-0 text-right flex flex-col items-end">
+                      <div className="text-base font-semibold text-espresso">
+                        {formatPrice(itemTotal)}
+                      </div>
+                      {hasDiscount && (
+                        <div className="text-[13px] text-muted-foreground line-through">
+                          {formatPrice(product.price * item.quantity)}
+                        </div>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveItem(item.id)}
+                        className="mt-auto pt-4 text-xs uppercase tracking-[0.08em] text-muted-foreground underline underline-offset-[3px] hover:text-maroon transition-colors"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="flex flex-wrap gap-3 pt-5">
               <Button
-                variant="outline"
-                className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
+                variant="ghost"
+                className="px-0 text-xs uppercase tracking-[0.08em] text-muted-foreground hover:text-sale hover:bg-transparent underline underline-offset-[3px]"
                 onClick={() => {
                   clearCart();
                   setDiscount(0);
@@ -2223,64 +2211,140 @@ const CartPage: React.FC = () => {
                   toast.success('Cart cleared');
                 }}
               >
-                <Trash2 className="h-4 w-4 mr-2" /> Clear Cart
+                <Trash2 className="h-4 w-4 mr-2" /> Clear Bag
               </Button>
             </div>
           </div>
 
           {/* Order Summary */}
           <div className="lg:col-span-1">
-            <Card className="border border-gray-200 sticky top-4">
-              <CardContent className="p-6">
-                <h2 className="text-xl font-bold mb-6 text-gray-900">
+            <aside className="bg-white border border-border rounded-sm p-6 sticky top-24">
+                <h2 className="font-serif text-xl font-medium text-espresso mb-5">
                   Order Summary
                 </h2>
 
-                <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 space-y-3">
-                  <h3 className="text-sm font-semibold text-gray-800">Summary</h3>
-
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm text-gray-600">
-                      <span>Subtotal</span>
-                      <span className="font-medium text-gray-800">{formatPrice(subtotal)}</span>
-                    </div>
-
-                    <div className="flex justify-between text-sm text-gray-600">
-                      <span>GST (18%)</span>
-                      <span className="font-medium text-gray-800">{formatPrice(gstAmount)}</span>
-                    </div>
-
-                    {shipping > 0 && (
-                      <div className="flex justify-between text-sm text-gray-600">
-                        <span>Shipping</span>
-                        <span className="font-medium text-gray-800">{formatPrice(shipping)}</span>
-                      </div>
+                {/* Coupon code */}
+                <div className="flex mb-3">
+                  <Input
+                    placeholder={
+                      isLoggedIn
+                        ? 'Coupon code'
+                        : 'Sign in to apply coupons'
+                    }
+                    value={couponCode}
+                    onChange={(e) =>
+                      setCouponCode(e.target.value.toUpperCase())
+                    }
+                    className="flex-1 min-w-0 h-11 text-sm font-mono bg-white border-input border-r-0 rounded-sm rounded-r-none focus-visible:ring-1 focus-visible:ring-maroon focus-visible:ring-offset-0"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleApplyCoupon();
+                    }}
+                    disabled={isApplyingCoupon || !isLoggedIn}
+                  />
+                  <Button
+                    onClick={() => {
+                      if (!isLoggedIn) { navigate('/login'); return; }
+                      handleApplyCoupon();
+                    }}
+                    disabled={
+                      isApplyingCoupon || (!couponCode.trim() && isLoggedIn)
+                    }
+                    className="h-11 px-5 rounded-sm rounded-l-none bg-maroon hover:bg-terracotta text-ivory text-xs font-semibold uppercase tracking-[0.16em] whitespace-nowrap transition-colors"
+                  >
+                    {isApplyingCoupon ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : !isLoggedIn ? (
+                      <>
+                        <LogIn className="h-4 w-4 mr-1" /> Login
+                      </>
+                    ) : (
+                      'Apply'
                     )}
+                  </Button>
+                </div>
 
-                    {discount > 0 && (
-                      <div className="flex justify-between text-sm text-green-600">
-                        <span>Discount</span>
-                        <span className="font-medium">- {formatPrice(discount)}</span>
+                {appliedCoupon && (
+                  <div className="mb-4 p-3 bg-green-50 rounded-sm border border-green-200">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="w-4 h-4 text-green-700" />
+                        <span className="text-sm font-medium text-green-700">
+                          "{appliedCoupon.code}" applied
+                        </span>
                       </div>
-                    )}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 w-6 p-0 hover:bg-green-100"
+                        onClick={handleRemoveDiscount}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                    <p className="text-xs text-green-700 mt-1">
+                      {discount > 0
+                        ? `You saved ₹${discount.toLocaleString('en-IN')}!`
+                        : 'Coupon applied successfully'}
+                    </p>
+                  </div>
+                )}
 
-                    <div className="border-t border-dashed border-gray-300 pt-2 flex justify-between text-base font-semibold text-gray-900">
-                      <span>Total</span>
-                      <span>{formatPrice(total)}</span>
+                {/* Summary lines */}
+                <div className="space-y-2.5 text-sm pt-2">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">
+                      Subtotal ({cartItems.length}{' '}
+                      {cartItems.length === 1 ? 'item' : 'items'})
+                    </span>
+                    <span className="text-espresso">{formatPrice(subtotal)}</span>
+                  </div>
+
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">GST (18%)</span>
+                    <span className="text-espresso">{formatPrice(gstAmount)}</span>
+                  </div>
+
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Shipping</span>
+                    {shipping > 0 ? (
+                      <span className="text-espresso">{formatPrice(shipping)}</span>
+                    ) : (
+                      <span className="text-green-700">Free</span>
+                    )}
+                  </div>
+
+                  {discount > 0 && (
+                    <div className="flex justify-between text-green-700">
+                      <span>You save</span>
+                      <span>− {formatPrice(discount)}</span>
+                    </div>
+                  )}
+
+                  <div className="flex justify-between items-baseline border-t border-border pt-4 mt-4">
+                    <span className="text-base font-semibold text-espresso">Total</span>
+                    <div className="text-right">
+                      {discount > 0 && (
+                        <div className="text-[13px] text-muted-foreground line-through">
+                          {formatPrice(totalBeforeDiscount)}
+                        </div>
+                      )}
+                      <span className="text-lg font-semibold text-espresso">
+                        {formatPrice(total)}
+                      </span>
                     </div>
                   </div>
                 </div>
 
                 {subtotal < 999 && (
-                  <div className="mb-6 p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg border border-gray-200 mt-4">
-                    <div className="flex items-center gap-2 text-sm text-gray-700 mb-2">
-                      <Truck className="w-4 h-4" />
+                  <div className="mt-5 p-3 bg-ivory rounded-sm border border-border">
+                    <div className="flex items-center gap-2 text-[13px] text-muted-foreground mb-2">
+                      <Truck className="w-4 h-4 text-terracotta" strokeWidth={1.5} />
                       Add ₹{(999 - subtotal).toLocaleString('en-IN')} more for
                       free shipping!
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div className="w-full bg-sand rounded-full h-1">
                       <div
-                        className="bg-gradient-to-r from-[#E97A48] to-[#5E9F50] h-2 rounded-full transition-all duration-300"
+                        className="bg-gold h-1 rounded-full transition-all duration-300"
                         style={{
                           width: `${Math.min(100, (subtotal / 999) * 100)}%`,
                         }}
@@ -2289,37 +2353,19 @@ const CartPage: React.FC = () => {
                   </div>
                 )}
 
-                <Separator className="my-6" />
-
-                <div className="flex justify-between items-center mb-6">
-                  <span className="text-lg font-bold text-gray-900">
-                    Total Amount
-                  </span>
-                  <div className="text-right">
-                    {discount > 0 && (
-                      <div className="text-sm text-gray-500 line-through mb-1">
-                        {formatPrice(totalBeforeDiscount)}
-                      </div>
-                    )}
-                    <span className="text-2xl font-bold text-gray-900">
-                      {formatPrice(total)}
-                    </span>
-                  </div>
-                </div>
-
                 {isLoggedIn ? (
                   <Button
                     size="lg"
-                    className="w-full bg-gradient-to-r from-[#5E9F50] to-[#4d8f40] hover:from-[#4d8f40] hover:to-[#3d7f30] text-white mb-6"
+                    className="w-full h-12 mt-6 bg-maroon hover:bg-terracotta text-ivory text-xs font-semibold uppercase tracking-[0.16em] rounded-sm transition-colors"
                     onClick={handleCheckout}
                   >
-                    <Shield className="w-4 h-4 mr-2" /> Proceed to Checkout
+                    Proceed to Checkout
                   </Button>
                 ) : (
-                  <div className="mb-6 space-y-2">
+                  <div className="mt-6 space-y-2">
                     <Button
                       size="lg"
-                      className="w-full bg-gradient-to-r from-[#5E9F50] to-[#4d8f40] hover:from-[#4d8f40] hover:to-[#3d7f30] text-white"
+                      className="w-full h-12 bg-maroon hover:bg-terracotta text-ivory text-xs font-semibold uppercase tracking-[0.16em] rounded-sm transition-colors"
                       onClick={() => navigate('/login')}
                     >
                       <LogIn className="w-4 h-4 mr-2" /> Sign In to Checkout
@@ -2327,16 +2373,28 @@ const CartPage: React.FC = () => {
                     <Button
                       size="lg"
                       variant="outline"
-                      className="w-full border-gray-300 text-gray-700 hover:bg-gray-50"
+                      className="w-full h-12 text-xs font-semibold uppercase tracking-[0.16em] rounded-sm"
                       onClick={() => navigate('/register')}
                     >
                       <UserPlus className="w-4 h-4 mr-2" /> Create Account
                     </Button>
-                    <p className="text-xs text-center text-gray-500 flex items-center justify-center gap-1 pt-1">
+                    <p className="text-xs text-center text-muted-foreground flex items-center justify-center gap-1 pt-1">
                       <Lock className="h-3 w-3" /> Login required to place orders
                     </p>
                   </div>
                 )}
+
+                {/* Payment chips */}
+                <div className="mt-4 flex justify-center gap-2">
+                  {['UPI', 'VISA', 'RUPAY', 'COD'].map((chip) => (
+                    <span
+                      key={chip}
+                      className="border border-border rounded-sm px-2.5 py-1 text-[11px] tracking-[0.08em] text-muted-foreground"
+                    >
+                      {chip}
+                    </span>
+                  ))}
+                </div>
 
                 {/* Coupons Section */}
                 <div className="border-t pt-6">
