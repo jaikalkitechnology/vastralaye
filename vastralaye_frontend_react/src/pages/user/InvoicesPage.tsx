@@ -33,22 +33,22 @@ import html2pdf from 'html2pdf.js';
 
 const getPaymentInfo = (method: string) => {
   const map: Record<string, any> = {
-    cod: { label: "Cash on Delivery", short: "COD", icon: Banknote, gradient: "from-green-500 to-emerald-600", bg: "from-green-50 to-emerald-50", border: "border-green-200", text: "text-green-700", badge: "bg-green-100 text-green-800 border-green-200" },
-    card: { label: "Credit/Debit Card", short: "Card", icon: CreditCard, gradient: "from-blue-500 to-indigo-600", bg: "from-blue-50 to-indigo-50", border: "border-blue-200", text: "text-blue-700", badge: "bg-blue-100 text-blue-800 border-blue-200" },
-    upi: { label: "UPI Payment", short: "UPI", icon: Wallet, gradient: "from-purple-500 to-violet-600", bg: "from-purple-50 to-violet-50", border: "border-purple-200", text: "text-purple-700", badge: "bg-purple-100 text-purple-800 border-purple-200" },
-    netbanking: { label: "Net Banking", short: "NetBanking", icon: Shield, gradient: "from-orange-500 to-amber-600", bg: "from-orange-50 to-amber-50", border: "border-orange-200", text: "text-orange-700", badge: "bg-orange-100 text-orange-800 border-orange-200" },
+    cod: { label: "Cash on Delivery", short: "COD", icon: Banknote, bg: "bg-ivory", border: "border-border", text: "text-espresso", badge: "bg-sand/60 text-muted-foreground border-border" },
+    card: { label: "Credit/Debit Card", short: "Card", icon: CreditCard, bg: "bg-ivory", border: "border-border", text: "text-espresso", badge: "bg-sand/60 text-muted-foreground border-border" },
+    upi: { label: "UPI Payment", short: "UPI", icon: Wallet, bg: "bg-ivory", border: "border-border", text: "text-espresso", badge: "bg-sand/60 text-muted-foreground border-border" },
+    netbanking: { label: "Net Banking", short: "NetBanking", icon: Shield, bg: "bg-ivory", border: "border-border", text: "text-espresso", badge: "bg-sand/60 text-muted-foreground border-border" },
   };
   return map[(method || "cod").toLowerCase()] || map["cod"];
 };
 
 const getStatusConfig = (status: string) => {
   const map: Record<string, any> = {
-    generated: { label: "Generated", icon: FileText, color: "text-blue-700", bg: "bg-blue-100", border: "border-blue-200" },
-    sent: { label: "Sent", icon: CheckCircle, color: "text-green-700", bg: "bg-green-100", border: "border-green-200" },
-    paid: { label: "Paid", icon: CheckCircle, color: "text-green-700", bg: "bg-green-100", border: "border-green-200" },
-    unpaid: { label: "Unpaid", icon: AlertCircle, color: "text-red-700", bg: "bg-red-100", border: "border-red-200" },
-    cancelled: { label: "Cancelled", icon: XCircle, color: "text-red-700", bg: "bg-red-100", border: "border-red-200" },
-    overdue: { label: "Overdue", icon: Clock, color: "text-orange-700", bg: "bg-orange-100", border: "border-orange-200" },
+    generated: { label: "Generated", icon: FileText, color: "text-muted-foreground", bg: "bg-sand/60", border: "border-border" },
+    sent: { label: "Sent", icon: CheckCircle, color: "text-[#3E6B4F]", bg: "bg-[#3E6B4F]/10", border: "border-[#3E6B4F]/25" },
+    paid: { label: "Paid", icon: CheckCircle, color: "text-[#3E6B4F]", bg: "bg-[#3E6B4F]/10", border: "border-[#3E6B4F]/25" },
+    unpaid: { label: "Unpaid", icon: AlertCircle, color: "text-sale", bg: "bg-sale/10", border: "border-sale/25" },
+    cancelled: { label: "Cancelled", icon: XCircle, color: "text-sale", bg: "bg-sale/10", border: "border-sale/25" },
+    overdue: { label: "Overdue", icon: Clock, color: "text-[#8A6414]", bg: "bg-gold/15", border: "border-gold/30" },
   };
   return map[(status || "generated").toLowerCase()] || map["generated"];
 };
@@ -587,8 +587,8 @@ const InvoicesPage: React.FC = () => {
     return (
       <UserLayout>
         <div className="flex flex-col justify-center items-center h-64 gap-4">
-          <Loader2 className="h-8 w-8 animate-spin text-[#7A1F2B]" />
-          <p className="text-gray-600">Loading invoice...</p>
+          <Loader2 className="h-8 w-8 animate-spin text-maroon" />
+          <p className="text-muted-foreground">Loading invoice...</p>
         </div>
       </UserLayout>
     );
@@ -599,26 +599,24 @@ const InvoicesPage: React.FC = () => {
     return (
       <UserLayout>
         <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4 px-4">
-          <div className="bg-red-50 rounded-full p-4">
-            <AlertCircle className="h-16 w-16 text-red-400" />
-          </div>
-          <h2 className="text-2xl font-bold text-gray-800 text-center">
+          <AlertCircle className="h-14 w-14 text-sale/60" />
+          <h2 className="font-serif text-2xl font-medium text-espresso text-center">
             {error || "Invoice Not Found"}
           </h2>
-          <p className="text-gray-600 text-center max-w-md">
-            {error === "Invoice not found for this order" 
+          <p className="text-muted-foreground text-center max-w-md">
+            {error === "Invoice not found for this order"
               ? "No invoice has been generated for this order yet. Please check back later."
               : "We couldn't find the invoice you're looking for. It might have been removed or you don't have permission to view it."}
           </p>
           <div className="flex gap-3 mt-4 flex-wrap justify-center">
-            <Button onClick={handleRetry} variant="outline" className="gap-2">
-              <RefreshCw className="w-4 h-4" />Retry
+            <Button onClick={handleRetry} variant="outline" className="h-auto gap-2 rounded-sm px-5 py-2.5 text-[11px] font-medium uppercase tracking-[0.12em]">
+              <RefreshCw className="w-3.5 h-3.5" />Retry
             </Button>
-            <Button onClick={() => navigate("/orders")} variant="outline" className="gap-2">
-              <Package className="w-4 h-4" />My Orders
+            <Button onClick={() => navigate("/orders")} variant="outline" className="h-auto gap-2 rounded-sm px-5 py-2.5 text-[11px] font-medium uppercase tracking-[0.12em]">
+              <Package className="w-3.5 h-3.5" />My Orders
             </Button>
-            <Button onClick={() => navigate("/")} variant="outline" className="gap-2">
-              <Home className="w-4 h-4" />Home
+            <Button onClick={() => navigate("/")} variant="outline" className="h-auto gap-2 rounded-sm px-5 py-2.5 text-[11px] font-medium uppercase tracking-[0.12em]">
+              <Home className="w-3.5 h-3.5" />Home
             </Button>
           </div>
         </div>
@@ -641,59 +639,57 @@ const InvoicesPage: React.FC = () => {
         </div>
 
         {/* Header */}
-        <div className="bg-gradient-to-r from-[#7A1F2B]/10 via-[#B85C38]/5 to-[#7A1F2B]/10 rounded-2xl p-6 border border-[#7A1F2B]/20">
+        <div className="rounded-sm border border-border bg-white p-5 md:p-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div className="flex items-center gap-4">
               <Button
                 variant="outline"
                 size="icon"
                 onClick={() => navigate("/invoices")}
-                className="h-12 w-12 rounded-xl border-[#7A1F2B]/30 hover:bg-[#7A1F2B]/5"
+                className="h-10 w-10 rounded-sm"
               >
-                <ArrowLeft className="h-5 w-5 text-[#7A1F2B]" />
+                <ArrowLeft className="h-4 w-4" />
               </Button>
               <div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] bg-clip-text text-transparent">
+                <h1 className="font-serif text-2xl font-medium text-espresso">
                   {invoice.invoice_number}
                 </h1>
-                <div className="flex items-center gap-2 text-sm text-gray-600 mt-1">
+                <div className="flex items-center gap-2 text-[13px] text-muted-foreground mt-1">
                   <Calendar className="w-3 h-3" />
                   {formatDate(invoice.invoice_date)}
-                  <span className="text-gray-400">•</span>
+                  <span>·</span>
                   <span>Order #{invoice.order_id}</span>
                 </div>
               </div>
             </div>
 
             <div className="flex items-center gap-2 flex-wrap">
-              <Badge variant="outline" className={`${statusCfg.bg} ${statusCfg.color} ${statusCfg.border} px-3 py-1.5 rounded-full`}>
+              <Badge variant="outline" className={`${statusCfg.bg} ${statusCfg.color} ${statusCfg.border} px-3 py-1 rounded-full text-[11px] font-semibold uppercase tracking-[0.12em]`}>
                 <StatusIcon className="w-3 h-3 mr-1" />{statusCfg.label}
               </Badge>
-              <Badge variant="outline" className={`${payInfo.badge} px-3 py-1 rounded-full text-xs`}>
+              <Badge variant="outline" className={`${payInfo.badge} px-2.5 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-[0.1em]`}>
                 <PayIcon className="w-3 h-3 mr-1" />{payInfo.short}
               </Badge>
-              
+
               {/* Action Buttons */}
               <div className="flex gap-2">
                 <Button
-                  size="sm"
                   variant="outline"
-                  className="border-[#7A1F2B] text-[#7A1F2B]"
+                  className="h-auto rounded-sm px-4 py-2 text-[11px] font-medium uppercase tracking-[0.12em]"
                   onClick={handlePrintInvoice}
                 >
-                  <Printer className="w-4 h-4 mr-1" />Print
+                  <Printer className="w-3.5 h-3.5 mr-1" />Print
                 </Button>
-                
+
                 <Button
-                  size="sm"
-                  className="bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] text-white hover:opacity-90"
+                  className="h-auto rounded-sm bg-maroon px-4 py-2 text-[11px] font-medium uppercase tracking-[0.12em] text-ivory hover:bg-terracotta"
                   onClick={() => handleDownloadPDF('pdf')}
                   disabled={generatingPDF}
                 >
                   {generatingPDF ? (
-                    <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                    <Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" />
                   ) : (
-                    <Download className="w-4 h-4 mr-1" />
+                    <Download className="w-3.5 h-3.5 mr-1" />
                   )}
                   Download
                 </Button>
@@ -701,24 +697,23 @@ const InvoicesPage: React.FC = () => {
                 {/* Share Dropdown */}
                 <div className="relative">
                   <Button
-                    size="sm"
                     variant="outline"
-                    className="border-[#7A1F2B] text-[#7A1F2B]"
+                    className="h-auto rounded-sm px-4 py-2 text-[11px] font-medium uppercase tracking-[0.12em]"
                     onClick={handleShare}
                   >
-                    <Share2 className="w-4 h-4 mr-1" />Share
+                    <Share2 className="w-3.5 h-3.5 mr-1" />Share
                     <ChevronDown className="w-3 h-3 ml-1" />
                   </Button>
-                  
+
                   {showShareOptions && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
+                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-sm border border-border shadow-[0_10px_30px_-12px_rgba(43,27,18,0.18)] z-50">
                       <div className="p-2 space-y-1">
                         <button
                           onClick={() => {
                             handleEmailInvoice();
                             setShowShareOptions(false);
                           }}
-                          className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 rounded-lg flex items-center gap-2"
+                          className="w-full text-left px-3 py-2 text-sm text-espresso hover:bg-ivory rounded-sm flex items-center gap-2"
                         >
                           <Mail className="w-4 h-4" /> Email
                         </button>
@@ -727,7 +722,7 @@ const InvoicesPage: React.FC = () => {
                             handleWhatsAppShare();
                             setShowShareOptions(false);
                           }}
-                          className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 rounded-lg flex items-center gap-2"
+                          className="w-full text-left px-3 py-2 text-sm text-espresso hover:bg-ivory rounded-sm flex items-center gap-2"
                         >
                           <Send className="w-4 h-4" /> WhatsApp
                         </button>
@@ -736,7 +731,7 @@ const InvoicesPage: React.FC = () => {
                             handleCopyLink();
                             setShowShareOptions(false);
                           }}
-                          className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 rounded-lg flex items-center gap-2"
+                          className="w-full text-left px-3 py-2 text-sm text-espresso hover:bg-ivory rounded-sm flex items-center gap-2"
                         >
                           {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                           {copied ? "Copied!" : "Copy Link"}
@@ -755,14 +750,14 @@ const InvoicesPage: React.FC = () => {
           <Button
             variant="outline"
             size="sm"
-            className="border-[#7A1F2B] text-[#7A1F2B]"
+            className="rounded-sm"
             onClick={handlePrintInvoice}
           >
             <Printer className="w-4 h-4" />
           </Button>
           <Button
             size="sm"
-            className="bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] text-white"
+            className="rounded-sm bg-maroon text-ivory hover:bg-terracotta"
             onClick={() => handleDownloadPDF('pdf')}
             disabled={generatingPDF}
           >
@@ -771,7 +766,7 @@ const InvoicesPage: React.FC = () => {
           <Button
             variant="outline"
             size="sm"
-            className="border-[#7A1F2B] text-[#7A1F2B]"
+            className="rounded-sm"
             onClick={handleShare}
           >
             <Share2 className="w-4 h-4" />
@@ -784,60 +779,60 @@ const InvoicesPage: React.FC = () => {
 
             {/* Customer & Invoice Info */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card className="border-[#7A1F2B]/20 shadow-md hover:shadow-lg transition-shadow">
-                <CardHeader className="pb-3 border-b border-[#7A1F2B]/10">
-                  <CardTitle className="flex items-center gap-2 text-[#7A1F2B] text-base">
-                    <User className="w-4 h-4" />Bill To
+              <Card className="rounded-sm border-border shadow-none">
+                <CardHeader className="pb-3 border-b border-border">
+                  <CardTitle className="flex items-center gap-2 font-serif text-base font-medium text-espresso">
+                    <User className="w-4 h-4 text-gold" />Bill To
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-4 space-y-2">
                   {invoice.customer_name && (
-                    <p className="font-semibold text-gray-900">{invoice.customer_name}</p>
+                    <p className="font-medium text-espresso">{invoice.customer_name}</p>
                   )}
                   {invoice.customer_email && (
-                    <p className="text-sm text-gray-600 flex items-center gap-2">
+                    <p className="text-sm text-muted-foreground flex items-center gap-2">
                       <Mail className="w-3 h-3" />{invoice.customer_email}
                     </p>
                   )}
                   {invoice.customer_phone && (
-                    <p className="text-sm text-gray-600 flex items-center gap-2">
+                    <p className="text-sm text-muted-foreground flex items-center gap-2">
                       <Phone className="w-3 h-3" />{invoice.customer_phone}
                     </p>
                   )}
                   {invoice.billing_address && (
-                    <p className="text-sm text-gray-600 flex items-start gap-2 mt-2">
+                    <p className="text-sm text-muted-foreground flex items-start gap-2 mt-2">
                       <MapPin className="w-3 h-3 mt-1 flex-shrink-0" />{invoice.billing_address}
                     </p>
                   )}
                 </CardContent>
               </Card>
 
-              <Card className="border-[#7A1F2B]/20 shadow-md hover:shadow-lg transition-shadow">
-                <CardHeader className="pb-3 border-b border-[#7A1F2B]/10">
-                  <CardTitle className="flex items-center gap-2 text-[#7A1F2B] text-base">
-                    <FileText className="w-4 h-4" />Invoice Details
+              <Card className="rounded-sm border-border shadow-none">
+                <CardHeader className="pb-3 border-b border-border">
+                  <CardTitle className="flex items-center gap-2 font-serif text-base font-medium text-espresso">
+                    <FileText className="w-4 h-4 text-gold" />Invoice Details
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-4 space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Invoice #</span>
-                    <span className="font-semibold">{invoice.invoice_number}</span>
+                    <span className="text-muted-foreground">Invoice #</span>
+                    <span className="font-medium text-espresso">{invoice.invoice_number}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Order #</span>
-                    <span className="font-semibold">{invoice.order_id}</span>
+                    <span className="text-muted-foreground">Order #</span>
+                    <span className="font-medium text-espresso">{invoice.order_id}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Date</span>
+                    <span className="text-muted-foreground">Date</span>
                     <span>{formatDate(invoice.invoice_date)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Due Date</span>
+                    <span className="text-muted-foreground">Due Date</span>
                     <span>{formatDate(invoice.due_date)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Status</span>
-                    <Badge className={`${statusCfg.bg} ${statusCfg.color} border-0 text-xs`}>
+                    <span className="text-muted-foreground">Status</span>
+                    <Badge className={`${statusCfg.bg} ${statusCfg.color} border-0 text-[10px] font-medium uppercase tracking-[0.1em]`}>
                       {statusCfg.label}
                     </Badge>
                   </div>
@@ -846,24 +841,19 @@ const InvoicesPage: React.FC = () => {
             </div>
 
             {/* Items Table */}
-            <Card className="border-[#7A1F2B]/20 shadow-lg hover:shadow-xl transition-shadow">
-              <CardHeader className="pb-4 border-b border-[#7A1F2B]/10">
-                <CardTitle className="flex items-center gap-3 text-[#7A1F2B]">
-                  <div className="w-10 h-10 bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] rounded-lg flex items-center justify-center">
-                    <Package className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    Items
-                    <p className="text-sm font-normal text-gray-600 mt-1">
-                      {invoice.total_products} product{invoice.total_products !== 1 ? "s" : ""} •{" "}
-                      {invoice.total_items} item{invoice.total_items !== 1 ? "s" : ""}
-                    </p>
-                  </div>
+            <Card className="rounded-sm border-border shadow-none">
+              <CardHeader className="pb-4 border-b border-border">
+                <CardTitle className="font-serif text-lg font-medium text-espresso">
+                  Items
+                  <p className="text-sm font-sans font-normal text-muted-foreground mt-1">
+                    {invoice.total_products} product{invoice.total_products !== 1 ? "s" : ""} ·{" "}
+                    {invoice.total_items} item{invoice.total_items !== 1 ? "s" : ""}
+                  </p>
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-0">
                 {/* Table Header */}
-                <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-3 bg-gray-50 border-b text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-3 bg-ivory border-b border-border text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.14em]">
                   <div className="col-span-5">Product</div>
                   <div className="col-span-2 text-right">Price</div>
                   <div className="col-span-1 text-center">Qty</div>
@@ -872,99 +862,99 @@ const InvoicesPage: React.FC = () => {
                 </div>
 
                 {/* Items */}
-                <div className="divide-y divide-gray-100">
+                <div className="divide-y divide-border">
                   {invoice.items.map((item, index) => (
-                    <div key={item.id || index} className="grid grid-cols-1 md:grid-cols-12 gap-4 px-6 py-4 items-center hover:bg-gray-50/50 transition-colors">
+                    <div key={item.id || index} className="grid grid-cols-1 md:grid-cols-12 gap-4 px-6 py-4 items-center hover:bg-ivory/60 transition-colors">
                       {/* Product */}
                       <div className="col-span-5 flex items-center gap-4">
                         <img
                           src={getImageUrl(item.product_image)}
                           alt={item.product_name}
-                          className="w-14 h-14 rounded-lg object-cover border border-gray-200 flex-shrink-0"
+                          className="aspect-[3/4] w-11 rounded-sm object-cover border border-border bg-sand flex-shrink-0"
                           onError={(e) => { (e.target as HTMLImageElement).src = "/placeholder.svg"; }}
                         />
                         <div className="min-w-0">
-                          <p className="font-medium text-gray-900 truncate">{item.product_name}</p>
+                          <p className="font-medium text-espresso truncate">{item.product_name}</p>
                           {item.product_sku && (
-                            <p className="text-xs text-gray-500">SKU: {item.product_sku}</p>
+                            <p className="text-xs text-muted-foreground">SKU: {item.product_sku}</p>
                           )}
                           {item.product_description && (
-                            <p className="text-xs text-gray-400 truncate mt-0.5">{item.product_description}</p>
+                            <p className="text-xs text-muted-foreground/80 truncate mt-0.5">{item.product_description}</p>
                           )}
                         </div>
                       </div>
 
                       {/* Price */}
                       <div className="col-span-2 text-right">
-                        <span className="md:hidden text-xs text-gray-500 mr-2">Price:</span>
+                        <span className="md:hidden text-xs text-muted-foreground mr-2">Price:</span>
                         <span className="font-medium">{formatPrice(item.unit_price)}</span>
                       </div>
 
                       {/* Quantity */}
                       <div className="col-span-1 text-center">
-                        <span className="md:hidden text-xs text-gray-500 mr-2">Qty:</span>
+                        <span className="md:hidden text-xs text-muted-foreground mr-2">Qty:</span>
                         <span className="font-medium">{item.quantity}</span>
                       </div>
 
                       {/* Tax */}
                       <div className="col-span-2 text-right">
-                        <span className="md:hidden text-xs text-gray-500 mr-2">Tax:</span>
-                        <span className="text-gray-600">{formatPrice(item.tax_amount)}</span>
-                        <p className="text-xs text-gray-400">({item.tax_rate}%)</p>
+                        <span className="md:hidden text-xs text-muted-foreground mr-2">Tax:</span>
+                        <span className="text-muted-foreground">{formatPrice(item.tax_amount)}</span>
+                        <p className="text-xs text-muted-foreground/80">({item.tax_rate}%)</p>
                       </div>
 
                       {/* Total */}
                       <div className="col-span-2 text-right">
-                        <span className="md:hidden text-xs text-gray-500 mr-2">Total:</span>
-                        <span className="font-bold text-gray-900">{formatPrice(item.total)}</span>
+                        <span className="md:hidden text-xs text-muted-foreground mr-2">Total:</span>
+                        <span className="font-semibold text-espresso">{formatPrice(item.total)}</span>
                       </div>
                     </div>
                   ))}
                 </div>
 
                 {/* Totals */}
-                <div className="border-t border-gray-200 bg-gray-50/50 p-6">
+                <div className="border-t border-border bg-ivory p-6">
                   <div className="max-w-xs ml-auto space-y-2">
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Subtotal</span>
+                      <span className="text-muted-foreground">Subtotal</span>
                       <span className="font-medium">{formatPrice(invoice.subtotal)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Shipping</span>
+                      <span className="text-muted-foreground">Shipping</span>
                       <span className="font-medium">
                         {invoice.shipping_amount === 0 ? (
-                          <span className="text-green-600">Free</span>
+                          <span className="text-[#3E6B4F]">Free</span>
                         ) : (
                           formatPrice(invoice.shipping_amount)
                         )}
                       </span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">GST ({invoice.tax_rate}%)</span>
+                      <span className="text-muted-foreground">GST ({invoice.tax_rate}%)</span>
                       <span className="font-medium">{formatPrice(invoice.tax_amount)}</span>
                     </div>
                     {invoice.discount_amount > 0 && (
                       <div className="flex justify-between text-sm">
-                        <span className="text-gray-600">Discount</span>
-                        <span className="font-medium text-green-600">-{formatPrice(invoice.discount_amount)}</span>
+                        <span className="text-muted-foreground">Discount</span>
+                        <span className="font-medium text-[#3E6B4F]">-{formatPrice(invoice.discount_amount)}</span>
                       </div>
                     )}
                     <Separator />
-                    <div className="flex justify-between text-lg font-bold pt-2">
+                    <div className="flex justify-between text-base font-semibold pt-2">
                       <span>Total Amount</span>
-                      <span className="text-[#7A1F2B]">{formatPrice(invoice.total_amount)}</span>
+                      <span className="text-maroon">{formatPrice(invoice.total_amount)}</span>
                     </div>
-                    <p className="text-xs text-gray-400 text-right">(Inclusive of all taxes)</p>
+                    <p className="text-xs text-muted-foreground/80 text-right">(Inclusive of all taxes)</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
             {/* Amount in Words */}
-            <Card className="border-[#7A1F2B]/20">
+            <Card className="rounded-sm border-border shadow-none">
               <CardContent className="p-4">
-                <p className="text-sm text-gray-600">
-                  <span className="font-medium">Amount in Words:</span>{" "}
+                <p className="text-sm text-muted-foreground">
+                  <span className="font-medium text-espresso">Amount in Words:</span>{" "}
                   {numberToWords(invoice.total_amount)} Rupees Only
                 </p>
               </CardContent>
@@ -972,10 +962,10 @@ const InvoicesPage: React.FC = () => {
 
             {/* Notes */}
             {invoice.notes && (
-              <Card className="border-[#7A1F2B]/20">
+              <Card className="rounded-sm border-border shadow-none">
                 <CardContent className="p-4">
-                  <p className="text-sm text-gray-500 mb-1 font-medium">Notes</p>
-                  <p className="text-sm text-gray-700">{invoice.notes}</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso mb-1">Notes</p>
+                  <p className="text-sm text-muted-foreground">{invoice.notes}</p>
                 </CardContent>
               </Card>
             )}
@@ -985,32 +975,29 @@ const InvoicesPage: React.FC = () => {
           <div className="space-y-6">
 
             {/* Payment Info */}
-            <Card className={`${payInfo.border} shadow-lg hover:shadow-xl transition-shadow`}>
-              <CardHeader className="pb-3 border-b border-gray-100">
-                <CardTitle className="flex items-center gap-3">
-                  <div className={`w-10 h-10 bg-gradient-to-r ${payInfo.gradient} rounded-lg flex items-center justify-center`}>
-                    <PayIcon className="w-5 h-5 text-white" />
-                  </div>
-                  <span className={payInfo.text}>Payment</span>
+            <Card className="rounded-sm border-border shadow-none">
+              <CardHeader className="pb-3 border-b border-border">
+                <CardTitle className="flex items-center gap-2 font-serif text-base font-medium text-espresso">
+                  <PayIcon className="w-4 h-4 text-gold" />Payment
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-4">
-                <div className={`p-4 bg-gradient-to-r ${payInfo.bg} rounded-xl border ${payInfo.border} space-y-3`}>
-                  <p className={`font-semibold ${payInfo.text}`}>{payInfo.label}</p>
-                  <div className="space-y-2 pt-3 border-t border-gray-200/50 text-sm">
+                <div className={`p-4 ${payInfo.bg} rounded-sm border ${payInfo.border} space-y-3`}>
+                  <p className={`font-medium ${payInfo.text}`}>{payInfo.label}</p>
+                  <div className="space-y-2 pt-3 border-t border-border text-sm">
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Status</span>
-                      <span className={`font-medium capitalize ${invoice.payment_status === 'unpaid' ? 'text-red-600' : 'text-gray-900'}`}>
+                      <span className="text-muted-foreground">Status</span>
+                      <span className={`font-medium capitalize ${invoice.payment_status === 'unpaid' ? 'text-sale' : 'text-espresso'}`}>
                         {invoice.payment_status}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Amount</span>
-                      <span className="font-bold">{formatPrice(invoice.total_amount)}</span>
+                      <span className="text-muted-foreground">Amount</span>
+                      <span className="font-semibold text-espresso">{formatPrice(invoice.total_amount)}</span>
                     </div>
                     {invoice.paid_date && (
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Paid On</span>
+                        <span className="text-muted-foreground">Paid On</span>
                         <span>{formatDate(invoice.paid_date)}</span>
                       </div>
                     )}
@@ -1019,8 +1006,8 @@ const InvoicesPage: React.FC = () => {
 
                 {/* Show payment reminder if Unpaid */}
                 {invoice.payment_status === "unpaid" && invoice.status !== "cancelled" && (
-                  <div className="mt-3 p-3 bg-red-50 rounded-lg border border-red-200">
-                    <p className="text-xs text-red-800 flex items-start gap-2">
+                  <div className="mt-3 p-3 bg-sale/5 rounded-sm border border-sale/30">
+                    <p className="text-xs text-sale flex items-start gap-2">
                       <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
                       Payment is pending. Please pay {formatPrice(invoice.total_amount)}.
                     </p>
@@ -1031,14 +1018,14 @@ const InvoicesPage: React.FC = () => {
 
             {/* Shipping */}
             {invoice.shipping_address && (
-              <Card className="border-[#7A1F2B]/20 shadow-lg hover:shadow-xl transition-shadow">
-                <CardHeader className="pb-3 border-b border-[#7A1F2B]/10">
-                  <CardTitle className="flex items-center gap-2 text-[#7A1F2B] text-base">
-                    <Truck className="w-4 h-4" />Shipping
+              <Card className="rounded-sm border-border shadow-none">
+                <CardHeader className="pb-3 border-b border-border">
+                  <CardTitle className="flex items-center gap-2 font-serif text-base font-medium text-espresso">
+                    <Truck className="w-4 h-4 text-gold" />Shipping
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-4">
-                  <p className="text-sm text-gray-700 p-3 bg-[#7A1F2B]/5 rounded-lg border border-[#7A1F2B]/10">
+                  <p className="text-sm text-muted-foreground p-3 bg-ivory rounded-sm border border-border">
                     {invoice.shipping_address}
                   </p>
                 </CardContent>
@@ -1046,38 +1033,38 @@ const InvoicesPage: React.FC = () => {
             )}
 
             {/* Download Options */}
-            <Card className="border-[#7A1F2B]/20 shadow-lg">
-              <CardHeader className="pb-3 border-b border-[#7A1F2B]/10">
-                <CardTitle className="flex items-center gap-2 text-[#7A1F2B] text-base">
-                  <DownloadCloud className="w-4 h-4" />Download Options
+            <Card className="rounded-sm border-border shadow-none">
+              <CardHeader className="pb-3 border-b border-border">
+                <CardTitle className="flex items-center gap-2 font-serif text-base font-medium text-espresso">
+                  <DownloadCloud className="w-4 h-4 text-gold" />Download Options
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-4 space-y-2">
                 <Button
-                  className="w-full bg-[#7A1F2B] hover:bg-[#457a3d] text-white"
+                  className="w-full h-auto rounded-sm bg-maroon px-5 py-2.5 text-[11px] font-medium uppercase tracking-[0.12em] text-ivory hover:bg-terracotta"
                   onClick={() => handleDownloadPDF('pdf')}
                   disabled={generatingPDF}
                 >
                   {generatingPDF ? (
-                    <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Generating...</>
+                    <><Loader2 className="w-3.5 h-3.5 mr-2 animate-spin" />Generating...</>
                   ) : (
-                    <><FileText className="w-4 h-4 mr-2" />Download PDF</>
+                    <><FileText className="w-3.5 h-3.5 mr-2" />Download PDF</>
                   )}
                 </Button>
                 <Button
                   variant="outline"
-                  className="w-full border-[#7A1F2B] text-[#7A1F2B]"
+                  className="w-full h-auto rounded-sm px-5 py-2.5 text-[11px] font-medium uppercase tracking-[0.12em]"
                   onClick={() => handleDownloadPDF('image')}
                   disabled={generatingPDF}
                 >
-                  <Download className="w-4 h-4 mr-2" />Download as Image
+                  <Download className="w-3.5 h-3.5 mr-2" />Download as Image
                 </Button>
                 <Button
                   variant="outline"
-                  className="w-full border-[#7A1F2B] text-[#7A1F2B]"
+                  className="w-full h-auto rounded-sm px-5 py-2.5 text-[11px] font-medium uppercase tracking-[0.12em]"
                   onClick={handlePrintInvoice}
                 >
-                  <Printer className="w-4 h-4 mr-2" />Print Invoice
+                  <Printer className="w-3.5 h-3.5 mr-2" />Print Invoice
                 </Button>
               </CardContent>
             </Card>
@@ -1086,24 +1073,24 @@ const InvoicesPage: React.FC = () => {
             <div className="space-y-3">
               <Button
                 variant="outline"
-                className="w-full border-[#7A1F2B] text-[#7A1F2B] hover:bg-[#7A1F2B]/5"
+                className="w-full h-auto rounded-sm px-5 py-2.5 text-[11px] font-medium uppercase tracking-[0.12em]"
                 onClick={() => navigate(`/orders/${invoice.order_id}`)}
               >
-                <Package className="w-4 h-4 mr-2" />View Order
+                <Package className="w-3.5 h-3.5 mr-2" />View Order
               </Button>
               <Button
                 variant="outline"
-                className="w-full"
+                className="w-full h-auto rounded-sm px-5 py-2.5 text-[11px] font-medium uppercase tracking-[0.12em]"
                 onClick={() => navigate("/invoices")}
               >
-                <FileText className="w-4 h-4 mr-2" />All Invoices
+                <FileText className="w-3.5 h-3.5 mr-2" />All Invoices
               </Button>
               <Button
                 variant="outline"
-                className="w-full"
+                className="w-full h-auto rounded-sm px-5 py-2.5 text-[11px] font-medium uppercase tracking-[0.12em]"
                 onClick={() => navigate("/products")}
               >
-                <Home className="w-4 h-4 mr-2" />Continue Shopping
+                <Home className="w-3.5 h-3.5 mr-2" />Continue Shopping
               </Button>
             </div>
           </div>

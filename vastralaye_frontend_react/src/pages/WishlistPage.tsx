@@ -44,7 +44,7 @@ const WishlistPage = () => {
 
   // Wishlist product mapping
   const wishlistProducts = wishlist
-    .map((item) => {
+    .map((item: any) => {
       if (item.product) return item.product;
       return products.find((p) => Number(p.id) === Number(item.product_id));
     })
@@ -58,7 +58,7 @@ const WishlistPage = () => {
   const updateWishlist = async (productId: string) => {
     try {
       setIsLoading(true);
-      const exists = wishlist.some((w) => Number(w.product_id) === Number(productId));
+      const exists = wishlist.some((w: any) => Number(w.product_id) === Number(productId));
 
       if (exists) {
         await removeFromWishlist(productId);
@@ -76,7 +76,7 @@ const WishlistPage = () => {
 
   // Check if product is in cart
   const isInCart = (productId: string) => {
-    return cart.some(item => Number(item.product_id) === Number(productId));
+    return cart.some((item: any) => Number(item.product_id) === Number(productId));
   };
 
   // Fetch reviews for all wishlist products
@@ -89,7 +89,7 @@ useEffect(() => {
       if (!product.id) continue;
       
       try {
-        const response = await axios.get(`${BASE_URL}/users/product/${product.id}/reviews?page=1&page_size=100`);
+        const response = await axios.get<any>(`${BASE_URL}/users/product/${product.id}/reviews?page=1&page_size=100`);
         let reviewsData: Review[] = [];
 
         // Handle paginated response
@@ -151,7 +151,7 @@ useEffect(() => {
         return product.in_stock;
       }
       if (typeof product.in_stock === 'string') {
-        const lowerValue = product.in_stock.toLowerCase().trim();
+        const lowerValue = (product.in_stock as any).toLowerCase().trim();
         if (lowerValue === 'true' || lowerValue === 'yes' || lowerValue === '1') {
           return true;
         }
@@ -185,10 +185,10 @@ useEffect(() => {
   // Loading screen
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="animate-pulse text-center">
-          <div className="w-16 h-16 bg-gradient-to-r from-[#E97A48] to-[#5E9F50] rounded-full mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading your wishlist...</p>
+          <div className="w-16 h-16 bg-sand rounded-full mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading your wishlist...</p>
         </div>
       </div>
     );
@@ -197,33 +197,33 @@ useEffect(() => {
   // Empty wishlist
   if (wishlistProducts.length === 0) {
     return (
-      <div className="min-h-screen bg-white py-16">
+      <div className="min-h-screen bg-background py-16">
         <div className="container mx-auto px-4">
           <div className="max-w-md mx-auto text-center">
             <div className="mb-8">
-              <div className="w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-50 rounded-full flex items-center justify-center mx-auto border-2 border-gray-200">
-                <Heart className="h-12 w-12 text-gray-400" />
+              <div className="w-24 h-24 bg-blush rounded-full flex items-center justify-center mx-auto">
+                <Heart className="h-10 w-10 text-maroon" strokeWidth={1.5} />
               </div>
             </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">
-              Your Wishlist is Empty
+            <h1 className="font-serif text-3xl md:text-4xl font-medium text-espresso mb-4">
+              Your wishlist is empty
             </h1>
-            <p className="text-gray-600 mb-8">
+            <p className="text-muted-foreground mb-8">
               Save items you love by clicking the heart icon on any product.
             </p>
             <div className="space-y-4">
               <Button
-                className="w-full bg-[#5E9F50] hover:bg-[#4d8f40] text-white py-3 text-base rounded-lg"
+                className="w-full h-12 bg-maroon hover:bg-terracotta text-ivory text-xs font-semibold uppercase tracking-[0.16em] rounded-sm transition-colors"
                 asChild
               >
                 <Link to="/products">
-                  <ShoppingCart className="mr-2 h-5 w-5" />
+                  <ShoppingCart className="mr-2 h-4 w-4" />
                   Start Shopping
                 </Link>
               </Button>
               {!isLoggedIn && (
                 <Button
-                  className="w-full border-2 border-gray-300 text-gray-700 py-3 text-base rounded-lg hover:bg-gray-50"
+                  className="w-full h-12 text-xs font-semibold uppercase tracking-[0.16em] rounded-sm"
                   variant="outline"
                   asChild
                 >
@@ -235,13 +235,16 @@ useEffect(() => {
               )}
             </div>
           </div>
-          
+
           {/* Recommended Products */}
           {recommendedProducts.length > 0 && (
             <div className="mt-20">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
-                Recommended for You
-              </h2>
+              <div className="text-center mb-8">
+                <span className="overline-label mb-2">Handpicked for you</span>
+                <h2 className="font-serif text-2xl md:text-3xl font-medium text-espresso">
+                  Recommended for You
+                </h2>
+              </div>
               <ProductGrid products={recommendedProducts} title="" />
             </div>
           )}
@@ -304,14 +307,14 @@ useEffect(() => {
     return (
       <div className="flex items-center gap-0.5">
         {Array.from({ length: fullStars }).map((_, i) => (
-          <Star key={`full-${i}`} className="h-3.5 w-3.5 text-yellow-500 fill-yellow-500" />
+          <Star key={`full-${i}`} className="h-3.5 w-3.5 text-gold fill-gold" />
         ))}
-        {hasHalfStar && <StarHalf className="h-3.5 w-3.5 text-yellow-500 fill-yellow-500" />}
+        {hasHalfStar && <StarHalf className="h-3.5 w-3.5 text-gold fill-gold" />}
         {Array.from({ length: emptyStars }).map((_, i) => (
-          <Star key={`empty-${i}`} className="h-3.5 w-3.5 text-gray-300" />
+          <Star key={`empty-${i}`} className="h-3.5 w-3.5 text-border" />
         ))}
         {totalReviews > 0 && (
-          <span className="text-xs text-gray-500 ml-1">({totalReviews})</span>
+          <span className="text-xs text-muted-foreground ml-1">({totalReviews})</span>
         )}
       </div>
     );
@@ -370,7 +373,7 @@ useEffect(() => {
   };
 
   return (
-    <div className="min-h-screen bg-white py-8">
+    <div className="min-h-screen bg-background py-8">
       <div className="container px-4 mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-8">
@@ -378,7 +381,7 @@ useEffect(() => {
             <Button
               variant="ghost"
               size="sm"
-              className="text-gray-600 hover:text-gray-900"
+              className="text-muted-foreground hover:text-espresso text-xs font-semibold uppercase tracking-[0.12em]"
               asChild
             >
               <Link to="/">
@@ -387,17 +390,17 @@ useEffect(() => {
               </Link>
             </Button>
           </div>
-          <div className="flex flex-col md:flex-row md:items-center justify-between">
+          <div className="flex flex-col md:flex-row md:items-end justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">My Wishlist</h1>
-              <p className="text-gray-600">
-                {wishlistProducts.length} {wishlistProducts.length === 1 ? 'item' : 'items'} saved
+              <h1 className="font-serif text-3xl md:text-4xl font-medium text-espresso mb-2">Your Wishlist</h1>
+              <p className="text-sm text-muted-foreground">
+                {wishlistProducts.length} {wishlistProducts.length === 1 ? 'piece' : 'pieces'} saved — they're waiting for you
               </p>
             </div>
             <div className="flex gap-3 mt-4 md:mt-0">
               <Button
                 variant="outline"
-                className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                className="text-xs font-semibold uppercase tracking-[0.12em] rounded-sm"
                 onClick={handleAddAllToCart}
                 disabled={wishlistProducts.every(p => !checkStockStatus(p)) || isLoading}
               >
@@ -406,7 +409,7 @@ useEffect(() => {
               </Button>
               <Button
                 variant="outline"
-                className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
+                className="text-xs font-semibold uppercase tracking-[0.12em] rounded-sm border-border text-muted-foreground hover:bg-transparent hover:border-sale hover:text-sale"
                 onClick={handleClearWishlist}
                 disabled={isLoading}
               >
@@ -421,15 +424,18 @@ useEffect(() => {
         <div className="mb-12">
           {wishlistProducts.length === 0 ? (
             <div className="text-center py-12">
-              <Heart className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Your wishlist is empty</h3>
-              <p className="text-gray-600 mb-6">Start adding items you love!</p>
-              <Button asChild>
+              <Heart className="h-14 w-14 text-border mx-auto mb-4" strokeWidth={1.5} />
+              <h3 className="font-serif text-2xl font-medium text-espresso mb-2">Your wishlist is empty</h3>
+              <p className="text-muted-foreground mb-6">Start adding items you love!</p>
+              <Button
+                className="bg-maroon hover:bg-terracotta text-ivory text-xs font-semibold uppercase tracking-[0.16em] px-8 rounded-sm transition-colors"
+                asChild
+              >
                 <Link to="/products">Browse Products</Link>
               </Button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-10">
               {wishlistProducts.map((product) => {
                 const { averageRating, totalReviews } = getProductRating(product.id);
                 const hasRating = averageRating !== null && averageRating > 0;
@@ -459,20 +465,17 @@ useEffect(() => {
                 };
 
                 return (
-                  <div
-                    key={product.id}
-                    className="group bg-white border border-gray-200 rounded-xl hover:shadow-lg transition-all duration-200 overflow-hidden"
-                  >
+                  <div key={product.id} className="group">
                     {/* Product Image */}
                     <Link to={`/product/${product.id}`} className="block relative">
-                      <div className="aspect-square overflow-hidden bg-gray-100">
+                      <div className="aspect-[3/4] overflow-hidden rounded-sm bg-sand">
                         <img
                           src={getImageUrl(product)}
                           alt={product.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300"
                         />
                       </div>
-                      
+
                       {/* Wishlist Remove Button */}
                       <button
                         onClick={(e) => {
@@ -480,20 +483,20 @@ useEffect(() => {
                           e.stopPropagation();
                           updateWishlist(String(product.id));
                         }}
-                        className="absolute top-3 right-3 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md hover:shadow-lg transition-shadow hover:scale-105"
+                        className="absolute top-2.5 right-2.5 w-9 h-9 bg-white/95 rounded-full flex items-center justify-center text-espresso hover:text-sale transition-colors"
                         title="Remove from wishlist"
                       >
-                        <Trash2 className="h-5 w-5 text-red-500" />
+                        <Trash2 className="h-4 w-4" strokeWidth={1.6} />
                       </button>
 
                       {/* Stock & Discount Badges */}
-                      <div className="absolute top-3 left-3 flex flex-col gap-2">
+                      <div className="absolute top-2.5 left-2.5 flex flex-col gap-1.5">
                         {hasDiscount && (
-                          <Badge className="bg-[#E97A48] text-white border-0">
-                            <Tag className="h-3 w-3 mr-1" /> {discountPercent}% OFF
+                          <Badge className="bg-sale text-white border-0 rounded-[1px] text-[10px] font-semibold uppercase tracking-[0.12em] px-2 py-0.5 hover:bg-sale">
+                            -{discountPercent}%
                           </Badge>
                         )}
-                        <Badge className={`border-0 ${isInStock ? 'bg-[#5E9F50] text-white' : 'bg-red-600 text-white'}`}>
+                        <Badge className={`border-0 rounded-[1px] text-[10px] font-semibold uppercase tracking-[0.12em] px-2 py-0.5 ${isInStock ? 'bg-ivory/95 text-green-700 hover:bg-ivory/95' : 'bg-espresso text-ivory hover:bg-espresso'}`}>
                           {isInStock ? (
                             <CheckCircle2 className="h-3 w-3 mr-1" />
                           ) : (
@@ -505,10 +508,10 @@ useEffect(() => {
                     </Link>
 
                     {/* Product Details */}
-                    <div className="p-5">
+                    <div className="pt-3">
                       {/* Category & Rating */}
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="text-sm text-gray-500">{product.category}</span>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-[11px] uppercase tracking-[0.08em] text-muted-foreground">{product.category}</span>
                         {hasRating && (
                           <div className="flex items-center gap-1">
                             {renderStars(averageRating as number, totalReviews)}
@@ -518,51 +521,57 @@ useEffect(() => {
 
                       {/* Product Name */}
                       <Link to={`/product/${product.id}`}>
-                        <h3 className="font-semibold text-gray-900 mb-3 line-clamp-2 group-hover:text-[#E97A48] transition-colors">
+                        <h3 className="text-sm font-medium text-espresso mb-1.5 line-clamp-2 group-hover:text-maroon transition-colors">
                           {product.name}
                         </h3>
                       </Link>
 
                       {/* Price */}
-                      <div className="mb-4">
-                        <div className="flex items-center gap-2">
-                          <span className="text-xl font-bold text-gray-900">
+                      <div className="mb-3">
+                        <div className="flex items-baseline gap-2 flex-wrap">
+                          <span className="text-[15px] font-semibold text-espresso">
                             {formatINR(finalPrice)}
                           </span>
                           {hasDiscount && (
-                            <span className="text-sm text-gray-500 line-through">
-                              {formatINR(price)}
-                            </span>
+                            <>
+                              <span className="text-[13px] text-muted-foreground line-through">
+                                {formatINR(price)}
+                              </span>
+                              <span className="text-xs font-semibold text-sale">
+                                ({discountPercent}% off)
+                              </span>
+                            </>
                           )}
                         </div>
                       </div>
 
                       {/* Action Buttons */}
-                      <div className="flex gap-3">
+                      <div className="flex gap-2">
                         {productInCart ? (
                           <Button
-                            className="flex-1 bg-green-50 text-[#5E9F50] hover:bg-green-100 border border-[#5E9F50]"
+                            variant="outline"
+                            className="flex-1 h-10 text-[11px] font-semibold uppercase tracking-[0.12em] rounded-sm"
                             asChild
                           >
                             <Link to="/cart">
-                              <ShoppingCart className="h-4 w-4 mr-2" />
+                              <ShoppingCart className="h-4 w-4 mr-1.5" />
                               In Cart
                             </Link>
                           </Button>
                         ) : (
                           <Button
-                            className="flex-1 bg-[#5E9F50] hover:bg-[#4d8f40] text-white"
+                            className="flex-1 h-10 bg-maroon hover:bg-terracotta text-ivory text-[11px] font-semibold uppercase tracking-[0.12em] rounded-sm transition-colors disabled:bg-sand disabled:text-muted-foreground"
                             onClick={handleAddToCart}
                             disabled={!isInStock}
                           >
-                            <ShoppingCart className="h-4 w-4 mr-2" />
+                            <ShoppingCart className="h-4 w-4 mr-1.5" />
                             {isInStock ? 'Add to Cart' : 'Out of Stock'}
                           </Button>
                         )}
-                        
+
                         <Button
                           variant="outline"
-                          className="border-gray-300 hover:border-gray-400"
+                          className="h-10 w-10 p-0 rounded-sm"
                           asChild
                         >
                           <Link to={`/product/${product.id}`}>
@@ -580,15 +589,16 @@ useEffect(() => {
 
         {/* Recommended Products */}
         {recommendedProducts.length > 0 && (
-          <div className="mt-16 pt-8 border-t border-gray-200">
-            <div className="flex items-center justify-between mb-8">
+          <div className="mt-16 pt-10 border-t border-border">
+            <div className="flex items-end justify-between mb-8">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">Recommended for You</h2>
-                <p className="text-gray-600 mt-1">Products you might like</p>
+                <span className="overline-label mb-2">Handpicked for you</span>
+                <h2 className="font-serif text-2xl md:text-3xl font-medium text-espresso">Recommended for You</h2>
+                <p className="text-sm text-muted-foreground mt-1">Products you might like</p>
               </div>
               <Button
                 variant="ghost"
-                className="text-gray-700 hover:text-gray-900"
+                className="text-espresso hover:text-maroon hover:bg-transparent text-xs font-semibold uppercase tracking-[0.12em] underline-offset-4 hover:underline"
                 asChild
               >
                 <Link to="/products">

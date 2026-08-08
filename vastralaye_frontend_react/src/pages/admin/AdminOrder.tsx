@@ -190,6 +190,17 @@ const updatePaymentStatus = async (
   return await res.json();
 };
 
+/* ================= STATUS CHIP (admin_design.md §3.4) ================= */
+
+const StatusChip = ({ tint, label }: { tint: string; label: string }) => (
+  <span
+    className={`inline-flex items-center gap-1.5 text-[11px] font-semibold rounded-full px-2.5 py-0.5 whitespace-nowrap ${tint}`}
+  >
+    <span className="h-1.5 w-1.5 rounded-full bg-current" />
+    {label}
+  </span>
+);
+
 /* ================= ✅ SAFE DATA NORMALIZER (THE FIX) ================= */
 
 const safeOrderData = (raw: any): OrderDataType => {
@@ -525,12 +536,12 @@ export default function AdminOrders() {
 
   const getOrderStatusColor = (s?: string) => {
     const colors: Record<string, string> = {
-      pending: "bg-amber-100 text-amber-800 border-amber-200",
-      processing: "bg-purple-100 text-purple-800 border-purple-200",
-      shipped: "bg-indigo-100 text-indigo-800 border-indigo-200",
-      delivered: "bg-emerald-100 text-emerald-800 border-emerald-200",
-      cancelled: "bg-red-100 text-red-800 border-red-200",
-      refunded: "bg-gray-100 text-gray-800 border-gray-200",
+      pending: "bg-amber-500/10 text-amber-700",
+      processing: "bg-[#5C6B8A]/10 text-[#5C6B8A]",
+      shipped: "bg-[#5C6B8A]/10 text-[#5C6B8A]",
+      delivered: "bg-green-700/10 text-green-800",
+      cancelled: "bg-sale/10 text-sale",
+      refunded: "bg-espresso/5 text-muted-foreground",
     };
     return colors[s || ""] || colors.pending;
   };
@@ -550,8 +561,8 @@ export default function AdminOrders() {
 
   const getPaymentStatusColor = (s?: string) => {
     const colors: Record<string, string> = {
-      paid: "bg-green-100 text-green-800 border-green-200",
-      unpaid: "bg-orange-100 text-orange-800 border-orange-200",
+      paid: "bg-green-700/10 text-green-800",
+      unpaid: "bg-amber-500/10 text-amber-700",
     };
     return colors[s || ""] || colors.unpaid;
   };
@@ -640,8 +651,8 @@ export default function AdminOrders() {
         @media print { .no-print { display: none !important; } }
         .invoice-container { max-width: 800px; margin: 0 auto; padding: 40px; }
         .print-btn-container { text-align: center; padding: 20px; background: #f8fafc; border-bottom: 2px solid #e2e8f0; }
-        .print-btn { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; border: none; padding: 12px 32px; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; margin: 0 8px; }
-        .close-btn { background: linear-gradient(135deg, #6b7280, #4b5563); color: white; border: none; padding: 12px 32px; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; margin: 0 8px; }
+        .print-btn { background: #7A1F2B; color: white; border: none; padding: 12px 32px; border-radius: 4px; font-size: 16px; font-weight: 600; cursor: pointer; margin: 0 8px; }
+        .close-btn { background: #6E5F53; color: white; border: none; padding: 12px 32px; border-radius: 4px; font-size: 16px; font-weight: 600; cursor: pointer; margin: 0 8px; }
       </style>
     </head>
     <body>
@@ -651,14 +662,14 @@ export default function AdminOrders() {
       </div>
 
       <div class="invoice-container">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; padding-bottom: 24px; border-bottom: 3px solid #3b82f6;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; padding-bottom: 24px; border-bottom: 3px solid #7A1F2B;">
           <div>
-            <h1 style="font-size: 32px; font-weight: 800; color: #1e40af; margin-bottom: 4px;">INVOICE</h1>
+            <h1 style="font-size: 32px; font-weight: 800; color: #7A1F2B; margin-bottom: 4px;">INVOICE</h1>
             <img src="/logo.png" alt="MizorPayMart Logo" style="width: 120px; height: auto; object-fit: contain;">
             <p style="color: #9ca3af; font-size: 12px; margin-top: 4px;">GSTIN: ${gstin}</p>
           </div>
           <div style="text-align: right;">
-            <div style="background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; padding: 12px 24px; border-radius: 12px; display: inline-block;">
+            <div style="background: #7A1F2B; color: white; padding: 12px 24px; border-radius: 6px; display: inline-block;">
               <p style="font-size: 12px; opacity: 0.9; margin-bottom: 2px;">ORDER NO.</p>
               <p style="font-size: 24px; font-weight: 800;">#${order.id}</p>
             </div>
@@ -666,9 +677,9 @@ export default function AdminOrders() {
         </div>
 
         <div style="display: flex; gap: 16px; margin-bottom: 32px;">
-          <div style="flex: 1; background: #f0f9ff; padding: 16px 20px; border-radius: 12px; border: 1px solid #bfdbfe;">
-            <p style="font-size: 11px; font-weight: 700; color: #3b82f6; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;">Order Date</p>
-            <p style="font-weight: 700; color: #1e3a5f; font-size: 15px;">${orderDate}</p>
+          <div style="flex: 1; background: #FBF8F3; padding: 16px 20px; border-radius: 6px; border: 1px solid #E7DFD3;">
+            <p style="font-size: 11px; font-weight: 700; color: #7A1F2B; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;">Order Date</p>
+            <p style="font-weight: 700; color: #2B1B12; font-size: 15px;">${orderDate}</p>
             <p style="color: #6b7280; font-size: 12px; margin-top: 2px;">${orderTime}</p>
           </div>
           <div style="flex: 1; background: ${orderStatus === "DELIVERED" ? "#f0fdf4" : orderStatus === "CANCELLED" ? "#fef2f2" : "#fffbeb"}; padding: 16px 20px; border-radius: 12px; border: 1px solid ${orderStatus === "DELIVERED" ? "#bbf7d0" : orderStatus === "CANCELLED" ? "#fecaca" : "#fde68a"};">
@@ -683,23 +694,23 @@ export default function AdminOrders() {
         </div>
 
         <div style="display: flex; gap: 24px; margin-bottom: 32px;">
-          <div style="flex: 1; background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0;">
-            <h3 style="font-size: 13px; font-weight: 700; color: #3b82f6; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #e2e8f0;">📋 Bill To</h3>
+          <div style="flex: 1; background: #FBF8F3; padding: 20px; border-radius: 6px; border: 1px solid #E7DFD3;">
+            <h3 style="font-size: 13px; font-weight: 700; color: #7A1F2B; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #E7DFD3;">📋 Bill To</h3>
             <p style="font-weight: 700; color: #111827; font-size: 16px; margin-bottom: 8px;">${customer_name}</p>
             ${customer_email ? `<p style="color: #4b5563; font-size: 13px; margin-bottom: 4px;">📧 ${customer_email}</p>` : ""}
             ${customer_phone ? `<p style="color: #4b5563; font-size: 13px; margin-bottom: 4px;">📱 ${customer_phone}</p>` : ""}
           </div>
-          <div style="flex: 1; background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0;">
-            <h3 style="font-size: 13px; font-weight: 700; color: #3b82f6; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #e2e8f0;">📍 Ship To</h3>
+          <div style="flex: 1; background: #FBF8F3; padding: 20px; border-radius: 6px; border: 1px solid #E7DFD3;">
+            <h3 style="font-size: 13px; font-weight: 700; color: #7A1F2B; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #E7DFD3;">📍 Ship To</h3>
             <p style="font-weight: 600; color: #111827; font-size: 14px; line-height: 1.6;">${address}</p>
           </div>
         </div>
 
         <div style="margin-bottom: 32px;">
-          <h3 style="font-size: 13px; font-weight: 700; color: #3b82f6; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px;">📦 Order Items</h3>
-          <table style="width: 100%; border-collapse: collapse; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
+          <h3 style="font-size: 13px; font-weight: 700; color: #7A1F2B; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px;">📦 Order Items</h3>
+          <table style="width: 100%; border-collapse: collapse; border-radius: 6px; overflow: hidden; border: 1px solid #E7DFD3;">
             <thead>
-              <tr style="background: linear-gradient(135deg, #1e40af, #3b82f6);">
+              <tr style="background: #2B1B12;">
                 <th style="padding: 14px 16px; text-align: center; color: white; font-size: 12px; font-weight: 700; text-transform: uppercase; width: 50px;">#</th>
                 <th style="padding: 14px 16px; text-align: left; color: white; font-size: 12px; font-weight: 700; text-transform: uppercase;">Product</th>
                 <th style="padding: 14px 16px; text-align: center; color: white; font-size: 12px; font-weight: 700; text-transform: uppercase; width: 80px;">Qty</th>
@@ -725,7 +736,7 @@ export default function AdminOrders() {
               <span style="color: #6b7280; font-size: 14px;">Shipping</span>
               <span style="font-weight: 600; color: #16a34a; font-size: 14px;">FREE</span>
             </div>
-            <div style="display: flex; justify-content: space-between; padding: 16px 20px; margin-top: 8px; background: linear-gradient(135deg, #1e40af, #3b82f6); border-radius: 12px;">
+            <div style="display: flex; justify-content: space-between; padding: 16px 20px; margin-top: 8px; background: #7A1F2B; border-radius: 6px;">
               <span style="color: white; font-size: 16px; font-weight: 700;">Grand Total</span>
               <span style="color: white; font-size: 20px; font-weight: 800;">₹${total_with_gst.toLocaleString("en-IN")}</span>
             </div>
@@ -755,26 +766,17 @@ export default function AdminOrders() {
   /* ================= SKELETON ================= */
 
   const SkeletonLoader = () => (
-    <div className="space-y-4">
-      {[...Array(5)].map((_, i) => (
-        <Card key={i} className="border border-gray-200/50 shadow-sm overflow-hidden">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center space-x-4">
-                <Skeleton className="h-12 w-12 rounded-full" />
-                <div>
-                  <Skeleton className="h-5 w-40 mb-2" />
-                  <Skeleton className="h-4 w-28" />
-                </div>
-              </div>
-              <Skeleton className="h-6 w-20 rounded-full" />
-            </div>
-            <div className="flex justify-between items-center pt-4 border-t">
-              <Skeleton className="h-4 w-32" />
-              <Skeleton className="h-9 w-28" />
-            </div>
-          </CardContent>
-        </Card>
+    <div className="bg-white border border-border rounded-md overflow-hidden">
+      {[...Array(6)].map((_, i) => (
+        <div key={i} className="flex items-center gap-4 px-3 py-3 border-b border-border last:border-b-0">
+          <Skeleton className="h-8 w-8 rounded-full" />
+          <div className="flex-1">
+            <Skeleton className="h-4 w-40 mb-2" />
+            <Skeleton className="h-3 w-28" />
+          </div>
+          <Skeleton className="h-5 w-20 rounded-full" />
+          <Skeleton className="h-5 w-16 rounded-full" />
+        </div>
       ))}
     </div>
   );
@@ -785,326 +787,249 @@ export default function AdminOrders() {
     <AdminLayout>
       <div className="space-y-8">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 tracking-tight mb-2">
-              Order Management
+            <h1 className="font-serif text-xl md:text-2xl font-medium text-espresso">
+              Orders
             </h1>
-            <p className="text-gray-600 text-base">
+            <p className="text-[13px] text-muted-foreground mt-1">
               Track and manage all customer orders
               {gstin && (
-                <span className="ml-2 text-xs text-gray-400">• GSTIN: {gstin}</span>
+                <span className="ml-2 text-xs">• GSTIN: {gstin}</span>
               )}
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <Button variant="outline" size="default" onClick={fetchOrders} className="gap-2 hover:bg-gray-50">
+            <Button variant="outline" onClick={fetchOrders} className="gap-2 uppercase text-[11px] tracking-[0.12em] px-5 py-2.5 rounded-sm">
               <RefreshCw className="h-4 w-4" /> Refresh
             </Button>
-            <Button size="default" className="gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-sm">
+            <Button className="gap-2 bg-maroon text-ivory uppercase text-[11px] tracking-[0.12em] px-5 py-2.5 rounded-sm hover:bg-terracotta">
               <Download className="h-4 w-4" /> Export Data
             </Button>
           </div>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card className="relative overflow-hidden border-none shadow-lg bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700 text-white hover:scale-105 transition-transform duration-300">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16" />
-            <CardContent className="p-6 relative z-10">
-              <div className="flex items-start justify-between mb-4">
-                <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl"><ShoppingBag className="h-6 w-6" /></div>
-                <TrendingUp className="h-5 w-5 opacity-70" />
-              </div>
-              <p className="text-sm font-medium text-blue-100 mb-1">Total Orders</p>
-              <p className="text-4xl font-bold tracking-tight">{total}</p>
-            </CardContent>
-          </Card>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="bg-white border border-border rounded-md p-5">
+            <div className="w-9 h-9 rounded-md bg-maroon/10 text-maroon flex items-center justify-center mb-3">
+              <ShoppingBag className="h-4 w-4" />
+            </div>
+            <p className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground font-semibold mb-1">Total Orders</p>
+            <p className="font-serif text-2xl md:text-[27px] font-medium text-espresso">{total}</p>
+          </div>
 
-          <Card className="relative overflow-hidden border-none shadow-lg bg-gradient-to-br from-emerald-500 via-emerald-600 to-emerald-700 text-white hover:scale-105 transition-transform duration-300">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16" />
-            <CardContent className="p-6 relative z-10">
-              <div className="flex items-start justify-between mb-4">
-                <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl"><IndianRupee className="h-6 w-6" /></div>
-                <DollarSign className="h-5 w-5 opacity-70" />
-              </div>
-              <p className="text-sm font-medium text-emerald-100 mb-1">Page Revenue</p>
-              <p className="text-4xl font-bold tracking-tight">{formatCurrency(totalRevenue).replace("₹", "₹ ")}</p>
-            </CardContent>
-          </Card>
+          <div className="bg-white border border-border rounded-md p-5">
+            <div className="w-9 h-9 rounded-md bg-green-700/10 text-green-800 flex items-center justify-center mb-3">
+              <IndianRupee className="h-4 w-4" />
+            </div>
+            <p className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground font-semibold mb-1">Page Revenue</p>
+            <p className="font-serif text-2xl md:text-[27px] font-medium text-espresso">{formatCurrency(totalRevenue).replace("₹", "₹ ")}</p>
+          </div>
 
-          <Card className="relative overflow-hidden border-none shadow-lg bg-gradient-to-br from-amber-500 via-amber-600 to-amber-700 text-white hover:scale-105 transition-transform duration-300">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16" />
-            <CardContent className="p-6 relative z-10">
-              <div className="flex items-start justify-between mb-4">
-                <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl"><AlertCircle className="h-6 w-6" /></div>
-                <Clock className="h-5 w-5 opacity-70" />
-              </div>
-              <p className="text-sm font-medium text-amber-100 mb-1">Pending Orders</p>
-              <p className="text-4xl font-bold tracking-tight">{pendingOrders}</p>
-            </CardContent>
-          </Card>
+          <div className="bg-white border border-border rounded-md p-5">
+            <div className="w-9 h-9 rounded-md bg-amber-500/10 text-amber-700 flex items-center justify-center mb-3">
+              <Clock className="h-4 w-4" />
+            </div>
+            <p className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground font-semibold mb-1">Pending Orders</p>
+            <p className="font-serif text-2xl md:text-[27px] font-medium text-espresso">{pendingOrders}</p>
+          </div>
 
-          <Card className="relative overflow-hidden border-none shadow-lg bg-gradient-to-br from-orange-500 via-orange-600 to-orange-700 text-white hover:scale-105 transition-transform duration-300">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16" />
-            <CardContent className="p-6 relative z-10">
-              <div className="flex items-start justify-between mb-4">
-                <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl"><CreditCard className="h-6 w-6" /></div>
-                <Wallet className="h-5 w-5 opacity-70" />
-              </div>
-              <p className="text-sm font-medium text-orange-100 mb-1">Unpaid Orders</p>
-              <p className="text-4xl font-bold tracking-tight">{unpaidOrders}</p>
-            </CardContent>
-          </Card>
+          <div className="bg-white border border-border rounded-md p-5">
+            <div className="w-9 h-9 rounded-md bg-[#5C6B8A]/10 text-[#5C6B8A] flex items-center justify-center mb-3">
+              <CreditCard className="h-4 w-4" />
+            </div>
+            <p className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground font-semibold mb-1">Unpaid Orders</p>
+            <p className="font-serif text-2xl md:text-[27px] font-medium text-espresso">{unpaidOrders}</p>
+          </div>
         </div>
 
         {/* Filters */}
-        <Card className="border-gray-200 shadow-sm">
-          <CardContent className="p-6">
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1 relative">
-                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <Input
-                  className="pl-11 h-11 border-gray-300 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-                  placeholder="Search by order ID, customer name, or email..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
-              </div>
-              <div className="flex gap-3">
-                <Select value={status} onValueChange={setStatus}>
-                  <SelectTrigger className="w-[180px] h-11 border-gray-300">
-                    <Filter className="h-4 w-4 mr-2" />
-                    <SelectValue placeholder="Order status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Status</SelectItem>
-                    {ORDER_STATUS_OPTIONS.map((s) => (
-                      <SelectItem key={s} value={s}>
-                        <div className="flex items-center gap-2">
-                          {getOrderStatusIcon(s)}
-                          {s.charAt(0).toUpperCase() + s.slice(1)}
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Select value={String(pageSize)} onValueChange={(v) => { setPageSize(Number(v)); setPage(1); }}>
-                  <SelectTrigger className="w-[140px] h-11 border-gray-300">
-                    <SelectValue placeholder="Per page" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="10">Show 10</SelectItem>
-                    <SelectItem value="25">Show 25</SelectItem>
-                    <SelectItem value="50">Show 50</SelectItem>
-                    <SelectItem value="100">Show 100</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="flex flex-col md:flex-row gap-3">
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              className="pl-9 h-10 bg-white rounded-sm border-border text-[13px] focus:border-maroon focus-visible:ring-0 focus-visible:ring-offset-0"
+              placeholder="Search by order ID, customer name, or email..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+          <div className="flex gap-3">
+            <Select value={status} onValueChange={setStatus}>
+              <SelectTrigger className="w-[180px] h-10 bg-white rounded-sm border-border text-[13px] focus:border-maroon focus:ring-0 focus:ring-offset-0">
+                <Filter className="h-4 w-4 mr-2 text-muted-foreground" />
+                <SelectValue placeholder="Order status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                {ORDER_STATUS_OPTIONS.map((s) => (
+                  <SelectItem key={s} value={s}>
+                    <div className="flex items-center gap-2">
+                      {getOrderStatusIcon(s)}
+                      {s.charAt(0).toUpperCase() + s.slice(1)}
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={String(pageSize)} onValueChange={(v) => { setPageSize(Number(v)); setPage(1); }}>
+              <SelectTrigger className="w-[140px] h-10 bg-white rounded-sm border-border text-[13px] focus:border-maroon focus:ring-0 focus:ring-offset-0">
+                <SelectValue placeholder="Per page" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="10">Show 10</SelectItem>
+                <SelectItem value="25">Show 25</SelectItem>
+                <SelectItem value="50">Show 50</SelectItem>
+                <SelectItem value="100">Show 100</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
 
         {/* ===================== ORDERS LIST ===================== */}
         {loading ? (
           <SkeletonLoader />
         ) : error ? (
-          <Card className="border-red-200 shadow-sm">
-            <CardContent className="p-16 text-center">
-              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-red-100 to-red-200 mb-6">
-                <XCircle className="h-10 w-10 text-red-600" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Error Loading Orders</h3>
-              <p className="text-gray-500 mb-6 max-w-md mx-auto">{error}</p>
-              <Button onClick={fetchOrders} className="bg-gradient-to-r from-blue-600 to-blue-700">Try Again</Button>
-            </CardContent>
-          </Card>
+          <div className="bg-white border border-border rounded-md p-16 text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-sale/10 mb-6">
+              <XCircle className="h-8 w-8 text-sale" />
+            </div>
+            <h3 className="font-serif text-xl font-medium text-espresso mb-2">Error Loading Orders</h3>
+            <p className="text-[13px] text-muted-foreground mb-6 max-w-md mx-auto">{error}</p>
+            <Button onClick={fetchOrders} className="bg-maroon text-ivory uppercase text-[11px] tracking-[0.12em] px-5 py-2.5 rounded-sm hover:bg-terracotta">Try Again</Button>
+          </div>
         ) : ordersData.length === 0 ? (
-          <Card className="border-gray-200 shadow-sm">
-            <CardContent className="p-16 text-center">
-              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 mb-6">
-                <ShoppingBag className="h-10 w-10 text-gray-400" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">No Orders Found</h3>
-              <p className="text-gray-500 mb-6 max-w-md mx-auto">
-                {search || status !== "all" ? "No orders match your filters." : "When customers place orders, they will appear here."}
-              </p>
-              {(search || status !== "all") && (
-                <Button onClick={() => { setSearch(""); setStatus("all"); }} className="bg-gradient-to-r from-blue-600 to-blue-700">Clear All Filters</Button>
-              )}
-            </CardContent>
-          </Card>
+          <div className="bg-white border border-border rounded-md p-16 text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-espresso/5 mb-6">
+              <ShoppingBag className="h-8 w-8 text-muted-foreground" />
+            </div>
+            <h3 className="font-serif text-xl font-medium text-espresso mb-2">No Orders Found</h3>
+            <p className="text-[13px] text-muted-foreground mb-6 max-w-md mx-auto">
+              {search || status !== "all" ? "No orders match your filters." : "When customers place orders, they will appear here."}
+            </p>
+            {(search || status !== "all") && (
+              <Button onClick={() => { setSearch(""); setStatus("all"); }} className="bg-maroon text-ivory uppercase text-[11px] tracking-[0.12em] px-5 py-2.5 rounded-sm hover:bg-terracotta">Clear All Filters</Button>
+            )}
+          </div>
         ) : (
           <>
-            <div className="space-y-4">
-              {ordersData.map((od) => {
-                const { order, customer_name, customer_email, customer_phone, items, items_count, subtotal, gst_18_percent, total_with_gst } = od;
+            <div className="bg-white border border-border rounded-md overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse text-left">
+                  <thead>
+                    <tr>
+                      <th className="text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground font-semibold bg-[#FBF8F3] border-b border-border px-3 py-2.5 whitespace-nowrap">Order</th>
+                      <th className="text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground font-semibold bg-[#FBF8F3] border-b border-border px-3 py-2.5 whitespace-nowrap">Customer</th>
+                      <th className="text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground font-semibold bg-[#FBF8F3] border-b border-border px-3 py-2.5 whitespace-nowrap">Date</th>
+                      <th className="text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground font-semibold bg-[#FBF8F3] border-b border-border px-3 py-2.5 whitespace-nowrap text-right">Items</th>
+                      <th className="text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground font-semibold bg-[#FBF8F3] border-b border-border px-3 py-2.5 whitespace-nowrap text-right">Total</th>
+                      <th className="text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground font-semibold bg-[#FBF8F3] border-b border-border px-3 py-2.5 whitespace-nowrap">Payment</th>
+                      <th className="text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground font-semibold bg-[#FBF8F3] border-b border-border px-3 py-2.5 whitespace-nowrap">Status</th>
+                      <th className="text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground font-semibold bg-[#FBF8F3] border-b border-border px-3 py-2.5 whitespace-nowrap text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="[&>tr:last-child>td]:border-b-0">
+                    {ordersData.map((od) => {
+                      const { order, customer_name, customer_email, items_count, total_with_gst } = od;
 
-                return (
-                  <Card key={order.id} className="border border-gray-200 hover:shadow-lg hover:border-gray-300 transition-all duration-300 overflow-hidden">
-                    <CardContent className="p-6">
-                      <div className="flex items-start justify-between mb-5">
-                        <div className="flex items-center gap-4">
-                          <div className="relative">
-                            <Avatar className="h-14 w-14 ring-4 ring-blue-100 shadow-lg">
-                              <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-700 text-white font-semibold text-lg">
-                                {getInitials(customer_name)}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full border-2 border-white bg-emerald-500 shadow-sm" />
-                          </div>
-                          <div>
-                            <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                              <h3 className="font-bold text-gray-900 text-lg">Order #{order.id}</h3>
-                              <Badge className={`${getOrderStatusColor(order.status)} border font-semibold px-3 py-1 flex items-center gap-1`}>
-                                {getOrderStatusIcon(order.status)}
-                                {(order.status || "pending").toUpperCase()}
-                              </Badge>
-                              <Badge className={`${getPaymentStatusColor(order.payment_status)} border font-semibold px-3 py-1 flex items-center gap-1`}>
-                                {getPaymentStatusIcon(order.payment_status)}
-                                {(order.payment_status || "unpaid").toUpperCase()}
-                              </Badge>
-                            </div>
-                            <p className="text-sm text-gray-500 font-medium">{customer_name}</p>
-                            {order.payment_method && (
-                              <p className="text-xs text-gray-400 mt-0.5">via {getPaymentMethodLabel(order.payment_method)}</p>
-                            )}
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <div className="flex items-center justify-end gap-1 mb-1">
-                            <IndianRupee className="h-5 w-5 text-emerald-600" />
-                            <p className="text-2xl font-bold text-gray-900">
-                              {formatCurrency(total_with_gst).replace("₹", "")}
-                            </p>
-                          </div>
-                          <p className="text-xs text-gray-400">
-                            Subtotal: {formatCurrency(subtotal)} + GST: {formatCurrency(gst_18_percent)}
-                          </p>
-                          <div className="bg-gray-50 px-3 py-1.5 rounded-lg mt-2">
-                            <div className="flex items-center gap-1.5 text-gray-900 text-xs font-medium mb-0.5">
-                              <Calendar className="h-3.5 w-3.5 text-gray-500" />
-                              {formatDate(order.created_at)}
-                            </div>
-                            <div className="flex items-center gap-1.5 text-gray-500 text-xs font-medium">
-                              <Clock className="h-3.5 w-3.5" />
-                              {formatTime(order.created_at)}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Items Preview */}
-                      {items.length > 0 && (
-                        <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-100">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Package className="h-3.5 w-3.5 text-gray-500" />
-                            <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
-                              {items_count} {items_count === 1 ? "Item" : "Items"}
-                            </span>
-                          </div>
-                          <div className="flex flex-wrap gap-2">
-                            {items.slice(0, 3).map((item) => (
-                              <div key={item.id} className="flex items-center gap-2 bg-white px-2.5 py-1.5 rounded-lg border border-gray-200">
-                                {item.product_image ? (
-                                  <img
-                                    src={getProductImageUrl(item.product_image)!}
-                                    alt={item.product_name}
-                                    className="w-8 h-8 rounded object-cover border border-gray-200"
-                                    onError={(e) => {
-                                      (e.currentTarget as HTMLImageElement).src = "/placeholder.png"; // Fallback image
-                                      (e.currentTarget as HTMLImageElement).onerror = null; // Prevent loop
-                                    }}
-                                  />
-                                ) : (
-                                  <div className="w-8 h-8 rounded bg-gray-100 flex items-center justify-center">
-                                    <ImageIcon className="h-4 w-4 text-gray-400" />
-                                  </div>
-                                )}
-                                <div>
-                                  <p className="text-xs font-medium text-gray-800 truncate max-w-[120px]">
-                                    {item.product_name}
-                                  </p>
-                                  <div className="flex items-center gap-2 mt-0.5">
-                                    <p className="text-xs text-gray-500">
-                                      {item.quantity}x {formatCurrency(item.price)}
-                                    </p>
-                                    {item.hsn_code && (
-                                      <span className="text-[10px] text-gray-400 px-1 py-0.5 bg-gray-100 rounded border">HSN: {item.hsn_code}</span>
-                                    )}
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
-                            {items.length > 3 && (
-                              <div className="flex items-center px-3 py-1.5 bg-blue-50 rounded-lg border border-blue-200">
-                                <span className="text-xs font-medium text-blue-700">
-                                  +{items.length - 3} more
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      )}
-
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-5 border-t border-gray-200">
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8 text-sm mb-4 sm:mb-0">
-                          <div className="flex items-center gap-2.5">
-                            <div className="p-2 bg-blue-50 rounded-lg"><Mail className="h-4 w-4 text-blue-600" /></div>
-                            <span className="text-gray-700 font-medium truncate max-w-[200px]">{customer_email || "No email"}</span>
-                          </div>
-                          {customer_phone && (
+                      return (
+                        <tr key={order.id} className="hover:bg-[#FBF8F3] transition-colors">
+                          <td className="px-3 py-3 border-b border-border text-[13px] font-semibold text-espresso whitespace-nowrap">
+                            #{order.id}
+                          </td>
+                          <td className="px-3 py-3 border-b border-border text-[13px]">
                             <div className="flex items-center gap-2.5">
-                              <div className="p-2 bg-emerald-50 rounded-lg"><Phone className="h-4 w-4 text-emerald-600" /></div>
-                              <span className="text-gray-700 font-medium">{customer_phone}</span>
+                              <span className="w-8 h-8 rounded-full bg-espresso/10 text-espresso text-[11px] font-semibold flex items-center justify-center flex-none">
+                                {getInitials(customer_name)}
+                              </span>
+                              <div className="min-w-0">
+                                <p className="font-medium text-espresso truncate max-w-[180px]">{customer_name}</p>
+                                <p className="text-[11.5px] text-muted-foreground truncate max-w-[180px]">{customer_email || "No email"}</p>
+                              </div>
                             </div>
-                          )}
-                          <div className="flex items-center gap-2.5">
-                            <div className="p-2 bg-violet-50 rounded-lg"><Package className="h-4 w-4 text-violet-600" /></div>
-                            <span className="text-gray-700 font-semibold">{items_count} {items_count === 1 ? "item" : "items"}</span>
-                          </div>
-                        </div>
-
-                        {/* Action Buttons */}
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <Button variant="outline" size="sm" className="gap-1.5 hover:bg-gray-50 border-gray-300"
-                            onClick={() => { setSelectedOrderData(od); setIsDialogOpen(true); }}>
-                            <Eye className="h-4 w-4" /> View
-                          </Button>
-                          <Button variant="outline" size="sm" className="gap-1.5 hover:bg-violet-50 border-violet-200 text-violet-600"
-                            onClick={() => printOrderInvoice(od)}>
-                            <Printer className="h-4 w-4" /> Invoice
-                          </Button>
-                          <Button variant="outline" size="sm" className="gap-1.5 hover:bg-blue-50 border-blue-200 text-blue-600"
-                            onClick={() => openEditStatusDialog(od)}>
-                            <Pencil className="h-4 w-4" /> Status
-                          </Button>
-                          <Button variant="outline" size="sm" className="gap-1.5 hover:bg-green-50 border-green-200 text-green-600"
-                            onClick={() => openEditPaymentDialog(od)}>
-                            <Wallet className="h-4 w-4" /> Payment
-                          </Button>
-                          <Button variant="outline" size="sm" className="gap-1.5 hover:bg-red-50 border-red-200 text-red-600"
-                            onClick={() => openDeleteDialog(od)}>
-                            <Trash2 className="h-4 w-4" /> Delete
-                          </Button>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
+                          </td>
+                          <td className="px-3 py-3 border-b border-border text-[13px] whitespace-nowrap">
+                            {formatDate(order.created_at)}
+                            <span className="block text-[11.5px] text-muted-foreground">{formatTime(order.created_at)}</span>
+                          </td>
+                          <td className="px-3 py-3 border-b border-border text-[13px] text-right">{items_count}</td>
+                          <td className="px-3 py-3 border-b border-border text-[13px] text-right font-semibold text-espresso whitespace-nowrap">
+                            {formatCurrency(total_with_gst)}
+                            <span className="block text-[11px] font-normal text-muted-foreground">incl. GST</span>
+                          </td>
+                          <td className="px-3 py-3 border-b border-border text-[13px] whitespace-nowrap">
+                            <StatusChip
+                              tint={getPaymentStatusColor(order.payment_status)}
+                              label={(order.payment_status || "unpaid").charAt(0).toUpperCase() + (order.payment_status || "unpaid").slice(1)}
+                            />
+                            {order.payment_method && (
+                              <span className="block text-[11px] text-muted-foreground mt-1">{getPaymentMethodLabel(order.payment_method)}</span>
+                            )}
+                          </td>
+                          <td className="px-3 py-3 border-b border-border text-[13px] whitespace-nowrap">
+                            <StatusChip
+                              tint={getOrderStatusColor(order.status)}
+                              label={(order.status || "pending").charAt(0).toUpperCase() + (order.status || "pending").slice(1)}
+                            />
+                          </td>
+                          <td className="px-3 py-3 border-b border-border text-[13px]">
+                            <div className="flex items-center justify-end gap-1.5">
+                              <button
+                                title="View details"
+                                className="w-7 h-7 border border-border rounded-[5px] inline-flex items-center justify-center text-muted-foreground bg-white hover:text-espresso hover:border-espresso transition-colors"
+                                onClick={() => { setSelectedOrderData(od); setIsDialogOpen(true); }}
+                              >
+                                <Eye className="h-3.5 w-3.5" />
+                              </button>
+                              <button
+                                title="Print invoice"
+                                className="w-7 h-7 border border-border rounded-[5px] inline-flex items-center justify-center text-muted-foreground bg-white hover:text-espresso hover:border-espresso transition-colors"
+                                onClick={() => printOrderInvoice(od)}
+                              >
+                                <Printer className="h-3.5 w-3.5" />
+                              </button>
+                              <button
+                                title="Update order status"
+                                className="w-7 h-7 border border-border rounded-[5px] inline-flex items-center justify-center text-muted-foreground bg-white hover:text-espresso hover:border-espresso transition-colors"
+                                onClick={() => openEditStatusDialog(od)}
+                              >
+                                <Pencil className="h-3.5 w-3.5" />
+                              </button>
+                              <button
+                                title="Update payment status"
+                                className="w-7 h-7 border border-border rounded-[5px] inline-flex items-center justify-center text-muted-foreground bg-white hover:text-espresso hover:border-espresso transition-colors"
+                                onClick={() => openEditPaymentDialog(od)}
+                              >
+                                <Wallet className="h-3.5 w-3.5" />
+                              </button>
+                              <button
+                                title="Delete order"
+                                className="w-7 h-7 border border-sale/35 rounded-[5px] inline-flex items-center justify-center text-sale bg-white hover:bg-sale/5 transition-colors"
+                                onClick={() => openDeleteDialog(od)}
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             </div>
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-gray-200">
-                <p className="text-sm text-gray-600 font-medium">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4">
+                <p className="text-[12.5px] text-muted-foreground">
                   Showing{" "}
-                  <span className="font-bold text-gray-900">{(page - 1) * pageSize + 1} - {Math.min(page * pageSize, total)}</span>
-                  {" "}of <span className="font-bold text-gray-900">{total}</span> orders
+                  <span className="font-semibold text-espresso">{(page - 1) * pageSize + 1} - {Math.min(page * pageSize, total)}</span>
+                  {" "}of <span className="font-semibold text-espresso">{total}</span> orders
                 </p>
                 <div className="flex items-center gap-2">
-                  <Button variant="outline" disabled={page === 1} onClick={() => setPage(page - 1)} className="gap-2 border-gray-300">
+                  <Button variant="outline" disabled={page === 1} onClick={() => setPage(page - 1)} className="gap-2 h-8 px-3 text-[12.5px] rounded-[5px] border-border text-espresso hover:bg-[#FBF8F3] hover:text-espresso">
                     <ChevronLeft className="h-4 w-4" /> Previous
                   </Button>
                   <div className="flex items-center gap-1.5">
@@ -1116,14 +1041,14 @@ export default function AdminOrders() {
                       else pageNum = page - 2 + i;
                       return (
                         <Button key={pageNum} variant={page === pageNum ? "default" : "outline"}
-                          className={`w-10 h-10 p-0 ${page === pageNum ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md" : "border-gray-300"}`}
+                          className={`w-8 h-8 p-0 text-[12.5px] rounded-[5px] ${page === pageNum ? "bg-maroon text-ivory hover:bg-terracotta" : "border-border text-espresso hover:bg-[#FBF8F3] hover:text-espresso"}`}
                           onClick={() => setPage(pageNum)}>
                           {pageNum}
                         </Button>
                       );
                     })}
                   </div>
-                  <Button variant="outline" disabled={page === totalPages} onClick={() => setPage(page + 1)} className="gap-2 border-gray-300">
+                  <Button variant="outline" disabled={page === totalPages} onClick={() => setPage(page + 1)} className="gap-2 h-8 px-3 text-[12.5px] rounded-[5px] border-border text-espresso hover:bg-[#FBF8F3] hover:text-espresso">
                     Next <ChevronRight className="h-4 w-4" />
                   </Button>
                 </div>
@@ -1136,8 +1061,8 @@ export default function AdminOrders() {
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="flex items-center gap-2.5 text-xl">
-                <div className="p-2 bg-blue-100 rounded-lg"><FileText className="h-5 w-5 text-blue-700" /></div>
+              <DialogTitle className="flex items-center gap-2.5 font-serif text-xl font-medium text-espresso">
+                <div className="p-2 bg-maroon/10 rounded-md"><FileText className="h-5 w-5 text-maroon" /></div>
                 Order Details
               </DialogTitle>
             </DialogHeader>
@@ -1148,77 +1073,77 @@ export default function AdminOrders() {
               return (
                 <div className="space-y-6">
                   {/* Header */}
-                  <div className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl">
+                  <div className="flex items-center justify-between p-4 bg-[#FBF8F3] border border-border rounded-md">
                     <div className="flex items-center gap-3">
-                      <Avatar className="h-12 w-12 ring-4 ring-blue-100">
-                        <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-700 text-white font-bold">
+                      <Avatar className="h-12 w-12">
+                        <AvatarFallback className="bg-maroon text-ivory font-semibold">
                           {getInitials(customer_name)}
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <h3 className="font-bold text-gray-900">Order #{order.id}</h3>
-                        <p className="text-sm text-gray-600">{customer_name}</p>
+                        <h3 className="font-semibold text-espresso text-[13px]">Order #{order.id}</h3>
+                        <p className="text-[13px] text-muted-foreground">{customer_name}</p>
                       </div>
                     </div>
                     <div className="flex flex-col gap-2 items-end">
-                      <Badge className={`${getOrderStatusColor(order.status)} border font-semibold px-3 py-1 flex items-center gap-1`}>
-                        {getOrderStatusIcon(order.status)}
-                        {(order.status || "pending").toUpperCase()}
-                      </Badge>
-                      <Badge className={`${getPaymentStatusColor(order.payment_status)} border font-semibold px-3 py-1 flex items-center gap-1`}>
-                        {getPaymentStatusIcon(order.payment_status)}
-                        {(order.payment_status || "unpaid").toUpperCase()}
-                      </Badge>
+                      <StatusChip
+                        tint={getOrderStatusColor(order.status)}
+                        label={(order.status || "pending").toUpperCase()}
+                      />
+                      <StatusChip
+                        tint={getPaymentStatusColor(order.payment_status)}
+                        label={(order.payment_status || "unpaid").toUpperCase()}
+                      />
                     </div>
                   </div>
 
                   {/* Info Grid */}
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    <div className="p-4 bg-gray-50 rounded-lg">
-                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Order ID</p>
-                      <p className="font-bold text-gray-900 text-lg">#{order.id}</p>
+                    <div className="p-4 bg-white border border-border rounded-md">
+                      <p className="text-[10.5px] font-semibold text-muted-foreground uppercase tracking-[0.14em] mb-2">Order ID</p>
+                      <p className="font-serif font-medium text-espresso text-lg">#{order.id}</p>
                     </div>
-                    <div className="p-4 bg-gray-50 rounded-lg">
-                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Subtotal</p>
-                      <p className="font-bold text-gray-900 text-lg">{formatCurrency(subtotal)}</p>
+                    <div className="p-4 bg-white border border-border rounded-md">
+                      <p className="text-[10.5px] font-semibold text-muted-foreground uppercase tracking-[0.14em] mb-2">Subtotal</p>
+                      <p className="font-serif font-medium text-espresso text-lg">{formatCurrency(subtotal)}</p>
                     </div>
-                    <div className="p-4 bg-gray-50 rounded-lg">
-                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">GST ({gstRate || "18%"})</p>
-                      <p className="font-bold text-orange-600 text-lg">{formatCurrency(gst_18_percent)}</p>
+                    <div className="p-4 bg-white border border-border rounded-md">
+                      <p className="text-[10.5px] font-semibold text-muted-foreground uppercase tracking-[0.14em] mb-2">GST ({gstRate || "18%"})</p>
+                      <p className="font-serif font-medium text-espresso text-lg">{formatCurrency(gst_18_percent)}</p>
                     </div>
-                    <div className="p-4 bg-emerald-50 rounded-lg border border-emerald-100">
-                      <p className="text-xs font-semibold text-emerald-600 uppercase tracking-wide mb-2">Total with GST</p>
-                      <p className="font-bold text-emerald-700 text-xl">{formatCurrency(total_with_gst)}</p>
+                    <div className="p-4 bg-green-700/10 rounded-md">
+                      <p className="text-[10.5px] font-semibold text-green-800 uppercase tracking-[0.14em] mb-2">Total with GST</p>
+                      <p className="font-serif font-medium text-green-800 text-xl">{formatCurrency(total_with_gst)}</p>
                     </div>
-                    <div className="p-4 bg-gray-50 rounded-lg">
-                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Payment Method</p>
-                      <p className="font-bold text-gray-900">{getPaymentMethodLabel(order.payment_method)}</p>
+                    <div className="p-4 bg-white border border-border rounded-md">
+                      <p className="text-[10.5px] font-semibold text-muted-foreground uppercase tracking-[0.14em] mb-2">Payment Method</p>
+                      <p className="font-semibold text-espresso text-[13px]">{getPaymentMethodLabel(order.payment_method)}</p>
                     </div>
-                    <div className="p-4 bg-gray-50 rounded-lg">
-                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Order Date</p>
-                      <p className="font-bold text-gray-900">{formatDate(order.created_at)}</p>
-                      <p className="text-xs text-gray-500 mt-1">{formatTime(order.created_at)}</p>
+                    <div className="p-4 bg-white border border-border rounded-md">
+                      <p className="text-[10.5px] font-semibold text-muted-foreground uppercase tracking-[0.14em] mb-2">Order Date</p>
+                      <p className="font-semibold text-espresso text-[13px]">{formatDate(order.created_at)}</p>
+                      <p className="text-xs text-muted-foreground mt-1">{formatTime(order.created_at)}</p>
                     </div>
                   </div>
 
                   {/* Customer Info */}
-                  <div className="p-4 bg-blue-50 rounded-xl border border-blue-100">
-                    <h4 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-                      <User className="h-4 w-4" /> Customer Information
+                  <div className="p-4 bg-[#FBF8F3] rounded-md border border-border">
+                    <h4 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso mb-3 flex items-center gap-2">
+                      <User className="h-4 w-4 text-maroon" /> Customer Information
                     </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-[13px]">
                       <div className="flex items-center gap-2">
-                        <User className="h-4 w-4 text-blue-600" />
-                        <span className="font-medium text-gray-700">{customer_name}</span>
+                        <User className="h-4 w-4 text-muted-foreground" />
+                        <span className="font-medium text-espresso">{customer_name}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Mail className="h-4 w-4 text-blue-600" />
-                        <span className="font-medium text-gray-700">{customer_email || "—"}</span>
+                        <Mail className="h-4 w-4 text-muted-foreground" />
+                        <span className="font-medium text-espresso">{customer_email || "—"}</span>
                       </div>
                       {customer_phone && (
                         <div className="flex items-center gap-2">
-                          <Phone className="h-4 w-4 text-blue-600" />
-                          <span className="font-medium text-gray-700">{customer_phone}</span>
+                          <Phone className="h-4 w-4 text-muted-foreground" />
+                          <span className="font-medium text-espresso">{customer_phone}</span>
                         </div>
                       )}
                     </div>
@@ -1226,83 +1151,83 @@ export default function AdminOrders() {
 
                   {/* Shipping Address */}
                   {order.shipping_address && (
-                    <div className="p-4 bg-violet-50 rounded-xl border border-violet-100">
-                      <h4 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-                        <MapPin className="h-4 w-4" /> Shipping Address
+                    <div className="p-4 bg-[#FBF8F3] rounded-md border border-border">
+                      <h4 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso mb-3 flex items-center gap-2">
+                        <MapPin className="h-4 w-4 text-maroon" /> Shipping Address
                       </h4>
-                      <p className="text-sm font-medium text-gray-700">{order.shipping_address}</p>
+                      <p className="text-[13px] font-medium text-espresso">{order.shipping_address}</p>
                     </div>
                   )}
 
                   {/* GSTIN Info */}
                   {gstin && (
-                    <div className="p-3 bg-gray-50 rounded-lg border border-gray-200 flex items-center gap-2">
-                      <FileText className="h-4 w-4 text-gray-500" />
-                      <span className="text-sm text-gray-600">GSTIN: <span className="font-bold text-gray-800">{gstin}</span></span>
-                      <span className="text-sm text-gray-400 ml-2">• GST Rate: <span className="font-bold text-gray-600">{gstRate}</span></span>
+                    <div className="p-3 bg-[#FBF8F3] rounded-md border border-border flex items-center gap-2">
+                      <FileText className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-[13px] text-muted-foreground">GSTIN: <span className="font-semibold text-espresso">{gstin}</span></span>
+                      <span className="text-[13px] text-muted-foreground ml-2">• GST Rate: <span className="font-semibold text-espresso">{gstRate}</span></span>
                     </div>
                   )}
 
                   {/* Order Items */}
                   {items.length > 0 && (
                     <div>
-                      <h4 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-                        <Package className="h-4 w-4" /> Order Items ({items_count})
+                      <h4 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso mb-3 flex items-center gap-2">
+                        <Package className="h-4 w-4 text-maroon" /> Order Items ({items_count})
                       </h4>
                       <div className="space-y-3">
                         {items.map((item) => {
                           const imgUrl = getProductImageUrl(item.product_image);
                           return (
-                            <div key={item.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
+                            <div key={item.id} className="flex items-center justify-between p-3 bg-white rounded-md border border-border">
                               <div className="flex items-center gap-4">
-                                <div className="w-16 h-16 rounded-lg overflow-hidden bg-white border border-gray-200 flex-shrink-0">
+                                <div className="w-[38px] h-[46px] rounded overflow-hidden bg-[#FBF8F3] border border-border flex-shrink-0">
                                   {imgUrl ? (
                                     <img src={imgUrl} alt={item.product_name} className="w-full h-full object-cover" />
                                   ) : (
-                                    <div className="w-full h-full flex items-center justify-center bg-gray-100">
-                                      <ImageIcon className="h-6 w-6 text-gray-400" />
+                                    <div className="w-full h-full flex items-center justify-center bg-[#FBF8F3]">
+                                      <ImageIcon className="h-4 w-4 text-muted-foreground" />
                                     </div>
                                   )}
                                 </div>
                                 <div>
-                                  <p className="font-semibold text-gray-900">{item.product_name}</p>
+                                  <p className="font-semibold text-espresso text-[13px]">{item.product_name}</p>
                                   <div className="flex items-center gap-3 mt-1 flex-wrap">
-                                    <p className="text-xs text-gray-500">Qty: {item.quantity}</p>
-                                    <p className="text-xs text-gray-500">@ {formatCurrency(item.price)} each</p>
-                                    
+                                    <p className="text-xs text-muted-foreground">Qty: {item.quantity}</p>
+                                    <p className="text-xs text-muted-foreground">@ {formatCurrency(item.price)} each</p>
+
                                     {/* ✅ HSN Code Badge */}
                                     {item.hsn_code && (
-                                      <Badge variant="outline" className="text-xs border-gray-300 text-gray-600 bg-gray-50">
+                                      <Badge variant="outline" className="text-[10.5px] rounded-sm border-border text-muted-foreground bg-[#FBF8F3]">
                                         HSN: {item.hsn_code}
                                       </Badge>
                                     )}
-                                    
+
                                     {item.sku && (
-                                      <Badge variant="outline" className="text-xs border-gray-300 text-gray-600">
+                                      <Badge variant="outline" className="text-[10.5px] rounded-sm border-border text-muted-foreground">
                                         SKU: {item.sku}
                                       </Badge>
                                     )}
                                   </div>
                                 </div>
                               </div>
-                              <p className="font-bold text-gray-900 text-lg">{formatCurrency(item.total)}</p>
+                              <p className="font-semibold text-espresso text-[13px]">{formatCurrency(item.total)}</p>
                             </div>
                           );
                         })}
 
                         {/* Totals Summary */}
                         <div className="space-y-2 mt-2">
-                          <div className="flex items-center justify-between p-3 bg-gray-100 rounded-lg">
-                            <p className="text-sm text-gray-600">Subtotal</p>
-                            <p className="font-semibold text-gray-900">{formatCurrency(subtotal)}</p>
+                          <div className="flex items-center justify-between p-3 bg-[#FBF8F3] border border-border rounded-md">
+                            <p className="text-[13px] text-muted-foreground">Subtotal</p>
+                            <p className="font-semibold text-espresso text-[13px]">{formatCurrency(subtotal)}</p>
                           </div>
-                          <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg border border-orange-100">
-                            <p className="text-sm text-orange-700">GST ({gstRate || "18%"})</p>
-                            <p className="font-semibold text-orange-800">{formatCurrency(gst_18_percent)}</p>
+                          <div className="flex items-center justify-between p-3 bg-[#FBF8F3] border border-border rounded-md">
+                            <p className="text-[13px] text-muted-foreground">GST ({gstRate || "18%"})</p>
+                            <p className="font-semibold text-espresso text-[13px]">{formatCurrency(gst_18_percent)}</p>
                           </div>
-                          <div className="flex items-center justify-between p-4 bg-emerald-50 rounded-xl border border-emerald-100">
-                            <p className="font-bold text-gray-900">Total with GST</p>
-                            <p className="font-bold text-emerald-700 text-xl">{formatCurrency(total_with_gst)}</p>
+                          <div className="flex items-center justify-between p-4 bg-green-700/10 rounded-md">
+                            <p className="font-semibold text-espresso text-[13px]">Total with GST</p>
+                            <p className="font-serif font-medium text-green-800 text-xl">{formatCurrency(total_with_gst)}</p>
                           </div>
                         </div>
                       </div>
@@ -1310,26 +1235,26 @@ export default function AdminOrders() {
                   )}
 
                   {/* Dialog Actions */}
-                  <div className="flex flex-wrap justify-between gap-3 pt-4 border-t border-gray-200">
+                  <div className="flex flex-wrap justify-between gap-3 pt-4 border-t border-border">
                     <div className="flex flex-wrap gap-2">
-                      <Button variant="outline" size="sm" className="gap-1.5 hover:bg-violet-50 border-violet-200 text-violet-600"
+                      <Button variant="outline" size="sm" className="gap-1.5 text-[12px]"
                         onClick={() => printOrderInvoice(selectedOrderData)}>
                         <Printer className="h-4 w-4" /> Print Invoice
                       </Button>
-                      <Button variant="outline" size="sm" className="gap-1.5 hover:bg-blue-50 border-blue-200 text-blue-600"
+                      <Button variant="outline" size="sm" className="gap-1.5 text-[12px]"
                         onClick={() => { setIsDialogOpen(false); openEditStatusDialog(selectedOrderData); }}>
                         <Pencil className="h-4 w-4" /> Order Status
                       </Button>
-                      <Button variant="outline" size="sm" className="gap-1.5 hover:bg-green-50 border-green-200 text-green-600"
+                      <Button variant="outline" size="sm" className="gap-1.5 text-[12px]"
                         onClick={() => { setIsDialogOpen(false); openEditPaymentDialog(selectedOrderData); }}>
                         <Wallet className="h-4 w-4" /> Payment
                       </Button>
-                      <Button variant="outline" size="sm" className="gap-1.5 hover:bg-red-50 border-red-200 text-red-600"
+                      <Button variant="outline" size="sm" className="gap-1.5 text-[12px] border-sale text-sale hover:bg-sale hover:text-ivory"
                         onClick={() => { setIsDialogOpen(false); openDeleteDialog(selectedOrderData); }}>
                         <Trash2 className="h-4 w-4" /> Delete
                       </Button>
                     </div>
-                    <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="border-gray-300">Close</Button>
+                    <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Close</Button>
                   </div>
                 </div>
               );
@@ -1341,40 +1266,40 @@ export default function AdminOrders() {
         <Dialog open={editStatusDialogOpen} onOpenChange={setEditStatusDialogOpen}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle className="flex items-center gap-2.5 text-xl">
-                <div className="p-2 bg-blue-100 rounded-lg"><Pencil className="h-5 w-5 text-blue-600" /></div>
+              <DialogTitle className="flex items-center gap-2.5 font-serif text-xl font-medium text-espresso">
+                <div className="p-2 bg-maroon/10 rounded-md"><Pencil className="h-5 w-5 text-maroon" /></div>
                 Update Order Status
               </DialogTitle>
-              <DialogDescription className="pt-3 text-gray-600">
-                Change status for <span className="font-bold text-gray-900">Order #{orderToEditStatus?.order.id}</span>
+              <DialogDescription className="pt-3 text-muted-foreground">
+                Change status for <span className="font-semibold text-espresso">Order #{orderToEditStatus?.order.id}</span>
               </DialogDescription>
             </DialogHeader>
             {orderToEditStatus && (
               <div className="space-y-5">
-                <div className="p-4 bg-blue-50 rounded-xl border border-blue-100">
+                <div className="p-4 bg-[#FBF8F3] rounded-md border border-border">
                   <div className="flex items-center gap-3">
                     <Avatar className="h-10 w-10">
-                      <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-700 text-white font-bold text-sm">
+                      <AvatarFallback className="bg-maroon text-ivory font-semibold text-sm">
                         {getInitials(orderToEditStatus.customer_name)}
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <p className="font-bold text-gray-900 text-sm">Order #{orderToEditStatus.order.id}</p>
-                      <p className="text-xs text-gray-600">{orderToEditStatus.customer_name} • {formatCurrency(orderToEditStatus.total_with_gst)}</p>
+                      <p className="font-semibold text-espresso text-sm">Order #{orderToEditStatus.order.id}</p>
+                      <p className="text-xs text-muted-foreground">{orderToEditStatus.customer_name} • {formatCurrency(orderToEditStatus.total_with_gst)}</p>
                     </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="text-sm font-medium text-gray-600 w-28">Current:</span>
-                  <Badge className={`${getOrderStatusColor(orderToEditStatus.order.status)} border font-semibold px-3 py-1 flex items-center gap-1`}>
-                    {getOrderStatusIcon(orderToEditStatus.order.status)}
-                    {(orderToEditStatus.order.status || "pending").toUpperCase()}
-                  </Badge>
+                  <span className="text-[13px] font-medium text-muted-foreground w-28">Current:</span>
+                  <StatusChip
+                    tint={getOrderStatusColor(orderToEditStatus.order.status)}
+                    label={(orderToEditStatus.order.status || "pending").toUpperCase()}
+                  />
                 </div>
                 <div>
-                  <label className="text-sm font-semibold text-gray-700 mb-2 block">New Order Status</label>
+                  <label className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso mb-2 block">New Order Status</label>
                   <Select value={newOrderStatus} onValueChange={setNewOrderStatus}>
-                    <SelectTrigger className="w-full h-11 border-gray-300"><SelectValue placeholder="Select new status" /></SelectTrigger>
+                    <SelectTrigger className="w-full h-10 bg-white rounded-sm border-border text-[13px] focus:border-maroon focus:ring-0 focus:ring-offset-0"><SelectValue placeholder="Select new status" /></SelectTrigger>
                     <SelectContent>
                       {ORDER_STATUS_OPTIONS.map((s) => (
                         <SelectItem key={s} value={s}>
@@ -1386,17 +1311,18 @@ export default function AdminOrders() {
                 </div>
                 {newOrderStatus !== (orderToEditStatus.order.status || "pending") && (
                   <div className="flex items-center gap-3">
-                    <span className="text-sm font-medium text-gray-600 w-28">New:</span>
-                    <Badge className={`${getOrderStatusColor(newOrderStatus)} border font-semibold px-3 py-1 flex items-center gap-1`}>
-                      {getOrderStatusIcon(newOrderStatus)} {newOrderStatus.toUpperCase()}
-                    </Badge>
+                    <span className="text-[13px] font-medium text-muted-foreground w-28">New:</span>
+                    <StatusChip
+                      tint={getOrderStatusColor(newOrderStatus)}
+                      label={newOrderStatus.toUpperCase()}
+                    />
                   </div>
                 )}
               </div>
             )}
             <DialogFooter className="gap-2 sm:gap-0 pt-2">
-              <Button variant="outline" onClick={() => { setEditStatusDialogOpen(false); setOrderToEditStatus(null); }} disabled={isUpdatingOrderStatus} className="border-gray-300">Cancel</Button>
-              <Button onClick={handleOrderStatusUpdate} disabled={isUpdatingOrderStatus || newOrderStatus === (orderToEditStatus?.order.status || "pending")} className="gap-2 bg-gradient-to-r from-blue-600 to-blue-700">
+              <Button variant="outline" onClick={() => { setEditStatusDialogOpen(false); setOrderToEditStatus(null); }} disabled={isUpdatingOrderStatus}>Cancel</Button>
+              <Button onClick={handleOrderStatusUpdate} disabled={isUpdatingOrderStatus || newOrderStatus === (orderToEditStatus?.order.status || "pending")} className="gap-2 bg-maroon text-ivory uppercase text-[11px] tracking-[0.12em] rounded-sm hover:bg-terracotta">
                 {isUpdatingOrderStatus ? (<><Loader2 className="h-4 w-4 animate-spin" /> Updating...</>) : (<><CheckCircle className="h-4 w-4" /> Update Status</>)}
               </Button>
             </DialogFooter>
@@ -1407,40 +1333,40 @@ export default function AdminOrders() {
         <Dialog open={editPaymentDialogOpen} onOpenChange={setEditPaymentDialogOpen}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle className="flex items-center gap-2.5 text-xl">
-                <div className="p-2 bg-green-100 rounded-lg"><Wallet className="h-5 w-5 text-green-600" /></div>
+              <DialogTitle className="flex items-center gap-2.5 font-serif text-xl font-medium text-espresso">
+                <div className="p-2 bg-maroon/10 rounded-md"><Wallet className="h-5 w-5 text-maroon" /></div>
                 Update Payment Status
               </DialogTitle>
-              <DialogDescription className="pt-3 text-gray-600">
-                Change payment for <span className="font-bold text-gray-900">Order #{orderToEditPayment?.order.id}</span>
+              <DialogDescription className="pt-3 text-muted-foreground">
+                Change payment for <span className="font-semibold text-espresso">Order #{orderToEditPayment?.order.id}</span>
               </DialogDescription>
             </DialogHeader>
             {orderToEditPayment && (
               <div className="space-y-5">
-                <div className="p-4 bg-green-50 rounded-xl border border-green-100">
+                <div className="p-4 bg-[#FBF8F3] rounded-md border border-border">
                   <div className="flex items-center gap-3">
                     <Avatar className="h-10 w-10">
-                      <AvatarFallback className="bg-gradient-to-br from-green-500 to-green-700 text-white font-bold text-sm">
+                      <AvatarFallback className="bg-maroon text-ivory font-semibold text-sm">
                         {getInitials(orderToEditPayment.customer_name)}
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <p className="font-bold text-gray-900 text-sm">Order #{orderToEditPayment.order.id}</p>
-                      <p className="text-xs text-gray-600">{orderToEditPayment.customer_name} • {formatCurrency(orderToEditPayment.total_with_gst)}</p>
+                      <p className="font-semibold text-espresso text-sm">Order #{orderToEditPayment.order.id}</p>
+                      <p className="text-xs text-muted-foreground">{orderToEditPayment.customer_name} • {formatCurrency(orderToEditPayment.total_with_gst)}</p>
                     </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="text-sm font-medium text-gray-600 w-28">Current:</span>
-                  <Badge className={`${getPaymentStatusColor(orderToEditPayment.order.payment_status)} border font-semibold px-3 py-1 flex items-center gap-1`}>
-                    {getPaymentStatusIcon(orderToEditPayment.order.payment_status)}
-                    {(orderToEditPayment.order.payment_status || "unpaid").toUpperCase()}
-                  </Badge>
+                  <span className="text-[13px] font-medium text-muted-foreground w-28">Current:</span>
+                  <StatusChip
+                    tint={getPaymentStatusColor(orderToEditPayment.order.payment_status)}
+                    label={(orderToEditPayment.order.payment_status || "unpaid").toUpperCase()}
+                  />
                 </div>
                 <div>
-                  <label className="text-sm font-semibold text-gray-700 mb-2 block">New Payment Status</label>
+                  <label className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso mb-2 block">New Payment Status</label>
                   <Select value={newPaymentStatus} onValueChange={setNewPaymentStatus}>
-                    <SelectTrigger className="w-full h-11 border-gray-300"><SelectValue placeholder="Select payment status" /></SelectTrigger>
+                    <SelectTrigger className="w-full h-10 bg-white rounded-sm border-border text-[13px] focus:border-maroon focus:ring-0 focus:ring-offset-0"><SelectValue placeholder="Select payment status" /></SelectTrigger>
                     <SelectContent>
                       {PAYMENT_STATUS_OPTIONS.map((s) => (
                         <SelectItem key={s} value={s}>
@@ -1452,29 +1378,30 @@ export default function AdminOrders() {
                 </div>
                 {newPaymentStatus !== (orderToEditPayment.order.payment_status || "unpaid") && (
                   <div className="flex items-center gap-3">
-                    <span className="text-sm font-medium text-gray-600 w-28">New:</span>
-                    <Badge className={`${getPaymentStatusColor(newPaymentStatus)} border font-semibold px-3 py-1 flex items-center gap-1`}>
-                      {getPaymentStatusIcon(newPaymentStatus)} {newPaymentStatus.toUpperCase()}
-                    </Badge>
+                    <span className="text-[13px] font-medium text-muted-foreground w-28">New:</span>
+                    <StatusChip
+                      tint={getPaymentStatusColor(newPaymentStatus)}
+                      label={newPaymentStatus.toUpperCase()}
+                    />
                   </div>
                 )}
-                <div className="p-3 bg-amber-50 rounded-lg border border-amber-100">
+                <div className="p-3 bg-[#FBF8F3] rounded-md border border-border">
                   <div className="flex items-center gap-2 mb-1">
-                    <AlertCircle className="h-4 w-4 text-amber-600" />
-                    <p className="text-sm font-semibold text-amber-800">Order Summary</p>
+                    <AlertCircle className="h-4 w-4 text-maroon" />
+                    <p className="text-[13px] font-semibold text-espresso">Order Summary</p>
                   </div>
                   <div className="ml-6 space-y-1">
-                    <p className="text-sm text-amber-700">Subtotal: <span className="font-bold">{formatCurrency(orderToEditPayment.subtotal)}</span></p>
-                    <p className="text-sm text-amber-700">GST: <span className="font-bold">{formatCurrency(orderToEditPayment.gst_18_percent)}</span></p>
-                    <p className="text-sm text-amber-700">Total: <span className="font-bold">{formatCurrency(orderToEditPayment.total_with_gst)}</span></p>
-                    <p className="text-sm text-amber-700">Method: <span className="font-bold">{getPaymentMethodLabel(orderToEditPayment.order.payment_method)}</span></p>
+                    <p className="text-[13px] text-muted-foreground">Subtotal: <span className="font-semibold text-espresso">{formatCurrency(orderToEditPayment.subtotal)}</span></p>
+                    <p className="text-[13px] text-muted-foreground">GST: <span className="font-semibold text-espresso">{formatCurrency(orderToEditPayment.gst_18_percent)}</span></p>
+                    <p className="text-[13px] text-muted-foreground">Total: <span className="font-semibold text-espresso">{formatCurrency(orderToEditPayment.total_with_gst)}</span></p>
+                    <p className="text-[13px] text-muted-foreground">Method: <span className="font-semibold text-espresso">{getPaymentMethodLabel(orderToEditPayment.order.payment_method)}</span></p>
                   </div>
                 </div>
               </div>
             )}
             <DialogFooter className="gap-2 sm:gap-0 pt-2">
-              <Button variant="outline" onClick={() => { setEditPaymentDialogOpen(false); setOrderToEditPayment(null); }} disabled={isUpdatingPaymentStatus} className="border-gray-300">Cancel</Button>
-              <Button onClick={handlePaymentStatusUpdate} disabled={isUpdatingPaymentStatus || newPaymentStatus === (orderToEditPayment?.order.payment_status || "unpaid")} className="gap-2 bg-gradient-to-r from-green-600 to-green-700">
+              <Button variant="outline" onClick={() => { setEditPaymentDialogOpen(false); setOrderToEditPayment(null); }} disabled={isUpdatingPaymentStatus}>Cancel</Button>
+              <Button onClick={handlePaymentStatusUpdate} disabled={isUpdatingPaymentStatus || newPaymentStatus === (orderToEditPayment?.order.payment_status || "unpaid")} className="gap-2 bg-maroon text-ivory uppercase text-[11px] tracking-[0.12em] rounded-sm hover:bg-terracotta">
                 {isUpdatingPaymentStatus ? (<><Loader2 className="h-4 w-4 animate-spin" /> Updating...</>) : (<><Wallet className="h-4 w-4" /> Update Payment</>)}
               </Button>
             </DialogFooter>
@@ -1485,25 +1412,25 @@ export default function AdminOrders() {
         <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle className="flex items-center gap-2.5 text-xl">
-                <div className="p-2 bg-red-100 rounded-lg"><Trash2 className="h-5 w-5 text-red-600" /></div>
+              <DialogTitle className="flex items-center gap-2.5 font-serif text-xl font-medium text-espresso">
+                <div className="p-2 bg-sale/10 rounded-md"><Trash2 className="h-5 w-5 text-sale" /></div>
                 Delete Order
               </DialogTitle>
-              <DialogDescription className="pt-3 text-gray-600">
-                Are you sure you want to delete <span className="font-bold text-gray-900">Order #{orderToDelete?.order.id}</span>? This cannot be undone.
+              <DialogDescription className="pt-3 text-muted-foreground">
+                Are you sure you want to delete <span className="font-semibold text-espresso">Order #{orderToDelete?.order.id}</span>? This cannot be undone.
               </DialogDescription>
             </DialogHeader>
             {orderToDelete && (
-              <div className="p-4 bg-red-50 rounded-xl border border-red-100 my-2">
+              <div className="p-4 bg-sale/5 rounded-md border border-sale/20 my-2">
                 <div className="flex items-center gap-3">
                   <Avatar className="h-10 w-10">
-                    <AvatarFallback className="bg-gradient-to-br from-red-400 to-red-600 text-white font-bold text-sm">
+                    <AvatarFallback className="bg-sale/10 text-sale font-semibold text-sm">
                       {getInitials(orderToDelete.customer_name)}
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="font-bold text-gray-900 text-sm">Order #{orderToDelete.order.id}</p>
-                    <p className="text-xs text-gray-600">
+                    <p className="font-semibold text-espresso text-sm">Order #{orderToDelete.order.id}</p>
+                    <p className="text-xs text-muted-foreground">
                       {orderToDelete.customer_name} • {formatCurrency(orderToDelete.total_with_gst)} • {orderToDelete.items_count} items
                     </p>
                   </div>
@@ -1511,8 +1438,8 @@ export default function AdminOrders() {
               </div>
             )}
             <DialogFooter className="gap-2 sm:gap-0">
-              <Button variant="outline" onClick={() => { setDeleteDialogOpen(false); setOrderToDelete(null); }} disabled={isDeleting} className="border-gray-300">Cancel</Button>
-              <Button variant="destructive" onClick={handleDeleteOrder} disabled={isDeleting} className="gap-2 bg-gradient-to-r from-red-600 to-red-700">
+              <Button variant="outline" onClick={() => { setDeleteDialogOpen(false); setOrderToDelete(null); }} disabled={isDeleting}>Cancel</Button>
+              <Button variant="destructive" onClick={handleDeleteOrder} disabled={isDeleting} className="gap-2 bg-sale text-ivory uppercase text-[11px] tracking-[0.12em] rounded-sm hover:bg-sale/90">
                 {isDeleting ? (<><Loader2 className="h-4 w-4 animate-spin" /> Deleting...</>) : (<><Trash2 className="h-4 w-4" /> Delete Order</>)}
               </Button>
             </DialogFooter>

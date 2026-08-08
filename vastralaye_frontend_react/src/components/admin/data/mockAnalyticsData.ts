@@ -1,5 +1,12 @@
+// ------------------------------------------------------------------
+// FALLBACK DATA ONLY.
+// The admin dashboard & analytics pages fetch live numbers from the
+// backend (/admin/admin_stats, /admin/analytics/*). These samples are
+// rendered only when a live endpoint is unreachable, so the pages
+// never break. Do not treat these values as real store data.
+// ------------------------------------------------------------------
 
-// Mock sales data
+// Sample monthly sales/orders
 export const monthlySales = [
   { month: 'Jan', sales: 4000, orders: 24 },
   { month: 'Feb', sales: 3000, orders: 18 },
@@ -15,22 +22,22 @@ export const monthlySales = [
   { month: 'Dec', sales: 20000, orders: 95 },
 ];
 
-// Mock category sales data
+// Sample category share
 export const categorySales = [
-  { name: 'T-Shirts', value: 18000 },
-  { name: 'Hoodies', value: 15000 },
-  { name: 'Jeans', value: 12000 },
-  { name: 'Accessories', value: 8000 },
-  { name: 'Shoes', value: 10000 },
+  { name: 'Sarees', value: 18000 },
+  { name: 'Suit Sets', value: 15000 },
+  { name: 'Kurtas', value: 12000 },
+  { name: 'Men', value: 10000 },
+  { name: 'Kids & Other', value: 8000 },
 ];
 
-// Mock customer data
+// Sample customer split
 export const customerData = [
   { name: 'New Customers', value: 120 },
   { name: 'Returning Customers', value: 85 },
 ];
 
-// Mock daily sales for the last week
+// Sample daily sales for the last week
 export const dailySales = [
   { day: 'Monday', sales: 1200 },
   { day: 'Tuesday', sales: 1400 },
@@ -41,4 +48,5 @@ export const dailySales = [
   { day: 'Sunday', sales: 1800 },
 ];
 
-export const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
+// Admin chart series palette (admin_design.md §3.5) — fixed order, never cycled
+export const COLORS = ['#7A1F2B', '#C99A45', '#5C6B8A', '#3E6B4F', '#B85C38'];

@@ -146,7 +146,7 @@ const NavBar = () => {
   const featuredCategories = categories.slice(0, 6);
 
   return (
-    <header className={`sticky top-0 z-50 bg-white border-b transition-all ${isScrolled ? "shadow-md" : "shadow-sm"}`}>
+    <header className={`sticky top-0 z-50 bg-white border-b border-border transition-all ${isScrolled ? "shadow-sm" : "shadow-none"}`}>
       {/* ANNOUNCEMENT BAR */}
       <div className="bg-maroon text-ivory text-center text-[11px] md:text-xs uppercase tracking-[0.18em] py-2 px-4">
         Free shipping on orders above ₹999 · <span className="text-gold font-semibold">Easy 7-day returns</span> · Handcrafted in India
@@ -154,26 +154,25 @@ const NavBar = () => {
       {/* HEADER */}
       <div className="container flex items-center h-16 px-4">
         {/* LOGO */}
-       <Link to="/" className="flex items-center gap-2">
-  <img
-    src={logo}
-    alt="mizorpaymart logo"
-    className="
-      w-40 sm:w-36 md:w-44 lg:w-52
-      h-auto
-      object-contain
-    "
-  />
-</Link>
+        <Link to="/" className="flex flex-col items-start shrink-0">
+          <img
+            src={logo}
+            alt="Vastralaye logo"
+            className="w-40 sm:w-36 md:w-44 lg:w-52 h-auto object-contain"
+          />
+          <span className="text-[9px] uppercase tracking-[0.42em] text-gold font-medium leading-none mt-1">
+            Handcrafted India
+          </span>
+        </Link>
 
 
         {/* DESKTOP NAV */}
-        <nav className="hidden lg:flex items-center gap-2 ml-8">
-          <Link 
-            to="/" 
-            className="flex items-center gap-2 px-4 py-2 hover:bg-gray-50 rounded-md text-sm font-medium text-gray-700 transition-colors"
+        <nav className="hidden lg:flex items-center gap-7 ml-10">
+          <Link
+            to="/"
+            className="py-2 text-[13px] uppercase tracking-[0.1em] font-medium text-espresso border-b-2 border-transparent hover:border-gold transition-colors"
           >
-            <Home className="w-4 h-4" /> Home
+            Home
           </Link>
 
           {/* DESKTOP MEGA MENU */}
@@ -181,62 +180,57 @@ const NavBar = () => {
             <button
               ref={triggerRef}
               onMouseEnter={() => setMegaMenuOpen(true)}
-              className="flex items-center gap-1 px-4 py-2 hover:bg-gray-50 rounded-md text-sm font-medium text-gray-700 transition-colors"
+              className={`flex items-center gap-1 py-2 text-[13px] uppercase tracking-[0.1em] font-medium text-espresso border-b-2 transition-colors ${megaMenuOpen ? "border-gold" : "border-transparent hover:border-gold"}`}
             >
               Shop
-              <ChevronDown className={`w-4 h-4 transition ${megaMenuOpen ? "rotate-180" : ""}`} />
+              <ChevronDown className={`w-3.5 h-3.5 transition ${megaMenuOpen ? "rotate-180" : ""}`} strokeWidth={1.5} />
             </button>
 
             {megaMenuOpen && (
               <div
                 ref={megaRef}
-                className="absolute top-full left-0 w-96 bg-white border border-gray-200 shadow-lg rounded-lg p-4"
+                className="absolute top-full left-0 w-96 bg-white border border-border shadow-lg rounded-sm p-5"
                 onMouseLeave={() => setMegaMenuOpen(false)}
               >
                 <div className="space-y-4">
                   {/* POPULAR CATEGORIES */}
                   <div>
-                    <h3 className="font-semibold mb-3 text-gray-900">Popular Categories</h3>
-                    <div className="space-y-2">
+                    <h3 className="text-xs uppercase tracking-[0.22em] text-gold font-semibold mb-3">Popular Categories</h3>
+                    <div className="space-y-1">
                       {popularCategories.map((cat) => (
                         <Link
                           key={cat.id}
                           to={`/category/${cat.slug}`}
-                          className="flex items-center justify-between p-2 rounded hover:bg-gray-50 group"
+                          className="flex items-center justify-between px-1 py-1.5 group"
                         >
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 bg-[#5E9F50] bg-opacity-10 rounded flex items-center justify-center">
-                              <Tag className="w-4 h-4 text-[#5E9F50]" />
-                            </div>
-                            <span className="text-gray-700 group-hover:text-[#E97A48] transition-colors">
-                              {cat.name}
-                            </span>
-                          </div>
-                          <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-[#E97A48] transition-colors" />
+                          <span className="text-[13px] text-espresso group-hover:text-maroon transition-colors">
+                            {cat.name}
+                          </span>
+                          <ArrowRight className="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 group-hover:text-maroon transition-all" strokeWidth={1.5} />
                         </Link>
                       ))}
                     </div>
                   </div>
 
                   {/* FEATURED */}
-                  <div className="pt-4 border-t">
-                    <h3 className="font-semibold mb-3 text-gray-900">Featured</h3>
+                  <div className="pt-4 border-t border-border">
+                    <h3 className="text-xs uppercase tracking-[0.22em] text-gold font-semibold mb-3">Featured</h3>
                     <div className="grid grid-cols-2 gap-2">
                       <Link
                         to="/new-arrivals"
-                        className="flex items-center gap-2 p-2 rounded hover:bg-gray-50 group"
+                        className="flex items-center gap-2 px-1 py-1.5 group"
                       >
-                        <Sparkles className="w-4 h-4 text-[#E97A48]" />
-                        <span className="text-sm text-gray-700 group-hover:text-[#E97A48] transition-colors">
+                        <Sparkles className="w-4 h-4 text-gold" strokeWidth={1.5} />
+                        <span className="text-[13px] text-espresso group-hover:text-maroon transition-colors">
                           New Arrivals
                         </span>
                       </Link>
                       <Link
                         to="/best-sellers"
-                        className="flex items-center gap-2 p-2 rounded hover:bg-gray-50 group"
+                        className="flex items-center gap-2 px-1 py-1.5 group"
                       >
-                        <Package className="w-4 h-4 text-[#5E9F50]" />
-                        <span className="text-sm text-gray-700 group-hover:text-[#5E9F50] transition-colors">
+                        <Package className="w-4 h-4 text-terracotta" strokeWidth={1.5} />
+                        <span className="text-[13px] text-espresso group-hover:text-maroon transition-colors">
                           Best Sellers
                         </span>
                       </Link>
@@ -248,15 +242,15 @@ const NavBar = () => {
           </div>
 
           {/* ALL CATEGORIES LINK */}
-          <Link 
-            to="/categories" 
-            className="px-4 py-2 hover:bg-gray-50 rounded-md text-sm font-medium text-gray-700 transition-colors"
+          <Link
+            to="/categories"
+            className="py-2 text-[13px] uppercase tracking-[0.1em] font-medium text-espresso border-b-2 border-transparent hover:border-gold transition-colors"
           >
             All Categories
           </Link>
-              <Link 
-            to="/products" 
-            className="px-4 py-2 hover:bg-gray-50 rounded-md text-sm font-medium text-gray-700 transition-colors"
+          <Link
+            to="/products"
+            className="py-2 text-[13px] uppercase tracking-[0.1em] font-medium text-espresso border-b-2 border-transparent hover:border-gold transition-colors"
           >
             All Products
           </Link>
@@ -266,17 +260,17 @@ const NavBar = () => {
         <div className="hidden lg:flex mx-6 flex-1 max-w-md">
           <form onSubmit={handleSearch} className="flex w-full">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" strokeWidth={1.5} />
               <Input
                 placeholder="Search products..."
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
-                className="pl-10 pr-4 py-2 w-full border-r-0 rounded-r-none focus-visible:ring-1 focus-visible:ring-[#E97A48]"
+                className="pl-10 pr-4 py-2 w-full bg-white border-border border-r-0 rounded-sm rounded-r-none focus-visible:ring-1 focus-visible:ring-maroon focus-visible:ring-offset-0 focus-visible:border-maroon"
               />
             </div>
-            <Button 
-              type="submit" 
-              className="bg-[#5E9F50] hover:bg-[#4d8f40] text-white rounded-l-none px-6"
+            <Button
+              type="submit"
+              className="bg-maroon hover:bg-terracotta text-ivory text-[13px] uppercase tracking-[0.1em] rounded-sm rounded-l-none px-6"
             >
               Search
             </Button>
@@ -290,17 +284,17 @@ const NavBar = () => {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="flex items-center gap-2 px-3 py-2">
-                  <div className="w-8 h-8 rounded-full bg-[#5E9F50] bg-opacity-10 text-[#5E9F50] flex items-center justify-center border border-[#5E9F50] border-opacity-20">
+                  <div className="w-8 h-8 rounded-full bg-blush text-maroon flex items-center justify-center border border-maroon/20 font-serif font-semibold">
                     {currentUser?.first_name?.charAt(0)}
                   </div>
-                  <span className="text-sm font-medium text-gray-700">{currentUser?.first_name}</span>
+                  <span className="text-[13px] font-medium text-espresso">{currentUser?.first_name}</span>
                 </Button>
               </DropdownMenuTrigger>
 
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuLabel className="flex flex-col gap-1">
-                  <div className="font-semibold text-gray-900">{currentUser?.first_name} {currentUser?.last_name}</div>
-                  <div className="text-xs text-gray-500">{currentUser?.email}</div>
+                  <div className="font-semibold text-espresso">{currentUser?.first_name} {currentUser?.last_name}</div>
+                  <div className="text-xs text-muted-foreground">{currentUser?.email}</div>
                 </DropdownMenuLabel>
 
                 <DropdownMenuSeparator />
@@ -308,8 +302,8 @@ const NavBar = () => {
                 {currentUser?.role === "user" && (
                   <DropdownMenuItem asChild>
                     <Link to="/account/profile" className="flex items-center gap-2 cursor-pointer">
-                      <User className="w-4 h-4" /> 
-                      <span className="text-gray-700">My Profile</span>
+                      <User className="w-4 h-4" strokeWidth={1.5} />
+                      <span className="text-espresso">My Profile</span>
                     </Link>
                   </DropdownMenuItem>
                 )}
@@ -317,8 +311,8 @@ const NavBar = () => {
                 {currentUser?.role === "admin" && (
                   <DropdownMenuItem asChild>
                     <Link to="/admin" className="flex items-center gap-2 cursor-pointer">
-                      <Crown className="w-4 h-4 text-amber-500" /> 
-                      <span className="text-gray-700">Admin Panel</span>
+                      <Crown className="w-4 h-4 text-gold" strokeWidth={1.5} />
+                      <span className="text-espresso">Admin Panel</span>
                     </Link>
                   </DropdownMenuItem>
                 )}
@@ -327,28 +321,28 @@ const NavBar = () => {
 
                 <DropdownMenuItem 
                   onClick={handleLogout} 
-                  className="flex items-center gap-2 cursor-pointer text-red-600 hover:text-red-700"
+                  className="flex items-center gap-2 cursor-pointer text-sale focus:text-sale"
                 >
-                  <LogOut className="w-4 h-4" /> 
+                  <LogOut className="w-4 h-4" strokeWidth={1.5} />
                   <span>Logout</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
             <Link to="/login">
-              <Button variant="ghost" className="flex items-center gap-2 px-4 py-2">
-                <User className="w-4 h-4" /> 
-                <span className="text-sm font-medium text-gray-700">Sign In</span>
+              <Button variant="ghost" className="flex items-center gap-2 px-4 py-2 text-espresso hover:text-terracotta">
+                <User className="w-4 h-4" strokeWidth={1.5} />
+                <span className="text-[13px] uppercase tracking-[0.1em] font-medium">Sign In</span>
               </Button>
             </Link>
           )}
 
           {/* WISHLIST */}
           <Link to="/wishlist">
-            <Button variant="ghost" size="icon" className="relative">
-              <Heart className="w-5 h-5 text-gray-700" />
+            <Button variant="ghost" size="icon" className="relative text-espresso hover:text-terracotta">
+              <Heart className="w-5 h-5" strokeWidth={1.5} />
               {totalWishlist > 0 && (
-                <span className="absolute -top-1 -right-1 bg-[#E97A48] text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 bg-maroon text-ivory text-[10px] font-semibold rounded-full h-4 w-4 flex items-center justify-center">
                   {totalWishlist}
                 </span>
               )}
@@ -357,10 +351,10 @@ const NavBar = () => {
 
           {/* CART */}
           <Link to="/cart">
-            <Button variant="ghost" size="icon" className="relative">
-              <ShoppingCart className="w-5 h-5 text-gray-700" />
+            <Button variant="ghost" size="icon" className="relative text-espresso hover:text-terracotta">
+              <ShoppingCart className="w-5 h-5" strokeWidth={1.5} />
               {totalItems > 0 && (
-                <span className="absolute -top-1 -right-1 bg-[#5E9F50] text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 bg-maroon text-ivory text-[10px] font-semibold rounded-full h-4 w-4 flex items-center justify-center">
                   {totalItems}
                 </span>
               )}
@@ -371,16 +365,16 @@ const NavBar = () => {
         {/* ================= MOBILE ICONS ================= */}
         <div className="ml-auto flex items-center gap-2 lg:hidden">
           {/* Search Button */}
-          <Button variant="ghost" size="icon" onClick={() => setIsSearchOpen(!isSearchOpen)}>
-            <Search className="w-5 h-5 text-gray-700" />
+          <Button variant="ghost" size="icon" onClick={() => setIsSearchOpen(!isSearchOpen)} className="text-espresso hover:text-terracotta">
+            <Search className="w-5 h-5" strokeWidth={1.5} />
           </Button>
 
           {/* Wishlist */}
           <Link to="/wishlist">
-            <Button variant="ghost" size="icon" className="relative">
-              <Heart className="w-5 h-5 text-gray-700" />
+            <Button variant="ghost" size="icon" className="relative text-espresso hover:text-terracotta">
+              <Heart className="w-5 h-5" strokeWidth={1.5} />
               {totalWishlist > 0 && (
-                <span className="absolute -top-1 -right-1 bg-[#E97A48] text-white text-[10px] rounded-full h-4 w-4 flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 bg-maroon text-ivory text-[10px] font-semibold rounded-full h-4 w-4 flex items-center justify-center">
                   {totalWishlist}
                 </span>
               )}
@@ -389,10 +383,10 @@ const NavBar = () => {
 
           {/* Cart */}
           <Link to="/cart">
-            <Button variant="ghost" size="icon" className="relative">
-              <ShoppingCart className="w-5 h-5 text-gray-700" />
+            <Button variant="ghost" size="icon" className="relative text-espresso hover:text-terracotta">
+              <ShoppingCart className="w-5 h-5" strokeWidth={1.5} />
               {totalItems > 0 && (
-                <span className="absolute -top-1 -right-1 bg-[#5E9F50] text-white text-[10px] rounded-full h-4 w-4 flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 bg-maroon text-ivory text-[10px] font-semibold rounded-full h-4 w-4 flex items-center justify-center">
                   {totalItems}
                 </span>
               )}
@@ -400,34 +394,34 @@ const NavBar = () => {
           </Link>
 
           {/* Mobile Menu */}
-          <Button variant="ghost" size="icon" onClick={openMobileMenu} className="ml-1">
-            <Menu className="w-5 h-5 text-gray-700" />
+          <Button variant="ghost" size="icon" onClick={openMobileMenu} className="ml-1 text-espresso hover:text-terracotta">
+            <Menu className="w-5 h-5" strokeWidth={1.5} />
           </Button>
         </div>
       </div>
 
       {/* MOBILE SEARCH BAR */}
       {isSearchOpen && (
-        <div className="lg:hidden bg-white border-b px-4 py-3">
+        <div className="lg:hidden bg-white border-b border-border px-4 py-3">
           <form onSubmit={handleSearch} className="flex items-center gap-2">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" strokeWidth={1.5} />
               <Input
                 placeholder="Search products..."
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
                 autoFocus
-                className="pl-10 pr-4 py-2 w-full"
+                className="pl-10 pr-4 py-2 w-full bg-white border-border rounded-sm focus-visible:ring-1 focus-visible:ring-maroon focus-visible:ring-offset-0 focus-visible:border-maroon"
               />
             </div>
-            <Button 
-              type="submit" 
-              className="bg-[#5E9F50] hover:bg-[#4d8f40] text-white"
+            <Button
+              type="submit"
+              className="bg-maroon hover:bg-terracotta text-ivory text-[13px] uppercase tracking-[0.1em] rounded-sm"
             >
               Go
             </Button>
-            <Button variant="ghost" size="icon" onClick={() => setIsSearchOpen(false)}>
-              <X className="w-4 h-4" />
+            <Button variant="ghost" size="icon" onClick={() => setIsSearchOpen(false)} className="text-espresso hover:text-terracotta">
+              <X className="w-4 h-4" strokeWidth={1.5} />
             </Button>
           </form>
         </div>
@@ -449,26 +443,26 @@ const NavBar = () => {
           ${isMobileMenuOpen ? "translate-x-0" : "translate-x-full"}`}
       >
         {/* HEADER */}
-        <div className="flex items-center justify-between p-4 border-b">
+        <div className="flex items-center justify-between p-4 border-b border-border">
           <div className="flex items-center gap-3">
             {isLoggedIn && (
-              <div className="w-10 h-10 rounded-full bg-[#5E9F50] bg-opacity-10 text-[#5E9F50] flex items-center justify-center border border-[#5E9F50] border-opacity-20 font-semibold">
+              <div className="w-10 h-10 rounded-full bg-blush text-maroon flex items-center justify-center border border-maroon/20 font-serif font-semibold">
                 {currentUser?.first_name?.charAt(0)}
               </div>
             )}
             <div>
               {isLoggedIn ? (
                 <>
-                  <div className="font-semibold text-gray-900">{currentUser?.first_name}</div>
-                  <div className="text-xs text-gray-500">Account</div>
+                  <div className="font-serif font-semibold text-espresso">{currentUser?.first_name}</div>
+                  <div className="text-xs text-muted-foreground">Account</div>
                 </>
               ) : (
-                <div className="font-semibold text-gray-900">Menu</div>
+                <div className="font-serif font-semibold text-espresso">Menu</div>
               )}
             </div>
           </div>
-          <Button variant="ghost" size="icon" onClick={closeMobileMenu} className="h-8 w-8">
-            <X className="w-4 h-4" />
+          <Button variant="ghost" size="icon" onClick={closeMobileMenu} className="h-8 w-8 text-espresso hover:text-terracotta">
+            <X className="w-4 h-4" strokeWidth={1.5} />
           </Button>
         </div>
 
@@ -477,32 +471,32 @@ const NavBar = () => {
           {/* HOME */}
           <Link
             to="/"
-            className="flex items-center gap-3 px-3 py-3 rounded-md hover:bg-gray-50 text-gray-700"
+            className="flex items-center gap-3 px-3 py-3 rounded-sm hover:bg-ivory text-espresso"
             onClick={closeMobileMenu}
           >
-            <Home className="w-5 h-5" /> 
+            <Home className="w-5 h-5" strokeWidth={1.5} />
             <span className="font-medium">Home</span>
           </Link>
 
           {/* CATEGORIES */}
           <details className="group">
-            <summary className="flex items-center justify-between px-3 py-3 cursor-pointer hover:bg-gray-50 rounded-md list-none">
+            <summary className="flex items-center justify-between px-3 py-3 cursor-pointer hover:bg-ivory rounded-sm list-none">
               <div className="flex items-center gap-3">
-                <Tag className="w-5 h-5 text-gray-700" />
-                <span className="font-medium text-gray-700">Categories</span>
+                <Tag className="w-5 h-5 text-espresso" strokeWidth={1.5} />
+                <span className="font-medium text-espresso">Categories</span>
               </div>
-              <ChevronDown className="w-5 h-5 text-gray-600 transition-transform duration-300 group-open:rotate-180" />
+              <ChevronDown className="w-5 h-5 text-muted-foreground transition-transform duration-300 group-open:rotate-180" strokeWidth={1.5} />
             </summary>
             <div className="pl-8 pr-3 py-2 space-y-1">
               {categories.map((cat) => (
                 <Link
                   key={cat.id}
                   to={`/category/${cat.slug}`}
-                  className="flex items-center justify-between px-3 py-2 rounded-md hover:bg-gray-100 text-gray-600"
+                  className="flex items-center justify-between px-3 py-2 rounded-sm hover:bg-ivory text-[13px] text-espresso hover:text-maroon transition-colors"
                   onClick={closeMobileMenu}
                 >
                   <span>{cat.name}</span>
-                  <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded">
+                  <span className="text-xs text-muted-foreground">
                     {cat.subcategories?.length || 0}
                   </span>
                 </Link>
@@ -512,48 +506,48 @@ const NavBar = () => {
 
           <Link
             to="/products"
-            className="flex items-center gap-3 px-3 py-3 rounded-md hover:bg-gray-50 text-gray-700"
+            className="flex items-center gap-3 px-3 py-3 rounded-sm hover:bg-ivory text-espresso"
             onClick={closeMobileMenu}
           >
-            <Package className="w-5 h-5" /> 
+            <Package className="w-5 h-5" strokeWidth={1.5} />
             <span className="font-medium">Products</span>
           </Link>
 
           {/* NEW ARRIVALS */}
           <Link
             to="/new-arrivals"
-            className="flex items-center gap-3 px-3 py-3 rounded-md hover:bg-gray-50 text-gray-700"
+            className="flex items-center gap-3 px-3 py-3 rounded-sm hover:bg-ivory text-espresso"
             onClick={closeMobileMenu}
           >
-            <Sparkles className="w-5 h-5 text-[#E97A48]" /> 
+            <Sparkles className="w-5 h-5 text-gold" strokeWidth={1.5} />
             <span className="font-medium">New Arrivals</span>
           </Link>
 
           {/* BEST SELLERS */}
           <Link
             to="/best-sellers"
-            className="flex items-center gap-3 px-3 py-3 rounded-md hover:bg-gray-50 text-gray-700"
+            className="flex items-center gap-3 px-3 py-3 rounded-sm hover:bg-ivory text-espresso"
             onClick={closeMobileMenu}
           >
-            <Package className="w-5 h-5 text-[#5E9F50]" /> 
+            <Package className="w-5 h-5 text-terracotta" strokeWidth={1.5} />
             <span className="font-medium">Best Sellers</span>
           </Link>
 
-          <div className="h-px bg-gray-200 my-3"></div>
+          <div className="h-px bg-border my-3"></div>
 
           {/* AUTH SECTION */}
           {!isLoggedIn ? (
             <>
               <Link
                 to="/login"
-                className="block w-full text-center bg-[#5E9F50] hover:bg-[#4d8f40] text-white py-3 rounded-md font-medium"
+                className="block w-full text-center bg-maroon hover:bg-terracotta text-ivory py-3 rounded-sm text-[13px] uppercase tracking-[0.1em] font-medium transition-colors"
                 onClick={closeMobileMenu}
               >
                 Sign In
               </Link>
               <Link
                 to="/register"
-                className="block w-full text-center border border-[#5E9F50] text-[#5E9F50] hover:bg-[#5E9F50] hover:text-white py-3 rounded-md font-medium transition-colors"
+                className="block w-full text-center border border-espresso text-espresso hover:bg-espresso hover:text-ivory py-3 rounded-sm text-[13px] uppercase tracking-[0.1em] font-medium transition-colors"
                 onClick={closeMobileMenu}
               >
                 Create Account
@@ -563,43 +557,43 @@ const NavBar = () => {
             <>
               <Link
                 to="/account/profile"
-                className="flex items-center gap-3 px-3 py-3 rounded-md hover:bg-gray-50 text-gray-700"
+                className="flex items-center gap-3 px-3 py-3 rounded-sm hover:bg-ivory text-espresso"
                 onClick={closeMobileMenu}
               >
-                <User className="w-5 h-5" /> 
+                <User className="w-5 h-5" strokeWidth={1.5} />
                 <span className="font-medium">My Profile</span>
               </Link>
 
               <Link
                 to="/wishlist"
-                className="flex items-center justify-between px-3 py-3 rounded-md hover:bg-gray-50 text-gray-700"
+                className="flex items-center justify-between px-3 py-3 rounded-sm hover:bg-ivory text-espresso"
                 onClick={closeMobileMenu}
               >
                 <div className="flex items-center gap-3">
-                  <Heart className="w-5 h-5" /> 
+                  <Heart className="w-5 h-5" strokeWidth={1.5} />
                   <span className="font-medium">Wishlist</span>
                 </div>
                 {totalWishlist > 0 && (
-                  <Badge className="bg-[#E97A48] text-white">{totalWishlist}</Badge>
+                  <Badge className="bg-maroon text-ivory hover:bg-maroon">{totalWishlist}</Badge>
                 )}
               </Link>
 
               {currentUser?.role === "admin" && (
                 <Link
                   to="/admin"
-                  className="flex items-center gap-3 px-3 py-3 rounded-md hover:bg-gray-50 text-gray-700"
+                  className="flex items-center gap-3 px-3 py-3 rounded-sm hover:bg-ivory text-espresso"
                   onClick={closeMobileMenu}
                 >
-                  <Crown className="w-5 h-5 text-amber-500" /> 
+                  <Crown className="w-5 h-5 text-gold" strokeWidth={1.5} />
                   <span className="font-medium">Admin Panel</span>
                 </Link>
               )}
 
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-3 px-3 py-3 w-full text-left text-red-600 hover:bg-red-50 rounded-md"
+                className="flex items-center gap-3 px-3 py-3 w-full text-left text-sale hover:bg-blush rounded-sm"
               >
-                <LogOut className="w-5 h-5" /> 
+                <LogOut className="w-5 h-5" strokeWidth={1.5} />
                 <span className="font-medium">Logout</span>
               </button>
             </>

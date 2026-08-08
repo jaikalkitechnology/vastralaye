@@ -310,37 +310,38 @@ const Contact = () => {
     if (hasError) {
       return `${baseClass} border-red-300 focus:ring-red-200 bg-red-50`;
     }
-    return `${baseClass} border-gray-300 focus:ring-blue-200 focus:border-blue-500`;
+    return `${baseClass} border-border focus:ring-gold/40 focus:border-gold`;
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-ivory py-12 md:py-16 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-3xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+        <div className="text-center mb-10 md:mb-12">
+          <span className="overline-label mb-2">Contact</span>
+          <h1 className="font-serif text-3xl md:text-4xl font-medium text-espresso mb-4">
             Get in Touch
           </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-[15px] leading-relaxed text-muted-foreground max-w-2xl mx-auto">
             All fields are required. Fill out the form below and our team will get back to you within 24 hours.
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-12">
+        <div className="grid gap-8">
           {/* Contact Information */}
-          <div className="bg-white rounded-2xl shadow-lg p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-8">
+          <div className="bg-white rounded-lg border border-border p-8">
+            <h2 className="font-serif text-xl font-medium text-espresso mb-8">
               Contact Information
             </h2>
 
             <div className="space-y-6 pb-5">
               <div className="flex items-start space-x-4">
-                <div className="bg-blue-50 p-3 rounded-lg">
-                  <Store className="w-6 h-6 text-blue-600" />
+                <div className="bg-blush p-3 rounded-lg">
+                  <Store className="w-6 h-6 text-maroon" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900">Legal Company Name</h3>
-                  <p className="text-sm text-gray-900">
+                  <h3 className="font-medium text-espresso">Legal Company Name</h3>
+                  <p className="text-sm text-muted-foreground">
                     MIZORPAY SOLUTION<br />(OPC) PRIVATE LIMITED
                   </p>
                 </div>
@@ -350,50 +351,50 @@ const Contact = () => {
 
             <div className="space-y-6">
               <div className="flex items-start space-x-4">
-                <div className="bg-blue-50 p-3 rounded-lg">
-                  <Phone className="w-6 h-6 text-blue-600" />
+                <div className="bg-blush p-3 rounded-lg">
+                  <Phone className="w-6 h-6 text-maroon" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900">Phone Support</h3>
-                  <p className="text-gray-600">+91 85275 96413</p>
-                  <p className="text-sm text-gray-500">Mon-Fri 9am-6pm</p>
+                  <h3 className="font-medium text-espresso">Phone Support</h3>
+                  <p className="text-muted-foreground">+91 85275 96413</p>
+                  <p className="text-sm text-muted-foreground">Mon-Fri 9am-6pm</p>
                 </div>
               </div>
 
               <div className="flex items-start space-x-4">
-                <div className="bg-green-50 p-3 rounded-lg">
-                  <Mail className="w-6 h-6 text-green-600" />
+                <div className="bg-blush p-3 rounded-lg">
+                  <Mail className="w-6 h-6 text-maroon" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900">Department Emails</h3>
+                  <h3 className="font-medium text-espresso">Department Emails</h3>
                   <div className="space-y-2">
                     <div>
-                      <p className="text-xs font-medium text-gray-500 mb-1">General Inquiries</p>
-                      <a href="mailto:info@mizorpaymart.in" className="block text-sm text-gray-600 hover:text-blue-600 transition-colors">
+                      <p className="text-xs font-medium text-muted-foreground mb-1">General Inquiries</p>
+                      <a href="mailto:info@mizorpaymart.in" className="block text-sm text-muted-foreground hover:text-maroon transition-colors">
                         info@mizorpaymart.com
                       </a>
                     </div>
                     <div>
-                      <p className="text-xs font-medium text-gray-500 mb-1">Support</p>
-                      <a href="mailto:support@mizorpaymart.in" className="block text-sm text-gray-600 hover:text-blue-600 transition-colors">
+                      <p className="text-xs font-medium text-muted-foreground mb-1">Support</p>
+                      <a href="mailto:support@mizorpaymart.in" className="block text-sm text-muted-foreground hover:text-maroon transition-colors">
                         support@mizorpaymart.com
                       </a>
                     </div>
                     <div>
-                      <p className="text-xs font-medium text-gray-500 mb-1">Complaints</p>
-                      <a href="mailto:complaints@mizorpaymart.in" className="block text-sm text-gray-600 hover:text-blue-600 transition-colors">
+                      <p className="text-xs font-medium text-muted-foreground mb-1">Complaints</p>
+                      <a href="mailto:complaints@mizorpaymart.in" className="block text-sm text-muted-foreground hover:text-maroon transition-colors">
                         complaints@mizorpaymart.com
                       </a>
                     </div>
                     <div>
-                      <p className="text-xs font-medium text-gray-500 mb-1">Refunds</p>
-                      <a href="mailto:refund@mizorpaymart.in" className="block text-sm text-gray-600 hover:text-blue-600 transition-colors">
+                      <p className="text-xs font-medium text-muted-foreground mb-1">Refunds</p>
+                      <a href="mailto:refund@mizorpaymart.in" className="block text-sm text-muted-foreground hover:text-maroon transition-colors">
                         refund@mizorpaymart.com
                       </a>
                     </div>
                     <div>
-                      <p className="text-xs font-medium text-gray-500 mb-1">Legal</p>
-                      <a href="mailto:legal@mizorpaymart.in" className="block text-sm text-gray-600 hover:text-blue-600 transition-colors">
+                      <p className="text-xs font-medium text-muted-foreground mb-1">Legal</p>
+                      <a href="mailto:legal@mizorpaymart.in" className="block text-sm text-muted-foreground hover:text-maroon transition-colors">
                         legal@mizorpaymart.com
                       </a>
                     </div>
@@ -402,16 +403,16 @@ const Contact = () => {
               </div>
 
               <div className="flex items-start space-x-4">
-                <div className="bg-blue-50 p-3 rounded-lg">
-                  <MapPin className="w-6 h-6 text-blue-600" />
+                <div className="bg-blush p-3 rounded-lg">
+                  <MapPin className="w-6 h-6 text-maroon" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900">Address</h3>
-                  <p className="text-gray-600"> PLOT NO 69-71, <br />OM SHUBHAM TOWER, BP, </p> <p className="text-gray-600"> Faridabad, Faridabad, </p> <p className="text-gray-600"> Haryana – 121001 </p>
+                  <h3 className="font-medium text-espresso">Address</h3>
+                  <p className="text-muted-foreground"> PLOT NO 69-71, <br />OM SHUBHAM TOWER, BP, </p> <p className="text-muted-foreground"> Faridabad, Faridabad, </p> <p className="text-muted-foreground"> Haryana – 121001 </p>
                 </div>
               </div>
 
-              <div className="mt-6 w-full h-[300px] rounded-xl overflow-hidden border">
+              <div className="mt-6 w-full h-[300px] rounded-lg overflow-hidden border border-border">
                 <iframe
                   title="Mizorpay Mart Location"
                   src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d112306.01439054766!2d77.31907425!3d28.40226565!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390cdc15f5a424b1%3A0xe4f50576c850e0f2!2sFaridabad%2C%20Haryana!5e0!3m2!1sen!2sin!4v1769501410330!5m2!1sen!2sin"
@@ -424,28 +425,28 @@ const Contact = () => {
           </div>
 
           {/* Contact Form */}
-          <div className="bg-white rounded-2xl shadow-lg p-8">
+          <div className="bg-white rounded-lg border border-border p-8">
             {isSubmitted ? (
               <div className="text-center py-12">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-6">
-                  <CheckCircle className="w-8 h-8 text-green-600" />
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-blush rounded-full mb-6">
+                  <CheckCircle className="w-8 h-8 text-maroon" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                <h3 className="font-serif text-xl font-medium text-espresso mb-3">
                   Message Sent Successfully!
                 </h3>
-                <p className="text-gray-600 mb-4">
+                <p className="text-muted-foreground mb-4">
                   Thank you for contacting us. We'll get back to you shortly.
                 </p>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-muted-foreground">
                   Your message has been sent to: {getRelevantEmail(formData.type)}
                 </p>
               </div>
             ) : (
               <>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                <h2 className="font-serif text-xl font-medium text-espresso mb-2">
                   Send us a Message
                 </h2>
-                <p className="text-gray-500 mb-8">
+                <p className="text-muted-foreground mb-8">
                   All fields are required. Please fill in all details.
                 </p>
 
@@ -461,7 +462,7 @@ const Contact = () => {
                 <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
                   {/* Name */}
                   <div>
-                    <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                    <label className="flex items-center text-sm font-medium text-espresso mb-2">
                       <User className="w-4 h-4 mr-2" />
                       Name *
                     </label>
@@ -482,7 +483,7 @@ const Contact = () => {
                           {errors.name}
                         </p>
                       ) : (
-                        <span className="text-sm text-gray-500">
+                        <span className="text-sm text-muted-foreground">
                           {formData.name.length > 0 ? `${formData.name.length}/50` : "Required"}
                         </span>
                       )}
@@ -493,7 +494,7 @@ const Contact = () => {
                   <div className="grid md:grid-cols-2 gap-6">
                     {/* Phone */}
                     <div>
-                      <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                      <label className="flex items-center text-sm font-medium text-espresso mb-2">
                         <Phone className="w-4 h-4 mr-2" />
                         Phone Number *
                       </label>
@@ -517,7 +518,7 @@ const Contact = () => {
 
                     {/* Email */}
                     <div>
-                      <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                      <label className="flex items-center text-sm font-medium text-espresso mb-2">
                         <Mail className="w-4 h-4 mr-2" />
                         Email Address *
                       </label>
@@ -542,7 +543,7 @@ const Contact = () => {
 
                   {/* Message Type */}
                   <div>
-                    <label className="text-sm font-medium text-gray-700 mb-2 block">
+                    <label className="text-sm font-medium text-espresso mb-2 block">
                       Message Type *
                     </label>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -552,8 +553,8 @@ const Contact = () => {
                           type="button"
                           onClick={() => handleTypeSelect(type)}
                           className={`px-4 py-3 rounded-lg border transition-all text-sm ${formData.type === type
-                            ? "bg-blue-50 border-blue-500 text-blue-700"
-                            : "border-gray-300 hover:border-gray-400 hover:bg-gray-50"
+                            ? "bg-blush border-maroon text-maroon"
+                            : "border-border text-muted-foreground hover:border-gold hover:bg-ivory"
                             }`}
                         >
                           {type}
@@ -567,7 +568,7 @@ const Contact = () => {
                           {errors.type}
                         </p>
                       ) : (
-                        <span className="text-sm text-gray-500">
+                        <span className="text-sm text-muted-foreground">
                           Will be sent to: {getRelevantEmail(formData.type)}
                         </span>
                       )}
@@ -576,7 +577,7 @@ const Contact = () => {
 
                   {/* Message */}
                   <div>
-                    <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                    <label className="flex items-center text-sm font-medium text-espresso mb-2">
                       <MessageSquare className="w-4 h-4 mr-2" />
                       Message *
                     </label>
@@ -597,14 +598,14 @@ const Contact = () => {
                           {errors.message}
                         </p>
                       ) : (
-                        <span className="text-sm text-gray-500">
+                        <span className="text-sm text-muted-foreground">
                           {formData.message.length > 0 ? `${formData.message.length}/1000` : "Minimum 10 characters"}
                         </span>
                       )}
-                      <span className={`text-sm ${formData.message.length < 10 ? "text-gray-500" :
-                        formData.message.length > 800 ? "text-red-600" :
-                          formData.message.length > 500 ? "text-yellow-600" :
-                            "text-green-600"
+                      <span className={`text-sm ${formData.message.length < 10 ? "text-muted-foreground" :
+                        formData.message.length > 800 ? "text-sale" :
+                          formData.message.length > 500 ? "text-terracotta" :
+                            "text-gold"
                         }`}>
                         {formData.message.length}/1000
                       </span>
@@ -615,7 +616,7 @@ const Contact = () => {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-lg font-medium hover:from-blue-700 hover:to-blue-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shadow-md hover:shadow-lg"
+                    className="w-full bg-maroon text-ivory py-4 rounded-lg font-medium hover:bg-terracotta transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                   >
                     {isSubmitting ? (
                       <>
@@ -630,13 +631,13 @@ const Contact = () => {
                     )}
                   </button>
 
-                  <p className="text-center text-sm text-gray-500">
+                  <p className="text-center text-sm text-muted-foreground">
                     By submitting this form, you agree to our{" "}
-                    <a href="/privacy-policy" className="text-blue-600 hover:underline">
+                    <a href="/privacy-policy" className="text-maroon hover:underline">
                       Privacy Policy
                     </a>
                     {" "}and{" "}
-                    <a href="/terms-conditions" className="text-blue-600 hover:underline">
+                    <a href="/terms-conditions" className="text-maroon hover:underline">
                       Terms of Service
                     </a>
                   </p>

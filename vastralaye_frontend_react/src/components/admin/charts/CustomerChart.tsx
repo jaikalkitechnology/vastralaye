@@ -1,52 +1,38 @@
-
-import { 
-  Cell, 
-  Pie, 
-  PieChart, 
-  ResponsiveContainer, 
-  Tooltip, 
-  Legend 
-} from 'recharts';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ChartCard, CHART_SERIES, Donut } from './chartTheme';
 
 interface CustomerChartProps {
   data: {
     name: string;
     value: number;
   }[];
+  colors?: string[];
+  title?: string;
+  subtitle?: string;
+  valueFormatter?: (value: number) => string;
+  centerLabel?: string;
 }
 
-const CustomerChart = ({ data }: CustomerChartProps) => {
+const CustomerChart = ({
+  data,
+  colors = CHART_SERIES,
+  title,
+  subtitle,
+  valueFormatter,
+  centerLabel = 'customers',
+}: CustomerChartProps) => {
+  const format = valueFormatter ?? ((value: number) => new Intl.NumberFormat('en-IN').format(value));
+  const total = data.reduce((sum, d) => sum + d.value, 0);
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Customer Breakdown</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="h-[400px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={data}
-                cx="50%"
-                cy="50%"
-                labelLine={true}
-                outerRadius={120}
-                fill="#8884d8"
-                dataKey="value"
-                nameKey="name"
-                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-              >
-                <Cell fill="#0088FE" />
-                <Cell fill="#00C49F" />
-              </Pie>
-              <Tooltip />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-      </CardContent>
-    </Card>
+    <ChartCard title={title ?? 'Customer Breakdown'} subtitle={subtitle}>
+      <Donut
+        data={data}
+        colors={colors}
+        valueFormatter={format}
+        centerValue={format(total)}
+        centerLabel={centerLabel}
+      />
+    </ChartCard>
   );
 };
 

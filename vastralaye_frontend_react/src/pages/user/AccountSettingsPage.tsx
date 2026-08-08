@@ -1,38 +1,22 @@
 import { useState } from 'react';
 import { useStore } from '@/contexts/StoreContext';
 import UserLayout from '@/components/user/UserLayout';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { changePassword, deleteAccount } from '@/api/apihelper';
 import {
-  Lock,
   Bell,
   Trash2,
   Eye,
   EyeOff,
-  Shield,
   Mail,
   Gift,
   Package,
   AlertTriangle,
   CheckCircle2,
-  Key,
-  Save,
-  UserCheck,
-  Calendar,
-  ShieldAlert,
-  Sparkles,
 } from 'lucide-react';
 import {
   AlertDialog,
@@ -45,6 +29,12 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from '@/components/ui/alert-dialog';
+
+const fieldClasses =
+  'h-11 bg-white border-input rounded-sm text-[14.5px] pr-12 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-maroon';
+
+const labelClasses =
+  'block text-[11px] font-sans font-semibold uppercase tracking-[0.16em] text-espresso';
 
 const AccountSettingsPage = () => {
   const { state } = useStore();
@@ -103,15 +93,15 @@ const AccountSettingsPage = () => {
   const getPasswordStrengthColor = (strength: number) => {
     switch (strength) {
       case 1:
-        return 'from-red-500 to-red-400';
+        return 'bg-sale';
       case 2:
-        return 'from-orange-500 to-amber-400';
+        return 'bg-terracotta';
       case 3:
-        return 'from-yellow-500 to-yellow-400';
+        return 'bg-gold';
       case 4:
-        return 'from-[#7A1F2B] to-[#B85C38]';
+        return 'bg-[#3E6B4F]';
       default:
-        return 'from-gray-300 to-gray-300';
+        return 'bg-sand';
     }
   };
 
@@ -220,48 +210,32 @@ const AccountSettingsPage = () => {
 
   return (
     <UserLayout>
-      <div className="max-w-6xl mx-auto space-y-8">
-        {/* Header */}
-        <div className="space-y-2">
-          <div className="flex items-center gap-3">
-            <div className="p-3 rounded-2xl bg-gradient-to-r from-[#7A1F2B]/10 to-[#B85C38]/10">
-              <Shield className="w-8 h-8 bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] bg-clip-text text-transparent" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Account Settings</h1>
-              <p className="text-gray-600">
-                Manage your account preferences and security settings
-              </p>
-            </div>
-          </div>
+      <div className="space-y-8">
+        {/* Page header */}
+        <div>
+          <h1 className="font-serif text-3xl font-medium text-espresso md:text-4xl">Account Settings</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Manage your account preferences and security settings
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 lg:gap-8">
           {/* Main Section */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="space-y-6 lg:col-span-2">
             {/* Security Settings */}
-            <Card className="border-0 shadow-lg rounded-2xl overflow-hidden">
-              <div className="bg-gradient-to-r from-[#7A1F2B]/5 to-[#B85C38]/5 p-1">
-                <CardHeader className="bg-white">
-                  <CardTitle className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] text-white">
-                      <Key className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <h2 className="text-xl font-bold text-gray-900">Security Settings</h2>
-                      <CardDescription className="text-gray-600 mt-1">
-                        Keep your account secure with a strong password
-                      </CardDescription>
-                    </div>
-                  </CardTitle>
-                </CardHeader>
+            <div className="rounded-sm border border-border bg-white">
+              <div className="border-b border-border bg-ivory px-6 py-4">
+                <h2 className="font-serif text-lg font-medium text-espresso">Security Settings</h2>
+                <p className="mt-0.5 text-[13px] text-muted-foreground">
+                  Keep your account secure with a strong password
+                </p>
               </div>
-              <CardContent className="pt-6">
-                <form onSubmit={handleSubmitPassword} className="space-y-6">
+              <div className="p-6">
+                <form onSubmit={handleSubmitPassword} className="space-y-5">
                   {/* Current Password */}
-                  <div className="space-y-3">
-                    <Label className="text-gray-700 font-medium">Current Password</Label>
-                    <div className="relative group">
+                  <div className="space-y-2">
+                    <Label className={labelClasses}>Current Password</Label>
+                    <div className="relative">
                       <Input
                         type={showPasswords.current ? 'text' : 'password'}
                         name="currentPassword"
@@ -269,28 +243,27 @@ const AccountSettingsPage = () => {
                         onChange={handlePasswordChange}
                         required
                         placeholder="Enter your current password"
-                        className="pr-12 py-6 rounded-xl border-gray-300 focus:border-[#7A1F2B] focus:ring-[#7A1F2B] transition-all group-hover:border-gray-400"
+                        className={fieldClasses}
                       />
-                      <Button
+                      <button
                         type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8 rounded-lg hover:bg-gray-100"
+                        className="absolute right-0 top-0 flex h-full items-center px-3 text-muted-foreground hover:text-espresso"
                         onClick={() => togglePasswordVisibility('current')}
+                        aria-label={showPasswords.current ? 'Hide password' : 'Show password'}
                       >
                         {showPasswords.current ? (
-                          <EyeOff className="h-4 w-4 text-gray-500" />
+                          <EyeOff className="h-4 w-4" />
                         ) : (
-                          <Eye className="h-4 w-4 text-gray-500" />
+                          <Eye className="h-4 w-4" />
                         )}
-                      </Button>
+                      </button>
                     </div>
                   </div>
 
                   {/* New Password */}
-                  <div className="space-y-3">
-                    <Label className="text-gray-700 font-medium">New Password</Label>
-                    <div className="relative group">
+                  <div className="space-y-2">
+                    <Label className={labelClasses}>New Password</Label>
+                    <div className="relative">
                       <Input
                         type={showPasswords.new ? 'text' : 'password'}
                         name="newPassword"
@@ -298,61 +271,60 @@ const AccountSettingsPage = () => {
                         onChange={handlePasswordChange}
                         required
                         placeholder="Create a strong new password"
-                        className="pr-12 py-6 rounded-xl border-gray-300 focus:border-[#7A1F2B] focus:ring-[#7A1F2B] transition-all group-hover:border-gray-400"
+                        className={fieldClasses}
                       />
-                      <Button
+                      <button
                         type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8 rounded-lg hover:bg-gray-100"
+                        className="absolute right-0 top-0 flex h-full items-center px-3 text-muted-foreground hover:text-espresso"
                         onClick={() => togglePasswordVisibility('new')}
+                        aria-label={showPasswords.new ? 'Hide password' : 'Show password'}
                       >
                         {showPasswords.new ? (
-                          <EyeOff className="h-4 w-4 text-gray-500" />
+                          <EyeOff className="h-4 w-4" />
                         ) : (
-                          <Eye className="h-4 w-4 text-gray-500" />
+                          <Eye className="h-4 w-4" />
                         )}
-                      </Button>
+                      </button>
                     </div>
 
                     {/* Strength Bar */}
                     {passwordData.newPassword && (
-                      <div className="space-y-3 p-4 rounded-xl bg-gradient-to-r from-gray-50 to-gray-50/50 border border-gray-200">
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm font-medium text-gray-700">Password strength</span>
-                          <span className={`text-sm font-bold ${
-                            passwordStrength >= 4
-                              ? 'text-[#7A1F2B]'
-                              : passwordStrength >= 3
-                              ? 'text-amber-600'
-                              : 'text-red-500'
-                          }`}>
+                      <div className="space-y-3 rounded-sm border border-border bg-blush/60 p-4">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[12px] text-muted-foreground">Password strength</span>
+                          <span
+                            className={`text-[12px] font-medium ${
+                              passwordStrength >= 4
+                                ? 'text-[#3E6B4F]'
+                                : passwordStrength >= 3
+                                ? 'text-[#8A6414]'
+                                : 'text-sale'
+                            }`}
+                          >
                             {getPasswordStrengthText(passwordStrength)}
                           </span>
                         </div>
-                        <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
+                        <div className="h-1 w-full overflow-hidden rounded-full bg-sand">
                           <div
-                            className={`h-2 rounded-full bg-gradient-to-r ${getPasswordStrengthColor(
-                              passwordStrength
-                            )} transition-all duration-300`}
+                            className={`h-full transition-all duration-300 ${getPasswordStrengthColor(passwordStrength)}`}
                             style={{ width: `${(passwordStrength / 4) * 100}%` }}
                           ></div>
                         </div>
-                        <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
+                        <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
                           <div className="flex items-center gap-2">
-                            <div className={`w-1.5 h-1.5 rounded-full ${passwordData.newPassword.length >= 8 ? 'bg-[#7A1F2B]' : 'bg-gray-300'}`}></div>
+                            <span className={`h-1.5 w-1.5 rounded-full ${passwordData.newPassword.length >= 8 ? 'bg-gold' : 'bg-sand'}`}></span>
                             <span>8+ characters</span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <div className={`w-1.5 h-1.5 rounded-full ${/[A-Z]/.test(passwordData.newPassword) ? 'bg-[#7A1F2B]' : 'bg-gray-300'}`}></div>
+                            <span className={`h-1.5 w-1.5 rounded-full ${/[A-Z]/.test(passwordData.newPassword) ? 'bg-gold' : 'bg-sand'}`}></span>
                             <span>Uppercase letter</span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <div className={`w-1.5 h-1.5 rounded-full ${/[0-9]/.test(passwordData.newPassword) ? 'bg-[#7A1F2B]' : 'bg-gray-300'}`}></div>
+                            <span className={`h-1.5 w-1.5 rounded-full ${/[0-9]/.test(passwordData.newPassword) ? 'bg-gold' : 'bg-sand'}`}></span>
                             <span>Number</span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <div className={`w-1.5 h-1.5 rounded-full ${/[^A-Za-z0-9]/.test(passwordData.newPassword) ? 'bg-[#7A1F2B]' : 'bg-gray-300'}`}></div>
+                            <span className={`h-1.5 w-1.5 rounded-full ${/[^A-Za-z0-9]/.test(passwordData.newPassword) ? 'bg-gold' : 'bg-sand'}`}></span>
                             <span>Special character</span>
                           </div>
                         </div>
@@ -361,9 +333,9 @@ const AccountSettingsPage = () => {
                   </div>
 
                   {/* Confirm Password */}
-                  <div className="space-y-3">
-                    <Label className="text-gray-700 font-medium">Confirm New Password</Label>
-                    <div className="relative group">
+                  <div className="space-y-2">
+                    <Label className={labelClasses}>Confirm New Password</Label>
+                    <div className="relative">
                       <Input
                         type={showPasswords.confirm ? 'text' : 'password'}
                         name="confirmPassword"
@@ -371,270 +343,195 @@ const AccountSettingsPage = () => {
                         onChange={handlePasswordChange}
                         required
                         placeholder="Re-enter your new password"
-                        className="pr-12 py-6 rounded-xl border-gray-300 focus:border-[#7A1F2B] focus:ring-[#7A1F2B] transition-all group-hover:border-gray-400"
+                        className={fieldClasses}
                       />
-                      <Button
+                      <button
                         type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8 rounded-lg hover:bg-gray-100"
+                        className="absolute right-0 top-0 flex h-full items-center px-3 text-muted-foreground hover:text-espresso"
                         onClick={() => togglePasswordVisibility('confirm')}
+                        aria-label={showPasswords.confirm ? 'Hide password' : 'Show password'}
                       >
                         {showPasswords.confirm ? (
-                          <EyeOff className="h-4 w-4 text-gray-500" />
+                          <EyeOff className="h-4 w-4" />
                         ) : (
-                          <Eye className="h-4 w-4 text-gray-500" />
+                          <Eye className="h-4 w-4" />
                         )}
-                      </Button>
+                      </button>
                     </div>
                     {passwordData.confirmPassword && (
-                      <div className={`flex items-center gap-3 p-3 rounded-lg ${
-                        passwordData.newPassword === passwordData.confirmPassword
-                          ? 'bg-green-50 border border-green-100'
-                          : 'bg-red-50 border border-red-100'
-                      }`}>
+                      <div
+                        className={`flex items-center gap-3 rounded-sm border p-3 ${
+                          passwordData.newPassword === passwordData.confirmPassword
+                            ? 'border-[#3E6B4F]/30 bg-[#3E6B4F]/5'
+                            : 'border-sale/30 bg-sale/5'
+                        }`}
+                      >
                         {passwordData.newPassword === passwordData.confirmPassword ? (
                           <>
-                            <div className="p-1.5 rounded-full bg-green-100">
-                              <CheckCircle2 className="w-4 h-4 text-green-600" />
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium text-green-800">Passwords match</p>
-                              <p className="text-xs text-green-600">Your passwords are identical</p>
-                            </div>
+                            <CheckCircle2 className="h-4 w-4 flex-shrink-0 text-[#3E6B4F]" />
+                            <p className="text-[13px] text-[#3E6B4F]">Passwords match</p>
                           </>
                         ) : (
                           <>
-                            <div className="p-1.5 rounded-full bg-red-100">
-                              <AlertTriangle className="w-4 h-4 text-red-600" />
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium text-red-800">Passwords don't match</p>
-                              <p className="text-xs text-red-600">Please make sure both passwords are identical</p>
-                            </div>
+                            <AlertTriangle className="h-4 w-4 flex-shrink-0 text-sale" />
+                            <p className="text-[13px] text-sale">Passwords don't match</p>
                           </>
                         )}
                       </div>
                     )}
                   </div>
 
-                  <Button 
-                    type="submit" 
+                  <Button
+                    type="submit"
                     disabled={isLoading}
-                    className="w-full md:w-auto bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] hover:from-[#7A1F2B]/90 hover:to-[#B85C38]/90 text-white font-semibold py-6 px-8 rounded-xl shadow-md hover:shadow-lg transition-all duration-300"
+                    className="h-auto w-full rounded-sm bg-maroon px-7 py-3 text-[12px] font-medium uppercase tracking-[0.14em] text-ivory hover:bg-terracotta md:w-auto"
                   >
-                    <Save className="w-4 h-4 mr-2" />
                     {isLoading ? 'Updating Password...' : 'Update Password'}
                   </Button>
                 </form>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
             {/* Notification Preferences */}
-            {/* <Card className="border-0 shadow-lg rounded-2xl overflow-hidden">
-              <div className="bg-gradient-to-r from-blue-500/5 to-cyan-500/5 p-1">
-                <CardHeader className="bg-white">
-                  <CardTitle className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-gradient-to-r from-blue-500 to-cyan-500 text-white">
-                      <Bell className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <h2 className="text-xl font-bold text-gray-900">Notification Preferences</h2>
-                      <CardDescription className="text-gray-600 mt-1">
-                        Choose how you want to receive notifications
-                      </CardDescription>
-                    </div>
-                  </CardTitle>
-                </CardHeader>
+            {/* <div className="rounded-sm border border-border bg-white">
+              <div className="border-b border-border bg-ivory px-6 py-4">
+                <h2 className="font-serif text-lg font-medium text-espresso">Notification Preferences</h2>
+                <p className="mt-0.5 text-[13px] text-muted-foreground">
+                  Choose how you want to receive notifications
+                </p>
               </div>
-              <CardContent className="pt-6">
-                <div className="space-y-4">
-                  {notificationItems.map((item) => {
-                    const Icon = item.icon;
-                    const isActive = notifications[item.key as keyof typeof notifications];
-                    return (
-                      <div
-                        key={item.key}
-                        className={`flex items-center justify-between p-4 rounded-xl border transition-all duration-300 ${
-                          isActive
-                            ? 'border-blue-200 bg-gradient-to-r from-blue-50 to-blue-50/50'
-                            : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                        }`}
-                      >
-                        <div className="flex items-start space-x-4">
-                          <div className={`p-3 rounded-lg ${
-                            isActive
-                              ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white'
-                              : 'bg-gray-100 text-gray-600'
-                          }`}>
-                            <Icon className="w-5 h-5" />
-                          </div>
-                          <div>
-                            <h4 className="font-semibold text-gray-900">
-                              {item.title}
-                            </h4>
-                            <p className="text-sm text-gray-600 mt-1">
-                              {item.desc}
-                            </p>
-                          </div>
+              <div className="space-y-3 p-6">
+                {notificationItems.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = notifications[item.key as keyof typeof notifications];
+                  return (
+                    <div
+                      key={item.key}
+                      className={`flex items-center justify-between rounded-sm border p-4 transition-colors ${
+                        isActive ? 'border-gold/40 bg-ivory' : 'border-border hover:bg-ivory'
+                      }`}
+                    >
+                      <div className="flex items-start gap-4">
+                        <Icon className={`mt-0.5 h-4 w-4 ${isActive ? 'text-maroon' : 'text-muted-foreground'}`} />
+                        <div>
+                          <h4 className="text-sm font-medium text-espresso">{item.title}</h4>
+                          <p className="mt-0.5 text-[13px] text-muted-foreground">{item.desc}</p>
                         </div>
-                        <Switch
-                          checked={isActive}
-                          onCheckedChange={() => handleToggle(item.key)}
-                          className={`data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-blue-500 data-[state=checked]:to-cyan-500`}
-                        />
                       </div>
-                    );
-                  })}
-                </div>
-              </CardContent>
-            </Card> */}
+                      <Switch
+                        checked={isActive}
+                        onCheckedChange={() => handleToggle(item.key)}
+                        className="data-[state=checked]:bg-maroon"
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            </div> */}
           </div>
 
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Account Status Card */}
-            <Card className="border-0 shadow-lg rounded-2xl overflow-hidden">
-              <div className="bg-gradient-to-r from-[#7A1F2B]/10 to-[#B85C38]/10 p-1">
-                <CardHeader className="bg-white">
-                  <CardTitle className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] text-white">
-                      <UserCheck className="w-5 h-5" />
-                    </div>
-                    <h2 className="text-lg font-bold text-gray-900">Account Status</h2>
-                  </CardTitle>
-                </CardHeader>
+            <div className="rounded-sm border border-border bg-white">
+              <div className="border-b border-border bg-ivory px-6 py-4">
+                <h2 className="font-serif text-lg font-medium text-espresso">Account Status</h2>
               </div>
-              <CardContent className="pt-6 space-y-5">
-                <div className="flex justify-between items-center p-3 rounded-xl bg-gradient-to-r from-emerald-50 to-emerald-50/50">
+              <div className="space-y-4 p-6">
+                <div className="flex items-center justify-between rounded-sm border border-border p-3">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-emerald-100">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                    </div>
-                    <span className="text-sm font-medium text-gray-700">Email Verified</span>
+                    <CheckCircle2 className="h-4 w-4 text-[#3E6B4F]" />
+                    <span className="text-sm text-espresso">Email Verified</span>
                   </div>
-                  <Badge className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-semibold px-3 py-1 rounded-full">
+                  <span className="inline-flex items-center rounded-full border border-[#3E6B4F]/25 bg-[#3E6B4F]/10 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-[#3E6B4F]">
                     Verified
-                  </Badge>
+                  </span>
                 </div>
 
-                {/* <div className="flex justify-between items-center p-3 rounded-xl bg-gray-50">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-gray-200">
-                      <Shield className="w-4 h-4 text-gray-600" />
-                    </div>
-                    <span className="text-sm font-medium text-gray-700">2FA Enabled</span>
-                  </div>
-                  <Badge variant="outline" className="bg-gray-100 text-gray-700 font-semibold px-3 py-1 rounded-full">
-                    Disabled
-                  </Badge>
-                </div> */}
-
-                <div className="flex justify-between items-center p-3 rounded-xl bg-gradient-to-r from-amber-50 to-amber-50/50">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-gradient-to-r from-[#7A1F2B]/20 to-[#B85C38]/20">
-                      <Calendar className="w-4 h-4 text-[#7A1F2B]" />
-                    </div>
-                    <span className="text-sm font-medium text-gray-700">Member Since</span>
-                  </div>
-                  <span className="text-sm font-bold bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] bg-clip-text text-transparent">
+                <div className="flex items-center justify-between rounded-sm border border-border p-3">
+                  <span className="text-sm text-espresso">Member Since</span>
+                  <span className="font-serif text-sm font-medium text-maroon">
                     {new Date().getFullYear()}
                   </span>
                 </div>
 
-                <div className="mt-6 p-4 rounded-xl bg-gradient-to-r from-[#7A1F2B]/5 to-[#B85C38]/5 border border-[#7A1F2B]/20">
-                  <div className="flex items-center gap-3 mb-3">
-                    <Sparkles className="w-5 h-5 text-[#B85C38]" />
-                    <span className="text-sm font-bold text-gray-900">Account Level</span>
+                <div className="rounded-sm border border-border bg-blush/60 p-4">
+                  <div className="mb-3 flex items-center justify-between">
+                    <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">
+                      Account Level
+                    </span>
+                    <span className="text-xs font-medium text-[#8A6414]">85%</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
-                    <div 
-                      className="bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] h-2 rounded-full" 
-                      style={{ width: '85%' }}
-                    ></div>
+                  <div className="mb-2 h-1 w-full overflow-hidden rounded-full bg-sand">
+                    <div className="h-full bg-gold" style={{ width: '85%' }}></div>
                   </div>
-                  <div className="flex justify-between text-xs">
-                    <span className="text-gray-600">Gold Member</span>
-                    <span className="font-bold text-[#7A1F2B]">85%</span>
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>Gold Member</span>
+                    <span>85% to Platinum Level</span>
                   </div>
-                  <p className="text-xs text-gray-500 mt-2">85% to Platinum Level</p>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
             {/* Danger Zone */}
-            <Card className="border-0 shadow-lg rounded-2xl overflow-hidden border-red-200">
-              <div className="bg-gradient-to-r from-red-500/10 to-red-600/10 p-1">
-                <CardHeader className="bg-white">
-                  <CardTitle className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-gradient-to-r from-red-500 to-red-600 text-white">
-                      <ShieldAlert className="w-5 h-5" />
-                    </div>
-                    <h2 className="text-lg font-bold text-red-700">Danger Zone</h2>
-                  </CardTitle>
-                </CardHeader>
+            <div className="rounded-sm border border-sale/30 bg-white">
+              <div className="border-b border-sale/30 bg-sale/5 px-6 py-4">
+                <h2 className="font-serif text-lg font-medium text-sale">Danger Zone</h2>
               </div>
-              <CardContent className="pt-6">
-                <div className="space-y-4">
-                  <div className="p-4 rounded-xl bg-red-50 border border-red-100">
-                    <div className="flex items-start gap-3 mb-3">
-                      <AlertTriangle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
-                      <div>
-                        <p className="text-sm font-semibold text-red-800 mb-1">Permanent Action</p>
-                        <p className="text-xs text-red-600">
-                          Once you delete your account, there is no going back. This action is permanent and cannot be undone.
-                        </p>
-                      </div>
-                    </div>
-                    
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button 
-                          variant="destructive" 
-                          className="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold py-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-300"
-                        >
-                          <Trash2 className="w-4 h-4 mr-2" />
-                          Delete Account
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent className="rounded-2xl border-0 shadow-2xl">
-                        <AlertDialogHeader>
-                          <div className="flex items-center gap-3 mb-4">
-                            <div className="p-3 rounded-full bg-gradient-to-r from-red-100 to-red-50">
-                              <AlertTriangle className="w-6 h-6 text-red-600" />
-                            </div>
-                            <AlertDialogTitle className="text-xl text-red-700">Delete Your Account?</AlertDialogTitle>
-                          </div>
-                          <AlertDialogDescription className="text-gray-600 text-sm leading-relaxed">
-                            <div className="space-y-3">
-                              <p>This action will permanently:</p>
-                              <ul className="list-disc pl-5 space-y-1 text-sm">
-                                <li>Remove your account and all personal information</li>
-                                <li>Delete your order history and saved data</li>
-                                <li>Cancel any pending orders or subscriptions</li>
-                              </ul>
-                              <p className="font-medium text-red-600 mt-4">This action cannot be undone!</p>
-                            </div>
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel className="rounded-xl border-gray-300 hover:bg-gray-50">
-                            Cancel
-                          </AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={handleDeleteAccount}
-                            disabled={isDeleting}
-                            className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold rounded-xl shadow-md hover:shadow-lg transition-all duration-300"
-                          >
-                            {isDeleting ? 'Deleting...' : 'Yes, Delete Account'}
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
+              <div className="p-6">
+                <div className="mb-4 flex items-start gap-3">
+                  <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0 text-sale" />
+                  <div>
+                    <p className="text-sm font-medium text-espresso">Permanent Action</p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                      Once you delete your account, there is no going back. This action is permanent and cannot be undone.
+                    </p>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button className="h-auto w-full gap-2 rounded-sm bg-sale px-5 py-3 text-[12px] font-medium uppercase tracking-[0.14em] text-ivory hover:bg-sale/90">
+                      <Trash2 className="h-3.5 w-3.5" />
+                      Delete Account
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent className="rounded-sm border border-border bg-white">
+                    <AlertDialogHeader>
+                      <div className="mb-2 flex items-center gap-3">
+                        <AlertTriangle className="h-5 w-5 text-sale" />
+                        <AlertDialogTitle className="font-serif text-xl font-medium text-espresso">
+                          Delete Your Account?
+                        </AlertDialogTitle>
+                      </div>
+                      <AlertDialogDescription className="text-sm leading-relaxed text-muted-foreground">
+                        <div className="space-y-3">
+                          <p>This action will permanently:</p>
+                          <ul className="list-disc space-y-1 pl-5 text-sm">
+                            <li>Remove your account and all personal information</li>
+                            <li>Delete your order history and saved data</li>
+                            <li>Cancel any pending orders or subscriptions</li>
+                          </ul>
+                          <p className="mt-4 font-medium text-sale">This action cannot be undone!</p>
+                        </div>
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel className="rounded-sm text-[12px] font-medium uppercase tracking-[0.12em]">
+                        Cancel
+                      </AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={handleDeleteAccount}
+                        disabled={isDeleting}
+                        className="rounded-sm bg-sale text-[12px] font-medium uppercase tracking-[0.12em] text-ivory hover:bg-sale/90"
+                      >
+                        {isDeleting ? 'Deleting...' : 'Yes, Delete Account'}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+            </div>
           </div>
         </div>
       </div>

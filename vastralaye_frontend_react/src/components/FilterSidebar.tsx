@@ -1,11 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
-import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import {
-  X, ChevronDown, Filter, Tag, IndianRupee,
+  X, ChevronDown,
   Sparkles, Zap, Star, Package,
 } from "lucide-react";
 import { Product } from "@/types";
@@ -35,6 +34,12 @@ interface Subcategory {
 }
 
 const DEFAULT_PRICE: [number, number] = [0, 5000];
+
+/** Square 15px checkbox — maroon fill when checked (design.md §5.10). */
+const checkboxClasses =
+  "h-[15px] w-[15px] shrink-0 rounded-[1px] border-border bg-white " +
+  "data-[state=checked]:bg-maroon data-[state=checked]:border-maroon " +
+  "data-[state=checked]:text-ivory [&_svg]:h-3 [&_svg]:w-3";
 
 // ═══════════════════════════════════════════════
 //  FIELD-NAME-SAFE ID EXTRACTORS
@@ -116,65 +121,43 @@ const PriceRangeFilter = ({
   }, [priceRange]);
 
   return (
-    <div className="space-y-6">
-      {/* Price display row */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-gradient-to-br from-[#E97A48]/10 to-[#E97A48]/20
-                          rounded-lg flex items-center justify-center">
-            <IndianRupee className="w-4 h-4 text-[#E97A48]" />
-          </div>
-          <div>
-            <div className="text-lg font-bold text-gray-900">
-              ₹{priceRange[0]} – ₹{priceRange[1]}
-            </div>
-            <div className="text-xs text-gray-500">Price range</div>
-          </div>
-        </div>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => onPriceRangeChange(DEFAULT_PRICE)}
-          className="text-xs text-gray-500 hover:text-[#E97A48]"
-        >
-          Reset
-        </Button>
-      </div>
-
-      {/* Slider */}
-      <div className="px-2 pt-4">
+    <div className="space-y-4">
+      {/* Minimal slider — track thin, maroon fill via tokens */}
+      <div className="px-1 pt-2">
         <Slider
           min={0}
           max={5000}
           step={100}
           value={priceRange}
           onValueChange={(v) => onPriceRangeChange(v as [number, number])}
-          className="[&>span]:bg-[#E97A48] [&>span]:border-[#E97A48]"
+          className="[&>span:first-child]:h-[2px] [&>span:first-child]:rounded-none
+                     [&>span:first-child]:bg-border
+                     [&_[role=slider]]:h-3 [&_[role=slider]]:w-3
+                     [&_[role=slider]]:border-2 [&_[role=slider]]:border-maroon
+                     [&_[role=slider]]:bg-white"
         />
-        <div className="flex justify-between text-xs text-gray-500 mt-2">
-          <span>₹0</span>
-          <span>₹2500</span>
-          <span>₹5000</span>
+        <div className="flex justify-between text-[13px] text-muted-foreground mt-3">
+          <span>₹{priceRange[0]}</span>
+          <span>₹{priceRange[1]}</span>
         </div>
       </div>
 
       {/* Min / Max inputs */}
-      <div className="grid grid-cols-2 gap-4 pt-2">
+      <div className="grid grid-cols-2 gap-3">
         {(["min", "max"] as const).map((type) => (
-          <div key={type} className="space-y-2">
-            <label className="text-xs font-medium text-gray-700 capitalize">
-              {type} Price
+          <div key={type}>
+            <label className="block text-[11px] uppercase tracking-[0.08em] text-muted-foreground mb-1.5 capitalize">
+              {type}
             </label>
-            <div className="flex items-center border border-gray-300 rounded-lg
-                            overflow-hidden bg-white">
-              <span className="px-3 py-2.5 bg-gray-50 border-r border-gray-300
-                               text-gray-600 font-medium">₹</span>
+            <div className="flex items-center border border-border rounded-sm bg-white
+                            focus-within:border-maroon transition-colors">
+              <span className="pl-3 pr-1 text-[13px] text-muted-foreground">₹</span>
               <input
                 type="number"
                 value={type === "min" ? minInput : maxInput}
                 onChange={(e) => handleInputChange(type, e.target.value)}
                 onBlur={handleBlur}
-                className="w-full pl-3 pr-3 py-2.5 text-sm focus:outline-none bg-transparent"
+                className="w-full pr-2 py-2 text-[13px] text-espresso bg-transparent focus:outline-none"
                 min={0}
                 max={5000}
               />
@@ -187,7 +170,7 @@ const PriceRangeFilter = ({
 };
 
 // ═══════════════════════════════════════════════
-//  APPLIED FILTERS BANNER
+//  APPLIED FILTERS — small espresso pills
 // ═══════════════════════════════════════════════
 
 const AppliedFilters = ({
@@ -220,16 +203,6 @@ const AppliedFilters = ({
     [categories, subcategories, filters],
   );
 
-  const iconMap: Record<string, JSX.Element> = {
-    category_id:    <Tag         className="w-3 h-3" />,
-    subcategory_id: <Tag         className="w-3 h-3" />,
-    priceRange:     <IndianRupee className="w-3 h-3" />,
-    in_stock:       <Package     className="w-3 h-3" />,
-    featured:       <Sparkles    className="w-3 h-3" />,
-    best_seller:    <Star        className="w-3 h-3" />,
-    new_arrival:    <Zap         className="w-3 h-3" />,
-  };
-
   const activeFilters: { type: string; value: any }[] = [];
   if (filters.category_id)    activeFilters.push({ type: "category_id",    value: filters.category_id });
   if (filters.subcategory_id) activeFilters.push({ type: "subcategory_id", value: filters.subcategory_id });
@@ -245,61 +218,40 @@ const AppliedFilters = ({
   if (activeFilters.length === 0) return null;
 
   return (
-    <div className="mb-6 p-5 bg-gradient-to-br from-gray-50 to-white
-                    rounded-xl border border-gray-200 shadow-sm">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-gradient-to-br from-[#E97A48]/10 to-[#E97A48]/20
-                          rounded-lg flex items-center justify-center">
-            <Filter className="w-4 h-4 text-[#E97A48]" />
-          </div>
-          <div>
-            <h3 className="text-sm font-semibold text-gray-900">Active Filters</h3>
-            <p className="text-xs text-gray-500">{activeFilters.length} applied</p>
-          </div>
-        </div>
+    <div className="pb-4">
+      <div className="flex flex-wrap items-center gap-2">
+        {activeFilters.map((f, idx) => (
+          <button
+            key={`${f.type}-${idx}`}
+            type="button"
+            onClick={() => onRemove(f.type, f.value)}
+            className="inline-flex items-center gap-1.5 bg-espresso text-ivory
+                       text-[12px] leading-none pl-3 pr-2 py-1.5 rounded-full
+                       hover:bg-maroon transition-colors"
+          >
+            {getFilterLabel(f.type, f.value)}
+            <X size={12} aria-hidden="true" />
+          </button>
+        ))}
         <button
+          type="button"
           onClick={() => onRemove("all")}
-          className="text-sm font-medium text-[#E97A48] hover:text-[#d86a38]
-                     px-3 py-1.5 rounded-lg hover:bg-[#E97A48]/5 transition-colors"
+          className="text-[12px] text-muted-foreground underline underline-offset-4
+                     hover:text-espresso transition-colors"
         >
           Clear all
         </button>
-      </div>
-
-      <div className="flex flex-wrap gap-2">
-        {activeFilters.map((f, idx) => (
-          <div
-            key={`${f.type}-${idx}`}
-            className="inline-flex items-center gap-2 px-3 py-2 bg-white
-                       border border-gray-200 rounded-lg text-sm shadow-sm
-                       hover:shadow transition-all"
-          >
-            <span className="text-[#E97A48]">{iconMap[f.type]}</span>
-            <span className="text-gray-800 font-medium">
-              {getFilterLabel(f.type, f.value)}
-            </span>
-            <button
-              onClick={() => onRemove(f.type, f.value)}
-              className="ml-1 text-gray-400 hover:text-red-500
-                         p-0.5 rounded hover:bg-red-50 transition-colors"
-            >
-              <X size={14} />
-            </button>
-          </div>
-        ))}
       </div>
     </div>
   );
 };
 
 // ═══════════════════════════════════════════════
-//  COLLAPSIBLE SECTION
+//  COLLAPSIBLE SECTION — flat accordion group
 // ═══════════════════════════════════════════════
 
 const CollapsibleSection = ({
   title,
-  icon: Icon,
   children,
   defaultOpen = true,
 }: {
@@ -311,39 +263,23 @@ const CollapsibleSection = ({
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
-    <div className="mb-4">
+    <div className="border-t border-border">
       <button
         type="button"
         onClick={() => setIsOpen((v) => !v)}
-        className="w-full flex items-center justify-between p-4
-                   bg-gradient-to-r from-gray-50 to-white
-                   hover:from-gray-100 hover:to-gray-50
-                   border border-gray-200 rounded-xl shadow-sm
-                   hover:shadow transition-all duration-200 group"
+        className="w-full flex items-center justify-between py-4 text-left group"
       >
-        <div className="flex items-center gap-3">
-          {Icon && (
-            <div className="w-9 h-9 bg-gradient-to-br from-[#5E9F50]/10 to-[#5E9F50]/20
-                            rounded-lg flex items-center justify-center
-                            group-hover:scale-105 transition-transform">
-              <Icon className="w-4 h-4 text-[#5E9F50]" />
-            </div>
-          )}
-          <h3 className="font-semibold text-gray-900 text-left">{title}</h3>
-        </div>
+        <h3 className="text-[12px] font-semibold uppercase tracking-[0.18em] text-espresso">
+          {title}
+        </h3>
         <ChevronDown
-          size={20}
-          className={`text-gray-500 group-hover:text-gray-700
-                      transition-transform duration-200
+          size={15}
+          className={`text-gold transition-transform duration-200
                       ${isOpen ? "rotate-180" : ""}`}
         />
       </button>
 
-      {isOpen && (
-        <div className="mt-4 px-2 animate-in fade-in duration-200">
-          {children}
-        </div>
-      )}
+      {isOpen && <div className="pb-5">{children}</div>}
     </div>
   );
 };
@@ -382,8 +318,8 @@ const FilterSidebar = ({
           axios.get(`${BASE_URL}/fronted/products/categories`),
           axios.get(`${BASE_URL}/fronted/products/subcategories`),
         ]);
-        setCategories(catRes.data || []);
-        setSubcategories(subRes.data || []);
+        setCategories((catRes.data as Category[]) || []);
+        setSubcategories((subRes.data as Subcategory[]) || []);
         setDataReady(true);
       } catch (err) {
         console.error("Category load error:", err);
@@ -503,47 +439,40 @@ const FilterSidebar = ({
   ];
 
   return (
-    <div
-      className={`fixed inset-y-0 left-0 z-30 w-80
-                  bg-gradient-to-b from-white to-gray-50
-                  shadow-xl transition-transform duration-300 ease-out
-                  ${isOpen ? "translate-x-0" : "-translate-x-full"}
-                  md:sticky md:top-0 md:h-screen md:translate-x-0
-                  overflow-y-auto border-r border-gray-200
+    <aside
+      className={`fixed inset-y-0 left-0 z-50 w-[85vw] max-w-[320px]
+                  bg-background transition-transform duration-300 ease-out
+                  ${isOpen ? "translate-x-0 shadow-xl" : "-translate-x-full"}
+                  lg:sticky lg:top-24 lg:z-0
+                  lg:max-h-[calc(100vh-7rem)] lg:translate-x-0 lg:shadow-none
+                  lg:bg-transparent overflow-y-auto
                   ${className || ""}`}
     >
-      {/* Top colour strip */}
-      <div className="absolute top-0 left-0 right-0 h-1
-                      bg-gradient-to-r from-[#E97A48] via-[#5E9F50] to-[#4F90E8]" />
-
-      <div className="p-6">
+      <div className="p-6 lg:p-0">
 
         {/* ── HEADER ── */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between pb-5">
+          <h2 className="text-[12px] font-semibold uppercase tracking-[0.18em] text-espresso">
+            Filter
+          </h2>
           <div className="flex items-center gap-4">
-            <div className="relative">
-              <div className="w-12 h-12 bg-gradient-to-br from-[#E97A48] to-[#E97A48]/80
-                              rounded-xl flex items-center justify-center shadow-md">
-                <Filter className="w-6 h-6 text-white" />
-              </div>
-              <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-[#5E9F50] rounded-full
-                              border-2 border-white flex items-center justify-center">
-                <span className="text-[10px] font-bold text-white">{categories.length}</span>
-              </div>
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900">Filters</h2>
-              <p className="text-sm text-gray-500 mt-0.5">Refine your search</p>
-            </div>
+            <button
+              type="button"
+              onClick={resetFilters}
+              className="text-[12px] text-muted-foreground underline underline-offset-4
+                         hover:text-espresso transition-colors"
+            >
+              Clear all
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="lg:hidden text-espresso hover:text-maroon transition-colors"
+              aria-label="Close filters"
+            >
+              <X size={18} />
+            </button>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onClose}
-            className="md:hidden hover:bg-gray-100 rounded-lg"
-          >
-            <X size={22} className="text-gray-600" />
-          </Button>
         </div>
 
         {/* ── APPLIED FILTERS ── */}
@@ -554,70 +483,47 @@ const FilterSidebar = ({
           subcategories={subcategories}
         />
 
-        {/* ── RESET BUTTON ── */}
-        <div className="mb-8">
-          <Button
-            variant="outline"
-            onClick={resetFilters}
-            className="w-full border-gray-300 text-gray-700 hover:border-gray-400
-                       hover:bg-gray-50 py-3 rounded-xl font-medium"
-          >
-            <X size={16} className="mr-2" />
-            Reset All Filters
-          </Button>
-        </div>
-
         {/* ── CATEGORIES + SUBCATEGORIES ── */}
         {categories.length > 0 && (
-          <CollapsibleSection title="Categories" icon={Tag} defaultOpen>
-            <div className="space-y-3">
+          <CollapsibleSection title="Category" defaultOpen>
+            <div className="space-y-2.5">
               {categories.map((cat) => {
                 const catCount   = getCategoryProductCount(cat.id);
                 const catSubs    = subcategories.filter((s) => s.category_id === cat.id);
                 const isSelected = filters.category_id === cat.id;
 
                 return (
-                  <div key={cat.id} className="space-y-1">
+                  <div key={cat.id}>
 
                     {/* Category row */}
-                    <div
-                      className={`flex items-center justify-between gap-2 p-3 rounded-lg
-                                  transition-colors cursor-pointer select-none
-                                  ${isSelected ? "bg-[#5E9F50]/8" : "hover:bg-gray-50"}`}
-                    >
-                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2 cursor-pointer select-none">
+                      <div className="flex items-center gap-2.5 flex-1 min-w-0">
                         <Checkbox
                           id={`cat-${cat.id}`}
                           checked={isSelected}
                           onCheckedChange={() => handleCategoryChange(cat.id)}
-                          className="data-[state=checked]:bg-[#5E9F50]
-                                     data-[state=checked]:border-[#5E9F50]
-                                     w-5 h-5 rounded-md flex-shrink-0"
+                          className={checkboxClasses}
                         />
                         <Label
                           htmlFor={`cat-${cat.id}`}
-                          className="cursor-pointer font-semibold text-gray-800 truncate"
+                          className={`cursor-pointer text-sm truncate font-normal
+                                      ${isSelected
+                                        ? "text-espresso font-medium"
+                                        : "text-muted-foreground hover:text-espresso"}`}
                         >
                           {cat.name}
                         </Label>
                       </div>
 
                       {/* ✅ Category count */}
-                      <span
-                        className={`flex-shrink-0 text-xs font-bold px-2.5 py-1
-                                    rounded-full min-w-[32px] text-center
-                                    transition-colors
-                                    ${isSelected
-                                      ? "bg-[#5E9F50] text-white"
-                                      : "bg-gray-100 text-gray-600"}`}
-                      >
-                        {catCount}
+                      <span className="flex-shrink-0 text-xs text-muted-foreground">
+                        ({catCount})
                       </span>
                     </div>
 
                     {/* ✅ Subcategories — ALWAYS visible (not gated on category selection) */}
                     {catSubs.length > 0 && (
-                      <div className="ml-4 pl-4 border-l-2 border-gray-200 space-y-0.5 pb-1">
+                      <div className="ml-[7px] mt-1.5 pl-4 border-l border-border space-y-1.5 pb-1">
                         {catSubs.map((sub) => {
                           // ✅ String-coerced comparison fixes "0" bug
                           const subCount      = getSubcategoryProductCount(sub.id);
@@ -626,41 +532,34 @@ const FilterSidebar = ({
                           return (
                             <div
                               key={sub.id}
-                              className={`flex items-center justify-between gap-2 p-2.5
-                                          rounded-lg transition-colors cursor-pointer select-none
-                                          ${isSubSelected
-                                            ? "bg-[#5E9F50]/8"
-                                            : "hover:bg-gray-50"}`}
+                              className="flex items-center justify-between gap-2 cursor-pointer select-none"
                             >
                               <div className="flex items-center gap-2.5 flex-1 min-w-0">
                                 <Checkbox
                                   id={`sub-${sub.id}`}
                                   checked={isSubSelected}
                                   onCheckedChange={() => handleSubcategoryChange(sub.id)}
-                                  className="data-[state=checked]:bg-[#5E9F50]
-                                             data-[state=checked]:border-[#5E9F50]
-                                             w-4 h-4 flex-shrink-0"
+                                  className={checkboxClasses}
                                 />
                                 <Label
                                   htmlFor={`sub-${sub.id}`}
-                                  className="cursor-pointer text-sm text-gray-700 truncate"
+                                  className={`cursor-pointer text-[13px] truncate font-normal
+                                              ${isSubSelected
+                                                ? "text-espresso font-medium"
+                                                : "text-muted-foreground hover:text-espresso"}`}
                                 >
                                   {sub.name}
                                 </Label>
                               </div>
 
-                              {/* ✅ Subcategory count badge — always shows real number */}
+                              {/* ✅ Subcategory count — always shows real number */}
                               <span
-                                className={`flex-shrink-0 text-xs font-bold px-2 py-0.5
-                                            rounded-full min-w-[28px] text-center
-                                            transition-colors
-                                            ${isSubSelected
-                                              ? "bg-[#5E9F50] text-white"
-                                              : subCount > 0
-                                                ? "bg-gray-100 text-gray-600"
-                                                : "bg-gray-50 text-gray-400"}`}
+                                className={`flex-shrink-0 text-xs
+                                            ${subCount > 0
+                                              ? "text-muted-foreground"
+                                              : "text-muted-foreground/50"}`}
                               >
-                                {subCount}
+                                ({subCount})
                               </span>
                             </div>
                           );
@@ -675,7 +574,7 @@ const FilterSidebar = ({
         )}
 
         {/* ── PRICE RANGE ── */}
-        <CollapsibleSection title="Price Range" icon={IndianRupee} defaultOpen>
+        <CollapsibleSection title="Price" defaultOpen>
           <PriceRangeFilter
             priceRange={[filters.min_price, filters.max_price]}
             onPriceRangeChange={(r) =>
@@ -685,29 +584,10 @@ const FilterSidebar = ({
         </CollapsibleSection>
 
         {/* ── QUICK FILTERS ── */}
-        <CollapsibleSection title="Quick Filters" defaultOpen>
-          <div className="space-y-2">
+        <CollapsibleSection title="Shop By" defaultOpen>
+          <div className="space-y-2.5">
             {quickFilters.map((f) => (
-              <div
-                key={f.id}
-                className={`flex items-center gap-3 p-3 rounded-lg transition-colors
-                            ${f.checked ? "bg-[#5E9F50]/5" : "hover:bg-gray-50"}`}
-              >
-                <div
-                  className={`w-8 h-8 rounded-lg flex items-center justify-center
-                              flex-shrink-0 transition-colors
-                              ${f.checked
-                                ? "bg-[#5E9F50] text-white"
-                                : "bg-gray-100 text-gray-600"}`}
-                >
-                  <f.icon className="w-4 h-4" />
-                </div>
-                <Label
-                  htmlFor={f.id}
-                  className="flex-1 cursor-pointer font-medium text-gray-800"
-                >
-                  {f.label}
-                </Label>
+              <div key={f.id} className="flex items-center gap-2.5">
                 <Checkbox
                   id={f.id}
                   checked={f.checked}
@@ -717,45 +597,40 @@ const FilterSidebar = ({
                       [f.id]: checked ? true : null,
                     }))
                   }
-                  className="data-[state=checked]:bg-[#5E9F50]
-                             data-[state=checked]:border-[#5E9F50]"
+                  className={checkboxClasses}
                 />
+                <Label
+                  htmlFor={f.id}
+                  className={`flex-1 cursor-pointer text-sm font-normal
+                              ${f.checked
+                                ? "text-espresso font-medium"
+                                : "text-muted-foreground hover:text-espresso"}`}
+                >
+                  {f.label}
+                </Label>
               </div>
             ))}
           </div>
         </CollapsibleSection>
 
         {/* ── RESULTS COUNT ── */}
-        <div className="mt-10 p-5 bg-gradient-to-br from-gray-50 to-white
-                        rounded-2xl border border-gray-200 shadow-sm text-center space-y-3">
-          <div className="inline-flex items-center justify-center w-16 h-16
-                          bg-gradient-to-br from-[#E97A48] to-[#E97A48]/80 rounded-full">
-            <Package className="w-8 h-8 text-white" />
-          </div>
-          <div>
-            <div className="text-3xl font-bold text-gray-900 mb-1">
-              {products.length}
-            </div>
-            <p className="text-sm text-gray-600">Products matching your filters</p>
-          </div>
-          <Button
+        <div className="border-t border-border pt-5">
+          <p className="text-sm text-muted-foreground">
+            <span className="font-medium text-espresso">{products.length}</span>{" "}
+            products match your filters
+          </p>
+          <button
+            type="button"
             onClick={onClose}
-            className="w-full bg-gradient-to-r from-[#E97A48] to-[#E97A48]/90
-                       hover:from-[#d86a38] hover:to-[#d86a38]
-                       rounded-xl py-3 font-semibold"
+            className="lg:hidden mt-4 w-full bg-maroon text-ivory text-xs font-semibold
+                       uppercase tracking-[0.16em] px-8 py-3.5 rounded-sm
+                       hover:bg-terracotta transition-colors"
           >
             Show Results
-          </Button>
-        </div>
-
-        {/* Footer note */}
-        <div className="mt-6 pt-4 border-t border-gray-200">
-          <p className="text-xs text-gray-500 text-center">
-            Filters update in real-time as you make selections
-          </p>
+          </button>
         </div>
       </div>
-    </div>
+    </aside>
   );
 };
 

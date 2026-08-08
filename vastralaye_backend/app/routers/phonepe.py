@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+import os
 import requests
 import time
 
@@ -7,8 +8,8 @@ router = APIRouter()
 OAUTH_URL = "https://api.phonepe.com/apis/identity-manager/v1/oauth/token"
 CHECKOUT_URL = "https://api.phonepe.com/apis/pg/checkout/v2/pay"
 
-CLIENT_ID = "SU2602031805256502577174"
-CLIENT_SECRET = "ec8e9271-2d62-416d-98fa-6db8ce9b332f"
+CLIENT_ID = os.getenv("PHONEPE_CLIENT_ID", "SU2602031805256502577174")
+CLIENT_SECRET = os.getenv("PHONEPE_CLIENT_SECRET", "ec8e9271-2d62-416d-98fa-6db8ce9b332f")
 
 # Temporary storage (use DB in production)
 payment_store = {}

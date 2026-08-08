@@ -1,13 +1,4 @@
-
-import { 
-  Cell, 
-  Pie, 
-  PieChart, 
-  ResponsiveContainer, 
-  Tooltip, 
-  Legend 
-} from 'recharts';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ChartCard, Donut } from './chartTheme';
 
 interface CategoryChartProps {
   data: {
@@ -16,40 +7,37 @@ interface CategoryChartProps {
   }[];
   colors: string[];
   formatCurrency: (value: number) => string;
+  title?: string;
+  subtitle?: string;
+  /** Overrides formatCurrency for legend/tooltip values (e.g. plain counts) */
+  valueFormatter?: (value: number) => string;
+  centerValue?: string;
+  centerLabel?: string;
 }
 
-const CategoryChart = ({ data, colors, formatCurrency }: CategoryChartProps) => {
+const CategoryChart = ({
+  data,
+  colors,
+  formatCurrency,
+  title,
+  subtitle,
+  valueFormatter,
+  centerValue,
+  centerLabel,
+}: CategoryChartProps) => {
+  const format = valueFormatter ?? formatCurrency;
+  const total = data.reduce((sum, d) => sum + d.value, 0);
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Sales by Category</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="h-[400px] flex flex-col md:flex-row items-center justify-center">
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={data}
-                cx="50%"
-                cy="50%"
-                labelLine={true}
-                outerRadius={120}
-                fill="#8884d8"
-                dataKey="value"
-                nameKey="name"
-                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-              >
-                {data.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
-                ))}
-              </Pie>
-              <Tooltip formatter={(value: number) => formatCurrency(value)} />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-      </CardContent>
-    </Card>
+    <ChartCard title={title ?? 'Sales by Category'} subtitle={subtitle}>
+      <Donut
+        data={data}
+        colors={colors}
+        valueFormatter={format}
+        centerValue={centerValue ?? format(total)}
+        centerLabel={centerLabel ?? 'total'}
+      />
+    </ChartCard>
   );
 };
 

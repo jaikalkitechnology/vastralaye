@@ -93,8 +93,8 @@ const ImageWithFallback: React.FC<{
 
   if (failed || !url) {
     return (
-      <div className={`bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg flex items-center justify-center ${className || ""}`}>
-        <HiOutlinePhotograph className="text-gray-400 h-6 w-6" />
+      <div className={`bg-sand flex items-center justify-center ${className || ""}`}>
+        <HiOutlinePhotograph className="text-muted-foreground h-6 w-6" />
       </div>
     );
   }
@@ -530,299 +530,157 @@ const AdminCategories: React.FC = () => {
   return (
     <AdminLayout>
       <div className="space-y-6 p-6">
-        {/* Modern Header with Gradient */}
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-8 text-white shadow-xl">
-          <div className="flex justify-between items-center">
-            <div>
-              <div className="flex items-center gap-3 mb-2">
-                <div className="bg-white/20 backdrop-blur-sm p-3 rounded-xl">
-                  <MdFolder className="h-8 w-8" />
-                </div>
-                <h1 className="text-3xl font-bold">Categories Management</h1>
-              </div>
-              <p className="text-blue-100 text-lg">
-                Organize your products with categories and subcategories
-              </p>
-              <div className="flex items-center gap-6 mt-4">
-                <div className="flex items-center gap-2">
-                  <div className="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-lg">
-                    <span className="font-semibold text-lg">{categories.length}</span>
-                  </div>
-                  <span className="text-blue-100">Categories</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-lg">
-                    <span className="font-semibold text-lg">
-                      {categories.reduce((acc, cat) => acc + (cat.subcategories?.length || 0), 0)}
-                    </span>
-                  </div>
-                  <span className="text-blue-100">Subcategories</span>
-                </div>
-              </div>
-            </div>
-            <Button
-              onClick={openAddCategory}
-              disabled={loading}
-              size="lg"
-              className="bg-white text-blue-600 hover:bg-blue-50 shadow-lg hover:shadow-xl transition-all"
-            >
-              <IoAdd className="mr-2 h-5 w-5" /> Add Category
-            </Button>
+        {/* Header */}
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h1 className="font-serif text-xl md:text-2xl font-medium text-espresso">Categories</h1>
+            <p className="text-[13px] text-muted-foreground mt-1">
+              {categories.length} categories · {categories.reduce((acc, cat) => acc + (cat.subcategories?.length || 0), 0)} subcategories
+            </p>
           </div>
+          <Button
+            onClick={openAddCategory}
+            disabled={loading}
+            className="bg-maroon text-ivory uppercase text-[11px] tracking-[0.12em] px-5 py-2.5 rounded-sm hover:bg-terracotta"
+          >
+            <IoAdd className="mr-2 h-4 w-4" /> Add Category
+          </Button>
         </div>
 
-        {/* Search Card */}
-        <Card className="border-0 shadow-lg">
-          <CardContent className="p-6">
-            <div className="relative">
-              <IoSearchSharp className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
-              <Input
-                placeholder="Search categories by name or slug..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-12 h-12 text-base border-gray-200 focus:border-blue-500 focus:ring-blue-500"
-              />
+        {/* Search */}
+        <div className="relative max-w-md">
+          <IoSearchSharp className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
+          <Input
+            placeholder="Search categories by name or slug..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-9 h-10 bg-white rounded-sm border-border text-[13px] focus:border-maroon focus-visible:ring-0 focus-visible:ring-offset-0"
+          />
+        </div>
+
+        {/* Categories Grid */}
+        {loading ? (
+          <div className="bg-white border border-border rounded-md p-16 text-center">
+            <div className="w-10 h-10 border-2 border-sand border-t-maroon rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-[13px] font-medium text-espresso">Loading categories...</p>
+            <p className="text-xs text-muted-foreground mt-1">Please wait a moment</p>
+          </div>
+        ) : filteredCategories.length === 0 ? (
+          <div className="bg-white border border-border rounded-md p-16 text-center">
+            <div className="bg-espresso/5 p-5 rounded-full inline-flex mb-4">
+              <MdFolder className="h-10 w-10 text-muted-foreground" />
             </div>
-          </CardContent>
-        </Card>
+            <p className="font-serif text-lg font-medium text-espresso mb-1">
+              {categories.length === 0
+                ? "No categories yet"
+                : "No categories match your search"}
+            </p>
+            <p className="text-[13px] text-muted-foreground">
+              {categories.length === 0
+                ? "Get started by creating your first category"
+                : "Try adjusting your search terms"}
+            </p>
+            {categories.length === 0 && (
+              <Button onClick={openAddCategory} className="mt-5 bg-maroon text-ivory uppercase text-[11px] tracking-[0.12em] px-5 py-2.5 rounded-sm hover:bg-terracotta">
+                <IoAdd className="mr-2 h-4 w-4" /> Create First Category
+              </Button>
+            )}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {filteredCategories.map((cat) => (
+              <div key={cat.id} className="bg-white border border-border rounded-md overflow-hidden flex flex-col">
+                <ImageWithFallback
+                  src={cat.image}
+                  alt={cat.name}
+                  className="w-full h-24 object-cover"
+                />
+                <div className="p-4 flex-1 flex flex-col">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <h3 className="text-sm font-semibold text-espresso truncate">{cat.name}</h3>
+                      <p className="text-[11.5px] text-muted-foreground truncate">/{cat.slug}</p>
+                    </div>
+                    <div className="flex gap-1.5 flex-none">
+                      <button
+                        type="button"
+                        title="Edit category"
+                        onClick={() => openEditCategory(cat)}
+                        className="w-7 h-7 border border-border rounded-[5px] inline-flex items-center justify-center text-muted-foreground bg-white hover:text-espresso hover:border-espresso transition-colors"
+                      >
+                        <BiPencil className="h-3.5 w-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        title="Delete category"
+                        onClick={() => deleteCategory(cat.id)}
+                        className="w-7 h-7 border border-sale/35 rounded-[5px] inline-flex items-center justify-center text-sale bg-white hover:bg-sale/5 transition-colors"
+                      >
+                        <BiTrash className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  </div>
 
-        {/* Categories Table */}
-        <Card className="border-0 shadow-lg overflow-hidden">
-          <CardContent className="p-0">
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-gray-50 border-b-2 border-gray-200">
-                    <TableHead className="w-[70px] font-semibold text-gray-700">ID</TableHead>
-                    <TableHead className="w-[90px] font-semibold text-gray-700">Image</TableHead>
-                    <TableHead className="font-semibold text-gray-700">Name</TableHead>
-                    <TableHead className="font-semibold text-gray-700">Slug</TableHead>
-                    <TableHead className="w-[140px] font-semibold text-gray-700">Subcategories</TableHead>
-                    <TableHead className="text-right w-[300px] font-semibold text-gray-700">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-
-                <TableBody>
-                  {loading ? (
-                    <TableRow>
-                      <TableCell colSpan={6} className="text-center py-16">
-                        <div className="flex flex-col items-center justify-center gap-3">
-                          <div className="relative">
-                            <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
-                          </div>
-                          <p className="text-base font-medium text-gray-700">Loading categories...</p>
-                          <p className="text-sm text-gray-500">Please wait a moment</p>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ) : filteredCategories.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={6} className="text-center py-16">
-                        <div className="flex flex-col items-center justify-center gap-4">
-                          <div className="bg-gradient-to-br from-blue-100 to-indigo-100 p-6 rounded-full">
-                            <MdFolder className="h-16 w-16 text-blue-600" />
-                          </div>
-                          <div>
-                            <p className="text-lg font-semibold text-gray-900 mb-1">
-                              {categories.length === 0
-                                ? "No categories yet"
-                                : "No categories match your search"}
-                            </p>
-                            <p className="text-sm text-gray-500">
-                              {categories.length === 0
-                                ? "Get started by creating your first category"
-                                : "Try adjusting your search terms"}
-                            </p>
-                          </div>
-                          {categories.length === 0 && (
-                            <Button onClick={openAddCategory} className="mt-2 bg-gradient-to-r from-blue-600 to-indigo-600">
-                              <IoAdd className="mr-2 h-4 w-4" /> Create First Category
-                            </Button>
-                          )}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    filteredCategories.flatMap((cat) => {
-                      const baseRow = (
-                        <TableRow 
-                          key={`cat-${cat.id}`} 
-                          className="hover:bg-blue-50/50 transition-colors border-b border-gray-100"
+                  {/* Subcategory chips */}
+                  <div className="flex flex-wrap gap-1.5 mt-3">
+                    {(cat.subcategories || []).map((sub) => (
+                      <span
+                        key={sub.id}
+                        className="inline-flex items-center gap-1 text-[11px] text-muted-foreground bg-ivory border border-border rounded-full pl-2.5 pr-1 py-0.5"
+                      >
+                        <button
+                          type="button"
+                          title="Edit subcategory"
+                          onClick={() => openEditSub(sub)}
+                          className="hover:text-maroon transition-colors"
                         >
-                          <TableCell className="font-semibold text-gray-900">
-                            <Badge variant="outline" className="font-mono">
-                              #{cat.id}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>
-                            <ImageWithFallback
-                              src={cat.image}
-                              alt={cat.name}
-                              className="w-14 h-14 object-cover rounded-xl shadow-sm ring-2 ring-gray-200"
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-2">
-                              <span className="font-semibold text-gray-900 text-base">{cat.name}</span>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <code className="text-sm bg-gray-100 px-3 py-1.5 rounded-lg text-gray-700 font-mono">
-                              {cat.slug}
-                            </code>
-                          </TableCell>
-                          <TableCell>
-                            <Badge 
-                              variant="secondary" 
-                              className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-semibold px-3 py-1"
-                            >
-                              {cat.subcategories?.length || 0} {cat.subcategories?.length === 1 ? 'sub' : 'subs'}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex gap-2 justify-end">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => openEditCategory(cat)}
-                                title="Edit category"
-                                className="hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300"
-                              >
-                                <BiPencil className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => deleteCategory(cat.id)}
-                                title="Delete category"
-                                className="hover:bg-red-50 hover:text-red-600 hover:border-red-300"
-                              >
-                                <BiTrash className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() =>
-                                  setExpandedCategoryId(expandedCategoryId === cat.id ? null : cat.id)
-                                }
-                                title={expandedCategoryId === cat.id ? "Collapse" : "Expand"}
-                                className="hover:bg-gray-100"
-                              >
-                                {expandedCategoryId === cat.id ? (
-                                  <FiChevronUp className="h-4 w-4" />
-                                ) : (
-                                  <FiChevronDown className="h-4 w-4" />
-                                )}
-                              </Button>
-                              <Button
-                                size="sm"
-                                onClick={() => openAddSub(cat)}
-                                title="Add subcategory"
-                                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
-                              >
-                                <IoAdd className="h-4 w-4 mr-1" /> Add Sub
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      );
+                          {sub.name}
+                        </button>
+                        <button
+                          type="button"
+                          title="Delete subcategory"
+                          onClick={() => deleteSubcategory(sub.id)}
+                          className="w-4 h-4 rounded-full inline-flex items-center justify-center leading-none hover:text-sale hover:bg-sale/10 transition-colors"
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                    <button
+                      type="button"
+                      title="Add subcategory"
+                      onClick={() => openAddSub(cat)}
+                      className="inline-flex items-center gap-1 text-[11px] text-maroon border border-dashed border-maroon/40 rounded-full px-2.5 py-0.5 hover:bg-maroon/5 transition-colors"
+                    >
+                      <IoAdd className="h-3 w-3" /> Add
+                    </button>
+                  </div>
 
-                      const subRow =
-                        expandedCategoryId === cat.id ? (
-                          <TableRow key={`cat-sub-${cat.id}`}>
-                            <TableCell colSpan={6} className="bg-gradient-to-br from-gray-50 to-blue-50/30 p-0 border-b-2 border-gray-200">
-                              <div className="p-8 pl-20">
-                                <div className="flex items-center gap-3 mb-6">
-                                  <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-2 rounded-lg">
-                                    <MdSubdirectoryArrowRight className="h-5 w-5 text-white" />
-                                  </div>
-                                  <h4 className="font-bold text-gray-900 text-lg">Subcategories</h4>
-                                  <Badge className="bg-blue-100 text-blue-700 font-semibold">
-                                    {cat.subcategories?.length || 0} items
-                                  </Badge>
-                                </div>
-                                {cat.subcategories && cat.subcategories.length > 0 ? (
-                                  <div className="grid gap-3">
-                                    {cat.subcategories.map((sub) => (
-                                      <div
-                                        key={sub.id}
-                                        className="group flex justify-between items-center py-4 px-5 bg-white rounded-xl border-2 border-gray-200 hover:border-blue-300 hover:shadow-md transition-all"
-                                      >
-                                        <div className="flex items-center gap-4">
-                                          <Badge variant="outline" className="font-mono text-xs">
-                                            #{sub.id}
-                                          </Badge>
-                                          <div className="h-8 w-1 bg-gradient-to-b from-blue-400 to-indigo-500 rounded-full"></div>
-                                          <span className="font-semibold text-gray-900 text-base">{sub.name}</span>
-                                          <span className="text-gray-300">•</span>
-                                          <code className="text-sm bg-gray-100 px-3 py-1 rounded-md text-gray-600 font-mono">
-                                            {sub.slug}
-                                          </code>
-                                        </div>
-                                        <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                          <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => openEditSub(sub)}
-                                            title="Edit subcategory"
-                                            className="hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300"
-                                          >
-                                            <BiPencil className="h-3.5 w-3.5" />
-                                          </Button>
-                                          <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => deleteSubcategory(sub.id)}
-                                            title="Delete subcategory"
-                                            className="hover:bg-red-50 hover:text-red-600 hover:border-red-300"
-                                          >
-                                            <BiTrash className="h-3.5 w-3.5" />
-                                          </Button>
-                                        </div>
-                                      </div>
-                                    ))}
-                                  </div>
-                                ) : (
-                                  <div className="text-center py-12 bg-white rounded-xl border-2 border-dashed border-gray-300">
-                                    <div className="bg-gradient-to-br from-gray-100 to-gray-200 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
-                                      <MdSubdirectoryArrowRight className="h-10 w-10 text-gray-400" />
-                                    </div>
-                                    <p className="text-base font-medium text-gray-700 mb-1">No subcategories yet</p>
-                                    <p className="text-sm text-gray-500 mb-4">Add your first subcategory to get started</p>
-                                    <Button
-                                      onClick={() => openAddSub(cat)}
-                                      className="bg-gradient-to-r from-blue-600 to-indigo-600"
-                                    >
-                                      <IoAdd className="h-4 w-4 mr-2" /> Add Subcategory
-                                    </Button>
-                                  </div>
-                                )}
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        ) : null;
-
-                      return subRow ? [baseRow, subRow] : [baseRow];
-                    })
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-          </CardContent>
-        </Card>
+                  <div className="flex items-center justify-between mt-auto pt-3 text-[11.5px] text-muted-foreground">
+                    <span className="font-mono">#{cat.id}</span>
+                    <span>
+                      {cat.subcategories?.length || 0}{" "}
+                      {(cat.subcategories?.length || 0) === 1 ? "subcategory" : "subcategories"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Add Category Dialog */}
       <Dialog open={isAddCategoryOpen} onOpenChange={setIsAddCategoryOpen}>
         <DialogContent className="sm:max-w-[550px]">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-gray-900">Add New Category</DialogTitle>
-            <p className="text-sm text-gray-500">Create a new product category with an image</p>
+            <DialogTitle className="font-serif text-xl font-medium text-espresso">Add New Category</DialogTitle>
+            <p className="text-[13px] text-muted-foreground">Create a new product category with an image</p>
           </DialogHeader>
           <form onSubmit={createCategory} className="space-y-5 mt-2">
             <div className="space-y-2">
-              <Label htmlFor="name" className="text-sm font-semibold text-gray-700">
-                Category Name <span className="text-red-500">*</span>
+              <Label htmlFor="name" className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">
+                Category Name <span className="text-sale">*</span>
               </Label>
               <Input
                 id="name"
@@ -831,12 +689,12 @@ const AdminCategories: React.FC = () => {
                 onChange={onCatInput}
                 placeholder="e.g., Women's Dresses"
                 required
-                className="h-11"
+                className="h-10 bg-white rounded-sm border-border text-[13px] focus:border-maroon focus-visible:ring-0 focus-visible:ring-offset-0"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="slug" className="text-sm font-semibold text-gray-700">
-                Slug <span className="text-red-500">*</span>
+              <Label htmlFor="slug" className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">
+                Slug <span className="text-sale">*</span>
               </Label>
               <Input
                 id="slug"
@@ -845,13 +703,13 @@ const AdminCategories: React.FC = () => {
                 onChange={onCatInput}
                 placeholder="e.g., womens-dresses"
                 required
-                className="h-11 font-mono"
+                className="h-10 bg-white rounded-sm border-border text-[13px] focus:border-maroon focus-visible:ring-0 focus-visible:ring-offset-0 font-mono"
               />
-              <p className="text-xs text-gray-500">URL-friendly version (lowercase, hyphens)</p>
+              <p className="text-xs text-muted-foreground">URL-friendly version (lowercase, hyphens)</p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="image" className="text-sm font-semibold text-gray-700">
-                Category Image <span className="text-red-500">*</span>
+              <Label htmlFor="image" className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">
+                Category Image <span className="text-sale">*</span>
               </Label>
               <div className="flex items-center gap-4">
                 <Input
@@ -860,16 +718,16 @@ const AdminCategories: React.FC = () => {
                   accept="image/*"
                   onChange={onCatImage}
                   required
-                  className="flex-1"
+                  className="flex-1 bg-white rounded-sm border-border text-[13px] focus:border-maroon focus-visible:ring-0 focus-visible:ring-offset-0"
                 />
               </div>
               {catForm.imagePreview && (
-                <div className="mt-4 p-4 bg-gray-50 rounded-xl border-2 border-gray-200">
-                  <p className="text-sm font-semibold text-gray-700 mb-3">Preview:</p>
+                <div className="mt-4 p-4 bg-[#FBF8F3] rounded-md border border-border">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso mb-3">Preview:</p>
                   <img
                     src={catForm.imagePreview}
                     alt="preview"
-                    className="w-40 h-40 object-cover rounded-lg shadow-lg border-2 border-white"
+                    className="w-40 h-40 object-cover rounded-md border border-border"
                   />
                 </div>
               )}
@@ -886,7 +744,7 @@ const AdminCategories: React.FC = () => {
               <Button 
                 type="submit" 
                 disabled={formLoading}
-                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                className="bg-maroon text-ivory uppercase text-[11px] tracking-[0.12em] rounded-sm hover:bg-terracotta"
               >
                 {formLoading ? (
                   <>
@@ -909,13 +767,13 @@ const AdminCategories: React.FC = () => {
       <Dialog open={isEditCategoryOpen} onOpenChange={setIsEditCategoryOpen}>
         <DialogContent className="sm:max-w-[550px]">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-gray-900">Edit Category</DialogTitle>
-            <p className="text-sm text-gray-500">Update category information</p>
+            <DialogTitle className="font-serif text-xl font-medium text-espresso">Edit Category</DialogTitle>
+            <p className="text-[13px] text-muted-foreground">Update category information</p>
           </DialogHeader>
           <form onSubmit={updateCategory} className="space-y-5 mt-2">
             <div className="space-y-2">
-              <Label htmlFor="edit-name" className="text-sm font-semibold text-gray-700">
-                Category Name <span className="text-red-500">*</span>
+              <Label htmlFor="edit-name" className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">
+                Category Name <span className="text-sale">*</span>
               </Label>
               <Input
                 id="edit-name"
@@ -923,12 +781,12 @@ const AdminCategories: React.FC = () => {
                 value={catForm.name}
                 onChange={onCatInput}
                 required
-                className="h-11"
+                className="h-10 bg-white rounded-sm border-border text-[13px] focus:border-maroon focus-visible:ring-0 focus-visible:ring-offset-0"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="edit-slug" className="text-sm font-semibold text-gray-700">
-                Slug <span className="text-red-500">*</span>
+              <Label htmlFor="edit-slug" className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">
+                Slug <span className="text-sale">*</span>
               </Label>
               <Input
                 id="edit-slug"
@@ -936,11 +794,11 @@ const AdminCategories: React.FC = () => {
                 value={catForm.slug}
                 onChange={onCatInput}
                 required
-                className="h-11 font-mono"
+                className="h-10 bg-white rounded-sm border-border text-[13px] focus:border-maroon focus-visible:ring-0 focus-visible:ring-offset-0 font-mono"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="edit-image" className="text-sm font-semibold text-gray-700">Category Image</Label>
+              <Label htmlFor="edit-image" className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">Category Image</Label>
               <Input
                 id="edit-image"
                 type="file"
@@ -948,18 +806,18 @@ const AdminCategories: React.FC = () => {
                 onChange={onCatImage}
               />
               {catForm.imagePreview && (
-                <div className="mt-4 p-4 bg-gray-50 rounded-xl border-2 border-gray-200">
-                  <p className="text-sm font-semibold text-gray-700 mb-3">
+                <div className="mt-4 p-4 bg-[#FBF8F3] rounded-md border border-border">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso mb-3">
                     {catForm.image ? "New Image Preview:" : "Current Image:"}
                   </p>
                   <img
                     src={catForm.imagePreview}
                     alt="current"
-                    className="w-40 h-40 object-cover rounded-lg shadow-lg border-2 border-white"
+                    className="w-40 h-40 object-cover rounded-md border border-border"
                   />
                 </div>
               )}
-              <p className="text-xs text-gray-500">Leave empty to keep the current image</p>
+              <p className="text-xs text-muted-foreground">Leave empty to keep the current image</p>
             </div>
             <DialogFooter className="gap-2 mt-6">
               <Button
@@ -973,7 +831,7 @@ const AdminCategories: React.FC = () => {
               <Button 
                 type="submit" 
                 disabled={formLoading}
-                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                className="bg-maroon text-ivory uppercase text-[11px] tracking-[0.12em] rounded-sm hover:bg-terracotta"
               >
                 {formLoading ? (
                   <>
@@ -996,17 +854,17 @@ const AdminCategories: React.FC = () => {
       <Dialog open={isSubcategoryDialogOpen} onOpenChange={setIsSubcategoryDialogOpen}>
         <DialogContent className="sm:max-w-[550px]">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-gray-900">
+            <DialogTitle className="font-serif text-xl font-medium text-espresso">
               {subcategoryMode === "add" ? "Add Subcategory" : "Edit Subcategory"}
             </DialogTitle>
-            <p className="text-sm text-gray-500">
+            <p className="text-[13px] text-muted-foreground">
               {subcategoryMode === "add" ? "Create a new subcategory" : "Update subcategory information"}
             </p>
           </DialogHeader>
           <form onSubmit={saveSubcategory} className="space-y-5 mt-2">
             <div className="space-y-2">
-              <Label htmlFor="sub-name" className="text-sm font-semibold text-gray-700">
-                Subcategory Name <span className="text-red-500">*</span>
+              <Label htmlFor="sub-name" className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">
+                Subcategory Name <span className="text-sale">*</span>
               </Label>
               <Input
                 id="sub-name"
@@ -1015,12 +873,12 @@ const AdminCategories: React.FC = () => {
                 onChange={(e) => setSubForm((s) => ({ ...s, name: e.target.value }))}
                 placeholder="e.g., Summer Dresses"
                 required
-                className="h-11"
+                className="h-10 bg-white rounded-sm border-border text-[13px] focus:border-maroon focus-visible:ring-0 focus-visible:ring-offset-0"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="sub-slug" className="text-sm font-semibold text-gray-700">
-                Slug <span className="text-red-500">*</span>
+              <Label htmlFor="sub-slug" className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">
+                Slug <span className="text-sale">*</span>
               </Label>
               <Input
                 id="sub-slug"
@@ -1029,14 +887,14 @@ const AdminCategories: React.FC = () => {
                 onChange={(e) => setSubForm((s) => ({ ...s, slug: e.target.value }))}
                 placeholder="e.g., summer-dresses"
                 required
-                className="h-11 font-mono"
+                className="h-10 bg-white rounded-sm border-border text-[13px] focus:border-maroon focus-visible:ring-0 focus-visible:ring-offset-0 font-mono"
               />
-              <p className="text-xs text-gray-500">URL-friendly version (lowercase, hyphens)</p>
+              <p className="text-xs text-muted-foreground">URL-friendly version (lowercase, hyphens)</p>
             </div>
             {subcategoryMode === "add" && (
               <div className="space-y-2">
-                <Label htmlFor="sub-category" className="text-sm font-semibold text-gray-700">
-                  Parent Category ID <span className="text-red-500">*</span>
+                <Label htmlFor="sub-category" className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">
+                  Parent Category ID <span className="text-sale">*</span>
                 </Label>
                 <Input
                   id="sub-category"
@@ -1046,9 +904,9 @@ const AdminCategories: React.FC = () => {
                   placeholder="Category ID"
                   required
                   disabled
-                  className="h-11 bg-gray-50 font-mono"
+                  className="h-10 bg-sand/30 rounded-sm border-border text-[13px] font-mono"
                 />
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-muted-foreground">
                   Auto-filled from parent category
                 </p>
               </div>
@@ -1065,7 +923,7 @@ const AdminCategories: React.FC = () => {
               <Button 
                 type="submit" 
                 disabled={formLoading}
-                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                className="bg-maroon text-ivory uppercase text-[11px] tracking-[0.12em] rounded-sm hover:bg-terracotta"
               >
                 {formLoading ? (
                   <>

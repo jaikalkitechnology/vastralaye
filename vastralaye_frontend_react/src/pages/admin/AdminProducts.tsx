@@ -225,6 +225,16 @@ const normalizeProduct = (p: any): ProductType => ({
   subcategory_id: toNumOrNull(p?.subcategory_id) ?? undefined,
 });
 
+/* ======================== Status chip (admin_design.md §3.4) ======================== */
+const StatusChip = ({ tint, label }: { tint: string; label: string }) => (
+  <span
+    className={`inline-flex items-center gap-1.5 text-[11px] font-semibold rounded-full px-2.5 py-0.5 whitespace-nowrap ${tint}`}
+  >
+    <span className="h-1.5 w-1.5 rounded-full bg-current" />
+    {label}
+  </span>
+);
+
 /* ======================== API endpoints ======================== */
 const ENDPOINTS = {
   productsList: `${BASE_URL}/admin/products`,
@@ -675,9 +685,9 @@ export default function AdminProductsPage(): JSX.Element {
       <AdminLayout>
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center">
-            <ShieldAlert className="h-16 w-16 text-red-500 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h2>
-            <p className="text-gray-600">Admin privileges required.</p>
+            <ShieldAlert className="h-16 w-16 text-sale mx-auto mb-4" />
+            <h2 className="font-serif text-2xl font-medium text-espresso mb-2">Access Denied</h2>
+            <p className="text-[13px] text-muted-foreground">Admin privileges required.</p>
           </div>
         </div>
       </AdminLayout>
@@ -694,51 +704,46 @@ export default function AdminProductsPage(): JSX.Element {
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 tracking-tight mb-2">Product Management</h1>
-            <p className="text-gray-600 text-base">Manage your product catalog</p>
+            <h1 className="font-serif text-xl md:text-2xl font-medium text-espresso">Products</h1>
+            <p className="text-[13px] text-muted-foreground mt-1">Manage your product catalog</p>
           </div>
           <div className="flex gap-3">
-            <Button variant="outline" onClick={() => { fetchProducts(); fetchCategories(); }} disabled={loading} className="hover:bg-gray-50">
+            <Button variant="outline" onClick={() => { fetchProducts(); fetchCategories(); }} disabled={loading} className="uppercase text-[11px] tracking-[0.12em] px-5 py-2.5 rounded-sm">
               <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />Refresh
             </Button>
-            <Button onClick={openCreate} className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-sm" disabled={loading}>
-              <Plus className="h-4 w-4 mr-2" />Add New Product
+            <Button onClick={openCreate} className="bg-maroon text-ivory uppercase text-[11px] tracking-[0.12em] px-5 py-2.5 rounded-sm hover:bg-terracotta" disabled={loading}>
+              <Plus className="h-4 w-4 mr-2" />Add Product
             </Button>
           </div>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
           {[
-            { label: "Total Products", value: totalProducts, icon: Package, gradient: "from-blue-500 via-blue-600 to-blue-700", lightText: "text-blue-100", corner: TrendingUp },
-            { label: "In Stock", value: stats.inStock, icon: ShoppingBag, gradient: "from-emerald-500 via-emerald-600 to-emerald-700", lightText: "text-emerald-100", corner: BarChart3 },
-            { label: "Featured", value: stats.featured, icon: Star, gradient: "from-violet-500 via-violet-600 to-violet-700", lightText: "text-violet-100", corner: Sparkles },
-            { label: "Best Sellers", value: stats.bestSellers, icon: Award, gradient: "from-amber-500 via-amber-600 to-amber-700", lightText: "text-amber-100", corner: DollarSign },
+            { label: "Total Products", value: totalProducts, icon: Package, tint: "bg-maroon/10 text-maroon" },
+            { label: "In Stock", value: stats.inStock, icon: ShoppingBag, tint: "bg-green-700/10 text-green-800" },
+            { label: "Featured", value: stats.featured, icon: Star, tint: "bg-gold/15 text-[#8a6414]" },
+            { label: "Best Sellers", value: stats.bestSellers, icon: Award, tint: "bg-[#5C6B8A]/10 text-[#5C6B8A]" },
           ].map((s) => (
-            <Card key={s.label} className={`relative overflow-hidden border-none shadow-lg bg-gradient-to-br ${s.gradient} text-white transform hover:scale-105 transition-transform duration-300`}>
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16" />
-              <CardContent className="p-6 relative z-10">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl"><s.icon className="h-6 w-6" /></div>
-                  <s.corner className="h-5 w-5 opacity-70" />
-                </div>
-                <p className={`text-sm font-medium ${s.lightText} mb-1`}>{s.label}</p>
-                <p className="text-4xl font-bold tracking-tight">{s.value}</p>
-              </CardContent>
-            </Card>
+            <div key={s.label} className="bg-white border border-border rounded-md p-5">
+              <div className={`w-9 h-9 rounded-md ${s.tint} flex items-center justify-center mb-3`}>
+                <s.icon className="h-4 w-4" />
+              </div>
+              <p className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground font-semibold mb-1">{s.label}</p>
+              <p className="font-serif text-2xl md:text-[27px] font-medium text-espresso">{s.value}</p>
+            </div>
           ))}
         </div>
 
         {/* Filters */}
-        <Card className="border-gray-200 shadow-sm">
-          <CardContent className="p-6">
+        <div className="bg-white border border-border rounded-md p-5">
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                 <div className="relative md:col-span-2">
-                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     placeholder="Search products..."
-                    className="pl-11 h-11 border-gray-300"
+                    className="pl-9 h-10 bg-white rounded-sm border-border text-[13px] focus:border-maroon focus-visible:ring-0 focus-visible:ring-offset-0"
                     value={filters.search}
                     onChange={(e) => updateFilter("search", e.target.value)}
                   />
@@ -757,7 +762,7 @@ export default function AdminProductsPage(): JSX.Element {
                     setCurrentPage(1);
                   }}
                 >
-                  <SelectTrigger className="h-11 border-gray-300">
+                  <SelectTrigger className="h-10 bg-white rounded-sm border-border text-[13px] focus:border-maroon focus:ring-0 focus:ring-offset-0">
                     <SelectValue placeholder="All Categories" />
                   </SelectTrigger>
                   <SelectContent>
@@ -774,7 +779,7 @@ export default function AdminProductsPage(): JSX.Element {
                   onValueChange={(v) => updateFilter("subcategory_id", v === "all" ? "" : v)}
                   disabled={!filters.category_id || filters.category_id === "all"}
                 >
-                  <SelectTrigger className="h-11 border-gray-300">
+                  <SelectTrigger className="h-10 bg-white rounded-sm border-border text-[13px] focus:border-maroon focus:ring-0 focus:ring-offset-0">
                     <SelectValue placeholder={
                       !filters.category_id || filters.category_id === "all"
                         ? "Select category first"
@@ -795,7 +800,7 @@ export default function AdminProductsPage(): JSX.Element {
                   </SelectContent>
                 </Select>
 
-                <Button variant="outline" onClick={() => setShowAdvancedFilters(!showAdvancedFilters)} className="w-full h-11 border-gray-300">
+                <Button variant="outline" onClick={() => setShowAdvancedFilters(!showAdvancedFilters)} className="w-full h-10 rounded-sm text-[12.5px]">
                   <SlidersHorizontal className="h-4 w-4 mr-2" />
                   {showAdvancedFilters ? "Hide" : "Show"} Filters
                 </Button>
@@ -803,19 +808,19 @@ export default function AdminProductsPage(): JSX.Element {
 
               {/* Advanced Filters */}
               {showAdvancedFilters && (
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-6 bg-gradient-to-br from-gray-50 to-blue-50 rounded-xl border border-gray-200">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-5 bg-[#FBF8F3] rounded-md border border-border">
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold text-gray-700 uppercase tracking-wide">Min Price (₹)</Label>
-                    <Input type="number" placeholder="0" value={filters.min_price} onChange={(e) => updateFilter("min_price", e.target.value)} min="0" step="0.01" className="border-gray-300" />
+                    <Label className="text-[10.5px] font-semibold text-muted-foreground uppercase tracking-[0.14em]">Min Price (₹)</Label>
+                    <Input type="number" placeholder="0" value={filters.min_price} onChange={(e) => updateFilter("min_price", e.target.value)} min="0" step="0.01" className="bg-white rounded-sm border-border text-[13px] focus:border-maroon focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0" />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold text-gray-700 uppercase tracking-wide">Max Price (₹)</Label>
-                    <Input type="number" placeholder="No limit" value={filters.max_price} onChange={(e) => updateFilter("max_price", e.target.value)} min="0" step="0.01" className="border-gray-300" />
+                    <Label className="text-[10.5px] font-semibold text-muted-foreground uppercase tracking-[0.14em]">Max Price (₹)</Label>
+                    <Input type="number" placeholder="No limit" value={filters.max_price} onChange={(e) => updateFilter("max_price", e.target.value)} min="0" step="0.01" className="bg-white rounded-sm border-border text-[13px] focus:border-maroon focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0" />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold text-gray-700 uppercase tracking-wide">Stock Status</Label>
+                    <Label className="text-[10.5px] font-semibold text-muted-foreground uppercase tracking-[0.14em]">Stock Status</Label>
                     <Select value={filters.in_stock} onValueChange={(v) => updateFilter("in_stock", v)}>
-                      <SelectTrigger className="border-gray-300"><SelectValue /></SelectTrigger>
+                      <SelectTrigger className="bg-white rounded-sm border-border text-[13px] focus:border-maroon focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0"><SelectValue /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">All Products</SelectItem>
                         <SelectItem value="true">In Stock</SelectItem>
@@ -824,9 +829,9 @@ export default function AdminProductsPage(): JSX.Element {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold text-gray-700 uppercase tracking-wide">Min Rating</Label>
+                    <Label className="text-[10.5px] font-semibold text-muted-foreground uppercase tracking-[0.14em]">Min Rating</Label>
                     <Select value={filters.min_rating || "all"} onValueChange={(v) => updateFilter("min_rating", v === "all" ? "" : v)}>
-                      <SelectTrigger className="border-gray-300"><SelectValue placeholder="Any rating" /></SelectTrigger>
+                      <SelectTrigger className="bg-white rounded-sm border-border text-[13px] focus:border-maroon focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0"><SelectValue placeholder="Any rating" /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">Any Rating</SelectItem>
                         <SelectItem value="4.5">4.5+ Stars</SelectItem>
@@ -837,9 +842,9 @@ export default function AdminProductsPage(): JSX.Element {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold text-gray-700 uppercase tracking-wide">Featured</Label>
+                    <Label className="text-[10.5px] font-semibold text-muted-foreground uppercase tracking-[0.14em]">Featured</Label>
                     <Select value={filters.featured} onValueChange={(v) => updateFilter("featured", v)}>
-                      <SelectTrigger className="border-gray-300"><SelectValue /></SelectTrigger>
+                      <SelectTrigger className="bg-white rounded-sm border-border text-[13px] focus:border-maroon focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0"><SelectValue /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">All</SelectItem>
                         <SelectItem value="true">Featured Only</SelectItem>
@@ -848,9 +853,9 @@ export default function AdminProductsPage(): JSX.Element {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold text-gray-700 uppercase tracking-wide">Best Seller</Label>
+                    <Label className="text-[10.5px] font-semibold text-muted-foreground uppercase tracking-[0.14em]">Best Seller</Label>
                     <Select value={filters.best_seller} onValueChange={(v) => updateFilter("best_seller", v)}>
-                      <SelectTrigger className="border-gray-300"><SelectValue /></SelectTrigger>
+                      <SelectTrigger className="bg-white rounded-sm border-border text-[13px] focus:border-maroon focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0"><SelectValue /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">All</SelectItem>
                         <SelectItem value="true">Best Sellers Only</SelectItem>
@@ -859,9 +864,9 @@ export default function AdminProductsPage(): JSX.Element {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold text-gray-700 uppercase tracking-wide">New Arrival</Label>
+                    <Label className="text-[10.5px] font-semibold text-muted-foreground uppercase tracking-[0.14em]">New Arrival</Label>
                     <Select value={filters.new_arrival} onValueChange={(v) => updateFilter("new_arrival", v)}>
-                      <SelectTrigger className="border-gray-300"><SelectValue /></SelectTrigger>
+                      <SelectTrigger className="bg-white rounded-sm border-border text-[13px] focus:border-maroon focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0"><SelectValue /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">All</SelectItem>
                         <SelectItem value="true">New Arrivals Only</SelectItem>
@@ -870,9 +875,9 @@ export default function AdminProductsPage(): JSX.Element {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold text-gray-700 uppercase tracking-wide">Sort By</Label>
+                    <Label className="text-[10.5px] font-semibold text-muted-foreground uppercase tracking-[0.14em]">Sort By</Label>
                     <Select value={filters.sort_by} onValueChange={(v) => updateFilter("sort_by", v)}>
-                      <SelectTrigger className="border-gray-300"><SelectValue /></SelectTrigger>
+                      <SelectTrigger className="bg-white rounded-sm border-border text-[13px] focus:border-maroon focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0"><SelectValue /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="newest">Newest First</SelectItem>
                         <SelectItem value="oldest">Oldest First</SelectItem>
@@ -884,74 +889,73 @@ export default function AdminProductsPage(): JSX.Element {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold text-gray-700 uppercase tracking-wide">Filter by Sizes</Label>
-                    <Input placeholder="e.g., S, M, L" value={filters.sizes} onChange={(e) => updateFilter("sizes", e.target.value)} className="border-gray-300" />
-                    <p className="text-xs text-gray-500">Comma-separated</p>
+                    <Label className="text-[10.5px] font-semibold text-muted-foreground uppercase tracking-[0.14em]">Filter by Sizes</Label>
+                    <Input placeholder="e.g., S, M, L" value={filters.sizes} onChange={(e) => updateFilter("sizes", e.target.value)} className="bg-white rounded-sm border-border text-[13px] focus:border-maroon focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0" />
+                    <p className="text-xs text-muted-foreground">Comma-separated</p>
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold text-gray-700 uppercase tracking-wide">Filter by Colors</Label>
-                    <Input placeholder="e.g., Red, Blue" value={filters.colors} onChange={(e) => updateFilter("colors", e.target.value)} className="border-gray-300" />
-                    <p className="text-xs text-gray-500">Comma-separated</p>
+                    <Label className="text-[10.5px] font-semibold text-muted-foreground uppercase tracking-[0.14em]">Filter by Colors</Label>
+                    <Input placeholder="e.g., Red, Blue" value={filters.colors} onChange={(e) => updateFilter("colors", e.target.value)} className="bg-white rounded-sm border-border text-[13px] focus:border-maroon focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0" />
+                    <p className="text-xs text-muted-foreground">Comma-separated</p>
                   </div>
                 </div>
               )}
 
-              <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-                <div className="text-sm text-gray-700 font-medium">
+              <div className="flex items-center justify-between pt-4 border-t border-border">
+                <div className="text-[13px] text-muted-foreground">
                   {products.length} product{products.length !== 1 ? "s" : ""} found
-                  {hasActiveFilters && <span className="ml-2 text-blue-600 font-semibold">(filtered)</span>}
+                  {hasActiveFilters && <span className="ml-2 text-maroon font-semibold">(filtered)</span>}
                 </div>
                 {hasActiveFilters && (
-                  <Button variant="outline" size="sm" onClick={clearAllFilters} className="border-gray-300">
+                  <Button variant="outline" size="sm" onClick={clearAllFilters} className="rounded-sm text-[12px]">
                     <X className="h-4 w-4 mr-1.5" /> Clear All
                   </Button>
                 )}
               </div>
             </div>
-          </CardContent>
-        </Card>
+        </div>
 
         {/* Products Table */}
-        <Card className="border-gray-200 shadow-sm">
-          <CardHeader className="border-b border-gray-200">
+        <div className="bg-white border border-border rounded-md overflow-hidden">
+          <div className="border-b border-border px-5 py-4">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <CardTitle className="text-xl font-bold text-gray-900">Products Catalog</CardTitle>
+              <h2 className="text-[12px] uppercase tracking-[0.16em] font-semibold text-espresso">Products Catalog</h2>
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2">
-                  <Label className="text-sm text-gray-600 font-medium">Per page:</Label>
+                  <Label className="text-[12.5px] text-muted-foreground font-medium">Per page:</Label>
                   <Select value={pageLimit.toString()} onValueChange={(v) => { setPageLimit(parseInt(v)); setCurrentPage(1); }}>
-                    <SelectTrigger className="w-20 h-9 border-gray-300"><SelectValue /></SelectTrigger>
+                    <SelectTrigger className="w-20 h-8 bg-white rounded-sm border-border text-[12.5px] focus:border-maroon focus:ring-0 focus:ring-offset-0"><SelectValue /></SelectTrigger>
                     <SelectContent>
                       {[10, 20, 50, 100].map(n => <SelectItem key={n} value={n.toString()}>{n}</SelectItem>)}
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Button variant="outline" size="sm" onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1 || loading} className="border-gray-300">
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1 || loading} className="h-8 px-3 text-[12.5px] rounded-[5px] border-border text-espresso hover:bg-[#FBF8F3] hover:text-espresso">
                     <ChevronLeft className="h-4 w-4 mr-1" />Previous
                   </Button>
-                  <div className="text-sm text-gray-600 font-medium min-w-[100px] text-center">
+                  <div className="text-[12.5px] text-muted-foreground font-medium min-w-[100px] text-center">
                     Page {currentPage} {totalPages > 1 ? `of ${totalPages}` : ''}
                   </div>
-                  <Button variant="outline" size="sm" onClick={() => setCurrentPage(p => p + 1)} disabled={products.length < pageLimit || loading} className="border-gray-300">
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPage(p => p + 1)} disabled={products.length < pageLimit || loading} className="h-8 px-3 text-[12.5px] rounded-[5px] border-border text-espresso hover:bg-[#FBF8F3] hover:text-espresso">
                     Next<ChevronRight className="h-4 w-4 ml-1" />
                   </Button>
                 </div>
               </div>
             </div>
-          </CardHeader>
+          </div>
 
-          <CardContent className="p-0">
+          <div>
             <Table>
               <TableHeader>
-                <TableRow className="bg-gray-50 hover:bg-gray-50">
-                  <TableHead className="font-semibold text-gray-700">Product</TableHead>
-                  <TableHead className="font-semibold text-gray-700">Category</TableHead>
-                  <TableHead className="font-semibold text-gray-700">Price</TableHead>
-                  <TableHead className="font-semibold text-gray-700">Rating</TableHead>
-                  <TableHead className="font-semibold text-gray-700">Stock</TableHead>
-                  <TableHead className="font-semibold text-gray-700">Status</TableHead>
-                  <TableHead className="text-right font-semibold text-gray-700">Actions</TableHead>
+                <TableRow className="bg-[#FBF8F3] hover:bg-[#FBF8F3] border-border">
+                  <TableHead className="h-auto px-3 py-2.5 text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground font-semibold whitespace-nowrap">Product</TableHead>
+                  <TableHead className="h-auto px-3 py-2.5 text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground font-semibold whitespace-nowrap">Category</TableHead>
+                  <TableHead className="h-auto px-3 py-2.5 text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground font-semibold whitespace-nowrap text-right">Price</TableHead>
+                  <TableHead className="h-auto px-3 py-2.5 text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground font-semibold whitespace-nowrap">Rating</TableHead>
+                  <TableHead className="h-auto px-3 py-2.5 text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground font-semibold whitespace-nowrap">Stock</TableHead>
+                  <TableHead className="h-auto px-3 py-2.5 text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground font-semibold whitespace-nowrap">Status</TableHead>
+                  <TableHead className="h-auto px-3 py-2.5 text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground font-semibold whitespace-nowrap text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -959,8 +963,8 @@ export default function AdminProductsPage(): JSX.Element {
                   <TableRow>
                     <TableCell colSpan={7} className="text-center py-12">
                       <div className="flex flex-col items-center gap-3">
-                        <RefreshCw className="h-8 w-8 animate-spin text-blue-600" />
-                        <p className="text-sm text-gray-500 font-medium">Loading products...</p>
+                        <RefreshCw className="h-8 w-8 animate-spin text-maroon" />
+                        <p className="text-[13px] text-muted-foreground font-medium">Loading products...</p>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -977,70 +981,79 @@ export default function AdminProductsPage(): JSX.Element {
                     const reviewsValue = hasReviews ? Number(p.reviews) : null;
 
                     return (
-                      <TableRow key={p.id} className="hover:bg-gray-50 transition-colors">
-                        <TableCell>
+                      <TableRow key={p.id} className="hover:bg-[#FBF8F3] border-border transition-colors">
+                        <TableCell className="px-3 py-3 text-[13px]">
                           <div className="flex items-center gap-3">
                             {firstImage ? (
-                              <img src={getImageUrl(firstImage)} alt={p.name} className="w-14 h-14 object-cover rounded-lg border-2 border-gray-200 shadow-sm" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                              <img src={getImageUrl(firstImage)} alt={p.name} className="w-[38px] h-[46px] object-cover rounded border border-border flex-none" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
                             ) : (
-                              <div className="w-14 h-14 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg border-2 border-gray-200 flex items-center justify-center">
-                                <ImageIcon className="h-7 w-7 text-gray-400" />
+                              <div className="w-[38px] h-[46px] bg-[#FBF8F3] rounded border border-border flex items-center justify-center flex-none">
+                                <ImageIcon className="h-4 w-4 text-muted-foreground" />
                               </div>
                             )}
                             <div>
-                              <div className="font-semibold text-gray-900">{p.name}</div>
-                              <div className="text-sm text-gray-500">{p.description?.substring(0, 60)}{p.description && p.description.length > 60 ? "..." : ""}</div>
+                              <div className="font-semibold text-espresso">{p.name}</div>
+                              <div className="text-[11.5px] text-muted-foreground">{p.description?.substring(0, 60)}{p.description && p.description.length > 60 ? "..." : ""}</div>
                             </div>
                           </div>
                         </TableCell>
 
                         {/* ✅ FIX #5: Category/Subcategory display — use Number() for map lookup */}
-                        <TableCell>
-                          <div className="text-sm font-semibold text-gray-900">
+                        <TableCell className="px-3 py-3 text-[13px]">
+                          <div className="font-medium text-espresso">
                             {p.category || categoryMap[Number(p.category_id)] || (p.category_id ? `Cat #${p.category_id}` : "N/A")}
                           </div>
-                          <div className="text-xs text-gray-500 font-medium">
+                          <div className="text-[11.5px] text-muted-foreground">
                             {p.subcategory || subcategoryMap[Number(p.subcategory_id)] || ""}
                           </div>
                         </TableCell>
 
-                        <TableCell>
-                          <div className="font-bold text-gray-900">₹{p.price ?? "-"}</div>
-                          {p.discount_price && p.discount_price > 0 && <div className="text-sm text-gray-500 line-through">₹{p.discount_price}</div>}
+                        <TableCell className="px-3 py-3 text-[13px] text-right">
+                          <div className="font-semibold text-espresso">₹{p.price ?? "-"}</div>
+                          {p.discount_price && p.discount_price > 0 && <div className="text-[11.5px] text-muted-foreground line-through">₹{p.discount_price}</div>}
                         </TableCell>
 
-                        <TableCell>
+                        <TableCell className="px-3 py-3 text-[13px]">
                           {hasRating ? (
                             <div className="flex items-center gap-1.5">
-                              <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
-                              <span className="text-sm font-semibold text-gray-900">{ratingValue!.toFixed(1)}</span>
-                              {hasReviews && <span className="text-xs text-gray-500 ml-1">({reviewsValue})</span>}
+                              <Star className="h-3.5 w-3.5 text-gold fill-gold" />
+                              <span className="font-semibold text-espresso">{ratingValue!.toFixed(1)}</span>
+                              {hasReviews && <span className="text-[11.5px] text-muted-foreground ml-1">({reviewsValue})</span>}
                             </div>
-                          ) : <span className="text-xs text-gray-400">—</span>}
+                          ) : <span className="text-xs text-muted-foreground">—</span>}
                         </TableCell>
 
-                        <TableCell>
-                          <Badge variant={p.in_stock ? "default" : "destructive"} className={`${p.in_stock ? "bg-emerald-100 text-emerald-800 border-emerald-200" : "bg-red-100 text-red-800 border-red-200"} border font-semibold`}>
-                            {p.in_stock ? "In Stock" : "Out of Stock"}
-                          </Badge>
+                        <TableCell className="px-3 py-3 text-[13px]">
+                          <StatusChip
+                            tint={p.in_stock ? "bg-green-700/10 text-green-800" : "bg-sale/10 text-sale"}
+                            label={p.in_stock ? "In Stock" : "Out of Stock"}
+                          />
                         </TableCell>
 
-                        <TableCell>
+                        <TableCell className="px-3 py-3 text-[13px]">
                           <div className="flex gap-1.5 flex-wrap">
-                            {p.featured && <Badge className="bg-violet-100 text-violet-800 border-violet-200 border font-semibold">Featured</Badge>}
-                            {p.best_seller && <Badge className="bg-amber-100 text-amber-800 border-amber-200 border font-semibold">Best Seller</Badge>}
-                            {p.new_arrival && <Badge className="bg-blue-100 text-blue-800 border-blue-200 border font-semibold">New</Badge>}
+                            {p.featured && <span className="text-[9.5px] font-bold uppercase tracking-[0.1em] rounded-[3px] px-1.5 py-0.5 bg-maroon/10 text-maroon">Featured</span>}
+                            {p.best_seller && <span className="text-[9.5px] font-bold uppercase tracking-[0.1em] rounded-[3px] px-1.5 py-0.5 bg-espresso text-ivory">Bestseller</span>}
+                            {p.new_arrival && <span className="text-[9.5px] font-bold uppercase tracking-[0.1em] rounded-[3px] px-1.5 py-0.5 bg-gold/20 text-[#8a6414]">New</span>}
                           </div>
                         </TableCell>
 
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-2">
-                            <Button variant="outline" size="sm" onClick={() => openEdit(p)} className="border-gray-300 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700">
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button variant="destructive" size="sm" onClick={() => { setDeleteTargetId(p.id); setDeleteDialogOpen(true); }} className="bg-red-600 hover:bg-red-700 text-white">
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
+                        <TableCell className="px-3 py-3 text-[13px] text-right">
+                          <div className="flex justify-end gap-1.5">
+                            <button
+                              title="Edit product"
+                              onClick={() => openEdit(p)}
+                              className="w-7 h-7 border border-border rounded-[5px] inline-flex items-center justify-center text-muted-foreground bg-white hover:text-espresso hover:border-espresso transition-colors"
+                            >
+                              <Edit className="h-3.5 w-3.5" />
+                            </button>
+                            <button
+                              title="Delete product"
+                              onClick={() => { setDeleteTargetId(p.id); setDeleteDialogOpen(true); }}
+                              className="w-7 h-7 border border-sale/35 rounded-[5px] inline-flex items-center justify-center text-sale bg-white hover:bg-sale/5 transition-colors"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
                           </div>
                         </TableCell>
                       </TableRow>
@@ -1050,11 +1063,11 @@ export default function AdminProductsPage(): JSX.Element {
                   <TableRow>
                     <TableCell colSpan={7} className="text-center py-12">
                       <div className="flex flex-col items-center gap-3">
-                        <div className="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center">
-                          <Package className="h-8 w-8 text-gray-400" />
+                        <div className="w-16 h-16 bg-espresso/5 rounded-full flex items-center justify-center">
+                          <Package className="h-8 w-8 text-muted-foreground" />
                         </div>
-                        <p className="text-gray-900 font-semibold">{hasActiveFilters ? "No products match your filters" : "No products found"}</p>
-                        <p className="text-sm text-gray-500">{hasActiveFilters ? "Try adjusting your filters" : "Create your first product"}</p>
+                        <p className="text-espresso font-semibold">{hasActiveFilters ? "No products match your filters" : "No products found"}</p>
+                        <p className="text-[13px] text-muted-foreground">{hasActiveFilters ? "Try adjusting your filters" : "Create your first product"}</p>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -1064,14 +1077,14 @@ export default function AdminProductsPage(): JSX.Element {
 
             {/* Bottom Pagination */}
             {products.length > 0 && (
-              <div className="flex flex-col sm:flex-row justify-between items-center gap-4 p-4 border-t border-gray-200 bg-gray-50">
-                <div className="text-sm text-gray-600 font-medium">
+              <div className="flex flex-col sm:flex-row justify-between items-center gap-4 p-4 border-t border-border bg-[#FBF8F3]">
+                <div className="text-[12.5px] text-muted-foreground">
                   Showing {((currentPage - 1) * pageLimit) + 1} to {((currentPage - 1) * pageLimit) + products.length}
                   {totalProducts > products.length ? ` of ${totalProducts}+` : ` of ${totalProducts}`} products
                 </div>
                 <div className="flex items-center gap-2">
-                  <Button variant="outline" size="sm" onClick={() => setCurrentPage(1)} disabled={currentPage === 1 || loading} className="border-gray-300"><ChevronsLeft className="h-4 w-4" /></Button>
-                  <Button variant="outline" size="sm" onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1 || loading} className="border-gray-300"><ChevronLeft className="h-4 w-4" /></Button>
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPage(1)} disabled={currentPage === 1 || loading} className="h-8 w-8 p-0 rounded-[5px] border-border text-espresso bg-white hover:bg-[#FBF8F3] hover:text-espresso"><ChevronsLeft className="h-4 w-4" /></Button>
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1 || loading} className="h-8 w-8 p-0 rounded-[5px] border-border text-espresso bg-white hover:bg-[#FBF8F3] hover:text-espresso"><ChevronLeft className="h-4 w-4" /></Button>
                   <div className="flex items-center gap-1.5">
                     {totalPages > 1 && Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                       let pageNum;
@@ -1081,53 +1094,53 @@ export default function AdminProductsPage(): JSX.Element {
                       else pageNum = currentPage - 2 + i;
                       return (
                         <Button key={pageNum} variant={currentPage === pageNum ? "default" : "outline"} size="sm" onClick={() => setCurrentPage(pageNum)} disabled={loading}
-                          className={`w-10 h-10 p-0 ${currentPage === pageNum ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md" : "border-gray-300"}`}>
+                          className={`w-8 h-8 p-0 text-[12.5px] rounded-[5px] ${currentPage === pageNum ? "bg-maroon text-ivory hover:bg-terracotta" : "border-border text-espresso bg-white hover:bg-[#FBF8F3] hover:text-espresso"}`}>
                           {pageNum}
                         </Button>
                       );
                     })}
                   </div>
-                  <Button variant="outline" size="sm" onClick={() => setCurrentPage(p => p + 1)} disabled={products.length < pageLimit || loading} className="border-gray-300"><ChevronRight className="h-4 w-4" /></Button>
-                  <Button variant="outline" size="sm" onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages || loading || totalPages === 0} className="border-gray-300"><ChevronsRight className="h-4 w-4" /></Button>
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPage(p => p + 1)} disabled={products.length < pageLimit || loading} className="h-8 w-8 p-0 rounded-[5px] border-border text-espresso bg-white hover:bg-[#FBF8F3] hover:text-espresso"><ChevronRight className="h-4 w-4" /></Button>
+                  <Button variant="outline" size="sm" onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages || loading || totalPages === 0} className="h-8 w-8 p-0 rounded-[5px] border-border text-espresso bg-white hover:bg-[#FBF8F3] hover:text-espresso"><ChevronsRight className="h-4 w-4" /></Button>
                 </div>
               </div>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Create Product Dialog */}
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
           <DialogContent className="max-w-4xl max-h-[95vh] overflow-y-auto p-0">
-            <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 text-white p-6">
+            <div className="bg-[#FBF8F3] border-b border-border p-6">
               <DialogHeader>
-                <DialogTitle className="text-2xl font-bold text-white flex items-center gap-2">
-                  <Plus className="h-6 w-6" />Create New Product
+                <DialogTitle className="font-serif text-xl md:text-2xl font-medium text-espresso flex items-center gap-2">
+                  <Plus className="h-5 w-5 text-maroon" />Create New Product
                 </DialogTitle>
-                <DialogDescription className="text-blue-100">Add a new product to your catalog</DialogDescription>
+                <DialogDescription className="text-muted-foreground text-[13px]">Add a new product to your catalog</DialogDescription>
               </DialogHeader>
             </div>
 
             <form onSubmit={handleCreateProduct} className="p-6 space-y-6">
               {submitError && (
-                <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4">
-                  <p className="text-red-700 text-sm font-medium">{submitError}</p>
+                <div className="bg-sale/5 border border-sale/30 rounded-md p-4">
+                  <p className="text-sale text-sm font-medium">{submitError}</p>
                 </div>
               )}
 
               {/* Basic Info */}
               <div>
-                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                  <Package className="h-5 w-5 text-blue-600" />Basic Information
+                <h3 className="text-[12px] uppercase tracking-[0.16em] font-semibold text-espresso mb-4 flex items-center gap-2">
+                  <Package className="h-4 w-4 text-maroon" />Basic Information
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="name" className="font-semibold text-gray-700">Product Name <span className="text-red-500">*</span></Label>
-                    <Input id="name" value={form.name} onChange={(e) => updateForm("name", e.target.value)} placeholder="Enter product name" required className="border-gray-300" />
+                    <Label htmlFor="name" className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">Product Name <span className="text-red-500">*</span></Label>
+                    <Input id="name" value={form.name} onChange={(e) => updateForm("name", e.target.value)} placeholder="Enter product name" required className="bg-white rounded-sm border-border text-[13px] focus:border-maroon focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0" />
                   </div>
 
                   {/* ✅ FIX #6: Create form category — properly reset subcategory */}
                   <div className="space-y-2">
-                    <Label className="font-semibold text-gray-700">Category <span className="text-red-500">*</span></Label>
+                    <Label className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">Category <span className="text-red-500">*</span></Label>
                     <Select
                       value={form.category_id}
                       onValueChange={(value) => {
@@ -1138,7 +1151,7 @@ export default function AdminProductsPage(): JSX.Element {
                         }));
                       }}
                     >
-                      <SelectTrigger className="border-gray-300">
+                      <SelectTrigger className="bg-white rounded-sm border-border text-[13px] focus:border-maroon focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0">
                         <SelectValue placeholder="Select Category" />
                       </SelectTrigger>
                       <SelectContent>
@@ -1151,10 +1164,10 @@ export default function AdminProductsPage(): JSX.Element {
 
                   {/* ✅ FIX #7: Create form subcategory — better UX with count & empty message */}
                   <div className="space-y-2">
-                    <Label className="font-semibold text-gray-700">
+                    <Label className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">
                       Subcategory
                       {form.category_id && (
-                        <span className="text-xs text-gray-400 ml-2">
+                        <span className="text-xs text-muted-foreground ml-2">
                           ({filteredSubcategories.length} available)
                         </span>
                       )}
@@ -1164,7 +1177,7 @@ export default function AdminProductsPage(): JSX.Element {
                       onValueChange={(value) => updateForm("subcategory_id", value)}
                       disabled={!form.category_id || filteredSubcategories.length === 0}
                     >
-                      <SelectTrigger className="border-gray-300">
+                      <SelectTrigger className="bg-white rounded-sm border-border text-[13px] focus:border-maroon focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0">
                         <SelectValue placeholder={
                           !form.category_id
                             ? "Select a category first"
@@ -1178,7 +1191,7 @@ export default function AdminProductsPage(): JSX.Element {
                           <SelectItem key={sub.id} value={sub.id.toString()}>{sub.name}</SelectItem>
                         ))}
                         {filteredSubcategories.length === 0 && form.category_id && (
-                          <div className="px-3 py-2 text-sm text-gray-400 italic">
+                          <div className="px-3 py-2 text-sm text-muted-foreground italic">
                             No subcategories found for this category
                           </div>
                         )}
@@ -1187,99 +1200,99 @@ export default function AdminProductsPage(): JSX.Element {
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="font-semibold text-gray-700">Price (₹) <span className="text-red-500">*</span></Label>
-                    <Input type="number" step="0.01" value={form.price} onChange={(e) => updateForm("price", e.target.value)} placeholder="0.00" required className="border-gray-300" />
+                    <Label className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">Price (₹) <span className="text-red-500">*</span></Label>
+                    <Input type="number" step="0.01" value={form.price} onChange={(e) => updateForm("price", e.target.value)} placeholder="0.00" required className="bg-white rounded-sm border-border text-[13px] focus:border-maroon focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0" />
                   </div>
                   <div className="space-y-2">
-                    <Label className="font-semibold text-gray-700">Discount Price (₹)</Label>
-                    <Input type="number" step="0.01" value={form.discount_price} onChange={(e) => updateForm("discount_price", e.target.value)} placeholder="0.00" className="border-gray-300" />
+                    <Label className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">Discount Price (₹)</Label>
+                    <Input type="number" step="0.01" value={form.discount_price} onChange={(e) => updateForm("discount_price", e.target.value)} placeholder="0.00" className="bg-white rounded-sm border-border text-[13px] focus:border-maroon focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0" />
                   </div>
                   <div className="space-y-2">
-                    <Label className="font-semibold text-gray-700">Sizes</Label>
-                    <Input value={form.sizes} onChange={(e) => updateForm("sizes", e.target.value)} placeholder="S, M, L, XL" className="border-gray-300" />
-                    <p className="text-xs text-gray-500">Separate with commas</p>
+                    <Label className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">Sizes</Label>
+                    <Input value={form.sizes} onChange={(e) => updateForm("sizes", e.target.value)} placeholder="S, M, L, XL" className="bg-white rounded-sm border-border text-[13px] focus:border-maroon focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0" />
+                    <p className="text-xs text-muted-foreground">Separate with commas</p>
                   </div>
                   <div className="space-y-2">
-                    <Label className="font-semibold text-gray-700">Colors</Label>
-                    <Input value={form.colors} onChange={(e) => updateForm("colors", e.target.value)} placeholder="Red, Blue, Green" className="border-gray-300" />
-                    <p className="text-xs text-gray-500">Separate with commas</p>
+                    <Label className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">Colors</Label>
+                    <Input value={form.colors} onChange={(e) => updateForm("colors", e.target.value)} placeholder="Red, Blue, Green" className="bg-white rounded-sm border-border text-[13px] focus:border-maroon focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0" />
+                    <p className="text-xs text-muted-foreground">Separate with commas</p>
                   </div>
                 </div>
                 <div className="mt-4 space-y-2">
-                  <Label className="font-semibold text-gray-700">Product Description</Label>
-                  <Textarea value={form.description} onChange={(e) => updateForm("description", e.target.value)} placeholder="Enter detailed product description..." rows={4} className="border-gray-300" />
+                  <Label className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">Product Description</Label>
+                  <Textarea value={form.description} onChange={(e) => updateForm("description", e.target.value)} placeholder="Enter detailed product description..." rows={4} className="bg-white rounded-sm border-border text-[13px] focus:border-maroon focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0" />
                 </div>
               </div>
 
               {/* Additional Info */}
               <div>
-                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                  <FileText className="h-5 w-5 text-blue-600" />Additional Information
+                <h3 className="text-[12px] uppercase tracking-[0.16em] font-semibold text-espresso mb-4 flex items-center gap-2">
+                  <FileText className="h-4 w-4 text-maroon" />Additional Information
                 </h3>
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label className="font-semibold text-gray-700">Details</Label>
-                    <Textarea value={form.details} onChange={(e) => updateForm("details", e.target.value)} placeholder="Product details..." rows={3} className="border-gray-300" />
+                    <Label className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">Details</Label>
+                    <Textarea value={form.details} onChange={(e) => updateForm("details", e.target.value)} placeholder="Product details..." rows={3} className="bg-white rounded-sm border-border text-[13px] focus:border-maroon focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0" />
                   </div>
                   <div className="space-y-2">
-                    <Label className="font-semibold text-gray-700">Specifications</Label>
-                    <Textarea value={form.specifications} onChange={(e) => updateForm("specifications", e.target.value)} placeholder="Technical specifications..." rows={3} className="border-gray-300" />
+                    <Label className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">Specifications</Label>
+                    <Textarea value={form.specifications} onChange={(e) => updateForm("specifications", e.target.value)} placeholder="Technical specifications..." rows={3} className="bg-white rounded-sm border-border text-[13px] focus:border-maroon focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0" />
                   </div>
                   <div className="space-y-2">
-                    <Label className="font-semibold text-gray-700">Highlights</Label>
-                    <Textarea value={form.highlights} onChange={(e) => updateForm("highlights", e.target.value)} placeholder="Key highlights, comma-separated..." rows={3} className="border-gray-300" />
-                    <p className="text-xs text-gray-500">Separate with commas</p>
+                    <Label className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">Highlights</Label>
+                    <Textarea value={form.highlights} onChange={(e) => updateForm("highlights", e.target.value)} placeholder="Key highlights, comma-separated..." rows={3} className="bg-white rounded-sm border-border text-[13px] focus:border-maroon focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0" />
+                    <p className="text-xs text-muted-foreground">Separate with commas</p>
                   </div>
                 </div>
               </div>
 
               {/* Media */}
               <div>
-                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                  <Upload className="h-5 w-5 text-blue-600" />Product Media
+                <h3 className="text-[12px] uppercase tracking-[0.16em] font-semibold text-espresso mb-4 flex items-center gap-2">
+                  <Upload className="h-4 w-4 text-maroon" />Product Media
                 </h3>
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label className="font-semibold text-gray-700">Product Images</Label>
-                    <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center bg-gray-50 hover:bg-gray-100 transition-colors">
+                    <Label className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">Product Images</Label>
+                    <div className="border-2 border-dashed border-sand rounded-md p-8 text-center bg-ivory hover:border-gold transition-colors">
                       <Input type="file" multiple accept="image/*" onChange={(e) => onFileChange(e.target.files)} className="hidden" id="image-upload" />
                       <Label htmlFor="image-upload" className="cursor-pointer">
-                        <Upload className="h-10 w-10 mx-auto mb-3 text-gray-400" />
-                        <p className="text-sm font-semibold text-gray-700 mb-1">Click to upload images</p>
-                        <p className="text-xs text-gray-500">PNG, JPG, WEBP up to 10MB each</p>
+                        <Upload className="h-10 w-10 mx-auto mb-3 text-maroon" />
+                        <p className="text-sm font-semibold text-espresso mb-1">Click to upload images</p>
+                        <p className="text-xs text-muted-foreground">PNG, JPG, WEBP up to 10MB each</p>
                       </Label>
                     </div>
                     {localPreviews.length > 0 && (
                       <div className="grid grid-cols-5 gap-3 mt-3">
-                        {localPreviews.map((preview, i) => <img key={i} src={preview} alt={`Preview ${i + 1}`} className="w-full h-24 object-cover rounded-lg border-2 border-gray-200" />)}
+                        {localPreviews.map((preview, i) => <img key={i} src={preview} alt={`Preview ${i + 1}`} className="w-full h-24 object-cover rounded-md border border-border" />)}
                       </div>
                     )}
                   </div>
                   <div className="space-y-2">
-                    <Label className="font-semibold text-gray-700">Product Video</Label>
-                    <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center bg-gray-50 hover:bg-gray-100 transition-colors">
+                    <Label className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">Product Video</Label>
+                    <div className="border-2 border-dashed border-sand rounded-md p-8 text-center bg-ivory hover:border-gold transition-colors">
                       <Input type="file" accept="video/*" onChange={(e) => onVideoChange(e.target.files?.[0] || null)} className="hidden" id="video-upload" />
                       <Label htmlFor="video-upload" className="cursor-pointer">
-                        <Play className="h-10 w-10 mx-auto mb-3 text-gray-400" />
-                        <p className="text-sm font-semibold text-gray-700 mb-1">Click to upload video</p>
-                        <p className="text-xs text-gray-500">Max 50MB (MP4, MKV, WEBM)</p>
+                        <Play className="h-10 w-10 mx-auto mb-3 text-maroon" />
+                        <p className="text-sm font-semibold text-espresso mb-1">Click to upload video</p>
+                        <p className="text-xs text-muted-foreground">Max 50MB (MP4, MKV, WEBM)</p>
                       </Label>
                     </div>
-                    {videoPreviewUrl && <video src={videoPreviewUrl} controls className="max-w-xs rounded-lg border-2 border-gray-200 mt-3" />}
+                    {videoPreviewUrl && <video src={videoPreviewUrl} controls className="max-w-xs rounded-md border border-border mt-3" />}
                   </div>
                   <div className="space-y-2">
-                    <Label className="font-semibold text-gray-700">Product PDF</Label>
-                    <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center bg-gray-50 hover:bg-gray-100 transition-colors">
+                    <Label className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">Product PDF</Label>
+                    <div className="border-2 border-dashed border-sand rounded-md p-8 text-center bg-ivory hover:border-gold transition-colors">
                       <Input type="file" accept=".pdf" onChange={(e) => onPdfChange(e.target.files?.[0] || null)} className="hidden" id="pdf-upload" />
                       <Label htmlFor="pdf-upload" className="cursor-pointer">
-                        <FileText className="h-10 w-10 mx-auto mb-3 text-gray-400" />
-                        <p className="text-sm font-semibold text-gray-700 mb-1">Click to upload PDF</p>
-                        <p className="text-xs text-gray-500">Max 10MB</p>
+                        <FileText className="h-10 w-10 mx-auto mb-3 text-maroon" />
+                        <p className="text-sm font-semibold text-espresso mb-1">Click to upload PDF</p>
+                        <p className="text-xs text-muted-foreground">Max 10MB</p>
                       </Label>
                     </div>
                     {form.pdf && (
-                      <div className="mt-3 flex items-center gap-2 text-sm text-gray-700 font-medium">
-                        <FileText className="h-4 w-4 text-blue-600" /><span>{form.pdf.name}</span>
+                      <div className="mt-3 flex items-center gap-2 text-sm text-espresso font-medium">
+                        <FileText className="h-4 w-4 text-maroon" /><span>{form.pdf.name}</span>
                       </div>
                     )}
                   </div>
@@ -1288,19 +1301,19 @@ export default function AdminProductsPage(): JSX.Element {
 
               {/* Flags */}
               <div>
-                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                  <Star className="h-5 w-5 text-blue-600" />Product Flags
+                <h3 className="text-[12px] uppercase tracking-[0.16em] font-semibold text-espresso mb-4 flex items-center gap-2">
+                  <Star className="h-4 w-4 text-maroon" />Product Flags
                 </h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {[
-                    { key: "in_stock", label: "In Stock", icon: Package, color: "text-emerald-600" },
-                    { key: "featured", label: "Featured", icon: Star, color: "text-violet-600" },
-                    { key: "best_seller", label: "Best Seller", icon: Award, color: "text-amber-600" },
-                    { key: "new_arrival", label: "New Arrival", icon: Sparkles, color: "text-blue-600" },
+                    { key: "in_stock", label: "In Stock", icon: Package, color: "text-green-800" },
+                    { key: "featured", label: "Featured", icon: Star, color: "text-maroon" },
+                    { key: "best_seller", label: "Best Seller", icon: Award, color: "text-[#8a6414]" },
+                    { key: "new_arrival", label: "New Arrival", icon: Sparkles, color: "text-[#5C6B8A]" },
                   ].map(flag => (
-                    <div key={flag.key} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                    <div key={flag.key} className="flex items-center space-x-3 p-3 bg-[#FBF8F3] rounded-md border border-border">
                       <Switch checked={(form as any)[flag.key]} onCheckedChange={(checked) => updateForm(flag.key, checked)} />
-                      <Label className={`flex items-center gap-2 font-semibold text-gray-700 cursor-pointer`}>
+                      <Label className={`flex items-center gap-2 text-[13px] font-medium text-espresso cursor-pointer`}>
                         <flag.icon className={`h-4 w-4 ${flag.color}`} />{flag.label}
                       </Label>
                     </div>
@@ -1310,25 +1323,25 @@ export default function AdminProductsPage(): JSX.Element {
 
               {/* Ratings */}
               <div>
-                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                  <Star className="h-5 w-5 text-blue-600" />Ratings & Reviews
+                <h3 className="text-[12px] uppercase tracking-[0.16em] font-semibold text-espresso mb-4 flex items-center gap-2">
+                  <Star className="h-4 w-4 text-maroon" />Ratings & Reviews
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="font-semibold text-gray-700">Rating (0–5)</Label>
-                    <Input type="number" step="0.1" min="0" max="5" value={form.rating} onChange={(e) => updateForm("rating", e.target.value)} placeholder="e.g. 4.5" className="border-gray-300" />
+                    <Label className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">Rating (0–5)</Label>
+                    <Input type="number" step="0.1" min="0" max="5" value={form.rating} onChange={(e) => updateForm("rating", e.target.value)} placeholder="e.g. 4.5" className="bg-white rounded-sm border-border text-[13px] focus:border-maroon focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0" />
                   </div>
                   <div className="space-y-2">
-                    <Label className="font-semibold text-gray-700">Reviews Count</Label>
-                    <Input type="number" value={form.reviews} onChange={(e) => updateForm("reviews", e.target.value)} placeholder="e.g. 123" className="border-gray-300" />
+                    <Label className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">Reviews Count</Label>
+                    <Input type="number" value={form.reviews} onChange={(e) => updateForm("reviews", e.target.value)} placeholder="e.g. 123" className="bg-white rounded-sm border-border text-[13px] focus:border-maroon focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0" />
                   </div>
                 </div>
               </div>
 
               {/* Submit */}
-              <div className="flex gap-3 pt-6 border-t border-gray-200">
-                <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)} className="flex-1 border-gray-300">Cancel</Button>
-                <Button type="submit" disabled={formLoading} className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800">
+              <div className="flex gap-3 pt-6 border-t border-border">
+                <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)} className="flex-1 rounded-sm uppercase text-[11px] tracking-[0.12em]">Cancel</Button>
+                <Button type="submit" disabled={formLoading} className="flex-1 bg-maroon text-ivory uppercase text-[11px] tracking-[0.12em] rounded-sm hover:bg-terracotta">
                   {formLoading ? <><RefreshCw className="h-4 w-4 mr-2 animate-spin" />Creating...</> : <><Check className="h-4 w-4 mr-2" />Create Product</>}
                 </Button>
               </div>
@@ -1340,15 +1353,15 @@ export default function AdminProductsPage(): JSX.Element {
         <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle className="flex items-center gap-2 text-xl">
-                <Trash2 className="h-5 w-5 text-red-600" />Delete Product
+              <DialogTitle className="flex items-center gap-2 font-serif text-xl font-medium text-espresso">
+                <Trash2 className="h-5 w-5 text-sale" />Delete Product
               </DialogTitle>
             </DialogHeader>
             <div className="p-4">
-              <p className="text-gray-700 mb-6">Are you sure? This action cannot be undone.</p>
+              <p className="text-[13px] text-muted-foreground mb-6">Are you sure? This action cannot be undone.</p>
               <div className="flex gap-3 justify-end">
-                <Button variant="outline" onClick={() => setDeleteDialogOpen(false)} className="border-gray-300">Cancel</Button>
-                <Button variant="destructive" onClick={confirmDelete} disabled={deleteLoading} className="bg-red-600 hover:bg-red-700">
+                <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
+                <Button variant="destructive" onClick={confirmDelete} disabled={deleteLoading} className="bg-sale text-ivory uppercase text-[11px] tracking-[0.12em] rounded-sm hover:bg-sale/90">
                   {deleteLoading ? <><RefreshCw className="h-4 w-4 animate-spin mr-2" />Deleting...</> : <><Trash2 className="h-4 w-4 mr-2" />Delete</>}
                 </Button>
               </div>

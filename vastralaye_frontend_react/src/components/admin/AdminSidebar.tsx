@@ -4,17 +4,15 @@ import {
   Users,
   ShoppingBag,
   Tag,
-  Home,
   LogOut,
   FolderTree,
   BarChart,
-  Package,
   TrendingUp,
   MessageSquare,
-  Clapperboard
+  Clapperboard,
+  ExternalLink,
 } from 'lucide-react';
 import { useStore } from '@/contexts/StoreContext';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 interface SidebarItem {
@@ -23,59 +21,52 @@ interface SidebarItem {
   icon: React.ReactNode;
 }
 
+interface SidebarSection {
+  label: string;
+  items: SidebarItem[];
+}
+
+const ICON_CLASS = 'h-[17px] w-[17px] flex-none';
+
 const AdminSidebar = () => {
   const { logout, state } = useStore();
   const location = useLocation();
   const { currentUser } = state;
-  
-  const navItems: SidebarItem[] = [
+
+  // Same destinations as before (Reels kept, Analytics re-enabled),
+  // grouped under the §2 section labels.
+  const navSections: SidebarSection[] = [
     {
-      name: 'Dashboard',
-      path: '/admin',
-      icon: <LayoutDashboard className="h-5 w-5" />,
+      label: 'Overview',
+      items: [
+        { name: 'Dashboard', path: '/admin', icon: <LayoutDashboard className={ICON_CLASS} /> },
+        { name: 'Analytics', path: '/admin/analytics', icon: <BarChart className={ICON_CLASS} /> },
+      ],
     },
     {
-      name: 'Products',
-      path: '/admin/products',
-      icon: <ShoppingBag className="h-5 w-5" />,
+      label: 'Catalog',
+      items: [
+        { name: 'Products', path: '/admin/products', icon: <ShoppingBag className={ICON_CLASS} /> },
+        { name: 'Categories', path: '/admin/categories', icon: <FolderTree className={ICON_CLASS} /> },
+        { name: 'Coupons', path: '/admin/coupons', icon: <Tag className={ICON_CLASS} /> },
+        { name: 'Reels', path: '/admin/reels', icon: <Clapperboard className={ICON_CLASS} /> },
+      ],
     },
     {
-      name: 'Orders',
-      path: '/admin/orders',
-      icon: <TrendingUp className="h-5 w-5" />,
+      label: 'Sales',
+      items: [
+        { name: 'Orders', path: '/admin/orders', icon: <TrendingUp className={ICON_CLASS} /> },
+        { name: 'Reviews', path: '/admin/reviews', icon: <MessageSquare className={ICON_CLASS} /> },
+      ],
     },
     {
-      name: 'Users',
-      path: '/admin/users',
-      icon: <Users className="h-5 w-5" />,
+      label: 'Customers',
+      items: [
+        { name: 'Users', path: '/admin/users', icon: <Users className={ICON_CLASS} /> },
+      ],
     },
-    {
-      name: 'Categories',
-      path: '/admin/categories',
-      icon: <FolderTree className="h-5 w-5" />,
-    },
-    {
-      name: 'Coupons',
-      path: '/admin/coupons',
-      icon: <Tag className="h-5 w-5" />,
-    },
-    {
-      name: 'Reels',
-      path: '/admin/reels',
-      icon: <Clapperboard className="h-5 w-5" />,
-    },
-    // {
-    //   name: 'Analytics',
-    //   path: '/admin/analytics',
-    //   icon: <BarChart className="h-5 w-5" />,
-    // },
-    {
-      name: 'Reviews',
-      path: '/admin/reviews',
-      icon: <MessageSquare className="h-5 w-5" />,
-    }
   ];
-  
+
   const isActive = (path: string) => {
     if (path === '/admin' && location.pathname === '/admin') {
       return true;
@@ -85,89 +76,88 @@ const AdminSidebar = () => {
     }
     return false;
   };
-  
-  return (
-    <div className="bg-gradient-to-b from-gray-900 to-gray-950 text-white h-screen flex flex-col w-64 fixed left-0 top-0 z-50 border-r border-gray-800">
-      {/* Header */}
-      <div className="p-6 border-b border-gray-800">
-        <Link to="/admin" className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] rounded-lg flex items-center justify-center shadow-md">
-            <LayoutDashboard className="h-6 w-6 text-white" />
-          </div>
-          <div>
-            <h1 className="text-lg font-semibold text-white">Vastralaye</h1>
-            <p className="text-gray-400 text-sm">Admin Panel</p>
-          </div>
-        </Link>
-      </div>
-      
-      {/* Navigation */}
-      <div className="flex-1 overflow-y-auto py-4 px-3">
-        <nav className="space-y-1">
-          {navItems.map((item) => {
-            const active = isActive(item.path);
-            return (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={cn(
-                  "flex items-center gap-3 px-3 py-3 rounded-lg transition-all",
-                  active
-                    ? "bg-gradient-to-r from-[#7A1F2B]/20 to-[#B85C38]/20 text-white border-l-4 border-[#7A1F2B]"
-                    : "text-gray-300 hover:bg-gray-800 hover:text-white"
-                )}
-              >
-                <div className={cn(
-                  "transition-colors",
-                  active ? "text-white" : "text-gray-400"
-                )}>
-                  {item.icon}
-                </div>
-                <span className="font-medium">{item.name}</span>
-              </Link>
-            );
-          })}
-        </nav>
-      </div>
-      
-      {/* Footer */}
-      <div className="p-4 border-t border-gray-800 space-y-3">
-        {/* User Info */}
-        <div className="flex items-center gap-3 p-2">
-          <div className="w-8 h-8 bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] rounded-full flex items-center justify-center text-white text-sm font-medium shadow-sm">
-            {currentUser?.first_name?.[0]?.toUpperCase() || 'A'}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-white truncate">
-              {currentUser?.first_name} {currentUser?.last_name}
-            </p>
-            <p className="text-gray-400 text-xs truncate">Administrator</p>
-          </div>
-        </div>
 
-        {/* Action Buttons */}
-        <div className="flex gap-2">
-          <Link to="/" className="flex-1">
-            <Button 
-              variant="outline" 
-              size="sm"
-              className="w-full border-gray-700/0 text-gray-300 bg-gray-800 hover:text-white"
-            >
-              <Home className="h-4 w-4 mr-2" />
-              Store
-            </Button>
-          </Link>
-          <Button 
-            variant="outline" 
-            size="sm"
-            className="border-gray-700/0 text-gray-300 bg-red-600/20 text-white hover:border-red-500/30"
-            onClick={logout}
-          >
-            <LogOut className="h-4 w-4" />
-          </Button>
+  const firstName = currentUser?.first_name || currentUser?.firstName || '';
+  const lastName = currentUser?.last_name || currentUser?.lastName || '';
+  const displayName = [firstName, lastName].filter(Boolean).join(' ') || 'Admin';
+  const initials =
+    `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase() ||
+    firstName.charAt(0).toUpperCase() ||
+    'A';
+
+  const itemClass = (active: boolean) =>
+    cn(
+      'flex items-center gap-3 border-l-[3px] px-5 py-[9px] text-[13.5px] transition-colors',
+      active
+        ? 'border-gold bg-gold/10 font-medium text-gold'
+        : 'border-transparent text-ivory/75 hover:bg-ivory/5 hover:text-ivory',
+    );
+
+  return (
+    <aside className="fixed left-0 top-0 z-50 flex h-screen w-60 flex-col bg-espresso text-ivory/75">
+      {/* Brand */}
+      <div className="border-b border-ivory/10 px-5 pb-5 pt-6">
+        <Link to="/admin" className="block">
+          <span className="font-serif text-[22px] font-semibold leading-none text-ivory">
+            Vastra<span className="text-gold">laye</span>
+          </span>
+          <span className="mt-1.5 block text-[8.5px] uppercase tracking-[0.4em] text-gold">
+            Handcrafted India
+          </span>
+        </Link>
+        <span className="mt-3 inline-block rounded-full border border-ivory/20 px-2.5 py-0.5 text-[10px] uppercase tracking-[0.18em] text-ivory/55">
+          Admin Panel
+        </span>
+      </div>
+
+      {/* Navigation */}
+      <nav className="flex-1 overflow-y-auto py-2">
+        {navSections.map((section) => (
+          <div key={section.label}>
+            <p className="px-5 pb-1.5 pt-4 text-[11px] font-semibold uppercase tracking-[0.26em] text-gold">
+              {section.label}
+            </p>
+            {section.items.map((item) => (
+              <Link key={item.path} to={item.path} className={itemClass(isActive(item.path))}>
+                {item.icon}
+                <span>{item.name}</span>
+              </Link>
+            ))}
+          </div>
+        ))}
+      </nav>
+
+      {/* Footer */}
+      <div className="border-t border-ivory/10 pb-4 pt-2">
+        <Link to="/" className={itemClass(false)}>
+          <ExternalLink className={ICON_CLASS} />
+          <span>View store</span>
+        </Link>
+        <button
+          type="button"
+          onClick={logout}
+          className={cn(itemClass(false), 'w-full text-left')}
+        >
+          <LogOut className={ICON_CLASS} />
+          <span>Logout</span>
+        </button>
+
+        {/* Admin identity chip */}
+        <div className="mt-2 flex items-center gap-3 px-5 pt-2">
+          <span className="flex h-[34px] w-[34px] flex-none items-center justify-center rounded-full bg-gold text-[13px] font-semibold text-espresso">
+            {initials}
+          </span>
+          <span className="min-w-0">
+            <span className="block truncate text-[13px] font-medium leading-tight text-ivory">
+              {displayName}
+            </span>
+            <span className="block truncate text-[11px] text-ivory/50">
+              {currentUser?.email || 'Administrator'}
+            </span>
+          </span>
         </div>
       </div>
-    </div>
+    </aside>
   );
 };
 
