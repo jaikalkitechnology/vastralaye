@@ -1120,7 +1120,7 @@ const OrderDetailPage = () => {
     if (loading) return (
         <UserLayout>
             <div className="flex justify-center items-center h-64 gap-3">
-                <Loader2 className="h-8 w-8 animate-spin text-[#559F4B]" />
+                <Loader2 className="h-8 w-8 animate-spin text-[#7A1F2B]" />
                 <p className="text-gray-600">Loading order #{orderId}…</p>
             </div>
         </UserLayout>
@@ -1164,14 +1164,14 @@ const OrderDetailPage = () => {
             <div className="max-w-6xl mx-auto p-4 md:p-6 space-y-6">
 
                 {/* ── TOP HEADER BAR ── */}
-                <div className="bg-gradient-to-r from-[#559F4B]/10 via-[#E1783E]/5 to-[#559F4B]/10 rounded-2xl p-4 sm:p-6 border border-[#559F4B]/20">
+                <div className="bg-gradient-to-r from-[#7A1F2B]/10 via-[#B85C38]/5 to-[#7A1F2B]/10 rounded-2xl p-4 sm:p-6 border border-[#7A1F2B]/20">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                         <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-                            <Button variant="outline" size="icon" onClick={() => navigate('/account/orders')} className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl border-[#559F4B]/30 flex-shrink-0">
-                                <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5 text-[#559F4B]" />
+                            <Button variant="outline" size="icon" onClick={() => navigate('/account/orders')} className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl border-[#7A1F2B]/30 flex-shrink-0">
+                                <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5 text-[#7A1F2B]" />
                             </Button>
                             <div className="min-w-0">
-                                <h1 className="text-xl sm:text-2xl font-bold truncate bg-gradient-to-r from-[#559F4B] to-[#E1783E] bg-clip-text text-transparent">
+                                <h1 className="text-xl sm:text-2xl font-bold truncate bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] bg-clip-text text-transparent">
                                     Order #{order.id}
                                 </h1>
                                 <div className="flex items-center gap-1.5 text-xs sm:text-sm text-gray-600 mt-1">
@@ -1187,12 +1187,12 @@ const OrderDetailPage = () => {
                             <Badge variant="outline" className={`${paymentInfo.badgeColor} px-3 py-1 rounded-full text-xs`}>
                                 <PaymentIcon className="w-3 h-3 mr-1" />{paymentInfo.shortLabel}
                             </Badge>
-                            <Button variant="outline" onClick={() => setView('invoice')} className="border-[#559F4B] text-[#559F4B] hover:bg-[#559F4B]/5">
+                            <Button variant="outline" onClick={() => setView('invoice')} className="border-[#7A1F2B] text-[#7A1F2B] hover:bg-[#7A1F2B]/5">
                                 <FileText className="w-4 h-4 mr-2" />View Invoice
                             </Button>
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                    <Button variant="outline" size="icon" className="border-[#559F4B] text-[#559F4B]">
+                                    <Button variant="outline" size="icon" className="border-[#7A1F2B] text-[#7A1F2B]">
                                         <ChevronDown className="w-4 h-4" />
                                     </Button>
                                 </DropdownMenuTrigger>
@@ -1208,7 +1208,7 @@ const OrderDetailPage = () => {
 
                 {/* Mobile invoice button */}
                 <div className="sm:hidden">
-                    <Button onClick={() => setView('invoice')} className="w-full bg-gradient-to-r from-[#559F4B] to-[#E1783E] text-white">
+                    <Button onClick={() => setView('invoice')} className="w-full bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] text-white">
                         <FileText className="w-4 h-4 mr-2" />View / Download Invoice
                     </Button>
                 </div>
@@ -1217,10 +1217,10 @@ const OrderDetailPage = () => {
                     <div className="lg:col-span-2 space-y-6">
 
                             {/* ── ORDER SUMMARY CARD ── */}
-                            <Card className="border-[#559F4B]/20 shadow-lg">
-                                <CardHeader className="border-b border-[#559F4B]/10">
-                                    <CardTitle className="flex items-center gap-3 text-[#559F4B]">
-                                        <div className="w-10 h-10 bg-gradient-to-r from-[#559F4B] to-[#E1783E] rounded-lg flex items-center justify-center flex-shrink-0">
+                            <Card className="border-[#7A1F2B]/20 shadow-lg">
+                                <CardHeader className="border-b border-[#7A1F2B]/10">
+                                    <CardTitle className="flex items-center gap-3 text-[#7A1F2B]">
+                                        <div className="w-10 h-10 bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] rounded-lg flex items-center justify-center flex-shrink-0">
                                             <ShoppingBag className="w-5 h-5 text-white" />
                                         </div>
                                         Order Summary
@@ -1293,10 +1293,10 @@ const OrderDetailPage = () => {
 
                         {/* ── ITEMS CARD ── */}
                         {order.items && order.items.length > 0 && (
-                            <Card className="border-[#559F4B]/20 shadow-lg">
-                                <CardHeader className="border-b border-[#559F4B]/10">
-                                    <CardTitle className="flex items-center gap-3 text-[#559F4B]">
-                                        <div className="w-10 h-10 bg-gradient-to-r from-[#559F4B] to-[#E1783E] rounded-lg flex items-center justify-center flex-shrink-0">
+                            <Card className="border-[#7A1F2B]/20 shadow-lg">
+                                <CardHeader className="border-b border-[#7A1F2B]/10">
+                                    <CardTitle className="flex items-center gap-3 text-[#7A1F2B]">
+                                        <div className="w-10 h-10 bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] rounded-lg flex items-center justify-center flex-shrink-0">
                                             <Package className="w-5 h-5 text-white" />
                                         </div>
                                         Items ({order.items.length})
@@ -1368,11 +1368,11 @@ const OrderDetailPage = () => {
 
                         {/* ── TRACKING CARD ── */}
                         {order.tracking && order.tracking.length > 0 && (
-                            <Card className="border-[#559F4B]/20 shadow-lg">
-                                <CardHeader className="border-b border-[#559F4B]/10">
+                            <Card className="border-[#7A1F2B]/20 shadow-lg">
+                                <CardHeader className="border-b border-[#7A1F2B]/10">
                                     <div className="flex items-center justify-between">
-                                        <CardTitle className="flex items-center gap-3 text-[#559F4B]">
-                                            <div className="w-10 h-10 bg-gradient-to-r from-[#559F4B] to-[#E1783E] rounded-lg flex items-center justify-center flex-shrink-0">
+                                        <CardTitle className="flex items-center gap-3 text-[#7A1F2B]">
+                                            <div className="w-10 h-10 bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] rounded-lg flex items-center justify-center flex-shrink-0">
                                                 <Truck className="w-5 h-5 text-white" />
                                             </div>
                                             Tracking
@@ -1489,26 +1489,26 @@ const OrderDetailPage = () => {
 
                         {/* Shipping Card */}
                         {order.shipping_address && (
-                            <Card className="border-[#559F4B]/20 shadow-lg">
-                                <CardHeader className="border-b border-[#559F4B]/10">
-                                    <CardTitle className="flex items-center gap-3 text-[#559F4B]">
-                                        <div className="w-10 h-10 bg-gradient-to-r from-[#559F4B] to-[#E1783E] rounded-lg flex items-center justify-center flex-shrink-0">
+                            <Card className="border-[#7A1F2B]/20 shadow-lg">
+                                <CardHeader className="border-b border-[#7A1F2B]/10">
+                                    <CardTitle className="flex items-center gap-3 text-[#7A1F2B]">
+                                        <div className="w-10 h-10 bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] rounded-lg flex items-center justify-center flex-shrink-0">
                                             <MapPin className="w-5 h-5 text-white" />
                                         </div>
                                         Shipping
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="p-6">
-                                    <p className="text-sm text-gray-700 p-3 bg-[#559F4B]/5 rounded-lg leading-relaxed">{order.shipping_address}</p>
+                                    <p className="text-sm text-gray-700 p-3 bg-[#7A1F2B]/5 rounded-lg leading-relaxed">{order.shipping_address}</p>
                                 </CardContent>
                             </Card>
                         )}
 
                         {/* Invoice Card */}
-                        <Card className="border-[#559F4B]/20 shadow-lg">
-                            <CardHeader className="border-b border-[#559F4B]/10">
-                                <CardTitle className="flex items-center gap-3 text-[#559F4B]">
-                                    <div className="w-10 h-10 bg-gradient-to-r from-[#559F4B] to-[#E1783E] rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Card className="border-[#7A1F2B]/20 shadow-lg">
+                            <CardHeader className="border-b border-[#7A1F2B]/10">
+                                <CardTitle className="flex items-center gap-3 text-[#7A1F2B]">
+                                    <div className="w-10 h-10 bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] rounded-lg flex items-center justify-center flex-shrink-0">
                                         <Receipt className="w-5 h-5 text-white" />
                                     </div>
                                     Invoice
@@ -1530,10 +1530,10 @@ const OrderDetailPage = () => {
                                     </div>
                                 </div>
                                 <div className="pt-3 space-y-2">
-                                    <Button onClick={() => setView('invoice')} className="w-full bg-[#559F4B] hover:bg-[#457a3d] text-white">
+                                    <Button onClick={() => setView('invoice')} className="w-full bg-[#7A1F2B] hover:bg-[#457a3d] text-white">
                                         <FileText className="w-4 h-4 mr-2" />View Invoice
                                     </Button>
-                                    <Button onClick={() => { setView('invoice'); setTimeout(() => window.print(), 700); }} variant="outline" className="w-full border-[#559F4B] text-[#559F4B]">
+                                    <Button onClick={() => { setView('invoice'); setTimeout(() => window.print(), 700); }} variant="outline" className="w-full border-[#7A1F2B] text-[#7A1F2B]">
                                         <Printer className="w-4 h-4 mr-2" />Print
                                     </Button>
                                 </div>
@@ -1560,11 +1560,11 @@ const OrderDetailPage = () => {
                                         toast.success(`New order #${d.id} created!`);
                                         navigate(`/orders/${d.id}`);
                                     } catch { toast.error("Failed to reorder"); }
-                                }} variant="outline" className="w-full border-[#559F4B] text-[#559F4B]">
+                                }} variant="outline" className="w-full border-[#7A1F2B] text-[#7A1F2B]">
                                     <RefreshCw className="w-4 h-4 mr-2" />Reorder
                                 </Button>
                             )}
-                            <Button onClick={() => navigate('/products')} className="w-full bg-gradient-to-r from-[#559F4B] to-[#E1783E] text-white">
+                            <Button onClick={() => navigate('/products')} className="w-full bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] text-white">
                                 <Home className="w-4 h-4 mr-2" />Continue Shopping
                             </Button>
                         </div>

@@ -55,83 +55,83 @@ const CategoriesPage = () => {
     const iconMap = {
       'men': { 
         Icon: Users, 
-        color: 'text-[#559F4B]',
-        bgColor: 'bg-gradient-to-br from-[#559F4B]/20 to-[#559F4B]/10',
-        borderColor: 'border-[#559F4B]/30',
-        gradient: 'from-[#559F4B] via-[#559F4B] to-[#559F4B]/90',
-        accentColor: 'bg-[#559F4B]'
+        color: 'text-[#7A1F2B]',
+        bgColor: 'bg-gradient-to-br from-[#7A1F2B]/20 to-[#7A1F2B]/10',
+        borderColor: 'border-[#7A1F2B]/30',
+        gradient: 'from-[#7A1F2B] via-[#7A1F2B] to-[#7A1F2B]/90',
+        accentColor: 'bg-[#7A1F2B]'
       },
       'women': { 
         Icon: User, 
-        color: 'text-[#E1783E]',
-        bgColor: 'bg-gradient-to-br from-[#E1783E]/20 to-[#E1783E]/10',
-        borderColor: 'border-[#E1783E]/30',
-        gradient: 'from-[#E1783E] via-[#E1783E] to-[#E1783E]/90',
-        accentColor: 'bg-[#E1783E]'
+        color: 'text-[#B85C38]',
+        bgColor: 'bg-gradient-to-br from-[#B85C38]/20 to-[#B85C38]/10',
+        borderColor: 'border-[#B85C38]/30',
+        gradient: 'from-[#B85C38] via-[#B85C38] to-[#B85C38]/90',
+        accentColor: 'bg-[#B85C38]'
       },
       'kids': { 
         Icon: Baby, 
-        color: 'text-[#559F4B]',
-        bgColor: 'bg-gradient-to-br from-[#559F4B]/20 to-[#559F4B]/10',
-        borderColor: 'border-[#559F4B]/30',
-        gradient: 'from-[#559F4B] via-[#559F4B] to-[#E1783E]',
-        accentColor: 'bg-gradient-to-r from-[#559F4B] to-[#E1783E]'
+        color: 'text-[#7A1F2B]',
+        bgColor: 'bg-gradient-to-br from-[#7A1F2B]/20 to-[#7A1F2B]/10',
+        borderColor: 'border-[#7A1F2B]/30',
+        gradient: 'from-[#7A1F2B] via-[#7A1F2B] to-[#B85C38]',
+        accentColor: 'bg-gradient-to-r from-[#7A1F2B] to-[#B85C38]'
       },
       'footwear': { 
         Icon: Footprints, 
-        color: 'text-[#559F4B]',
-        bgColor: 'bg-gradient-to-br from-[#559F4B]/20 to-[#559F4B]/10',
-        borderColor: 'border-[#559F4B]/30',
-        gradient: 'from-[#559F4B] via-[#559F4B] to-[#559F4B]/90',
-        accentColor: 'bg-[#559F4B]'
+        color: 'text-[#7A1F2B]',
+        bgColor: 'bg-gradient-to-br from-[#7A1F2B]/20 to-[#7A1F2B]/10',
+        borderColor: 'border-[#7A1F2B]/30',
+        gradient: 'from-[#7A1F2B] via-[#7A1F2B] to-[#7A1F2B]/90',
+        accentColor: 'bg-[#7A1F2B]'
       },
       'accessories': { 
         Icon: Watch, 
-        color: 'text-[#E1783E]',
-        bgColor: 'bg-gradient-to-br from-[#E1783E]/20 to-[#E1783E]/10',
-        borderColor: 'border-[#E1783E]/30',
-        gradient: 'from-[#E1783E] via-[#E1783E] to-[#E1783E]/90',
-        accentColor: 'bg-[#E1783E]'
+        color: 'text-[#B85C38]',
+        bgColor: 'bg-gradient-to-br from-[#B85C38]/20 to-[#B85C38]/10',
+        borderColor: 'border-[#B85C38]/30',
+        gradient: 'from-[#B85C38] via-[#B85C38] to-[#B85C38]/90',
+        accentColor: 'bg-[#B85C38]'
       },
       'winter-wear': { 
         Icon: Snowflake, 
-        color: 'text-[#559F4B]',
-        bgColor: 'bg-gradient-to-br from-[#559F4B]/20 to-[#559F4B]/10',
-        borderColor: 'border-[#559F4B]/30',
-        gradient: 'from-[#559F4B] via-[#559F4B] to-[#559F4B]/90',
-        accentColor: 'bg-[#559F4B]'
+        color: 'text-[#7A1F2B]',
+        bgColor: 'bg-gradient-to-br from-[#7A1F2B]/20 to-[#7A1F2B]/10',
+        borderColor: 'border-[#7A1F2B]/30',
+        gradient: 'from-[#7A1F2B] via-[#7A1F2B] to-[#7A1F2B]/90',
+        accentColor: 'bg-[#7A1F2B]'
       },
       'ethnic': { 
         Icon: Sparkles, 
-        color: 'text-[#E1783E]',
-        bgColor: 'bg-gradient-to-br from-[#E1783E]/20 to-[#E1783E]/10',
-        borderColor: 'border-[#E1783E]/30',
-        gradient: 'from-[#E1783E] via-[#E1783E] to-[#E1783E]/90',
-        accentColor: 'bg-[#E1783E]'
+        color: 'text-[#B85C38]',
+        bgColor: 'bg-gradient-to-br from-[#B85C38]/20 to-[#B85C38]/10',
+        borderColor: 'border-[#B85C38]/30',
+        gradient: 'from-[#B85C38] via-[#B85C38] to-[#B85C38]/90',
+        accentColor: 'bg-[#B85C38]'
       },
       'sports': { 
         Icon: Trophy, 
-        color: 'text-[#559F4B]',
-        bgColor: 'bg-gradient-to-br from-[#559F4B]/20 to-[#559F4B]/10',
-        borderColor: 'border-[#559F4B]/30',
-        gradient: 'from-[#559F4B] via-[#559F4B] to-[#E1783E]',
-        accentColor: 'bg-gradient-to-r from-[#559F4B] to-[#E1783E]'
+        color: 'text-[#7A1F2B]',
+        bgColor: 'bg-gradient-to-br from-[#7A1F2B]/20 to-[#7A1F2B]/10',
+        borderColor: 'border-[#7A1F2B]/30',
+        gradient: 'from-[#7A1F2B] via-[#7A1F2B] to-[#B85C38]',
+        accentColor: 'bg-gradient-to-r from-[#7A1F2B] to-[#B85C38]'
       },
       'formal': { 
         Icon: Briefcase, 
-        color: 'text-[#E1783E]',
-        bgColor: 'bg-gradient-to-br from-[#E1783E]/20 to-[#E1783E]/10',
-        borderColor: 'border-[#E1783E]/30',
-        gradient: 'from-[#E1783E] via-[#E1783E] to-[#E1783E]/90',
-        accentColor: 'bg-[#E1783E]'
+        color: 'text-[#B85C38]',
+        bgColor: 'bg-gradient-to-br from-[#B85C38]/20 to-[#B85C38]/10',
+        borderColor: 'border-[#B85C38]/30',
+        gradient: 'from-[#B85C38] via-[#B85C38] to-[#B85C38]/90',
+        accentColor: 'bg-[#B85C38]'
       },
       'casual': { 
         Icon: Shirt, 
-        color: 'text-[#559F4B]',
-        bgColor: 'bg-gradient-to-br from-[#559F4B]/20 to-[#559F4B]/10',
-        borderColor: 'border-[#559F4B]/30',
-        gradient: 'from-[#559F4B] via-[#559F4B] to-[#559F4B]/90',
-        accentColor: 'bg-[#559F4B]'
+        color: 'text-[#7A1F2B]',
+        bgColor: 'bg-gradient-to-br from-[#7A1F2B]/20 to-[#7A1F2B]/10',
+        borderColor: 'border-[#7A1F2B]/30',
+        gradient: 'from-[#7A1F2B] via-[#7A1F2B] to-[#7A1F2B]/90',
+        accentColor: 'bg-[#7A1F2B]'
       },
     };
 
@@ -322,21 +322,21 @@ const CategoriesPage = () => {
       
       {/* Background Decorative Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-[#559F4B]/10 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 -left-40 w-80 h-80 bg-[#E1783E]/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-1/3 w-96 h-96 bg-gradient-to-r from-[#559F4B]/5 to-[#E1783E]/5 rounded-full blur-3xl" />
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-[#7A1F2B]/10 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 -left-40 w-80 h-80 bg-[#B85C38]/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/3 w-96 h-96 bg-gradient-to-r from-[#7A1F2B]/5 to-[#B85C38]/5 rounded-full blur-3xl" />
       </div>
 
       <div className="container px-4 mx-auto relative z-10">
 
         {/* Header */}
         <div className="text-center mb-10 md:mb-14">
-          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-[#559F4B] to-[#E1783E] text-white px-4 md:px-5 py-2 md:py-2.5 rounded-full text-sm font-bold mb-4 md:mb-5 shadow-lg">
+          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] text-white px-4 md:px-5 py-2 md:py-2.5 rounded-full text-sm font-bold mb-4 md:mb-5 shadow-lg">
             <Tag className="w-3.5 h-3.5 md:w-4 md:h-4" fill="white" />
             Browse All Categories
           </div>
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 md:mb-6">
-            Explore Our <span className="bg-gradient-to-r from-[#559F4B] to-[#E1783E] bg-clip-text text-transparent">Categories</span>
+            Explore Our <span className="bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] bg-clip-text text-transparent">Categories</span>
           </h1>
           <p className="text-base md:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
             Discover our complete collection across all categories. Find exactly what you're looking for.
@@ -354,7 +354,7 @@ const CategoriesPage = () => {
                   placeholder="Search categories..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 md:pl-12 pr-8 md:pr-10 py-2.5 md:py-3 border-2 border-gray-200 rounded-lg md:rounded-xl focus:border-[#559F4B] focus:ring-2 focus:ring-[#559F4B]/20 focus:outline-none transition-all duration-300"
+                  className="w-full pl-10 md:pl-12 pr-8 md:pr-10 py-2.5 md:py-3 border-2 border-gray-200 rounded-lg md:rounded-xl focus:border-[#7A1F2B] focus:ring-2 focus:ring-[#7A1F2B]/20 focus:outline-none transition-all duration-300"
                 />
                 {searchTerm && (
                   <button
@@ -375,7 +375,7 @@ const CategoriesPage = () => {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="border-2 border-gray-200 rounded-lg md:rounded-xl px-3 md:px-4 py-2 md:py-2.5 focus:border-[#559F4B] focus:outline-none transition-all duration-300 text-sm md:text-base"
+                className="border-2 border-gray-200 rounded-lg md:rounded-xl px-3 md:px-4 py-2 md:py-2.5 focus:border-[#7A1F2B] focus:outline-none transition-all duration-300 text-sm md:text-base"
               >
                 <option value="popular">Most Popular</option>
                 <option value="a-z">A to Z</option>
@@ -391,7 +391,7 @@ const CategoriesPage = () => {
           <div className="bg-white rounded-xl md:rounded-2xl shadow-lg p-4 md:p-6 mb-8 md:mb-12 border border-gray-100">
             <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6 lg:gap-8">
               <div className="flex items-center gap-2 md:gap-3">
-                <div className="bg-gradient-to-r from-[#559F4B] to-[#559F4B]/80 rounded-full p-2 md:p-3">
+                <div className="bg-gradient-to-r from-[#7A1F2B] to-[#7A1F2B]/80 rounded-full p-2 md:p-3">
                   <Grid3x3 className="w-4 h-4 md:w-5 md:h-5 text-white" />
                 </div>
                 <div>
@@ -401,7 +401,7 @@ const CategoriesPage = () => {
               </div>
               <div className="hidden sm:block h-8 md:h-12 w-px bg-gray-200" />
               <div className="flex items-center gap-2 md:gap-3">
-                <div className="bg-gradient-to-r from-[#E1783E] to-[#E1783E]/80 rounded-full p-2 md:p-3">
+                <div className="bg-gradient-to-r from-[#B85C38] to-[#B85C38]/80 rounded-full p-2 md:p-3">
                   <ShoppingBag className="w-4 h-4 md:w-5 md:h-5 text-white" />
                 </div>
                 <div>
@@ -413,7 +413,7 @@ const CategoriesPage = () => {
               </div>
               <div className="hidden sm:block h-8 md:h-12 w-px bg-gray-200" />
               <div className="flex items-center gap-2 md:gap-3">
-                <div className="bg-gradient-to-r from-[#559F4B] to-[#E1783E] rounded-full p-2 md:p-3">
+                <div className="bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] rounded-full p-2 md:p-3">
                   <Star className="w-4 h-4 md:w-5 md:h-5 text-white" fill="white" />
                 </div>
                 <div>
@@ -427,7 +427,7 @@ const CategoriesPage = () => {
     
               <div className="hidden sm:block h-8 md:h-12 w-px bg-gray-200" />
               <div className="flex items-center gap-2 md:gap-3">
-                <div className="bg-gradient-to-r from-[#E1783E] to-[#559F4B] rounded-full p-2 md:p-3">
+                <div className="bg-gradient-to-r from-[#B85C38] to-[#7A1F2B] rounded-full p-2 md:p-3">
                   <TrendingUp className="w-4 h-4 md:w-5 md:h-5 text-white" />
                 </div>
                 <div>
@@ -473,7 +473,7 @@ const CategoriesPage = () => {
               <p className="text-gray-600 mb-4 md:mb-6">{error}</p>
               <Button 
                 onClick={fetchCategories}
-                className="bg-gradient-to-r from-[#559F4B] to-[#E1783E] hover:from-[#E1783E] hover:to-[#559F4B] text-white shadow-lg"
+                className="bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] hover:from-[#B85C38] hover:to-[#7A1F2B] text-white shadow-lg"
               >
                 <RefreshCw className="w-4 h-4 mr-2" /> 
                 Try Again
@@ -497,7 +497,7 @@ const CategoriesPage = () => {
             {searchTerm && (
               <Button 
                 onClick={() => setSearchTerm('')}
-                className="bg-gradient-to-r from-[#559F4B] to-[#E1783E] hover:from-[#E1783E] hover:to-[#559F4B] text-white shadow-lg"
+                className="bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] hover:from-[#B85C38] hover:to-[#7A1F2B] text-white shadow-lg"
               >
                 Clear Search
               </Button>
@@ -558,7 +558,7 @@ const CategoriesPage = () => {
 
                         {/* Hover CTA */}
                         <div className="absolute bottom-4 md:bottom-5 lg:bottom-6 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300">
-                          <div className="flex items-center gap-1 md:gap-2 text-xs md:text-sm font-semibold text-[#559F4B]">
+                          <div className="flex items-center gap-1 md:gap-2 text-xs md:text-sm font-semibold text-[#7A1F2B]">
                             View Products
                             <ChevronRight className={`w-3 h-3 md:w-4 md:h-4 ${color} group-hover:translate-x-1 transition-transform duration-300`} />
                           </div>
@@ -568,7 +568,7 @@ const CategoriesPage = () => {
                       {/* Popular Badge */}
                       {globalIndex < 3 && (
                         <div className="absolute top-2 md:top-3 left-2 md:left-3 z-10">
-                          <div className="bg-gradient-to-r from-[#559F4B] to-[#E1783E] text-white px-2 md:px-3 py-1 rounded-full text-xs font-bold shadow-md flex items-center gap-1">
+                          <div className="bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] text-white px-2 md:px-3 py-1 rounded-full text-xs font-bold shadow-md flex items-center gap-1">
                             <Flame className="w-2.5 h-2.5 md:w-3 md:h-3" fill="white" />
                             <span className="hidden xs:inline">Hot</span>
                           </div>
@@ -611,7 +611,7 @@ const CategoriesPage = () => {
                         size="icon"
                         onClick={() => handlePageChange(1)}
                         disabled={currentPage === 1}
-                        className="h-8 w-8 md:h-10 md:w-10 rounded-lg md:rounded-xl border border-gray-200 hover:border-[#559F4B] hover:bg-[#559F4B]/10 transition-all"
+                        className="h-8 w-8 md:h-10 md:w-10 rounded-lg md:rounded-xl border border-gray-200 hover:border-[#7A1F2B] hover:bg-[#7A1F2B]/10 transition-all"
                       >
                         <ChevronsLeft className="h-3 w-3 md:h-4 md:w-4" />
                       </Button>
@@ -622,7 +622,7 @@ const CategoriesPage = () => {
                         size="icon"
                         onClick={() => handlePageChange(currentPage - 1)}
                         disabled={currentPage === 1}
-                        className="h-8 w-8 md:h-10 md:w-10 rounded-lg md:rounded-xl border border-gray-200 hover:border-[#559F4B] hover:bg-[#559F4B]/10 transition-all"
+                        className="h-8 w-8 md:h-10 md:w-10 rounded-lg md:rounded-xl border border-gray-200 hover:border-[#7A1F2B] hover:bg-[#7A1F2B]/10 transition-all"
                       >
                         <ChevronLeft className="h-3 w-3 md:h-4 md:w-4" />
                       </Button>
@@ -638,8 +638,8 @@ const CategoriesPage = () => {
                             disabled={typeof page !== 'number'}
                             className={`h-8 w-8 md:h-10 md:w-10 rounded-lg md:rounded-xl ${
                               page === currentPage 
-                                ? 'bg-gradient-to-r from-[#559F4B] to-[#E1783E] text-white shadow-lg' 
-                                : 'border border-gray-200 hover:border-[#559F4B]'
+                                ? 'bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] text-white shadow-lg' 
+                                : 'border border-gray-200 hover:border-[#7A1F2B]'
                             } ${typeof page !== 'number' ? 'cursor-default hover:bg-transparent' : ''}`}
                           >
                             <span className="text-xs md:text-sm">{page}</span>
@@ -653,7 +653,7 @@ const CategoriesPage = () => {
                         size="icon"
                         onClick={() => handlePageChange(currentPage + 1)}
                         disabled={currentPage === totalPages}
-                        className="h-8 w-8 md:h-10 md:w-10 rounded-lg md:rounded-xl border border-gray-200 hover:border-[#559F4B] hover:bg-[#559F4B]/10 transition-all"
+                        className="h-8 w-8 md:h-10 md:w-10 rounded-lg md:rounded-xl border border-gray-200 hover:border-[#7A1F2B] hover:bg-[#7A1F2B]/10 transition-all"
                       >
                         <ChevronRight className="h-3 w-3 md:h-4 md:w-4" />
                       </Button>
@@ -664,7 +664,7 @@ const CategoriesPage = () => {
                         size="icon"
                         onClick={() => handlePageChange(totalPages)}
                         disabled={currentPage === totalPages}
-                        className="h-8 w-8 md:h-10 md:w-10 rounded-lg md:rounded-xl border border-gray-200 hover:border-[#559F4B] hover:bg-[#559F4B]/10 transition-all"
+                        className="h-8 w-8 md:h-10 md:w-10 rounded-lg md:rounded-xl border border-gray-200 hover:border-[#7A1F2B] hover:bg-[#7A1F2B]/10 transition-all"
                       >
                         <ChevronsRight className="h-3 w-3 md:h-4 md:w-4" />
                       </Button>
@@ -679,7 +679,7 @@ const CategoriesPage = () => {
                           setItemsPerPage(Number(e.target.value));
                           setCurrentPage(1);
                         }}
-                        className="border border-gray-200 rounded-lg md:rounded-xl px-2 md:px-3 py-1.5 md:py-2 focus:border-[#559F4B] focus:outline-none transition-all text-sm md:text-base"
+                        className="border border-gray-200 rounded-lg md:rounded-xl px-2 md:px-3 py-1.5 md:py-2 focus:border-[#7A1F2B] focus:outline-none transition-all text-sm md:text-base"
                       >
                         <option value={8}>8 per page</option>
                         <option value={12}>12 per page</option>
@@ -693,7 +693,7 @@ const CategoriesPage = () => {
                   <div className="mt-4 md:mt-6">
                     <div className="h-1.5 md:h-2 bg-gray-200 rounded-full overflow-hidden">
                       <div 
-                        className="h-full bg-gradient-to-r from-[#559F4B] to-[#E1783E] transition-all duration-500"
+                        className="h-full bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] transition-all duration-500"
                         style={{ width: `${(currentPage / totalPages) * 100}%` }}
                       />
                     </div>
@@ -708,7 +708,7 @@ const CategoriesPage = () => {
             )}
 
             {/* Bottom CTA */}
-            <div className="text-center mt-10 md:mt-12 p-6 md:p-8 lg:p-12 bg-gradient-to-r from-[#559F4B] to-[#E1783E] rounded-2xl md:rounded-3xl shadow-xl text-white relative overflow-hidden">
+            <div className="text-center mt-10 md:mt-12 p-6 md:p-8 lg:p-12 bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] rounded-2xl md:rounded-3xl shadow-xl text-white relative overflow-hidden">
               {/* Decorative Elements */}
               <div className="absolute inset-0 bg-grid-white/10" />
               <div className="absolute -top-12 md:-top-24 -left-12 md:-left-24 w-24 h-24 md:w-48 md:h-48 bg-white/10 rounded-full blur-2xl md:blur-3xl" />
@@ -729,7 +729,7 @@ const CategoriesPage = () => {
                   <Button 
                     asChild
                     size="lg"
-                    className="bg-white text-[#559F4B] hover:bg-gray-50 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 text-sm md:text-base px-6 md:px-8 py-3 md:py-4 rounded-xl"
+                    className="bg-white text-[#7A1F2B] hover:bg-gray-50 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 text-sm md:text-base px-6 md:px-8 py-3 md:py-4 rounded-xl"
                   >
                     <Link to="/products" className="flex items-center gap-2">
                       <ShoppingBag className="w-4 h-4 md:w-5 md:h-5" />
@@ -741,7 +741,7 @@ const CategoriesPage = () => {
                     asChild
                     size="lg"
                     variant="outline"
-                    className="bg-white/10 border-2 border-white text-white hover:bg-white hover:text-[#559F4B] backdrop-blur-sm shadow-lg transition-all duration-300 text-sm md:text-base px-6 md:px-8 py-3 md:py-4 rounded-xl"
+                    className="bg-white/10 border-2 border-white text-white hover:bg-white hover:text-[#7A1F2B] backdrop-blur-sm shadow-lg transition-all duration-300 text-sm md:text-base px-6 md:px-8 py-3 md:py-4 rounded-xl"
                   >
                     <Link to="/contact" className="flex items-center gap-2">
                       Contact Support

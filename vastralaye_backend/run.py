@@ -19,6 +19,7 @@ from app.routers import phonepe
 from app.routers.webhook import router as payment_webhook
 from app.routers import product_excel
 from app.routers import category_excel
+from app.routers import reels
 
 from fastapi.responses import FileResponse
 
@@ -99,6 +100,7 @@ app.include_router(phonepe.router)
 app.include_router(payment_webhook)   # ✅ /api/v1/webhook
 app.include_router(product_excel.router)
 app.include_router(category_excel.router)
+app.include_router(reels.router)   # ✅ shoppable product reels
 
 
 # ---------------------- Run the Server ----------------------

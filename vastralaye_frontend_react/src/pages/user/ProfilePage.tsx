@@ -129,7 +129,7 @@ const ProfilePage = () => {
     return (
       <UserLayout>
         <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#559F4B]"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#7A1F2B]"></div>
           <p className="ml-3 text-gray-600">Loading your profile...</p>
         </div>
       </UserLayout>
@@ -140,14 +140,14 @@ const ProfilePage = () => {
     <UserLayout>
       <div className="max-w-6xl mx-auto space-y-8 p-4">
         {/* Header Section with Gradient */}
-        <div className="bg-gradient-to-r from-[#559F4B]/10 via-[#E1783E]/5 to-[#559F4B]/10 rounded-2xl p-6 border border-[#559F4B]/20">
+        <div className="bg-gradient-to-r from-[#7A1F2B]/10 via-[#B85C38]/5 to-[#7A1F2B]/10 rounded-2xl p-6 border border-[#7A1F2B]/20">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="space-y-2">
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-[#559F4B] to-[#E1783E] bg-clip-text text-transparent">
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] bg-clip-text text-transparent">
                 My Profile
               </h1>
               <p className="text-gray-600 flex items-center gap-2">
-                <Leaf className="w-4 h-4 text-[#559F4B]" />
+                <Leaf className="w-4 h-4 text-[#7A1F2B]" />
                 Manage your personal information and preferences
               </p>
             </div>
@@ -155,7 +155,7 @@ const ProfilePage = () => {
             {!isEditing ? (
               <Button
                 onClick={() => setIsEditing(true)}
-                className="flex items-center gap-2 bg-gradient-to-r from-[#559F4B] to-[#E1783E] hover:from-[#559F4B]/90 hover:to-[#E1783E]/90 text-white shadow-lg hover:shadow-xl transition-all duration-300"
+                className="flex items-center gap-2 bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] hover:from-[#7A1F2B]/90 hover:to-[#B85C38]/90 text-white shadow-lg hover:shadow-xl transition-all duration-300"
               >
                 <Edit3 className="w-4 h-4" />
                 Edit Profile
@@ -165,7 +165,7 @@ const ProfilePage = () => {
                 <Button
                   variant="outline"
                   onClick={handleCancel}
-                  className="flex items-center gap-2 border-[#E1783E] text-[#E1783E] hover:bg-[#E1783E]/5 transition-all duration-200"
+                  className="flex items-center gap-2 border-[#B85C38] text-[#B85C38] hover:bg-[#B85C38]/5 transition-all duration-200"
                   disabled={isSubmitting}
                 >
                   <X className="w-4 h-4" />
@@ -174,7 +174,7 @@ const ProfilePage = () => {
                 <Button
                   type="submit"
                   form="profile-form"
-                  className="flex items-center gap-2 bg-gradient-to-r from-[#559F4B] to-[#E1783E] hover:from-[#559F4B]/90 hover:to-[#E1783E]/90 text-white shadow-lg hover:shadow-xl transition-all duration-300"
+                  className="flex items-center gap-2 bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] hover:from-[#7A1F2B]/90 hover:to-[#B85C38]/90 text-white shadow-lg hover:shadow-xl transition-all duration-300"
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? (
@@ -196,16 +196,16 @@ const ProfilePage = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Profile Picture Card */}
-          <Card className="lg:col-span-1 border-[#559F4B]/20 shadow-lg hover:shadow-xl transition-shadow duration-300">
-            <CardHeader className="bg-gradient-to-r from-[#559F4B]/5 to-[#E1783E]/5 border-b border-[#559F4B]/10 rounded-t-lg">
-              <CardTitle className="flex items-center gap-2 text-[#559F4B]">
+          <Card className="lg:col-span-1 border-[#7A1F2B]/20 shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <CardHeader className="bg-gradient-to-r from-[#7A1F2B]/5 to-[#B85C38]/5 border-b border-[#7A1F2B]/10 rounded-t-lg">
+              <CardTitle className="flex items-center gap-2 text-[#7A1F2B]">
                 <UserIcon className="w-5 h-5" />
                 Profile Picture
               </CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col items-center space-y-6 p-6">
               <div className="relative group">
-                <div className="absolute inset-0 bg-gradient-to-r from-[#559F4B] to-[#E1783E] rounded-full blur-lg opacity-30 group-hover:opacity-50 transition-opacity duration-300"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] rounded-full blur-lg opacity-30 group-hover:opacity-50 transition-opacity duration-300"></div>
                 <img
                   src={avatarPreview || "/default-avatar.png"}
                   alt="Profile"
@@ -229,7 +229,7 @@ const ProfilePage = () => {
     
     {/* Desktop badge */}
     <div className="hidden sm:block absolute -bottom-3 left-1/2 -translate-x-1/2">
-      <span className="text-xs font-medium text-white bg-gradient-to-r from-[#559F4B] to-[#E1783E] px-3 py-1.5 rounded-full shadow-lg whitespace-nowrap">
+      <span className="text-xs font-medium text-white bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] px-3 py-1.5 rounded-full shadow-lg whitespace-nowrap">
         Click to change
       </span>
     </div>
@@ -240,7 +240,7 @@ const ProfilePage = () => {
 
               {!isEditing && (
                 <div className="text-center space-y-2">
-                  <h3 className="font-bold text-xl bg-gradient-to-r from-[#559F4B] to-[#E1783E] bg-clip-text text-transparent">
+                  <h3 className="font-bold text-xl bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] bg-clip-text text-transparent">
                     {formData.first_name} {formData.last_name}
                   </h3>
                   <p className="text-gray-600 flex items-center justify-center gap-2">
@@ -254,9 +254,9 @@ const ProfilePage = () => {
           </Card>
 
           {/* Personal Information Card */}
-          <Card className="lg:col-span-2 border-[#559F4B]/20 shadow-lg">
-            <CardHeader className="bg-gradient-to-r from-[#559F4B]/5 to-[#E1783E]/5 border-b border-[#559F4B]/10 rounded-t-lg">
-              <CardTitle className="flex items-center gap-2 text-[#559F4B]">
+          <Card className="lg:col-span-2 border-[#7A1F2B]/20 shadow-lg">
+            <CardHeader className="bg-gradient-to-r from-[#7A1F2B]/5 to-[#B85C38]/5 border-b border-[#7A1F2B]/10 rounded-t-lg">
+              <CardTitle className="flex items-center gap-2 text-[#7A1F2B]">
                 <UserIcon className="w-5 h-5" />
                 Personal Information
               </CardTitle>
@@ -267,7 +267,7 @@ const ProfilePage = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-3">
                     <Label htmlFor="first_name" className="text-sm font-medium flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-[#559F4B]"></div>
+                      <div className="w-2 h-2 rounded-full bg-[#7A1F2B]"></div>
                       First Name
                     </Label>
                     <div className="relative">
@@ -277,14 +277,14 @@ const ProfilePage = () => {
                         value={formData.first_name || ""}
                         onChange={handleChange}
                         disabled={!isEditing || isSubmitting}
-                        className={`pl-10 ${isEditing ? "border-[#559F4B] focus:border-[#559F4B] focus:ring-[#559F4B]" : "bg-gray-50"}`}
+                        className={`pl-10 ${isEditing ? "border-[#7A1F2B] focus:border-[#7A1F2B] focus:ring-[#7A1F2B]" : "bg-gray-50"}`}
                       />
                       <UserIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                     </div>
                   </div>
                   <div className="space-y-3">
                     <Label htmlFor="last_name" className="text-sm font-medium flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-[#559F4B]"></div>
+                      <div className="w-2 h-2 rounded-full bg-[#7A1F2B]"></div>
                       Last Name
                     </Label>
                     <div className="relative">
@@ -294,7 +294,7 @@ const ProfilePage = () => {
                         value={formData.last_name || ""}
                         onChange={handleChange}
                         disabled={!isEditing || isSubmitting}
-                        className={`pl-10 ${isEditing ? "border-[#559F4B] focus:border-[#559F4B] focus:ring-[#559F4B]" : "bg-gray-50"}`}
+                        className={`pl-10 ${isEditing ? "border-[#7A1F2B] focus:border-[#7A1F2B] focus:ring-[#7A1F2B]" : "bg-gray-50"}`}
                       />
                       <UserIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                     </div>
@@ -302,9 +302,9 @@ const ProfilePage = () => {
                 </div>
 
                 {/* Contact Information */}
-                <div className="space-y-6 p-4 bg-gradient-to-r from-[#559F4B]/5 to-transparent rounded-xl">
+                <div className="space-y-6 p-4 bg-gradient-to-r from-[#7A1F2B]/5 to-transparent rounded-xl">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-gradient-to-r from-[#559F4B] to-[#E1783E] rounded-lg flex items-center justify-center">
+                    <div className="w-8 h-8 bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] rounded-lg flex items-center justify-center">
                       <Mail className="w-4 h-4 text-white" />
                     </div>
                     <h4 className="font-semibold text-lg text-gray-900">
@@ -315,7 +315,7 @@ const ProfilePage = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-3">
                       <Label htmlFor="email" className="text-sm font-medium flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-[#E1783E]"></div>
+                        <div className="w-2 h-2 rounded-full bg-[#B85C38]"></div>
                         Email Address
                       </Label>
                       <div className="relative">
@@ -330,14 +330,14 @@ const ProfilePage = () => {
                         <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                       </div>
                       <p className="text-xs text-gray-500 flex items-center gap-2">
-                        <Shield className="w-3 h-3 text-[#559F4B]" />
+                        <Shield className="w-3 h-3 text-[#7A1F2B]" />
                         Email cannot be changed for security reasons
                       </p>
                     </div>
 
                     <div className="space-y-3">
                       <Label htmlFor="phone" className="text-sm font-medium flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-[#E1783E]"></div>
+                        <div className="w-2 h-2 rounded-full bg-[#B85C38]"></div>
                         Phone Number
                       </Label>
                       <div className="relative">
@@ -348,7 +348,7 @@ const ProfilePage = () => {
                           value={formData.phone || ""}
                           onChange={handleChange}
                           disabled={!isEditing || isSubmitting}
-                          className={`pl-10 ${isEditing ? "border-[#E1783E] focus:border-[#E1783E] focus:ring-[#E1783E]" : "bg-gray-50"}`}
+                          className={`pl-10 ${isEditing ? "border-[#B85C38] focus:border-[#B85C38] focus:ring-[#B85C38]" : "bg-gray-50"}`}
                           minLength={10}
                           maxLength={10}
                           inputMode="numeric"
@@ -360,9 +360,9 @@ const ProfilePage = () => {
                 </div>
 
                 {/* Address Information */}
-                <div className="space-y-6 p-4 bg-gradient-to-r from-transparent to-[#E1783E]/5 rounded-xl">
+                <div className="space-y-6 p-4 bg-gradient-to-r from-transparent to-[#B85C38]/5 rounded-xl">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-gradient-to-r from-[#559F4B] to-[#E1783E] rounded-lg flex items-center justify-center">
+                    <div className="w-8 h-8 bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] rounded-lg flex items-center justify-center">
                       <MapPin className="w-4 h-4 text-white" />
                     </div>
                     <h4 className="font-semibold text-lg text-gray-900">
@@ -382,7 +382,7 @@ const ProfilePage = () => {
                           value={formData.address_line1 || ""}
                           onChange={handleChange}
                           disabled={!isEditing || isSubmitting}
-                          className={isEditing ? "border-[#559F4B] focus:border-[#559F4B] focus:ring-[#559F4B]" : ""}
+                          className={isEditing ? "border-[#7A1F2B] focus:border-[#7A1F2B] focus:ring-[#7A1F2B]" : ""}
                         />
                       </div>
                       <div className="space-y-3">
@@ -395,7 +395,7 @@ const ProfilePage = () => {
                           value={formData.address_line2 || ""}
                           onChange={handleChange}
                           disabled={!isEditing || isSubmitting}
-                          className={isEditing ? "border-[#559F4B] focus:border-[#559F4B] focus:ring-[#559F4B]" : ""}
+                          className={isEditing ? "border-[#7A1F2B] focus:border-[#7A1F2B] focus:ring-[#7A1F2B]" : ""}
                         />
                       </div>
                     </div>
@@ -411,7 +411,7 @@ const ProfilePage = () => {
                           value={formData.city || ""}
                           onChange={handleChange}
                           disabled={!isEditing || isSubmitting}
-                          className={isEditing ? "border-[#559F4B] focus:border-[#559F4B] focus:ring-[#559F4B]" : ""}
+                          className={isEditing ? "border-[#7A1F2B] focus:border-[#7A1F2B] focus:ring-[#7A1F2B]" : ""}
                         />
                       </div>
                       <div className="space-y-3">
@@ -424,7 +424,7 @@ const ProfilePage = () => {
                           value={formData.region || ""}
                           onChange={handleChange}
                           disabled={!isEditing || isSubmitting}
-                          className={isEditing ? "border-[#E1783E] focus:border-[#E1783E] focus:ring-[#E1783E]" : ""}
+                          className={isEditing ? "border-[#B85C38] focus:border-[#B85C38] focus:ring-[#B85C38]" : ""}
                         />
                       </div>
                       <div className="space-y-3">
@@ -439,7 +439,7 @@ const ProfilePage = () => {
                           minLength={6}
                           maxLength={6}
                           disabled={!isEditing || isSubmitting}
-                          className={isEditing ? "border-[#E1783E] focus:border-[#E1783E] focus:ring-[#E1783E]" : ""}
+                          className={isEditing ? "border-[#B85C38] focus:border-[#B85C38] focus:ring-[#B85C38]" : ""}
                         />
                       </div>
                       <div className="space-y-3">
@@ -452,7 +452,7 @@ const ProfilePage = () => {
                           value={formData.country || ""}
                           onChange={handleChange}
                           disabled={!isEditing || isSubmitting}
-                          className={isEditing ? "border-[#559F4B] focus:border-[#559F4B] focus:ring-[#559F4B]" : ""}
+                          className={isEditing ? "border-[#7A1F2B] focus:border-[#7A1F2B] focus:ring-[#7A1F2B]" : ""}
                         />
                       </div>
                     </div>
@@ -460,11 +460,11 @@ const ProfilePage = () => {
                 </div>
 
                 {/* Security Note */}
-                <div className="p-4 bg-gradient-to-r from-[#559F4B]/10 to-[#E1783E]/10 rounded-xl border border-[#559F4B]/20">
+                <div className="p-4 bg-gradient-to-r from-[#7A1F2B]/10 to-[#B85C38]/10 rounded-xl border border-[#7A1F2B]/20">
                   <div className="flex items-start gap-3">
-                    <Shield className="w-5 h-5 text-[#559F4B] mt-0.5 flex-shrink-0" />
+                    <Shield className="w-5 h-5 text-[#7A1F2B] mt-0.5 flex-shrink-0" />
                     <div className="space-y-1">
-                      <div className="text-sm font-medium text-[#559F4B]">Security Information</div>
+                      <div className="text-sm font-medium text-[#7A1F2B]">Security Information</div>
                       <p className="text-xs text-gray-600">
                         Your personal information is encrypted and securely stored. We never share your data with third parties.
                       </p>

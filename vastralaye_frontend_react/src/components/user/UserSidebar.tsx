@@ -66,7 +66,7 @@ const UserSidebar = () => {
 
       {/* HEADER */}
       <div className="mb-8">
-        <h2 className="text-2xl font-bold bg-gradient-to-r from-[#559F4B] to-[#E1783E] bg-clip-text text-transparent">
+        <h2 className="text-2xl font-bold bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] bg-clip-text text-transparent">
           My Account
         </h2>
 
@@ -88,8 +88,8 @@ const UserSidebar = () => {
               transition-all duration-300 group
               ${
                 isActive(item.path)
-                  ? "bg-gradient-to-r from-[#559F4B]/10 to-[#E1783E]/10 border-l-4 border-[#559F4B]"
-                  : "hover:bg-gradient-to-r hover:from-[#559F4B]/5 hover:to-[#E1783E]/5 border-l-4 border-transparent"
+                  ? "bg-gradient-to-r from-[#7A1F2B]/10 to-[#B85C38]/10 border-l-4 border-[#7A1F2B]"
+                  : "hover:bg-gradient-to-r hover:from-[#7A1F2B]/5 hover:to-[#B85C38]/5 border-l-4 border-transparent"
               }
             `}
           >
@@ -100,8 +100,8 @@ const UserSidebar = () => {
                 transition-all duration-300
                 ${
                   isActive(item.path)
-                    ? "bg-gradient-to-r from-[#559F4B] to-[#E1783E] text-white"
-                    : "bg-gray-100 text-gray-600 group-hover:text-[#559F4B]"
+                    ? "bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] text-white"
+                    : "bg-gray-100 text-gray-600 group-hover:text-[#7A1F2B]"
                 }
               `}
             >

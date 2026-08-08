@@ -369,7 +369,7 @@ const OrdersPage: React.FC = () => {
       <UserLayout>
         <div className="max-w-6xl mx-auto p-6">
           <div className="flex flex-col justify-center items-center h-64 gap-4">
-            <Loader2 className="h-8 w-8 animate-spin text-[#559F4B]" />
+            <Loader2 className="h-8 w-8 animate-spin text-[#7A1F2B]" />
             <p className="text-gray-600">Loading your orders...</p>
           </div>
         </div>
@@ -393,7 +393,7 @@ const OrdersPage: React.FC = () => {
               <Button onClick={() => window.location.reload()} variant="outline">
                 <RefreshCw className="w-4 h-4 mr-2" />Retry
               </Button>
-              <Button onClick={() => navigate('/')} className="bg-[#559F4B]">
+              <Button onClick={() => navigate('/')} className="bg-[#7A1F2B]">
                 <Home className="w-4 h-4 mr-2" />Home
               </Button>
             </div>
@@ -419,7 +419,7 @@ const OrdersPage: React.FC = () => {
             <p className="text-gray-600 text-center max-w-md">
               You haven't placed any orders yet. Start shopping to see your orders here.
             </p>
-            <Button onClick={() => navigate('/products')} className="bg-gradient-to-r from-[#559F4B] to-[#E1783E] text-white">
+            <Button onClick={() => navigate('/products')} className="bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] text-white">
               <ShoppingBag className="w-4 h-4 mr-2" />Start Shopping
             </Button>
           </div>
@@ -439,21 +439,21 @@ const OrdersPage: React.FC = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-[#559F4B] to-[#E1783E] bg-clip-text text-transparent">
+            <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-[#7A1F2B] to-[#B85C38] bg-clip-text text-transparent">
               My Orders
             </h1>
             <p className="text-gray-600 mt-1">{orders.length} order{orders.length !== 1 ? 's' : ''} total</p>
           </div>
-          <Button onClick={() => navigate('/products')} variant="outline" className="border-[#559F4B] text-[#559F4B] hover:bg-[#559F4B]/5">
+          <Button onClick={() => navigate('/products')} variant="outline" className="border-[#7A1F2B] text-[#7A1F2B] hover:bg-[#7A1F2B]/5">
             <ShoppingBag className="w-4 h-4 mr-2" />Continue Shopping
           </Button>
         </div>
 
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="p-4 bg-gradient-to-br from-[#559F4B]/10 to-[#559F4B]/5 rounded-xl border border-[#559F4B]/20">
+          <div className="p-4 bg-gradient-to-br from-[#7A1F2B]/10 to-[#7A1F2B]/5 rounded-xl border border-[#7A1F2B]/20">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-[#559F4B] rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-[#7A1F2B] rounded-lg flex items-center justify-center">
                 <ShoppingBag className="w-5 h-5 text-white" />
               </div>
               <div>
@@ -462,9 +462,9 @@ const OrdersPage: React.FC = () => {
               </div>
             </div>
           </div>
-          <div className="p-4 bg-gradient-to-br from-[#E1783E]/10 to-[#E1783E]/5 rounded-xl border border-[#E1783E]/20">
+          <div className="p-4 bg-gradient-to-br from-[#B85C38]/10 to-[#B85C38]/5 rounded-xl border border-[#B85C38]/20">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-[#E1783E] rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-[#B85C38] rounded-lg flex items-center justify-center">
                 <Receipt className="w-5 h-5 text-white" />
               </div>
               <div>
@@ -556,7 +556,7 @@ const OrdersPage: React.FC = () => {
               variant="ghost"
               size="sm"
               onClick={() => { setSearchQuery(''); setStatusFilter('all'); setPaymentFilter('all'); setSortBy('newest'); }}
-              className="text-[#559F4B]"
+              className="text-[#7A1F2B]"
             >
               Clear Filters
             </Button>
@@ -582,7 +582,7 @@ const OrdersPage: React.FC = () => {
               return (
                 <Card
                   key={order.id}
-                  className="border border-gray-200 hover:border-[#559F4B]/30 hover:shadow-lg transition-all duration-200 cursor-pointer"
+                  className="border border-gray-200 hover:border-[#7A1F2B]/30 hover:shadow-lg transition-all duration-200 cursor-pointer"
                   onClick={() => navigate(`/orders/${order.id}`)}
                 >
                   <CardContent className="p-0">
@@ -675,7 +675,7 @@ const OrdersPage: React.FC = () => {
                           <Button
                             variant="outline"
                             size="sm"
-                            className="border-[#559F4B] text-[#559F4B] hover:bg-[#559F4B]/5"
+                            className="border-[#7A1F2B] text-[#7A1F2B] hover:bg-[#7A1F2B]/5"
                             onClick={(e) => {
                               e.stopPropagation();
                               navigate(`/orders/${order.id}`);

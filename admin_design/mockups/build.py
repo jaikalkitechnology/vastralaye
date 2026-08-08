@@ -38,6 +38,7 @@ ICONS = {
     "gear":  '<svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M2 12h3M19 12h3M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>',
     "ext":   '<svg class="i" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9"/><path d="M20 14v5a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 19V6a1.5 1.5 0 0 1 1.5-1.5H10"/></svg>',
     "out":   '<svg class="i" viewBox="0 0 24 24"><path d="M9 4H5.5A1.5 1.5 0 0 0 4 5.5v13A1.5 1.5 0 0 0 5.5 20H9M15 16l4-4-4-4M19 12H9"/></svg>',
+    "film":  '<svg class="i" viewBox="0 0 24 24"><rect x="3" y="7" width="12" height="10" rx="2"/><path d="M15 10l6-3v10l-6-3"/></svg>',
     "search":'<svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>',
     "bell":  '<svg class="i" viewBox="0 0 24 24"><path d="M6 9a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6"/><path d="M10 19a2 2 0 0 0 4 0"/></svg>',
     "plus":  '<svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
@@ -52,6 +53,7 @@ NAV = [
     ("products", "tag", "Products", "312"),
     ("categories", "folder", "Categories", "18"),
     ("coupons", "ticket", "Coupons", ""),
+    ("reels", "film", "Reels", "24"),
     ("sec", "Sales"),
     ("orders", "box", "Orders", "23"),
     ("reviews", "star", "Reviews", "9"),
@@ -101,6 +103,7 @@ PAGES = {
     "users":      ("Users", "8,214 registered customers", ""),
     "reviews":    ("Reviews", "1,046 reviews · 9 awaiting reply", ""),
     "categories": ("Categories", "18 categories · 42 subcategories", "Add Category"),
+    "reels":      ("Reels", "24 reels · 1.2M views across the store", "Upload Reel"),
 }
 
 for name, (title, context, action) in PAGES.items():

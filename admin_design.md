@@ -31,7 +31,7 @@ Visual mockups + screenshots of every admin page live in [`admin_design/`](admin
 └──────────┴────────────────────────────────────────────┘
 ```
 
-- **Sidebar** (`AdminSidebar.tsx`): fixed 240px, espresso `#2B1B12`, ivory text. Brand logo top. Nav grouped by section labels (11px gold uppercase): *Overview* (Dashboard, Analytics), *Catalog* (Products, Categories, Coupons), *Sales* (Orders, Reviews), *Customers* (Users, Support). Active item: 3px gold left bar + `rgba(201,154,69,.12)` fill + gold text. Bottom block: "View store ↗", Settings, Logout, and the logged‑in admin chip.
+- **Sidebar** (`AdminSidebar.tsx`): fixed 240px, espresso `#2B1B12`, ivory text. Brand logo top. Nav grouped by section labels (11px gold uppercase): *Overview* (Dashboard, Analytics), *Catalog* (Products, Categories, Coupons, Reels), *Sales* (Orders, Reviews), *Customers* (Users, Support). Active item: 3px gold left bar + `rgba(201,154,69,.12)` fill + gold text. Bottom block: "View store ↗", Settings, Logout, and the logged‑in admin chip.
 - **Topbar** (new `AdminTopbar.tsx`): white, 64px, 1px bottom border. Left: page title (Fraunces 22px) + one‑line muted context. Right: global search (`⌘K` hint), page‑specific primary action (maroon button), notification bell with dot, avatar chip.
 - **Content canvas**: `#F7F4EF` background, 28–32px padding, 12‑col grid with 20px gutters, max‑width ~1400px.
 - **Mobile/tablet**: sidebar collapses to an icon rail (72px) at <1200px and a drawer at <768px; tables gain horizontal scroll; KPI row wraps 2×2.
@@ -95,6 +95,7 @@ Single theme object consumed by every chart in `src/components/admin/charts/`:
 | `src/pages/admin/AdminCoupons.tsx` | Table + create drawer; expired rows muted |
 | `src/pages/admin/AdminUsers.tsx` | Table w/ avatar+name cell, role & status chips, activate/deactivate confirm |
 | `src/pages/admin/CustomerReviews.tsx` | Moderation cards: stars, product ref, quote, reply box, approve/reply/delete |
+| **new** `src/pages/admin/AdminReels.tsx` | **Reels manager** — upload & manage the product videos shown on the storefront (home "Vastralaye in Motion" row and PDP "Watch It Styled"); see §5.9. v1 rides on the backend's existing per-product video upload (`static/uploads/product_videos/`, `video_file` in the product Excel/product form); placement flags & captions can start client-side and later move to a small `/api/v1/admin/reels` CRUD |
 | `src/pages/admin/AdminAnalytics.tsx` | 2×2 chart grid + top customers table (§5.4) |
 
 ---
@@ -129,6 +130,12 @@ Summary tiles (avg rating, total, pending replies) → moderation list: each car
 ### 5.8 Categories — `08-categories.png`
 `Add Category` primary → responsive grid of image cards (name, slug, product & subcategory counts, edit/delete) + "Import Excel" tile; subcategories listed as removable chips inside each card.
 
+### 5.9 Reels — `09-reels.png`
+Summary tiles (total reels, total views, orders attributed to reels, drafts/processing) → two‑column layout:
+- **Upload panel** (left, 400px): drag‑and‑drop dropzone (vertical 9:16 · MP4 · ≤30s · ≤8MB, poster auto‑generated) with an in‑progress upload row (file name + progress bar); fields: Caption, **Linked Product** (search‑select shown as a removable product chip), **Show On** checkboxes (Homepage reels row / Product page "Watch It Styled" / Category banner), **Poster Frame** picker (3 auto‑extracted frames), *Publish immediately* toggle, `Upload Reel` primary + `Save Draft` outline.
+- **Library** (right): filter tabs (All / Published / Drafts / Processing) + placement & sort selects → grid of reel cards: 9:16 poster with play button, status chip, view count, duration; below: caption, linked‑product strip, placement chips (Home / PDP), edit/delete actions.
+Upload flow: video posts to the existing product‑video storage; while transcoding the card shows **Processing**; publishing flips it live on the storefront sections it's assigned to.
+
 ---
 
 ## 6. Interaction & Motion
@@ -143,7 +150,7 @@ Summary tiles (avg rating, total, pending replies) → moderation list: each car
 
 - **Phase A — shell** *(≈1 day)*: tokens file, `AdminLayout`, `AdminSidebar`, `AdminTopbar`, `StatusChip`, `DataTable`, `FilterTabs`. Every page instantly inherits the new frame.
 - **Phase B — dashboard & analytics** *(≈1–1.5 days)*: `StatsCard`, Recharts theme, wire real endpoints (drop `mockAnalyticsData.ts`), dashboard + analytics blueprints.
-- **Phase C — operational pages** *(≈2 days)*: Orders (tabs+drawer), Products (+form drawer), Categories, Coupons.
+- **Phase C — operational pages** *(≈2–2.5 days)*: Orders (tabs+drawer), Products (+form drawer), Categories, Coupons, **Reels manager** (upload + library).
 - **Phase D — people pages & polish** *(≈1 day)*: Users, Reviews, empty states, confirm dialogs, responsive rail/drawer, QA below.
 
 **QA:** all data flows unchanged · AA contrast on chips/charts · 1280/1440/1680 layouts + icon‑rail at 1024 · no storefront motifs in admin · no hard‑coded hex outside the token file.

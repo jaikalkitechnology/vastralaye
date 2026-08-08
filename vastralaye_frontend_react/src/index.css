@@ -5,65 +5,66 @@
 
 @layer base {
   :root {
-    --background: 0 0% 98%;
-    --foreground: 222.2 84% 4.9%;
+    /* Vastralaye design tokens — see design.md §3 */
+    --background: 36 50% 96%;        /* ivory */
+    --foreground: 22 41% 12%;        /* espresso */
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 22 41% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 22 41% 12%;
 
-    --primary: 226 58% 22%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 352 59% 30%;          /* maroon */
+    --primary-foreground: 36 50% 96%;
 
-    --secondary: 35 33% 96%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 13 50% 93%;         /* blush */
+    --secondary-foreground: 22 41% 12%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 36 38% 90%;             /* sand */
+    --muted-foreground: 22 15% 38%;
 
-    --accent: 21 100% 41%;
+    --accent: 17 53% 47%;            /* terracotta */
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 66% 47%;        /* sale red */
+    --destructive-foreground: 36 50% 96%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 226 58% 22%;
+    --border: 33 28% 86%;
+    --input: 33 28% 86%;
+    --ring: 352 59% 30%;
 
-    --radius: 0.5rem;
+    --radius: 0.25rem;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --background: 22 41% 8%;
+    --foreground: 36 50% 96%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 22 35% 12%;
+    --card-foreground: 36 50% 96%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 22 35% 12%;
+    --popover-foreground: 36 50% 96%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 352 45% 42%;
+    --primary-foreground: 36 50% 96%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 22 30% 16%;
+    --secondary-foreground: 36 50% 96%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 22 30% 16%;
+    --muted-foreground: 33 25% 70%;
 
-    --accent: 21 100% 41%;
+    --accent: 17 53% 47%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 40%;
+    --destructive-foreground: 36 50% 96%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    --border: 22 30% 20%;
+    --input: 22 30% 20%;
+    --ring: 39 54% 53%;
   }
 }
 
@@ -73,122 +74,78 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+
+  h1, h2, h3, .font-display {
+    @apply font-serif;
   }
 }
 
 @layer components {
+  /* Legacy helper classes kept for older pages — re-pointed to brand tokens */
   .product-card {
-    @apply bg-white rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300;
+    @apply bg-white rounded-sm overflow-hidden transition-shadow duration-300;
   }
-  
+
   .btn-primary {
-    @apply bg-navy text-white hover:opacity-90 transition-opacity;
+    @apply bg-maroon text-ivory hover:bg-terracotta transition-colors;
   }
-  
+
   .btn-secondary {
-    @apply bg-cream text-charcoal hover:bg-opacity-80 transition-opacity;
+    @apply bg-blush text-espresso hover:bg-sand transition-colors;
   }
-  
+
   .btn-accent {
-    @apply bg-terracotta text-white hover:opacity-90 transition-opacity;
+    @apply bg-terracotta text-white hover:bg-maroon transition-colors;
+  }
+
+  /* Gold overline used above section headings */
+  .overline-label {
+    @apply block text-[12px] font-sans font-semibold uppercase tracking-[0.3em] text-gold;
+  }
+
+  /* Scalloped edge between contrasting sections (Aachho motif) */
+  .scallop-divider {
+    height: 14px;
+    background: radial-gradient(circle at 8px -4px, transparent 12px, hsl(var(--background)) 13px);
+    background-size: 28px 14px;
+  }
+
+  .scallop-divider-blush {
+    height: 14px;
+    background: radial-gradient(circle at 8px -4px, transparent 12px, hsl(var(--secondary)) 13px);
+    background-size: 28px 14px;
   }
 }
 
-
-/* Slower versions of standard animations */
-@keyframes spin-slow {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* Ken Burns zoom for hero imagery */
+@keyframes kenburns {
+  from { transform: scale(1); }
+  to { transform: scale(1.06); }
 }
 
-@keyframes pulse-slow {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
+.animate-kenburns {
+  animation: kenburns 7s ease-out forwards;
 }
 
-@keyframes pulse-slower {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.3;
-  }
+@media (prefers-reduced-motion: reduce) {
+  .animate-kenburns { animation: none; }
 }
 
-@keyframes fadeInOut {
-  0%, 100% {
-    opacity: 0.3;
-  }
-  50% {
-    opacity: 1;
-  }
-}
+/* Legacy animation helpers (still referenced by a few pages) */
+@keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes pulse-slow { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+@keyframes pulse-slower { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+@keyframes fadeInOut { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+@keyframes wave { 0%, 100% { transform: translateY(0) scale(1); opacity: 0.7; } 50% { transform: translateY(-10px) scale(1.05); opacity: 1; } }
+@keyframes expand { 0%, 100% { height: 20%; opacity: 0.3; } 50% { height: 100%; opacity: 1; } }
+@keyframes bounce-slow { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
 
-@keyframes wave {
-  0%, 100% {
-    transform: translateY(0) scale(1);
-    opacity: 0.7;
-  }
-  50% {
-    transform: translateY(-10px) scale(1.05);
-    opacity: 1;
-  }
-}
-
-@keyframes expand {
-  0%, 100% {
-    height: 20%;
-    opacity: 0.3;
-  }
-  50% {
-    height: 100%;
-    opacity: 1;
-  }
-}
-
-@keyframes bounce-slow {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-8px);
-  }
-}
-
-/* Tailwind custom animations */
-.animate-spin-slow {
-  animation: spin-slow 3s linear infinite;
-}
-
-.animate-pulse-slow {
-  animation: pulse-slow 3s ease-in-out infinite;
-}
-
-.animate-pulse-slower {
-  animation: pulse-slower 4s ease-in-out infinite;
-}
-
-.animate-fade-in-out {
-  animation: fadeInOut 3s ease-in-out infinite;
-}
-
-.animate-wave {
-  animation: wave 6s ease-in-out infinite;
-}
-
-.animate-expand {
-  animation: expand 3s ease-in-out infinite;
-}
-
-.animate-bounce-slow {
-  animation: bounce-slow 2s ease-in-out infinite;
-}
+.animate-spin-slow { animation: spin-slow 3s linear infinite; }
+.animate-pulse-slow { animation: pulse-slow 3s ease-in-out infinite; }
+.animate-pulse-slower { animation: pulse-slower 4s ease-in-out infinite; }
+.animate-fade-in-out { animation: fadeInOut 3s ease-in-out infinite; }
+.animate-wave { animation: wave 6s ease-in-out infinite; }
+.animate-expand { animation: expand 3s ease-in-out infinite; }
+.animate-bounce-slow { animation: bounce-slow 2s ease-in-out infinite; }

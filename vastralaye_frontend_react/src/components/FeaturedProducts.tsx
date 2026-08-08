@@ -197,12 +197,12 @@ const FeaturedProducts = () => {
       <div className="container px-4 mx-auto">
         {/* Header */}
         <div className="text-center mb-10 md:mb-14">
-          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-[#559F4B] to-[#E1783E] text-white px-5 py-2.5 rounded-full text-sm font-bold mb-5 shadow-lg hover:shadow-xl transition-shadow duration-300">
+          <div className="inline-flex items-center gap-2 bg-maroon text-ivory px-5 py-2.5 rounded-full text-xs uppercase tracking-[0.2em] font-semibold mb-5">
             <Award className="w-4 h-4" fill="white" />
             Premium Collection
           </div>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-5">
-            Discover Our <span className="bg-gradient-to-r from-[#559F4B] to-[#E1783E] bg-clip-text text-transparent">Featured</span> Products
+            Discover Our <span className="text-maroon">Featured</span> Products
           </h2>
           <p className="text-gray-600 max-w-2xl mx-auto text-base md:text-lg">
             Explore our handpicked selection of premium products across different categories
@@ -219,7 +219,7 @@ const FeaturedProducts = () => {
     <TabsList className="bg-white border border-gray-200 shadow-sm rounded-xl p-1 inline-flex w-full lg:w-auto">
       <TabsTrigger 
         value="all"
-        className="flex-1 lg:flex-initial rounded-lg px-3 sm:px-4 lg:px-5 py-2 sm:py-2.5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#559F4B] data-[state=active]:to-[#E1783E] data-[state=active]:text-white font-medium transition-all duration-300 text-xs sm:text-sm lg:text-base"
+        className="flex-1 lg:flex-initial rounded-lg px-3 sm:px-4 lg:px-5 py-2 sm:py-2.5 data-[state=active]:bg-maroon data-[state=active]:text-ivory font-medium transition-all duration-300 text-xs sm:text-sm lg:text-base"
       >
         <div className="flex items-center justify-center gap-1 sm:gap-2">
           <Package className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -230,7 +230,7 @@ const FeaturedProducts = () => {
       
       <TabsTrigger 
         value="new"
-        className="flex-1 lg:flex-initial rounded-lg px-3 sm:px-4 lg:px-5 py-2 sm:py-2.5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#559F4B] data-[state=active]:to-[#E1783E] data-[state=active]:text-white font-medium transition-all duration-300 text-xs sm:text-sm lg:text-base"
+        className="flex-1 lg:flex-initial rounded-lg px-3 sm:px-4 lg:px-5 py-2 sm:py-2.5 data-[state=active]:bg-maroon data-[state=active]:text-ivory font-medium transition-all duration-300 text-xs sm:text-sm lg:text-base"
       >
         <div className="flex items-center justify-center gap-1 sm:gap-2">
           <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -241,7 +241,7 @@ const FeaturedProducts = () => {
       
       <TabsTrigger 
         value="bestseller"
-        className="flex-1 lg:flex-initial rounded-lg px-3 sm:px-4 lg:px-5 py-2 sm:py-2.5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#559F4B] data-[state=active]:to-[#E1783E] data-[state=active]:text-white font-medium transition-all duration-300 text-xs sm:text-sm lg:text-base"
+        className="flex-1 lg:flex-initial rounded-lg px-3 sm:px-4 lg:px-5 py-2 sm:py-2.5 data-[state=active]:bg-maroon data-[state=active]:text-ivory font-medium transition-all duration-300 text-xs sm:text-sm lg:text-base"
       >
         <div className="flex items-center justify-center gap-1 sm:gap-2">
           <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -261,7 +261,7 @@ const FeaturedProducts = () => {
       onClick={() => setViewMode('grid')}
       className={`flex-1 lg:flex-initial rounded-lg px-3 sm:px-4 py-2 sm:py-2.5 transition-all ${
         viewMode === 'grid' 
-          ? 'bg-white shadow-sm text-[#559F4B]' 
+          ? 'bg-white shadow-sm text-maroon' 
           : 'text-gray-600 hover:text-gray-900'
       }`}
     >
@@ -275,7 +275,7 @@ const FeaturedProducts = () => {
       onClick={() => setViewMode('list')}
       className={`flex-1 lg:flex-initial rounded-lg px-3 sm:px-4 py-2 sm:py-2.5 transition-all ${
         viewMode === 'list' 
-          ? 'bg-white shadow-sm text-[#559F4B]' 
+          ? 'bg-white shadow-sm text-maroon' 
           : 'text-gray-600 hover:text-gray-900'
       }`}
     >
@@ -339,7 +339,7 @@ const FeaturedProducts = () => {
         <div className="text-center mt-10 md:mt-14">
           <Link to="/products">
             <Button 
-              className="bg-gradient-to-r from-[#559F4B] to-[#E1783E] hover:from-[#E1783E] hover:to-[#559F4B] text-white shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-105 rounded-xl px-8 py-6 text-lg font-bold group"
+              className="bg-maroon hover:bg-terracotta text-ivory shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-105 rounded-xl px-8 py-6 text-lg font-bold group"
               size="lg"
             >
               <div className="flex items-center gap-3">
@@ -361,7 +361,7 @@ const FeaturedProducts = () => {
         {/* Empty State */}
         {!loading && getCurrentProducts().length === 0 && (
           <div className="text-center py-16">
-            <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-[#559F4B]/10 to-[#E1783E]/10 rounded-full flex items-center justify-center">
+            <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-maroon/10 to-gold/10 rounded-full flex items-center justify-center">
               <ShoppingBag className="w-12 h-12 text-gray-400" />
             </div>
             <h3 className="text-2xl font-bold text-gray-900 mb-3">No Products Found</h3>
@@ -372,13 +372,13 @@ const FeaturedProducts = () => {
               <Button 
                 variant="outline"
                 onClick={() => setTab('all')}
-                className="border-[#559F4B] text-[#559F4B] hover:bg-[#559F4B]/10"
+                className="border-maroon text-maroon hover:bg-maroon/10"
               >
                 View All Products
               </Button>
               <Button 
                 variant="default"
-                className="bg-gradient-to-r from-[#559F4B] to-[#E1783E] hover:from-[#E1783E] hover:to-[#559F4B] text-white"
+                className="bg-maroon hover:bg-terracotta text-ivory"
                 onClick={() => window.location.reload()}
               >
                 Refresh Page
@@ -392,11 +392,11 @@ const FeaturedProducts = () => {
           <div className="text-center py-16">
             <div className="inline-flex flex-col items-center gap-4">
               <div className="relative">
-                <div className="w-16 h-16 border-4 border-[#559F4B]/20 rounded-full"></div>
-                <div className="absolute top-0 left-0 w-16 h-16 border-4 border-[#559F4B] border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-16 h-16 border-4 border-maroon/20 rounded-full"></div>
+                <div className="absolute top-0 left-0 w-16 h-16 border-4 border-maroon border-t-transparent rounded-full animate-spin"></div>
               </div>
               <div className="text-center">
-                <div className="text-[#559F4B] font-bold text-lg">Loading Products</div>
+                <div className="text-maroon font-bold text-lg">Loading Products</div>
                 <p className="text-gray-600 text-sm">Fetching our premium collection...</p>
               </div>
             </div>

@@ -16,6 +16,7 @@ Fabric-toned blocks stand in for product/category imagery; all numbers are illus
 | 06 | Users | Customer table with avatars, role & status chips, activate/deactivate actions | `06-users.png` |
 | 07 | Reviews | Rating summary tiles, moderation cards with reply box / posted-reply state | `07-reviews.png` |
 | 08 | Categories | Image cards with slugs, subcategory chips, counts, add-category tile | `08-categories.png` |
+| 09 | Reels | Product-video upload panel (drag & drop, linked product, placement, poster picker) + reels library with status/views | `09-reels.png` |
 
 ## Mockup sources (`mockups/`)
 
