@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Instagram, Facebook, Twitter, Youtube, MapPin, Phone, Mail } from 'lucide-react';
 import { useSiteSettings } from '@/hooks/use-site-settings';
+import PaymentBadges from '@/components/PaymentBadges';
 
 /**
  * Editorial dark footer (design.md §5.13) — espresso background,
@@ -137,16 +138,7 @@ const Footer = () => {
         {/* Bottom bar */}
         <div className="border-t border-ivory/15 py-5 flex flex-col md:flex-row items-center justify-between gap-4 text-[13px]">
           <span>© {new Date().getFullYear()} Vastralaye · All rights reserved</span>
-          <div className="flex gap-2">
-            {['UPI', 'VISA', 'MASTERCARD', 'RUPAY', 'COD'].map((m) => (
-              <span
-                key={m}
-                className="border border-ivory/30 rounded-[2px] text-[10.5px] tracking-[0.08em] px-2.5 py-1"
-              >
-                {m}
-              </span>
-            ))}
-          </div>
+          <PaymentBadges />
         </div>
       </div>
     </footer>
