@@ -159,6 +159,30 @@ each method now renders as a **white badge chip with its brand mark**:
 
 ---
 
+## 6. Premium Collection — List view redesigned
+
+The homepage product section's **Grid / List toggle** had a leftover old-style list layout
+(gradient accent bars, glowing stars, a pile of gradient badges mixed into the button row).
+The list row is now a clean **editorial horizontal card**:
+
+- **Left:** fixed 3:4 image column on sand with the same **hover second-image crossfade** as the
+  grid card, and the same flat badges (gold `NEW`, espresso `BESTSELLER`, red `-x%`, out-of-stock).
+- **Right:** gold category overline → **serif product title** (maroon on hover) → gold star rating
+  with count → two-line muted description (hidden on phones) → price block (semibold price, struck
+  MRP, red % off) → bottom action row separated by a hairline: maroon **Add to Cart**, square
+  outline wishlist heart (blush fill when saved), and a hover-reveal "View details →" on desktop.
+- Flat `bg-white border-border rounded-sm` container with a soft shadow on hover — no gradients,
+  no badge soup. Stays horizontal on mobile (that's the point of list view) with tightened
+  paddings and a compact "Add" label.
+- Review fetching, image normalization and cart/wishlist logic are byte-preserved; the same
+  component serves the products page's list mode, so it upgrades there too.
+
+| File | Change |
+|---|---|
+| `src/components/ProductListItem.tsx` | Rewritten to the editorial list row (visuals only) |
+
+---
+
 ## Verification
 
 - `tsc --noEmit` — no errors in any changed file.
