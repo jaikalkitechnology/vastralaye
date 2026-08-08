@@ -10,7 +10,9 @@ import {
   Eye,
   Play,
   RefreshCw,
+  Link2,
 } from 'lucide-react';
+import { getYouTubeId, youTubeThumb } from '@/lib/media';
 
 interface ReelProduct {
   id: number;
@@ -56,6 +58,8 @@ const AdminReels = () => {
   const [showOnHome, setShowOnHome] = useState(true);
   const [showOnPdp, setShowOnPdp] = useState(true);
   const [publishNow, setPublishNow] = useState(true);
+  const [videoSource, setVideoSource] = useState<'upload' | 'link'>('upload');
+  const [videoLink, setVideoLink] = useState('');
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [posterFile, setPosterFile] = useState<File | null>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
@@ -90,6 +94,8 @@ const AdminReels = () => {
     setShowOnPdp(true);
     setPublishNow(true);
     setVideoFile(null);
+    setVideoLink('');
+    setVideoSource('upload');
     setPosterFile(null);
     if (videoInputRef.current) videoInputRef.current.value = '';
     if (posterInputRef.current) posterInputRef.current.value = '';
@@ -97,7 +103,13 @@ const AdminReels = () => {
 
   const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!videoFile) return toast({ title: 'Please choose a video file (MP4)' });
+    if (videoSource === 'upload' && !videoFile)
+      return toast({ title: 'Please choose a video file (MP4)' });
+    if (videoSource === 'link') {
+      const link = videoLink.trim();
+      if (!/^https?:\/\/.+/.test(link))
+        return toast({ title: 'Please paste a valid video link (YouTube or MP4 URL)' });
+    }
     if (!caption.trim()) return toast({ title: 'Please add a caption' });
 
     const form = new FormData();
@@ -106,7 +118,8 @@ const AdminReels = () => {
     form.append('show_on_home', String(showOnHome));
     form.append('show_on_pdp', String(showOnPdp));
     form.append('is_published', String(publishNow));
-    form.append('video_file', videoFile);
+    if (videoSource === 'upload' && videoFile) form.append('video_file', videoFile);
+    if (videoSource === 'link') form.append('video_link', videoLink.trim());
     if (posterFile) form.append('poster_file', posterFile);
 
     setUploading(true);
@@ -168,18 +181,64 @@ const AdminReels = () => {
         <form onSubmit={handleUpload} className="bg-white border border-border rounded-md p-5">
           <h2 className="text-xs font-semibold uppercase tracking-[0.16em] mb-4">Upload New Reel</h2>
 
-          <label
-            htmlFor="reel-video"
-            className="block border-2 border-dashed border-sand rounded-md bg-ivory text-center px-4 py-8 cursor-pointer hover:border-gold transition-colors"
-          >
-            <UploadCloud className="h-8 w-8 mx-auto text-maroon mb-2" strokeWidth={1.5} />
-            <span className="block text-sm font-medium text-espresso">
-              {videoFile ? videoFile.name : 'Click to choose a video'}
-            </span>
-            <span className="block text-xs text-muted-foreground mt-1">
-              Vertical 9:16 · MP4 · up to 30s · max 30 MB
-            </span>
-          </label>
+          {/* Video source toggle: upload a file or paste a link (e.g. YouTube) */}
+          <div className="flex border border-border rounded-sm overflow-hidden mb-3">
+            <button
+              type="button"
+              onClick={() => setVideoSource('upload')}
+              className={`flex-1 inline-flex items-center justify-center gap-2 py-2.5 text-[11px] font-semibold uppercase tracking-[0.12em] transition-colors ${
+                videoSource === 'upload' ? 'bg-maroon text-ivory' : 'bg-white text-muted-foreground hover:text-espresso'
+              }`}
+            >
+              <UploadCloud className="h-3.5 w-3.5" /> Upload File
+            </button>
+            <button
+              type="button"
+              onClick={() => setVideoSource('link')}
+              className={`flex-1 inline-flex items-center justify-center gap-2 py-2.5 text-[11px] font-semibold uppercase tracking-[0.12em] border-l border-border transition-colors ${
+                videoSource === 'link' ? 'bg-maroon text-ivory' : 'bg-white text-muted-foreground hover:text-espresso'
+              }`}
+            >
+              <Link2 className="h-3.5 w-3.5" /> Video Link
+            </button>
+          </div>
+
+          {videoSource === 'upload' ? (
+            <label
+              htmlFor="reel-video"
+              className="block border-2 border-dashed border-sand rounded-md bg-ivory text-center px-4 py-8 cursor-pointer hover:border-gold transition-colors"
+            >
+              <UploadCloud className="h-8 w-8 mx-auto text-maroon mb-2" strokeWidth={1.5} />
+              <span className="block text-sm font-medium text-espresso">
+                {videoFile ? videoFile.name : 'Click to choose a video'}
+              </span>
+              <span className="block text-xs text-muted-foreground mt-1">
+                Vertical 9:16 · MP4 · up to 30s · max 30 MB
+              </span>
+            </label>
+          ) : (
+            <div className="border border-border rounded-md bg-ivory px-4 py-4">
+              <label className="block text-[11px] font-semibold uppercase tracking-[0.14em] mb-1.5">
+                Video link (YouTube or MP4 URL)
+              </label>
+              <input
+                type="url"
+                value={videoLink}
+                onChange={(e) => setVideoLink(e.target.value)}
+                placeholder="https://youtube.com/shorts/…"
+                className="w-full border border-input rounded-sm px-3 py-2.5 text-sm bg-white focus:outline-none focus:border-maroon"
+              />
+              <span className="block text-xs text-muted-foreground mt-1.5">
+                YouTube links play in an embedded player; YouTube thumbnails are used
+                automatically when no poster is uploaded.
+              </span>
+              {getYouTubeId(videoLink) && (
+                <span className="inline-flex items-center gap-1.5 mt-2 text-[11px] font-semibold text-green-700">
+                  ✓ YouTube link detected
+                </span>
+              )}
+            </div>
+          )}
           <input
             id="reel-video"
             ref={videoInputRef}
@@ -296,6 +355,12 @@ const AdminReels = () => {
                         alt={reel.caption}
                         className="absolute inset-0 w-full h-full object-cover"
                       />
+                    ) : getYouTubeId(reel.video_url) ? (
+                      <img
+                        src={youTubeThumb(getYouTubeId(reel.video_url) as string)}
+                        alt={reel.caption}
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
                     ) : (
                       <video
                         src={mediaUrl(reel.video_url)}
@@ -304,6 +369,11 @@ const AdminReels = () => {
                         playsInline
                         preload="metadata"
                       />
+                    )}
+                    {getYouTubeId(reel.video_url) && (
+                      <span className="absolute top-2 right-2 z-10 text-[9px] font-bold uppercase tracking-[0.08em] bg-white/95 text-sale px-1.5 py-0.5 rounded-sm">
+                        YouTube
+                      </span>
                     )}
                     <a
                       href={mediaUrl(reel.video_url)}
