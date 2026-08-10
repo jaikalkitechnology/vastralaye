@@ -279,6 +279,31 @@ so links and payment badges keep full contrast.
 
 ---
 
+## 11. Catalogue page banners (All Products / All Categories)
+
+Both catalogue pages open with a full-width **image banner** instead of a plain heading:
+
+- **Admin-driven image** — the banner background is the first hero banner from
+  **Admin → Banner Control** (`GET /fronted/banners`, fetched once per session and shared
+  between pages), laid under an espresso gradient (95% → 35% left-to-right) so the ivory
+  serif title, breadcrumb and counts stay readable over any photo.
+- **Fallback** — with no banner configured, the band renders the espresso + gold paisley
+  treatment, so the page never looks broken.
+- Layout: ivory breadcrumb (`Home · <gold>Shop/Categories</gold>`), serif ivory title,
+  muted subtitle with live counts, gold line–diamond–line ornament; closed by the site's
+  3px gold rule (same family as the hero and account band).
+- The paisley tile moved to a shared `decor/patterns.ts` (used by the footer and banners).
+
+| File | Change |
+|---|---|
+| `src/components/PageBanner.tsx` | New — shared admin-image banner with espresso fallback |
+| `src/components/decor/patterns.ts` | New — shared `PAISLEY_TILE` data-URI |
+| `src/pages/ProductsPage.tsx` | Banner replaces the in-container breadcrumb + heading |
+| `src/pages/AllCategoriesPage.tsx` | Banner replaces the in-container breadcrumb + heading |
+| `src/components/Footer.tsx` | Imports the shared paisley tile |
+
+---
+
 ## Verification
 
 - `tsc --noEmit` — no errors in any changed file.

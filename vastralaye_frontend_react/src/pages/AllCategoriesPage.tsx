@@ -12,6 +12,7 @@ import {
   Search,
 } from 'lucide-react';
 import { BASE_IMG } from '@/config';
+import PageBanner from '@/components/PageBanner';
 
 const CategoriesPage = () => {
   const [categories, setCategories] = useState([]);
@@ -212,27 +213,14 @@ const CategoriesPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 pb-16 lg:pb-20">
+      {/* Admin-driven banner (Admin → Banner Control) */}
+      <PageBanner
+        title="All Categories"
+        subtitle={`Every weave, every occasion · ${filteredCategories.length} categories · ${totalProducts} products`}
+        crumb="Categories"
+      />
 
-        {/* Breadcrumb */}
-        <nav
-          className="pt-6 text-[12px] uppercase tracking-[0.08em] text-muted-foreground"
-          aria-label="Breadcrumb"
-        >
-          <Link to="/" className="hover:text-maroon transition-colors">Home</Link>
-          <span className="mx-2">/</span>
-          <span className="text-espresso font-medium">Categories</span>
-        </nav>
-
-        {/* Page head */}
-        <div className="pt-4 pb-8">
-          <h1 className="font-serif text-3xl md:text-4xl font-medium text-espresso">
-            All Categories
-          </h1>
-          <p className="text-sm text-muted-foreground mt-2">
-            Every weave, every occasion · {filteredCategories.length} categories · {totalProducts} products
-          </p>
-        </div>
+      <div className="container mx-auto px-4 pt-8 pb-16 lg:pb-20">
 
         {/* Toolbar: search left, sort right */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-y border-border py-3 mb-10">
