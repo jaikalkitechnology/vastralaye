@@ -255,6 +255,19 @@ HTML mockups and screenshots live in **[`user_design/`](user_design/README.md)**
 
 ---
 
+## 10. Footer — woven paisley background
+
+The espresso footer now carries a **background motif**: a repeating gold paisley (boteh)
+tile with diamond accents, drawn as an **inline SVG data-URI** — no image request, crisp
+at every size. It sits in an absolutely-positioned layer at **5% opacity** under the
+content (`pointer-events-none`), so link contrast and readability are unchanged.
+
+| File | Change |
+|---|---|
+| `src/components/Footer.tsx` | `PAISLEY_TILE` SVG tile + background layer; content lifted with `relative` |
+
+---
+
 ## Verification
 
 - `tsc --noEmit` — no errors in any changed file.

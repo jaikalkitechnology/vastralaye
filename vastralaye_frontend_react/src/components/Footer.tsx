@@ -13,7 +13,13 @@ import {
 /**
  * Editorial dark footer (design.md §5.13) — espresso background,
  * gold accents, link columns covering all existing routes.
+ *
+ * The background carries a faint woven paisley (boteh) motif — an
+ * inline SVG tile so it costs no network request and stays crisp at
+ * any size; opacity is kept low so text contrast is unaffected.
  */
+const PAISLEY_TILE = `url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'><g fill='none' stroke='%23C99A45' stroke-width='1.1'><path d='M40 14c17 7 26 22 24 39-2 15-13 27-27 30-9 2-16-3-17-10-1-7 4-13 11-13 6 0 10 4 10 9 0 4-3 7-7 7'/><path d='M40 26c10 5 16 15 14 26-1 9-8 17-17 19'/><circle cx='40' cy='84' r='2'/><path d='M120 146c-17-7-26-22-24-39 2-15 13-27 27-30 9-2 16 3 17 10 1 7-4 13-11 13-6 0-10-4-10-9 0-4 3-7 7-7'/><path d='M120 134c-10-5-16-15-14-26 1-9 8-17 17-19'/><circle cx='120' cy='76' r='2'/><rect x='116' y='36' width='7' height='7' transform='rotate(45 119.5 39.5)'/><rect x='36' y='116' width='7' height='7' transform='rotate(45 39.5 119.5)'/></g></svg>")`;
+
 const Footer = () => {
   const settings = useSiteSettings();
 
@@ -41,8 +47,14 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="bg-espresso text-ivory/70 border-t-[3px] border-gold">
-      <div className="container mx-auto px-4">
+    <footer className="relative overflow-hidden bg-espresso text-ivory/70 border-t-[3px] border-gold">
+      {/* Woven paisley background motif */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-[0.05]"
+        style={{ backgroundImage: PAISLEY_TILE, backgroundSize: '160px 160px' }}
+      />
+      <div className="container relative mx-auto px-4">
         {/* Main columns */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr] gap-10 lg:gap-12 py-14">
           {/* Brand */}
