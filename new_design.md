@@ -1,9 +1,13 @@
-# new_design.md — Reels Experience Enhancements
+# new_design.md — Reels Experience & Storefront Polish
 
-> **Status: ✅ ALL IMPLEMENTED** — three upgrades to the reels experience:
-> **1)** the reels row becomes a slider when more videos exist, **2)** the reel viewer shows
-> prev/next video previews with slider navigation, **3)** the product page gets a sticky floating
-> reel that follows the shopper on scroll.
+> **Status: ✅ ALL IMPLEMENTED** — **1)** the reels row becomes a slider when more videos exist,
+> **2)** the reel viewer shows prev/next video previews with smooth slider navigation,
+> **3)** the product page gets a sticky floating reel that follows the shopper on scroll,
+> **4)** the WhatsApp button becomes a middle-right admin-controlled contact hub,
+> **5)** UPI / Visa / Mastercard / RuPay / COD payment badges in the footer and cart,
+> **6)** the Premium Collection list view is redesigned as an editorial card,
+> **7)** the scroll-to-top button joins the espresso/gold theme,
+> **8)** contact hub & footer socials use the original brand logos.
 
 ---
 
@@ -201,6 +205,43 @@ banned by the motion rules. Now per `design.md` §5.14:
 | File | Change |
 |---|---|
 | `src/pages/ScrollToTopButton.tsx` | Restyled to the espresso/gold theme; bounce + ripple removed; mobile offset added |
+
+---
+
+## 8. Original brand logos — contact hub & footer socials
+
+The contact hub and the footer social row were drawing their links with **generic lucide
+outline icons** (a camera square for Instagram, a plain triangle for YouTube…). Both now use
+the **official brand-mark SVGs**, inlined the same way as the payment badges (§5) — no image
+requests, no external icon fonts:
+
+- **New shared icon set** `src/components/icons/SocialIcons.tsx` — the original logo paths for
+  **WhatsApp, Instagram, Facebook, YouTube and X (Twitter)**. Every glyph fills with
+  `currentColor`; the Instagram mark can also render with the **official warm gradient**
+  (`gradient` prop: #FEDA75 → #FA7E1E → #D62976 → #962FBF → #4F5BD5), and the classic radial
+  Instagram gradient is exported as a CSS background for chips.
+- **Floating contact hub (`WhatsAppFloat`)** — each expanded mini-button is now the brand's
+  original logo on its **official color**: WhatsApp white-on-green `#25D366`, Instagram
+  white-on-gradient, Facebook white-on-`#1877F2`, X white-on-black, YouTube white-on-`#FF0000`;
+  Call keeps the maroon theme chip (a phone has no brand). Buttons grow 10% on hover; the
+  espresso/gold main toggle is unchanged. **X (Twitter) joins the hub** — like the others it
+  appears only when its URL is set in Admin → Store Settings, and the hand-drawn WhatsApp
+  path was replaced with the official logo.
+- **Footer social row** — the outline circles became **ivory chips with the full-color original
+  logos** (green WhatsApp, gradient Instagram, blue Facebook, black X, red YouTube), which read
+  crisply on the espresso footer like app icons; hover brightens the chip to white and grows it
+  10%. **WhatsApp is now part of the footer socials too**, linking to the same admin-controlled
+  `wa.me` number as the hub (shared `FALLBACK_WHATSAPP` until one is set); YouTube still appears
+  only when configured.
+- All links keep their **Admin → Store Settings wiring** — same `useSiteSettings()` cache, same
+  per-link show/hide rules, same `float_enabled` kill-switch.
+
+| File | Change |
+|---|---|
+| `src/components/icons/SocialIcons.tsx` | New — official WhatsApp / Instagram / Facebook / YouTube / X logo SVGs + Instagram gradient |
+| `src/components/WhatsAppFloat.tsx` | Hub buttons redrawn with original logos on brand colors; X (Twitter) link added |
+| `src/components/Footer.tsx` | Social row rebuilt as ivory chips with full-color brand logos; WhatsApp link added |
+| `src/hooks/use-site-settings.ts` | Exports the shared `FALLBACK_WHATSAPP` number |
 
 ---
 
