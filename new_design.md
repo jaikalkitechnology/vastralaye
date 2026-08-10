@@ -474,6 +474,31 @@ Implemented from the approved mockup (`user_design/mockups/09-all-products.html`
 
 ---
 
+## 19. Admin sidebar — responsive on every screen
+
+The admin shell assumed desktop: the espresso sidebar was permanently fixed at 240px and
+the content column permanently offset `ml-60`, leaving almost no room on phones. Now:
+
+- **lg+ (≥1024px)** — unchanged: static 240px rail, content offset, no hamburger.
+- **Below lg** — the sidebar becomes an **off-canvas drawer**: hidden by default
+  (`-translate-x-full`), content takes the full width, and a bordered **hamburger button**
+  appears in the topbar. Opening slides the rail in (300ms) over an espresso backdrop
+  with a subtle blur; it closes via the backdrop, a new X button in the brand row,
+  the Escape key, or automatically on any navigation (route-change effect). Body scroll
+  locks while open.
+- Topbar/content paddings tightened on small screens (`px-4`/`p-4` → `lg:px-8`/`p-8`).
+- Props are optional and backward-compatible (`isOpen`/`onClose` on the sidebar,
+  `onMenuClick` on the topbar); all nav logic, auth redirect and the nested-shell
+  context are untouched.
+
+| File | Change |
+|---|---|
+| `src/components/admin/AdminSidebar.tsx` | Off-canvas drawer + backdrop + close/Escape/route-close |
+| `src/components/admin/AdminLayout.tsx` | Drawer state, `lg:ml-60`, responsive padding |
+| `src/components/admin/AdminTopbar.tsx` | Hamburger trigger below lg |
+
+---
+
 ## Verification
 
 - `tsc --noEmit` — no errors in any changed file.
