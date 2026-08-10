@@ -606,6 +606,47 @@ zero errors and the build passes.
 
 ---
 
+## 23. Admin print invoice — merchant document redesign
+
+`AdminOrder.tsx` builds its invoice as a **print-popup HTML template**, and it was the last
+place carrying old-template artifacts: a `/logo.png` labelled *"MizorPayMart Logo"*, a
+`support@mizorpaymart.com` footer, a *"MizorPay Mart"* generated-on line, emoji headings
+(📋 📍 📦 📧 📱), Segoe UI, and a gray/green/amber palette half-migrated to brand colors.
+Rebuilt from the approved mockup (`user_design/mockups/13-admin-invoice.html`):
+
+- **Espresso action bar** (screen only): "Admin · Invoice for order #N" with a gold
+  **Print / Save as PDF** button and an outline Close.
+- **Branded letterhead**: wordmark, real Vastralaye address/email/phone/GSTIN, gold
+  "TAX INVOICE", the serif order number and an **"Office copy"** chip — this is the
+  merchant's copy, not the customer's.
+- **Status strip**: three hairline-divided cells (order date + time, order status chip,
+  payment status chip + method) replacing the three mismatched pastel boxes; chips are
+  gold/green/red by state.
+- **Bill to / Ship to** ivory panels with gold overline labels, no emoji.
+- **Items table**: espresso header, product thumbnails, `HSN · SKU` subline (replacing the
+  piped `HSN: x | SKU: y` string), zebra rows for long orders.
+- **Totals**: subtotal, GST at the configured rate, shipping, gold-ruled serif maroon grand
+  total, plus an espresso **"To collect on delivery"** band for unpaid, non-cancelled
+  orders. Beside it, a new **amount-in-words** panel with item/unit counts.
+- **Footer**: merchant line with GSTIN, queries line, generated timestamp, and the gold
+  ornament + "For Vastralaye · Authorised signatory"; thank-you, fine print and the
+  maroon→gold→terracotta edge bar.
+- The popup now loads **Fraunces + Jost** from Google Fonts so printed sheets match the
+  brand instead of falling back to Segoe UI, and print CSS drops the action bar, keeps
+  headers repeating across pages and sets A4 margins.
+- Fields absent from the admin payload (discount, place of supply, AWB) are simply not
+  rendered rather than faked.
+
+**Also fixed:** the file hard-coded `IMAGE_BASE_URL = "https://api.mizorpaymart.com"`
+instead of importing `BASE_IMG`, so admin order/invoice product images stayed pinned to
+that domain even on local or staging deploys. It now follows the app config.
+
+| File | Change |
+|---|---|
+| `src/pages/admin/AdminOrder.tsx` | Print invoice template rebuilt; `amountInWords` helper added; image base now from config |
+
+---
+
 ## Verification
 
 - `tsc --noEmit` — no errors in any changed file.

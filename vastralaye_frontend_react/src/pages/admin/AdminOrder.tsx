@@ -37,7 +37,7 @@ import {
   Image as ImageIcon,
   Printer,
 } from "lucide-react";
-import { BASE_URL } from "@/config";
+import { BASE_URL, BASE_IMG } from "@/config";
 import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import {
@@ -61,7 +61,8 @@ import { toast } from "sonner";
 
 /* ================= IMAGE BASE URL ================= */
 
-const IMAGE_BASE_URL = "https://api.mizorpaymart.com";
+// Follows the app config so local/staging deploys resolve images correctly
+const IMAGE_BASE_URL = BASE_IMG;
 
 /* ================= TYPES ================= */
 
@@ -583,21 +584,54 @@ export default function AdminOrders() {
 
   /* ================= PRINT ORDER / PDF ================= */
 
+  /** Amount in words for the invoice (Indian numbering, whole rupees). */
+  const amountInWords = (value: number): string => {
+    const ones = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"];
+    const teens = ["Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen",
+      "Sixteen", "Seventeen", "Eighteen", "Nineteen"];
+    const tens = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
+
+    const under1000 = (n: number): string => {
+      if (n === 0) return "";
+      if (n < 10) return ones[n];
+      if (n < 20) return teens[n - 10];
+      if (n < 100) return tens[Math.floor(n / 10)] + (n % 10 ? " " + ones[n % 10] : "");
+      return ones[Math.floor(n / 100)] + " Hundred" + (n % 100 ? " " + under1000(n % 100) : "");
+    };
+
+    let n = Math.round(Number(value) || 0);
+    if (n <= 0) return "Zero Rupees Only";
+
+    const crore = Math.floor(n / 10000000); n %= 10000000;
+    const lakh = Math.floor(n / 100000); n %= 100000;
+    const thousand = Math.floor(n / 1000); n %= 1000;
+
+    const parts = [
+      crore ? `${under1000(crore)} Crore` : "",
+      lakh ? `${under1000(lakh)} Lakh` : "",
+      thousand ? `${under1000(thousand)} Thousand` : "",
+      under1000(n),
+    ].filter(Boolean);
+
+    return `${parts.join(" ")} Rupees Only`;
+  };
+
   const printOrderInvoice = (orderData: OrderDataType) => {
     if (!orderData?.order) {
       toast.error("Invalid order data");
       return;
     }
 
-    const { 
-      order, 
-      customer_name = "Unknown", 
-      customer_email = "", 
-      customer_phone = "", 
-      items = [], 
-      subtotal = 0, 
-      gst_18_percent = 0, 
-      total_with_gst = 0 
+    const {
+      order,
+      customer_name = "Unknown",
+      customer_email = "",
+      customer_phone = "",
+      items = [],
+      items_count = 0,
+      subtotal = 0,
+      gst_18_percent = 0,
+      total_with_gst = 0
     } = orderData;
 
     const safeItems = Array.isArray(items) ? items : [];
@@ -607,35 +641,59 @@ export default function AdminOrders() {
     const paymentMethod = getPaymentMethodLabel(order.payment_method);
     const orderStatus = (order.status || "pending").toUpperCase();
     const paymentStatus = (order.payment_status || "unpaid").toUpperCase();
+    const isPaid = paymentStatus === "PAID";
+    const isCancelled = orderStatus === "CANCELLED";
+    const isDelivered = orderStatus === "DELIVERED";
+    const unitCount = safeItems.reduce((n, it) => n + (Number(it.quantity) || 0), 0);
+
+    /* Brand palette — literal hex so the print window renders it exactly */
+    const C = {
+      ivory: "#FAF6F0", esp: "#2B1B12", mar: "#7A1F2B", terra: "#B85C38",
+      gold: "#C99A45", gd: "#8A6414", sand: "#EFE7DB", blush: "#F6E8E4",
+      bd: "#E7DFD3", mut: "#6E5F53", sale: "#C62828", ok: "#3E6B4F",
+    };
+    const SERIF = "'Fraunces', Georgia, serif";
+
+    /* Status chip colours */
+    const statusTag = isDelivered
+      ? { bg: "rgba(62,107,79,0.10)", bd: "rgba(62,107,79,0.30)", fg: C.ok }
+      : isCancelled
+      ? { bg: "rgba(198,40,40,0.08)", bd: "rgba(198,40,40,0.28)", fg: C.sale }
+      : { bg: "rgba(201,154,69,0.15)", bd: "rgba(201,154,69,0.40)", fg: C.gd };
+    const payTag = isPaid
+      ? { bg: "rgba(62,107,79,0.10)", bd: "rgba(62,107,79,0.30)", fg: C.ok }
+      : { bg: "rgba(198,40,40,0.08)", bd: "rgba(198,40,40,0.28)", fg: C.sale };
+
+    const chip = (t: { bg: string; bd: string; fg: string }, label: string) =>
+      `<span style="display:inline-block;margin-top:4px;padding:3px 11px;border-radius:999px;font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;background:${t.bg};border:1px solid ${t.bd};color:${t.fg};">${label}</span>`;
 
     const itemsRows = safeItems
-      .map(
-        (item, idx) => `
-        <tr>
-          <td style="padding: 12px 16px; border-bottom: 1px solid #e5e7eb; text-align: center; color: #6b7280; font-size: 14px;">${idx + 1}</td>
-          <td style="padding: 12px 16px; border-bottom: 1px solid #e5e7eb;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-              ${
-                item.product_image
-                  ? `<img src="${getProductImageUrl(item.product_image)}" alt="${item.product_name}" style="width: 48px; height: 48px; border-radius: 8px; object-fit: cover; border: 1px solid #e5e7eb;" />`
-                  : `<div style="width: 48px; height: 48px; border-radius: 8px; background: #f3f4f6; display: flex; align-items: center; justify-content: center; color: #9ca3af; font-size: 12px;">IMG</div>`
-              }
+      .map((item, idx) => {
+        const img = item.product_image ? getProductImageUrl(item.product_image) : null;
+        const meta = [
+          item.hsn_code ? `HSN ${item.hsn_code}` : "",
+          item.sku ? `SKU ${item.sku}` : "",
+        ].filter(Boolean).join(" · ");
+        const zebra = idx % 2 === 1 ? `background:rgba(250,246,240,0.55);` : "";
+        return `
+        <tr style="${zebra}">
+          <td style="padding:10px 12px;border-bottom:1px solid ${C.bd};text-align:center;color:${C.mut};">${idx + 1}</td>
+          <td style="padding:10px 12px;border-bottom:1px solid ${C.bd};">
+            <div style="display:flex;align-items:center;gap:11px;">
+              ${img
+                ? `<img src="${img}" alt="" style="width:38px;height:50px;object-fit:cover;border:1px solid ${C.bd};border-radius:2px;flex:none;" />`
+                : `<div style="width:38px;height:50px;background:${C.sand};border:1px solid ${C.bd};border-radius:2px;flex:none;"></div>`}
               <div>
-                <div style="font-weight: 600; color: #111827; font-size: 14px;">${item.product_name}</div>
-                <div style="color: #6b7280; font-size: 12px; margin-top: 2px;">
-                  ${item.hsn_code ? `HSN: <strong>${item.hsn_code}</strong>` : ""}
-                  ${item.hsn_code && item.sku ? " | " : ""}
-                  ${item.sku ? `SKU: ${item.sku}` : ""}
-                </div>
+                <div style="font-weight:500;font-size:13px;color:${C.esp};">${item.product_name || "Product"}</div>
+                ${meta ? `<div style="font-size:10.5px;color:${C.mut};margin-top:2px;">${meta}</div>` : ""}
               </div>
             </div>
           </td>
-          <td style="padding: 12px 16px; border-bottom: 1px solid #e5e7eb; text-align: center; color: #374151; font-size: 14px;">${item.quantity || 0}</td>
-          <td style="padding: 12px 16px; border-bottom: 1px solid #e5e7eb; text-align: right; color: #374151; font-size: 14px;">₹${(item.price || 0).toLocaleString("en-IN")}</td>
-          <td style="padding: 12px 16px; border-bottom: 1px solid #e5e7eb; text-align: right; font-weight: 700; color: #111827; font-size: 14px;">₹${(item.total || 0).toLocaleString("en-IN")}</td>
-        </tr>
-      `
-      )
+          <td style="padding:10px 12px;border-bottom:1px solid ${C.bd};text-align:center;color:${C.esp};">${item.quantity || 0}</td>
+          <td style="padding:10px 12px;border-bottom:1px solid ${C.bd};text-align:right;color:${C.esp};">₹${(item.price || 0).toLocaleString("en-IN")}</td>
+          <td style="padding:10px 12px;border-bottom:1px solid ${C.bd};text-align:right;font-weight:600;color:${C.esp};">₹${(item.total || 0).toLocaleString("en-IN")}</td>
+        </tr>`;
+      })
       .join("");
 
     const invoiceHTML = `
@@ -644,111 +702,152 @@ export default function AdminOrders() {
     <head>
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>Invoice - Order #${order.id}</title>
+      <title>Invoice · Order #${order.id} · Vastralaye</title>
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;500;600&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
       <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #1f2937; background: #ffffff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-        @media print { .no-print { display: none !important; } }
-        .invoice-container { max-width: 800px; margin: 0 auto; padding: 40px; }
-        .print-btn-container { text-align: center; padding: 20px; background: #f8fafc; border-bottom: 2px solid #e2e8f0; }
-        .print-btn { background: #7A1F2B; color: white; border: none; padding: 12px 32px; border-radius: 4px; font-size: 16px; font-weight: 600; cursor: pointer; margin: 0 8px; }
-        .close-btn { background: #6E5F53; color: white; border: none; padding: 12px 32px; border-radius: 4px; font-size: 16px; font-weight: 600; cursor: pointer; margin: 0 8px; }
+        body { font-family: 'Jost', 'Segoe UI', sans-serif; color: ${C.esp}; background: #F0EBE3; font-size: 14px; line-height: 1.55;
+               -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        @media print {
+          .no-print { display: none !important; }
+          body { background: #ffffff; }
+          .sheet { margin: 0 !important; box-shadow: none !important; border: none !important; max-width: none !important; }
+          tr { page-break-inside: avoid; }
+          thead { display: table-header-group; }
+          @page { size: A4 portrait; margin: 8mm; }
+        }
       </style>
     </head>
     <body>
-      <div class="print-btn-container no-print">
-        <button class="print-btn" onclick="window.print()">🖨️ Print / Save as PDF</button>
-        <button class="close-btn" onclick="window.close()">✕ Close</button>
+      <!-- Admin action bar -->
+      <div class="no-print" style="background:${C.esp};border-bottom:3px solid ${C.gold};padding:14px 24px;display:flex;align-items:center;gap:12px;">
+        <span style="margin-right:auto;color:rgba(250,246,240,.6);font-size:11px;letter-spacing:.18em;text-transform:uppercase;">
+          Admin · Invoice for order <b style="color:${C.gold};font-weight:500;">#${order.id}</b>
+        </span>
+        <button onclick="window.print()" style="border-radius:3px;padding:10px 22px;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;background:${C.gold};border:1px solid ${C.gold};color:${C.esp};cursor:pointer;font-family:inherit;">Print / Save as PDF</button>
+        <button onclick="window.close()" style="border-radius:3px;padding:10px 22px;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;background:transparent;border:1px solid rgba(250,246,240,.3);color:rgba(250,246,240,.8);cursor:pointer;font-family:inherit;">Close</button>
       </div>
 
-      <div class="invoice-container">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; padding-bottom: 24px; border-bottom: 3px solid #7A1F2B;">
+      <div class="sheet" style="max-width:820px;margin:26px auto;background:#fff;border:1px solid ${C.bd};box-shadow:0 16px 40px rgba(43,27,18,.12);overflow:hidden;">
+
+        <!-- Letterhead -->
+        <div style="background:${C.esp};color:${C.ivory};padding:24px 32px;display:flex;justify-content:space-between;align-items:flex-start;">
           <div>
-            <h1 style="font-size: 32px; font-weight: 800; color: #7A1F2B; margin-bottom: 4px;">INVOICE</h1>
-            <img src="/logo.png" alt="MizorPayMart Logo" style="width: 120px; height: auto; object-fit: contain;">
-            <p style="color: #9ca3af; font-size: 12px; margin-top: 4px;">GSTIN: ${gstin}</p>
-          </div>
-          <div style="text-align: right;">
-            <div style="background: #7A1F2B; color: white; padding: 12px 24px; border-radius: 6px; display: inline-block;">
-              <p style="font-size: 12px; opacity: 0.9; margin-bottom: 2px;">ORDER NO.</p>
-              <p style="font-size: 24px; font-weight: 800;">#${order.id}</p>
+            <div style="font-family:${SERIF};font-size:23px;font-weight:600;">Vastra<span style="color:${C.gold};">laye</span></div>
+            <div style="font-size:8.5px;letter-spacing:.42em;text-transform:uppercase;color:${C.gold};margin-top:3px;">Handcrafted India</div>
+            <div style="font-size:11px;color:rgba(250,246,240,.6);margin-top:9px;line-height:1.65;">
+              14 Weaver's Lane, Faridabad, Haryana 121001<br>
+              support@vastralaye.in · +91 85275 96413${gstin ? `<br>GSTIN ${gstin}` : ""}
             </div>
           </div>
-        </div>
-
-        <div style="display: flex; gap: 16px; margin-bottom: 32px;">
-          <div style="flex: 1; background: #FBF8F3; padding: 16px 20px; border-radius: 6px; border: 1px solid #E7DFD3;">
-            <p style="font-size: 11px; font-weight: 700; color: #7A1F2B; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;">Order Date</p>
-            <p style="font-weight: 700; color: #2B1B12; font-size: 15px;">${orderDate}</p>
-            <p style="color: #6b7280; font-size: 12px; margin-top: 2px;">${orderTime}</p>
-          </div>
-          <div style="flex: 1; background: ${orderStatus === "DELIVERED" ? "#f0fdf4" : orderStatus === "CANCELLED" ? "#fef2f2" : "#fffbeb"}; padding: 16px 20px; border-radius: 12px; border: 1px solid ${orderStatus === "DELIVERED" ? "#bbf7d0" : orderStatus === "CANCELLED" ? "#fecaca" : "#fde68a"};">
-            <p style="font-size: 11px; font-weight: 700; color: ${orderStatus === "DELIVERED" ? "#16a34a" : orderStatus === "CANCELLED" ? "#dc2626" : "#d97706"}; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;">Order Status</p>
-            <p style="font-weight: 800; color: ${orderStatus === "DELIVERED" ? "#15803d" : orderStatus === "CANCELLED" ? "#b91c1c" : "#92400e"}; font-size: 15px;">${orderStatus}</p>
-          </div>
-          <div style="flex: 1; background: ${paymentStatus === "PAID" ? "#f0fdf4" : "#fff7ed"}; padding: 16px 20px; border-radius: 12px; border: 1px solid ${paymentStatus === "PAID" ? "#bbf7d0" : "#fed7aa"};">
-            <p style="font-size: 11px; font-weight: 700; color: ${paymentStatus === "PAID" ? "#16a34a" : "#ea580c"}; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;">Payment</p>
-            <p style="font-weight: 800; color: ${paymentStatus === "PAID" ? "#15803d" : "#c2410c"}; font-size: 15px;">${paymentStatus}</p>
-            <p style="color: #6b7280; font-size: 12px; margin-top: 2px;">${paymentMethod}</p>
+          <div style="text-align:right;">
+            <div style="font-family:${SERIF};font-size:23px;letter-spacing:.06em;color:${C.gold};">TAX INVOICE</div>
+            <div style="font-family:${SERIF};font-size:26px;margin-top:2px;">#${order.id}</div>
+            <span style="display:inline-block;margin-top:8px;border:1px solid rgba(201,154,69,.6);color:${C.gold};border-radius:999px;padding:3px 12px;font-size:9.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;">Office copy</span>
           </div>
         </div>
 
-        <div style="display: flex; gap: 24px; margin-bottom: 32px;">
-          <div style="flex: 1; background: #FBF8F3; padding: 20px; border-radius: 6px; border: 1px solid #E7DFD3;">
-            <h3 style="font-size: 13px; font-weight: 700; color: #7A1F2B; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #E7DFD3;">📋 Bill To</h3>
-            <p style="font-weight: 700; color: #111827; font-size: 16px; margin-bottom: 8px;">${customer_name}</p>
-            ${customer_email ? `<p style="color: #4b5563; font-size: 13px; margin-bottom: 4px;">📧 ${customer_email}</p>` : ""}
-            ${customer_phone ? `<p style="color: #4b5563; font-size: 13px; margin-bottom: 4px;">📱 ${customer_phone}</p>` : ""}
-          </div>
-          <div style="flex: 1; background: #FBF8F3; padding: 20px; border-radius: 6px; border: 1px solid #E7DFD3;">
-            <h3 style="font-size: 13px; font-weight: 700; color: #7A1F2B; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #E7DFD3;">📍 Ship To</h3>
-            <p style="font-weight: 600; color: #111827; font-size: 14px; line-height: 1.6;">${address}</p>
-          </div>
-        </div>
+        <div style="padding:24px 32px 26px;">
 
-        <div style="margin-bottom: 32px;">
-          <h3 style="font-size: 13px; font-weight: 700; color: #7A1F2B; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px;">📦 Order Items</h3>
-          <table style="width: 100%; border-collapse: collapse; border-radius: 6px; overflow: hidden; border: 1px solid #E7DFD3;">
+          <!-- Status strip -->
+          <div style="display:flex;border:1px solid ${C.bd};border-radius:3px;overflow:hidden;">
+            <div style="flex:1;padding:13px 16px;">
+              <div style="font-size:9.5px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:${C.gd};">Order date</div>
+              <div style="font-size:15px;font-weight:600;margin-top:4px;">${orderDate}</div>
+              <div style="font-size:11.5px;color:${C.mut};margin-top:1px;">${orderTime}</div>
+            </div>
+            <div style="flex:1;padding:13px 16px;border-left:1px solid ${C.bd};">
+              <div style="font-size:9.5px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:${C.gd};">Order status</div>
+              ${chip(statusTag, orderStatus)}
+            </div>
+            <div style="flex:1;padding:13px 16px;border-left:1px solid ${C.bd};">
+              <div style="font-size:9.5px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:${C.gd};">Payment</div>
+              ${chip(payTag, paymentStatus)}
+              <div style="font-size:11.5px;color:${C.mut};margin-top:3px;">${paymentMethod}</div>
+            </div>
+          </div>
+
+          <!-- Parties -->
+          <div style="display:flex;gap:18px;margin-top:18px;">
+            <div style="flex:1;border:1px solid ${C.bd};border-radius:3px;padding:14px 16px;background:${C.ivory};">
+              <div style="font-size:9.5px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:${C.gd};margin-bottom:7px;">Bill to</div>
+              <b style="font-size:14px;display:block;">${customer_name}</b>
+              ${customer_email ? `<span style="font-size:12.5px;color:${C.mut};display:block;margin-top:2px;">${customer_email}</span>` : ""}
+              ${customer_phone ? `<span style="font-size:12.5px;color:${C.mut};display:block;margin-top:2px;">${customer_phone}</span>` : ""}
+            </div>
+            <div style="flex:1;border:1px solid ${C.bd};border-radius:3px;padding:14px 16px;background:${C.ivory};">
+              <div style="font-size:9.5px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:${C.gd};margin-bottom:7px;">Ship to</div>
+              <b style="font-size:14px;display:block;">${customer_name}</b>
+              <span style="font-size:12.5px;color:${C.mut};display:block;margin-top:2px;line-height:1.6;">${address}</span>
+            </div>
+          </div>
+
+          <!-- Items -->
+          <table style="width:100%;border-collapse:collapse;font-size:12.5px;margin-top:20px;">
             <thead>
-              <tr style="background: #2B1B12;">
-                <th style="padding: 14px 16px; text-align: center; color: white; font-size: 12px; font-weight: 700; text-transform: uppercase; width: 50px;">#</th>
-                <th style="padding: 14px 16px; text-align: left; color: white; font-size: 12px; font-weight: 700; text-transform: uppercase;">Product</th>
-                <th style="padding: 14px 16px; text-align: center; color: white; font-size: 12px; font-weight: 700; text-transform: uppercase; width: 80px;">Qty</th>
-                <th style="padding: 14px 16px; text-align: right; color: white; font-size: 12px; font-weight: 700; text-transform: uppercase; width: 120px;">Price</th>
-                <th style="padding: 14px 16px; text-align: right; color: white; font-size: 12px; font-weight: 700; text-transform: uppercase; width: 120px;">Total</th>
+              <tr>
+                <th style="background:${C.esp};color:${C.ivory};font-size:9.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;padding:10px 12px;text-align:center;width:44px;">#</th>
+                <th style="background:${C.esp};color:${C.ivory};font-size:9.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;padding:10px 12px;text-align:left;">Product</th>
+                <th style="background:${C.esp};color:${C.ivory};font-size:9.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;padding:10px 12px;text-align:center;width:70px;">Qty</th>
+                <th style="background:${C.esp};color:${C.ivory};font-size:9.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;padding:10px 12px;text-align:right;width:110px;">Rate</th>
+                <th style="background:${C.esp};color:${C.ivory};font-size:9.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;padding:10px 12px;text-align:right;width:120px;">Amount</th>
               </tr>
             </thead>
             <tbody>${itemsRows}</tbody>
           </table>
-        </div>
 
-        <div style="display: flex; justify-content: flex-end; margin-bottom: 40px;">
-          <div style="width: 320px;">
-            <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #e5e7eb;">
-              <span style="color: #6b7280; font-size: 14px;">Subtotal</span>
-              <span style="font-weight: 600; color: #374151; font-size: 14px;">₹${subtotal.toLocaleString("en-IN")}</span>
+          <!-- Words + totals -->
+          <div style="display:flex;justify-content:space-between;gap:24px;margin-top:20px;align-items:flex-start;">
+            <div style="flex:1;background:rgba(246,232,228,.6);border:1px solid ${C.bd};border-radius:3px;padding:13px 15px;font-size:12.5px;color:${C.mut};">
+              Amount in words — <b style="color:${C.esp};font-weight:500;">${amountInWords(total_with_gst)}</b>
+              <div style="font-size:11.5px;margin-top:10px;">${items_count || safeItems.length} item${(items_count || safeItems.length) === 1 ? "" : "s"} · ${unitCount} unit${unitCount === 1 ? "" : "s"}</div>
             </div>
-            <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #e5e7eb;">
-              <span style="color: #6b7280; font-size: 14px;">GST (${gstRate || "18%"})</span>
-              <span style="font-weight: 600; color: #374151; font-size: 14px;">₹${gst_18_percent.toLocaleString("en-IN")}</span>
+            <div style="width:310px;font-size:13.5px;">
+              <div style="display:flex;justify-content:space-between;padding:6px 0;color:${C.mut};">
+                <span>Subtotal</span><b style="color:${C.esp};font-weight:500;">₹${subtotal.toLocaleString("en-IN")}</b>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:6px 0;color:${C.mut};">
+                <span>GST (${gstRate || "18%"})</span><b style="color:${C.esp};font-weight:500;">₹${gst_18_percent.toLocaleString("en-IN")}</b>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:6px 0;color:${C.mut};">
+                <span>Shipping</span><b style="color:${C.ok};font-weight:500;">Free</b>
+              </div>
+              <div style="border-top:2px solid ${C.gold};margin-top:6px;padding-top:11px;display:flex;justify-content:space-between;align-items:baseline;">
+                <span style="font-size:10.5px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;">Grand total</span>
+                <span style="font-family:${SERIF};font-size:24px;color:${C.mar};font-weight:500;">₹${total_with_gst.toLocaleString("en-IN")}</span>
+              </div>
+              ${!isPaid && !isCancelled ? `
+              <div style="margin-top:9px;background:${C.esp};color:${C.ivory};border-radius:3px;padding:9px 13px;display:flex;justify-content:space-between;align-items:center;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;">
+                <span>To collect on delivery</span>
+                <b style="color:${C.gold};font-family:${SERIF};font-size:15px;letter-spacing:0;text-transform:none;">₹${total_with_gst.toLocaleString("en-IN")}</b>
+              </div>` : ""}
             </div>
-            <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #e5e7eb;">
-              <span style="color: #6b7280; font-size: 14px;">Shipping</span>
-              <span style="font-weight: 600; color: #16a34a; font-size: 14px;">FREE</span>
+          </div>
+
+          <!-- Footer -->
+          <div style="display:flex;justify-content:space-between;align-items:flex-end;border-top:1px solid ${C.bd};margin-top:24px;padding-top:18px;gap:20px;">
+            <div style="font-size:11.5px;color:${C.mut};line-height:1.7;">
+              <b style="color:${C.esp};font-weight:500;">Vastralaye</b>${gstin ? ` · GSTIN ${gstin}` : ""}<br>
+              Queries: support@vastralaye.in · +91 85275 96413<br>
+              Generated ${new Date().toLocaleString("en-IN")}
             </div>
-            <div style="display: flex; justify-content: space-between; padding: 16px 20px; margin-top: 8px; background: #7A1F2B; border-radius: 6px;">
-              <span style="color: white; font-size: 16px; font-weight: 700;">Grand Total</span>
-              <span style="color: white; font-size: 20px; font-weight: 800;">₹${total_with_gst.toLocaleString("en-IN")}</span>
+            <div style="text-align:center;">
+              <div style="display:flex;align-items:center;gap:9px;justify-content:center;">
+                <span style="width:36px;height:1px;background:${C.gold};opacity:.6;display:block;"></span>
+                <span style="width:6px;height:6px;border:1px solid ${C.gold};transform:rotate(45deg);display:block;"></span>
+                <span style="width:36px;height:1px;background:${C.gold};opacity:.6;display:block;"></span>
+              </div>
+              <div style="font-family:${SERIF};font-size:14px;margin-top:8px;">For Vastralaye</div>
+              <div style="font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:${C.mut};margin-top:2px;">Authorised signatory</div>
             </div>
           </div>
         </div>
 
-        <div style="text-align: center; padding-top: 24px; border-top: 2px solid #e5e7eb;">
-          <p style="color: #6b7280; font-size: 13px; margin-bottom: 4px;">Thank you for your order!</p>
-          <p style="color: #9ca3af; font-size: 12px;">Contact us at support@mizorpaymart.com</p>
-          ${gstin ? `<p style="color: #9ca3af; font-size: 11px; margin-top: 8px;">GSTIN: ${gstin}</p>` : ""}
-          <p style="color: #d1d5db; font-size: 11px; margin-top: 12px;">Generated on ${new Date().toLocaleString("en-IN")} • MizorPay Mart</p>
-        </div>
+        <p style="font-family:${SERIF};font-size:15px;text-align:center;padding:14px 32px 4px;">Thank you for weaving us into your story.</p>
+        <p style="padding:0 32px 18px;font-size:10.5px;color:${C.mut};text-align:center;">Computer-generated invoice · no physical signature required. Goods once sold are subject to our 7-day return policy.</p>
+        <div style="height:5px;background:linear-gradient(90deg,${C.mar},${C.gold},${C.terra});"></div>
       </div>
     </body>
     </html>
