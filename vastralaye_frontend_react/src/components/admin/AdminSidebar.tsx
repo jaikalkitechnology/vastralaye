@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -14,6 +15,7 @@ import {
   GalleryHorizontal,
   Quote,
   Settings,
+  X,
 } from 'lucide-react';
 import { useStore } from '@/contexts/StoreContext';
 import { cn } from '@/lib/utils';
@@ -31,10 +33,30 @@ interface SidebarSection {
 
 const ICON_CLASS = 'h-[17px] w-[17px] flex-none';
 
-const AdminSidebar = () => {
+interface AdminSidebarProps {
+  /** Mobile/tablet drawer state (ignored on lg+, where the rail is static). */
+  isOpen?: boolean;
+  onClose?: () => void;
+}
+
+const AdminSidebar = ({ isOpen = false, onClose }: AdminSidebarProps) => {
   const { logout, state } = useStore();
   const location = useLocation();
   const { currentUser } = state;
+
+  /* Drawer UX: Escape closes; body scroll locks while open (<lg). */
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose?.();
+    };
+    document.addEventListener('keydown', onKey);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = '';
+    };
+  }, [isOpen, onClose]);
 
   // Same destinations as before (Reels kept, Analytics re-enabled),
   // grouped under the §2 section labels.
@@ -104,10 +126,26 @@ const AdminSidebar = () => {
     );
 
   return (
-    <aside className="fixed left-0 top-0 z-50 flex h-screen w-60 flex-col bg-espresso text-ivory/75">
+    <>
+      {/* Backdrop for the mobile/tablet drawer */}
+      {isOpen && (
+        <div
+          aria-hidden
+          onClick={onClose}
+          className="fixed inset-0 z-40 bg-espresso/60 backdrop-blur-[2px] lg:hidden"
+        />
+      )}
+
+      <aside
+        className={cn(
+          'fixed left-0 top-0 z-50 flex h-screen w-60 flex-col bg-espresso text-ivory/75',
+          'transition-transform duration-300 lg:translate-x-0',
+          isOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full',
+        )}
+      >
       {/* Brand */}
-      <div className="border-b border-ivory/10 px-5 pb-5 pt-6">
-        <Link to="/admin" className="block">
+      <div className="relative border-b border-ivory/10 px-5 pb-5 pt-6">
+        <Link to="/admin" onClick={onClose} className="block">
           <span className="font-serif text-[22px] font-semibold leading-none text-ivory">
             Vastra<span className="text-gold">laye</span>
           </span>
@@ -118,6 +156,15 @@ const AdminSidebar = () => {
         <span className="mt-3 inline-block rounded-full border border-ivory/20 px-2.5 py-0.5 text-[10px] uppercase tracking-[0.18em] text-ivory/55">
           Admin Panel
         </span>
+        {/* Close (drawer only) */}
+        <button
+          type="button"
+          aria-label="Close menu"
+          onClick={onClose}
+          className="absolute right-4 top-6 flex h-8 w-8 items-center justify-center rounded-sm border border-ivory/20 text-ivory/70 transition-colors hover:border-gold hover:text-gold lg:hidden"
+        >
+          <X className="h-4 w-4" />
+        </button>
       </div>
 
       {/* Navigation */}
@@ -128,7 +175,12 @@ const AdminSidebar = () => {
               {section.label}
             </p>
             {section.items.map((item) => (
-              <Link key={item.path} to={item.path} className={itemClass(isActive(item.path))}>
+              <Link
+                key={item.path}
+                to={item.path}
+                onClick={onClose}
+                className={itemClass(isActive(item.path))}
+              >
                 {item.icon}
                 <span>{item.name}</span>
               </Link>
@@ -139,11 +191,15 @@ const AdminSidebar = () => {
 
       {/* Footer */}
       <div className="border-t border-ivory/10 pb-4 pt-2">
-        <Link to="/admin/settings" className={itemClass(isActive('/admin/settings'))}>
+        <Link
+          to="/admin/settings"
+          onClick={onClose}
+          className={itemClass(isActive('/admin/settings'))}
+        >
           <Settings className={ICON_CLASS} />
           <span>Store Settings</span>
         </Link>
-        <Link to="/" className={itemClass(false)}>
+        <Link to="/" onClick={onClose} className={itemClass(false)}>
           <ExternalLink className={ICON_CLASS} />
           <span>View store</span>
         </Link>
@@ -171,7 +227,8 @@ const AdminSidebar = () => {
           </span>
         </div>
       </div>
-    </aside>
+      </aside>
+    </>
   );
 };
 

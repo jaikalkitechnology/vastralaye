@@ -1,5 +1,5 @@
-import { createContext, useContext, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { createContext, useContext, useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useStore } from '@/contexts/StoreContext';
 import AdminSidebar from './AdminSidebar';
 import AdminTopbar from './AdminTopbar';
@@ -18,8 +18,17 @@ const AdminShellContext = createContext(false);
 const AdminLayout = ({ children }: AdminLayoutProps) => {
   const insideShell = useContext(AdminShellContext);
   const navigate = useNavigate();
+  const location = useLocation();
   const { state } = useStore();
   const { isLoggedIn, currentUser } = state;
+
+  /* Mobile/tablet sidebar drawer (static rail on lg+) */
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Close the drawer whenever the route changes
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [location.pathname]);
 
   useEffect(() => {
     if (insideShell) return;
@@ -41,11 +50,11 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
   return (
     <AdminShellContext.Provider value={true}>
       <div className="min-h-screen bg-[#F7F4EF] font-sans text-espresso">
-        <AdminSidebar />
-        {/* Content column, offset by the fixed 240px sidebar */}
-        <div className="flex min-h-screen flex-col ml-60">
-          <AdminTopbar />
-          <main className="mx-auto w-full max-w-[1400px] flex-1 p-6 lg:p-8">
+        <AdminSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+        {/* Content column — offset by the fixed 240px rail on lg+, full width below */}
+        <div className="flex min-h-screen flex-col lg:ml-60">
+          <AdminTopbar onMenuClick={() => setSidebarOpen(true)} />
+          <main className="mx-auto w-full max-w-[1400px] flex-1 p-4 sm:p-6 lg:p-8">
             {children}
           </main>
         </div>

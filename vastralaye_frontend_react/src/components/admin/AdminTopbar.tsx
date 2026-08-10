@@ -1,6 +1,11 @@
 import { useLocation } from 'react-router-dom';
-import { Bell, Search } from 'lucide-react';
+import { Bell, Menu, Search } from 'lucide-react';
 import { useStore } from '@/contexts/StoreContext';
+
+interface AdminTopbarProps {
+  /** Opens the sidebar drawer on mobile/tablet (button hidden on lg+). */
+  onMenuClick?: () => void;
+}
 
 interface PageMeta {
   prefix: string;
@@ -24,7 +29,7 @@ const PAGE_META: PageMeta[] = [
   { prefix: '/admin', title: 'Dashboard' },
 ];
 
-const AdminTopbar = () => {
+const AdminTopbar = ({ onMenuClick }: AdminTopbarProps) => {
   const location = useLocation();
   const { state } = useStore();
   const { currentUser } = state;
@@ -52,7 +57,17 @@ const AdminTopbar = () => {
     'A';
 
   return (
-    <header className="sticky top-0 z-40 flex h-16 flex-none items-center gap-4 border-b border-border bg-white px-6 lg:px-8">
+    <header className="sticky top-0 z-40 flex h-16 flex-none items-center gap-3 border-b border-border bg-white px-4 sm:px-6 lg:gap-4 lg:px-8">
+      {/* Sidebar trigger (mobile/tablet) */}
+      <button
+        type="button"
+        aria-label="Open menu"
+        onClick={onMenuClick}
+        className="flex h-9 w-9 flex-none items-center justify-center rounded-md border border-border text-espresso transition-colors hover:bg-[#FBF8F3] lg:hidden"
+      >
+        <Menu className="h-[18px] w-[18px]" />
+      </button>
+
       {/* Page title + context */}
       <div className="min-w-0">
         <h1 className="truncate font-serif text-xl font-medium leading-tight text-espresso">
