@@ -63,3 +63,12 @@ def sync_missing_columns() -> None:
                 log.warning("schema_sync: added missing column %s.%s (%s)", table.name, col.name, col_type)
             except Exception as exc:
                 log.error("schema_sync: failed to add %s.%s: %s", table.name, col.name, exc)
+
+
+if __name__ == "__main__":
+    # Run directly against the configured DATABASE_URL:
+    #   cd vastralaye_backend && python -m app.schema_sync
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
+    print("Syncing missing columns into the database…")
+    sync_missing_columns()
+    print("Done. Any added columns are listed above; nothing listed = schema already up to date.")
