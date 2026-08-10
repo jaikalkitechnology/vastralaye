@@ -16,6 +16,7 @@ ivory canvas, espresso band, maroon/gold accents, Fraunces serif + Jost sans.
 | 06 | Invoice | (invoice view) | [`screenshots/06-invoice.png`](screenshots/06-invoice.png) |
 | 07 | Product Detail | `/product/:id` | [`screenshots/07-product-detail.png`](screenshots/07-product-detail.png) |
 | 08 | All Categories | `/categories` | [`screenshots/08-all-categories.png`](screenshots/08-all-categories.png) |
+| 09 | All Products | `/products` | [`screenshots/09-all-products.png`](screenshots/09-all-products.png) |
 
 Mockup sources live in [`mockups/`](mockups) — plain HTML + one shared stylesheet
 (`styles.css`) using the design.md tokens. Open any `.html` in a browser to inspect.
