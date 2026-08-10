@@ -304,6 +304,33 @@ Both catalogue pages open with a full-width **image banner** instead of a plain 
 
 ---
 
+## 12. Premium Collection section — chrome brought onto the theme
+
+The homepage Premium Collection section (`FeaturedProducts`) still wore the old template:
+gray gradient background, bold gray heading with a maroon pill badge, rounded-xl icon
+tabs, a gray toggle group, a mega CTA with ping/scale animations, and an invalid
+`<style jsx>` block. Now:
+
+- **Header** — centered editorial stack in a `Reveal`: gold overline **Curated For You**,
+  serif "Premium Collection", muted subline.
+- **Tabs** — hairline underline tabs (uppercase, letter-spaced, no icons): active tab gets
+  a **2px gold underline** and espresso text on a shared `border-b` rule; row scrolls on
+  mobile with the standard hidden-scrollbar utilities (styled-jsx block removed).
+- **Grid/List toggle** — flat bordered pair, active side espresso-filled; sits on the same
+  hairline as the tabs.
+- **View All Products** — hairline espresso outline button that fills espresso on hover
+  with an arrow nudge (ping ripple, shadows and scale removed).
+- **Empty & loading states** — blush icon circle + serif title + themed buttons; single
+  maroon ring spinner.
+- All fetching/pagination/tab lazy-loading and the `ProductGrid` wiring are unchanged —
+  the cards were already on-theme.
+
+| File | Change |
+|---|---|
+| `src/components/FeaturedProducts.tsx` | Section chrome restyled (visuals only) |
+
+---
+
 ## Verification
 
 - `tsc --noEmit` — no errors in any changed file.
