@@ -22,6 +22,11 @@ from fastapi.responses import FileResponse
 # ---------------------- DB Setup ----------------------
 Base.metadata.create_all(bind=engine)
 
+# Add any model columns missing from pre-existing tables (create_all
+# only creates new tables — see app/schema_sync.py).
+from app.schema_sync import sync_missing_columns  # noqa: E402
+sync_missing_columns()
+
 
 # ---------------------- Lifespan: Startup Events ----------------------
 @asynccontextmanager
@@ -88,6 +93,39 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# ---------------------- Unhandled-error handler ----------------------
+# Unhandled exceptions are turned into 500 responses OUTSIDE the
+# middleware stack, so they normally reach the browser without CORS
+# headers and show up as a misleading "blocked by CORS policy" error.
+# This handler logs the traceback and returns a JSON 500 that echoes
+# the request Origin, so the real error is visible in the frontend.
+from fastapi import Request  # noqa: E402
+from fastapi.responses import JSONResponse  # noqa: E402
+import logging as _logging  # noqa: E402
+
+_app_logger = _logging.getLogger("app")
+
+
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request: Request, exc: Exception):
+    _app_logger.exception(
+        "Unhandled error on %s %s: %s", request.method, request.url.path, exc
+    )
+    headers = {}
+    origin = request.headers.get("origin")
+    if origin:
+        headers = {
+            "Access-Control-Allow-Origin": origin,
+            "Access-Control-Allow-Credentials": "true",
+            "Vary": "Origin",
+        }
+    return JSONResponse(
+        status_code=500,
+        content={"detail": f"Internal server error: {type(exc).__name__}: {exc}"},
+        headers=headers,
+    )
 
 
 # ---------------------- Routers ----------------------
