@@ -373,6 +373,29 @@ default controls, red error screens). Now, matching §11's catalogue pages:
 
 ---
 
+## 15. Product card — matted atelier redesign
+
+`ProductCard` (used by every grid: homepage tabs, catalogue, New Arrivals, Bestsellers,
+related products) moved from the borderless left-aligned card to a **matted gallery
+card**:
+
+- **White mat frame** — the 3:4 image sits inside a bordered white card with 10px
+  matting; hover lifts it with a soft espresso shadow, warms the border to gold and
+  reveals an **inner gold hairline frame** around the image.
+- **Museum-label typography, centered** — gold category overline (when the product has a
+  category), serif name (maroon on hover), gold stars + count, price with struck MRP and
+  red % off, closed by a **44px gold rule that draws in on hover**.
+- **Quick-add** — the slide-up bar is now espresso/ivory (always visible on touch);
+  wishlist becomes a framed square chip matching the site's square vocabulary.
+- Badges (gold NEW / espresso BESTSELLER / red −x% / out-of-stock), hover image-swap,
+  image normalization and all cart/wishlist logic unchanged.
+
+| File | Change |
+|---|---|
+| `src/components/ProductCard.tsx` | Rewritten to the matted card (visuals only) |
+
+---
+
 ## Verification
 
 - `tsc --noEmit` — no errors in any changed file.
