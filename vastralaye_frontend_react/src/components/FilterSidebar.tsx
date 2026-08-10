@@ -3,10 +3,7 @@ import axios from "axios";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import {
-  X, ChevronDown,
-  Sparkles, Zap, Star, Package,
-} from "lucide-react";
+import { X } from "lucide-react";
 import { Product } from "@/types";
 import { BASE_URL } from "@/config";
 
@@ -14,12 +11,30 @@ import { BASE_URL } from "@/config";
 //  TYPES
 // ═══════════════════════════════════════════════
 
+/** Shape the parent may pass to sync/clear the sidebar UI (chips row, clear-all). */
+interface SidebarFilterValue {
+  category_id?: number | null;
+  subcategory_id?: number | null;
+  min_price?: number | null;
+  max_price?: number | null;
+  in_stock?: boolean | null;
+  featured?: boolean | null;
+  best_seller?: boolean | null;
+  new_arrival?: boolean | null;
+}
+
 interface FilterSidebarProps {
   isOpen: boolean;
   onClose: () => void;
   products: Product[];
   onFilterChange: (filters: any) => void;
   className?: string;
+  /**
+   * Optional parent-driven state. When provided, the sidebar mirrors it —
+   * letting the page's chips-row "×" / "Clear all filters" reset the sidebar
+   * UI without desync. Fully backward compatible when omitted.
+   */
+  value?: SidebarFilterValue;
 }
 
 interface Category {
@@ -35,11 +50,18 @@ interface Subcategory {
 
 const DEFAULT_PRICE: [number, number] = [0, 5000];
 
-/** Square 15px checkbox — maroon fill when checked (design.md §5.10). */
+/** 16px checkbox — gold fill + white ✓ when checked. */
 const checkboxClasses =
-  "h-[15px] w-[15px] shrink-0 rounded-[1px] border-border bg-white " +
-  "data-[state=checked]:bg-maroon data-[state=checked]:border-maroon " +
-  "data-[state=checked]:text-ivory [&_svg]:h-3 [&_svg]:w-3";
+  "h-4 w-4 shrink-0 rounded-[2px] border border-border bg-white " +
+  "data-[state=checked]:bg-gold data-[state=checked]:border-gold " +
+  "data-[state=checked]:text-white [&_svg]:h-3 [&_svg]:w-3";
+
+/** Gold section overline (Refine panel section heading). */
+const SectionOverline = ({ children }: { children: React.ReactNode }) => (
+  <div className="mb-2.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8A6414]">
+    {children}
+  </div>
+);
 
 // ═══════════════════════════════════════════════
 //  FIELD-NAME-SAFE ID EXTRACTORS
@@ -80,7 +102,7 @@ const getProductCategoryId = (product: Product): string | null => {
 };
 
 // ═══════════════════════════════════════════════
-//  PRICE RANGE FILTER
+//  PRICE RANGE FILTER — gold slider + min/max inputs
 // ═══════════════════════════════════════════════
 
 const PriceRangeFilter = ({
@@ -121,9 +143,9 @@ const PriceRangeFilter = ({
   }, [priceRange]);
 
   return (
-    <div className="space-y-4">
-      {/* Minimal slider — track thin, maroon fill via tokens */}
-      <div className="px-1 pt-2">
+    <div>
+      {/* Minimal slider — thin track, gold fill */}
+      <div className="px-1 pt-1">
         <Slider
           min={0}
           max={5000}
@@ -132,36 +154,37 @@ const PriceRangeFilter = ({
           onValueChange={(v) => onPriceRangeChange(v as [number, number])}
           className="[&>span:first-child]:h-[2px] [&>span:first-child]:rounded-none
                      [&>span:first-child]:bg-border
+                     [&>span:first-child>span]:bg-gold
                      [&_[role=slider]]:h-3 [&_[role=slider]]:w-3
-                     [&_[role=slider]]:border-2 [&_[role=slider]]:border-maroon
+                     [&_[role=slider]]:border-2 [&_[role=slider]]:border-gold
                      [&_[role=slider]]:bg-white"
         />
-        <div className="flex justify-between text-[13px] text-muted-foreground mt-3">
+        <div className="mt-2.5 flex justify-between text-[12px] text-muted-foreground">
           <span>₹{priceRange[0]}</span>
           <span>₹{priceRange[1]}</span>
         </div>
       </div>
 
       {/* Min / Max inputs */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="mt-3 grid grid-cols-2 gap-2">
         {(["min", "max"] as const).map((type) => (
-          <div key={type}>
-            <label className="block text-[11px] uppercase tracking-[0.08em] text-muted-foreground mb-1.5 capitalize">
-              {type}
-            </label>
-            <div className="flex items-center border border-border rounded-sm bg-white
-                            focus-within:border-maroon transition-colors">
-              <span className="pl-3 pr-1 text-[13px] text-muted-foreground">₹</span>
-              <input
-                type="number"
-                value={type === "min" ? minInput : maxInput}
-                onChange={(e) => handleInputChange(type, e.target.value)}
-                onBlur={handleBlur}
-                className="w-full pr-2 py-2 text-[13px] text-espresso bg-transparent focus:outline-none"
-                min={0}
-                max={5000}
-              />
-            </div>
+          <div
+            key={type}
+            className="flex h-9 items-center rounded-[3px] border border-border bg-white px-2.5
+                       transition-colors focus-within:border-gold"
+          >
+            <span className="pr-1 text-[13px] text-muted-foreground">₹</span>
+            <input
+              type="number"
+              aria-label={type === "min" ? "Minimum price" : "Maximum price"}
+              placeholder={type === "min" ? "Min" : "Max"}
+              value={type === "min" ? minInput : maxInput}
+              onChange={(e) => handleInputChange(type, e.target.value)}
+              onBlur={handleBlur}
+              className="w-full bg-transparent text-[13px] text-espresso focus:outline-none"
+              min={0}
+              max={5000}
+            />
           </div>
         ))}
       </div>
@@ -170,122 +193,7 @@ const PriceRangeFilter = ({
 };
 
 // ═══════════════════════════════════════════════
-//  APPLIED FILTERS — small espresso pills
-// ═══════════════════════════════════════════════
-
-const AppliedFilters = ({
-  filters,
-  onRemove,
-  categories,
-  subcategories,
-}: {
-  filters: any;
-  onRemove: (type: string, value?: any) => void;
-  categories: Category[];
-  subcategories: Subcategory[];
-}) => {
-  const getFilterLabel = useCallback(
-    (type: string, value: any): string => {
-      switch (type) {
-        case "category_id":
-          return categories.find((c) => c.id === value)?.name ?? `Category ${value}`;
-        case "subcategory_id":
-          return subcategories.find((s) => s.id === value)?.name ?? `Subcategory ${value}`;
-        case "priceRange":
-          return `₹${filters.min_price} – ₹${filters.max_price}`;
-        case "in_stock":    return "In Stock Only";
-        case "featured":    return "Featured";
-        case "best_seller": return "Best Seller";
-        case "new_arrival": return "New Arrival";
-        default:            return String(value);
-      }
-    },
-    [categories, subcategories, filters],
-  );
-
-  const activeFilters: { type: string; value: any }[] = [];
-  if (filters.category_id)    activeFilters.push({ type: "category_id",    value: filters.category_id });
-  if (filters.subcategory_id) activeFilters.push({ type: "subcategory_id", value: filters.subcategory_id });
-  if (
-    filters.min_price !== DEFAULT_PRICE[0] ||
-    filters.max_price !== DEFAULT_PRICE[1]
-  ) activeFilters.push({ type: "priceRange", value: "priceRange" });
-  if (filters.in_stock)    activeFilters.push({ type: "in_stock",    value: true });
-  if (filters.featured)    activeFilters.push({ type: "featured",    value: true });
-  if (filters.best_seller) activeFilters.push({ type: "best_seller", value: true });
-  if (filters.new_arrival) activeFilters.push({ type: "new_arrival", value: true });
-
-  if (activeFilters.length === 0) return null;
-
-  return (
-    <div className="pb-4">
-      <div className="flex flex-wrap items-center gap-2">
-        {activeFilters.map((f, idx) => (
-          <button
-            key={`${f.type}-${idx}`}
-            type="button"
-            onClick={() => onRemove(f.type, f.value)}
-            className="inline-flex items-center gap-1.5 bg-espresso text-ivory
-                       text-[12px] leading-none pl-3 pr-2 py-1.5 rounded-full
-                       hover:bg-maroon transition-colors"
-          >
-            {getFilterLabel(f.type, f.value)}
-            <X size={12} aria-hidden="true" />
-          </button>
-        ))}
-        <button
-          type="button"
-          onClick={() => onRemove("all")}
-          className="text-[12px] text-muted-foreground underline underline-offset-4
-                     hover:text-espresso transition-colors"
-        >
-          Clear all
-        </button>
-      </div>
-    </div>
-  );
-};
-
-// ═══════════════════════════════════════════════
-//  COLLAPSIBLE SECTION — flat accordion group
-// ═══════════════════════════════════════════════
-
-const CollapsibleSection = ({
-  title,
-  children,
-  defaultOpen = true,
-}: {
-  title: string;
-  icon?: React.ElementType;
-  children: React.ReactNode;
-  defaultOpen?: boolean;
-}) => {
-  const [isOpen, setIsOpen] = useState(defaultOpen);
-
-  return (
-    <div className="border-t border-border">
-      <button
-        type="button"
-        onClick={() => setIsOpen((v) => !v)}
-        className="w-full flex items-center justify-between py-4 text-left group"
-      >
-        <h3 className="text-[12px] font-semibold uppercase tracking-[0.18em] text-espresso">
-          {title}
-        </h3>
-        <ChevronDown
-          size={15}
-          className={`text-gold transition-transform duration-200
-                      ${isOpen ? "rotate-180" : ""}`}
-        />
-      </button>
-
-      {isOpen && <div className="pb-5">{children}</div>}
-    </div>
-  );
-};
-
-// ═══════════════════════════════════════════════
-//  MAIN FILTER SIDEBAR
+//  MAIN FILTER SIDEBAR — the "Refine" panel
 // ═══════════════════════════════════════════════
 
 const FilterSidebar = ({
@@ -294,6 +202,7 @@ const FilterSidebar = ({
   products,
   onFilterChange,
   className,
+  value,
 }: FilterSidebarProps) => {
   const [categories,    setCategories]    = useState<Category[]>([]);
   const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
@@ -309,6 +218,26 @@ const FilterSidebar = ({
     best_seller:    null as boolean | null,
     new_arrival:    null as boolean | null,
   });
+
+  // ── Optional parent sync (chips row "×" / "Clear all filters") ──
+  const valueString = value ? JSON.stringify(value) : null;
+  useEffect(() => {
+    if (valueString === null) return;
+    const v: SidebarFilterValue = JSON.parse(valueString);
+    setFilters((prev) => {
+      const next = {
+        category_id:    v.category_id    ?? null,
+        subcategory_id: v.subcategory_id ?? null,
+        min_price:      v.min_price      ?? DEFAULT_PRICE[0],
+        max_price:      v.max_price      ?? DEFAULT_PRICE[1],
+        in_stock:       v.in_stock       ?? null,
+        featured:       v.featured       ?? null,
+        best_seller:    v.best_seller    ?? null,
+        new_arrival:    v.new_arrival    ?? null,
+      };
+      return JSON.stringify(next) === JSON.stringify(prev) ? prev : next;
+    });
+  }, [valueString]);
 
   // ── Fetch categories + subcategories ──
   useEffect(() => {
@@ -370,7 +299,7 @@ const FilterSidebar = ({
     onFilterChange(filters);
   }, [filters, onFilterChange]);
 
-  // ── ✅ FIXED: category count — String comparison to avoid type mismatch ──
+  // ── ✅ Category count — String comparison to avoid type mismatch ──
   const getCategoryProductCount = useCallback(
     (categoryId: number): number =>
       products.filter(
@@ -379,7 +308,7 @@ const FilterSidebar = ({
     [products],
   );
 
-  // ── ✅ FIXED: subcategory count — String comparison ──
+  // ── ✅ Subcategory count — String comparison ──
   const getSubcategoryProductCount = useCallback(
     (subcategoryId: number): number =>
       products.filter(
@@ -431,204 +360,194 @@ const FilterSidebar = ({
     }));
   }, []);
 
-  const quickFilters = [
-    { id: "in_stock",    label: "In Stock Only",    icon: Package,  checked: filters.in_stock    === true },
-    { id: "featured",    label: "Featured Products", icon: Sparkles, checked: filters.featured    === true },
-    { id: "best_seller", label: "Best Sellers",      icon: Star,     checked: filters.best_seller === true },
-    { id: "new_arrival", label: "New Arrivals",      icon: Zap,      checked: filters.new_arrival === true },
+  const availabilityFilters = [
+    { id: "in_stock", label: "In stock only", checked: filters.in_stock === true },
   ];
+
+  const highlightFilters = [
+    { id: "featured",    label: "Featured",     checked: filters.featured    === true },
+    { id: "best_seller", label: "Bestsellers",  checked: filters.best_seller === true },
+    { id: "new_arrival", label: "New arrivals", checked: filters.new_arrival === true },
+  ];
+
+  const renderCheckboxRow = (f: { id: string; label: string; checked: boolean }) => (
+    <div key={f.id} className="flex items-center gap-2.5 py-1.5 text-[13px]">
+      <Checkbox
+        id={f.id}
+        checked={f.checked}
+        onCheckedChange={(checked) =>
+          setFilters((prev) => ({
+            ...prev,
+            [f.id]: checked ? true : null,
+          }))
+        }
+        className={checkboxClasses}
+      />
+      <Label
+        htmlFor={f.id}
+        className={`flex-1 cursor-pointer text-[13px] font-normal
+                    ${f.checked
+                      ? "text-espresso"
+                      : "text-muted-foreground hover:text-espresso"}`}
+      >
+        {f.label}
+      </Label>
+    </div>
+  );
 
   return (
     <aside
       className={`fixed inset-y-0 left-0 z-50 w-[85vw] max-w-[320px]
-                  bg-background transition-transform duration-300 ease-out
+                  overflow-y-auto bg-white transition-transform duration-300 ease-out
                   ${isOpen ? "translate-x-0 shadow-xl" : "-translate-x-full"}
                   lg:sticky lg:top-24 lg:z-0
                   lg:max-h-[calc(100vh-7rem)] lg:translate-x-0 lg:shadow-none
-                  lg:bg-transparent overflow-y-auto
+                  lg:rounded-sm lg:border lg:border-border
                   ${className || ""}`}
     >
-      <div className="p-6 lg:p-0">
-
-        {/* ── HEADER ── */}
-        <div className="flex items-center justify-between pb-5">
-          <h2 className="text-[12px] font-semibold uppercase tracking-[0.18em] text-espresso">
-            Filter
-          </h2>
-          <div className="flex items-center gap-4">
-            <button
-              type="button"
-              onClick={resetFilters}
-              className="text-[12px] text-muted-foreground underline underline-offset-4
-                         hover:text-espresso transition-colors"
-            >
-              Clear all
-            </button>
-            <button
-              type="button"
-              onClick={onClose}
-              className="lg:hidden text-espresso hover:text-maroon transition-colors"
-              aria-label="Close filters"
-            >
-              <X size={18} />
-            </button>
-          </div>
-        </div>
-
-        {/* ── APPLIED FILTERS ── */}
-        <AppliedFilters
-          filters={filters}
-          onRemove={removeFilter}
-          categories={categories}
-          subcategories={subcategories}
-        />
-
-        {/* ── CATEGORIES + SUBCATEGORIES ── */}
-        {categories.length > 0 && (
-          <CollapsibleSection title="Category" defaultOpen>
-            <div className="space-y-2.5">
-              {categories.map((cat) => {
-                const catCount   = getCategoryProductCount(cat.id);
-                const catSubs    = subcategories.filter((s) => s.category_id === cat.id);
-                const isSelected = filters.category_id === cat.id;
-
-                return (
-                  <div key={cat.id}>
-
-                    {/* Category row */}
-                    <div className="flex items-center justify-between gap-2 cursor-pointer select-none">
-                      <div className="flex items-center gap-2.5 flex-1 min-w-0">
-                        <Checkbox
-                          id={`cat-${cat.id}`}
-                          checked={isSelected}
-                          onCheckedChange={() => handleCategoryChange(cat.id)}
-                          className={checkboxClasses}
-                        />
-                        <Label
-                          htmlFor={`cat-${cat.id}`}
-                          className={`cursor-pointer text-sm truncate font-normal
-                                      ${isSelected
-                                        ? "text-espresso font-medium"
-                                        : "text-muted-foreground hover:text-espresso"}`}
-                        >
-                          {cat.name}
-                        </Label>
-                      </div>
-
-                      {/* ✅ Category count */}
-                      <span className="flex-shrink-0 text-xs text-muted-foreground">
-                        ({catCount})
-                      </span>
-                    </div>
-
-                    {/* ✅ Subcategories — ALWAYS visible (not gated on category selection) */}
-                    {catSubs.length > 0 && (
-                      <div className="ml-[7px] mt-1.5 pl-4 border-l border-border space-y-1.5 pb-1">
-                        {catSubs.map((sub) => {
-                          // ✅ String-coerced comparison fixes "0" bug
-                          const subCount      = getSubcategoryProductCount(sub.id);
-                          const isSubSelected = filters.subcategory_id === sub.id;
-
-                          return (
-                            <div
-                              key={sub.id}
-                              className="flex items-center justify-between gap-2 cursor-pointer select-none"
-                            >
-                              <div className="flex items-center gap-2.5 flex-1 min-w-0">
-                                <Checkbox
-                                  id={`sub-${sub.id}`}
-                                  checked={isSubSelected}
-                                  onCheckedChange={() => handleSubcategoryChange(sub.id)}
-                                  className={checkboxClasses}
-                                />
-                                <Label
-                                  htmlFor={`sub-${sub.id}`}
-                                  className={`cursor-pointer text-[13px] truncate font-normal
-                                              ${isSubSelected
-                                                ? "text-espresso font-medium"
-                                                : "text-muted-foreground hover:text-espresso"}`}
-                                >
-                                  {sub.name}
-                                </Label>
-                              </div>
-
-                              {/* ✅ Subcategory count — always shows real number */}
-                              <span
-                                className={`flex-shrink-0 text-xs
-                                            ${subCount > 0
-                                              ? "text-muted-foreground"
-                                              : "text-muted-foreground/50"}`}
-                              >
-                                ({subCount})
-                              </span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </CollapsibleSection>
-        )}
-
-        {/* ── PRICE RANGE ── */}
-        <CollapsibleSection title="Price" defaultOpen>
-          <PriceRangeFilter
-            priceRange={[filters.min_price, filters.max_price]}
-            onPriceRangeChange={(r) =>
-              setFilters((f) => ({ ...f, min_price: r[0], max_price: r[1] }))
-            }
-          />
-        </CollapsibleSection>
-
-        {/* ── QUICK FILTERS ── */}
-        <CollapsibleSection title="Shop By" defaultOpen>
-          <div className="space-y-2.5">
-            {quickFilters.map((f) => (
-              <div key={f.id} className="flex items-center gap-2.5">
-                <Checkbox
-                  id={f.id}
-                  checked={f.checked}
-                  onCheckedChange={(checked) =>
-                    setFilters((prev) => ({
-                      ...prev,
-                      [f.id]: checked ? true : null,
-                    }))
-                  }
-                  className={checkboxClasses}
-                />
-                <Label
-                  htmlFor={f.id}
-                  className={`flex-1 cursor-pointer text-sm font-normal
-                              ${f.checked
-                                ? "text-espresso font-medium"
-                                : "text-muted-foreground hover:text-espresso"}`}
-                >
-                  {f.label}
-                </Label>
-              </div>
-            ))}
-          </div>
-        </CollapsibleSection>
-
-        {/* ── RESULTS COUNT ── */}
-        <div className="border-t border-border pt-5">
-          <p className="text-sm text-muted-foreground">
-            <span className="font-medium text-espresso">{products.length}</span>{" "}
-            products match your filters
-          </p>
+      {/* ── HEADER ── */}
+      <div className="sticky top-0 z-10 flex items-baseline justify-between border-b border-border bg-ivory px-4 py-4">
+        <h2 className="font-serif text-[17px] font-medium text-espresso">Refine</h2>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={resetFilters}
+            className="text-[11px] text-maroon underline underline-offset-[3px]
+                       transition-colors hover:text-terracotta"
+          >
+            Clear all
+          </button>
           <button
             type="button"
             onClick={onClose}
-            className="lg:hidden mt-4 w-full bg-maroon text-ivory text-xs font-semibold
-                       uppercase tracking-[0.16em] px-8 py-3.5 rounded-sm
-                       hover:bg-terracotta transition-colors"
+            className="lg:hidden text-espresso transition-colors hover:text-maroon"
+            aria-label="Close filters"
           >
-            Show Results
+            <X size={16} />
           </button>
         </div>
+      </div>
+
+      {/* ── CATEGORY ── */}
+      {categories.length > 0 && (
+        <div className="border-b border-border px-4 py-4">
+          <SectionOverline>Category</SectionOverline>
+          <div>
+            {categories.map((cat) => {
+              const catCount   = getCategoryProductCount(cat.id);
+              const catSubs    = subcategories.filter((s) => s.category_id === cat.id);
+              const isSelected = filters.category_id === cat.id;
+
+              return (
+                <div key={cat.id}>
+                  {/* Category row */}
+                  <button
+                    type="button"
+                    onClick={() => handleCategoryChange(cat.id)}
+                    className={`flex w-full cursor-pointer items-center justify-between gap-2 py-1
+                                text-left text-[13px] transition-colors
+                                ${isSelected
+                                  ? "font-semibold text-maroon"
+                                  : "text-muted-foreground hover:text-espresso"}`}
+                  >
+                    <span className="flex min-w-0 items-center gap-2">
+                      {isSelected && (
+                        <span className="h-[5px] w-[5px] shrink-0 rotate-45 bg-gold" aria-hidden="true" />
+                      )}
+                      <span className="truncate">{cat.name}</span>
+                    </span>
+                    <span
+                      className={`shrink-0 text-[12px] font-normal
+                                  ${isSelected ? "text-maroon" : "text-muted-foreground"}`}
+                    >
+                      {catCount}
+                    </span>
+                  </button>
+
+                  {/* Subcategories — always visible under their category */}
+                  {catSubs.length > 0 && (
+                    <div className="mb-1 ml-[2px] mt-0.5 border-l border-border pl-3">
+                      {catSubs.map((sub) => {
+                        const subCount      = getSubcategoryProductCount(sub.id);
+                        const isSubSelected = filters.subcategory_id === sub.id;
+
+                        return (
+                          <button
+                            key={sub.id}
+                            type="button"
+                            onClick={() => handleSubcategoryChange(sub.id)}
+                            className={`flex w-full cursor-pointer items-center justify-between gap-2 py-1
+                                        text-left text-[13px] transition-colors
+                                        ${isSubSelected
+                                          ? "font-semibold text-maroon"
+                                          : "text-muted-foreground hover:text-espresso"}`}
+                          >
+                            <span className="flex min-w-0 items-center gap-2">
+                              {isSubSelected && (
+                                <span className="h-[5px] w-[5px] shrink-0 rotate-45 bg-gold" aria-hidden="true" />
+                              )}
+                              <span className="truncate">{sub.name}</span>
+                            </span>
+                            <span
+                              className={`shrink-0 text-[12px] font-normal
+                                          ${isSubSelected
+                                            ? "text-maroon"
+                                            : subCount > 0
+                                            ? "text-muted-foreground"
+                                            : "text-muted-foreground/50"}`}
+                            >
+                              {subCount}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* ── PRICE ── */}
+      <div className="border-b border-border px-4 py-4">
+        <SectionOverline>Price</SectionOverline>
+        <PriceRangeFilter
+          priceRange={[filters.min_price, filters.max_price]}
+          onPriceRangeChange={(r) =>
+            setFilters((f) => ({ ...f, min_price: r[0], max_price: r[1] }))
+          }
+        />
+      </div>
+
+      {/* ── AVAILABILITY ── */}
+      <div className="border-b border-border px-4 py-4">
+        <SectionOverline>Availability</SectionOverline>
+        <div>{availabilityFilters.map(renderCheckboxRow)}</div>
+      </div>
+
+      {/* ── HIGHLIGHTS ── */}
+      <div className="border-b border-border px-4 py-4">
+        <SectionOverline>Highlights</SectionOverline>
+        <div>{highlightFilters.map(renderCheckboxRow)}</div>
+      </div>
+
+      {/* ── RESULTS COUNT ── */}
+      <div className="px-4 py-4">
+        <p className="text-[13px] text-muted-foreground">
+          <span className="font-medium text-espresso">{products.length}</span>{" "}
+          products match your filters
+        </p>
+        <button
+          type="button"
+          onClick={onClose}
+          className="lg:hidden mt-4 w-full rounded-sm bg-maroon px-8 py-3.5 text-xs
+                     font-semibold uppercase tracking-[0.16em] text-ivory
+                     transition-colors hover:bg-terracotta"
+        >
+          Show Results
+        </button>
       </div>
     </aside>
   );
