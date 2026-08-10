@@ -124,7 +124,7 @@ const StickyReelVideo = ({ productId, fallbackVideoUrl }: StickyReelVideoProps) 
     <>
       {/* Mini floating player */}
       <div
-        className={`fixed bottom-5 left-4 z-40 w-[110px] md:w-[132px] transition-all duration-300 ${
+        className={`fixed bottom-[124px] md:bottom-[84px] lg:bottom-5 left-4 z-40 w-[110px] md:w-[132px] transition-all duration-300 ${
           visible && !expanded && !overReels
             ? 'opacity-100 translate-y-0'
             : 'opacity-0 translate-y-6 pointer-events-none'

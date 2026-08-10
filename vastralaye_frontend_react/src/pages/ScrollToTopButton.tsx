@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { ChevronUp } from "lucide-react";
 
 /**
@@ -9,6 +10,10 @@ import { ChevronUp } from "lucide-react";
  */
 const ScrollToTopButton = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const location = useLocation();
+  /* On mobile the product page stacks add-to-cart bar + bottom nav, so
+     the button needs extra clearance there. */
+  const onProductPage = location.pathname.startsWith("/product/");
 
   useEffect(() => {
     const toggleVisibility = () => {
@@ -30,7 +35,7 @@ const ScrollToTopButton = () => {
     <button
       onClick={scrollToTop}
       aria-label="Scroll to top"
-      className={`group fixed bottom-20 md:bottom-6 right-4 md:right-5 z-40 w-11 h-11 rounded-sm bg-espresso border border-gold shadow-lg flex items-center justify-center transition-all duration-300 hover:bg-maroon hover:scale-105 active:scale-90
+      className={`group fixed ${onProductPage ? "bottom-[124px]" : "bottom-20"} md:bottom-6 right-4 md:right-5 z-40 w-11 h-11 rounded-sm bg-espresso border border-gold shadow-lg flex items-center justify-center transition-all duration-300 hover:bg-maroon hover:scale-105 active:scale-90
         ${isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0 pointer-events-none"}`}
     >
       <ChevronUp
