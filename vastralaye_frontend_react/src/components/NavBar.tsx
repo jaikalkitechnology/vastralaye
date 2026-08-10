@@ -360,13 +360,13 @@ const NavBar = () => {
 
         {/* ================= MOBILE ICONS ================= */}
         <div className="ml-auto flex items-center gap-2 lg:hidden">
-          {/* Search Button */}
-          <Button variant="ghost" size="icon" onClick={() => setIsSearchOpen(!isSearchOpen)} className="text-espresso hover:text-terracotta">
+          {/* Search Button — phones use the bottom nav's Search instead */}
+          <Button variant="ghost" size="icon" onClick={() => setIsSearchOpen(!isSearchOpen)} className="hidden md:inline-flex text-espresso hover:text-terracotta">
             <Search className="w-5 h-5" strokeWidth={1.5} />
           </Button>
 
-          {/* Wishlist */}
-          <Link to="/wishlist">
+          {/* Wishlist — reachable from the menu drawer on phones */}
+          <Link to="/wishlist" className="hidden md:block">
             <Button variant="ghost" size="icon" className="relative text-espresso hover:text-terracotta">
               <Heart className="w-5 h-5" strokeWidth={1.5} />
               {totalWishlist > 0 && (
@@ -377,8 +377,8 @@ const NavBar = () => {
             </Button>
           </Link>
 
-          {/* Cart */}
-          <Link to="/cart">
+          {/* Cart — phones use the bottom nav's Cart tab instead */}
+          <Link to="/cart" className="hidden md:block">
             <Button variant="ghost" size="icon" className="relative text-espresso hover:text-terracotta">
               <ShoppingCart className="w-5 h-5" strokeWidth={1.5} />
               {totalItems > 0 && (
