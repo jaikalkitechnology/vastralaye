@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,6 +11,50 @@ const fieldClasses =
 
 const labelClasses =
   'block text-[11px] font-sans font-semibold uppercase tracking-[0.16em] text-espresso';
+
+const BrandPanel = () => (
+  <aside className="relative hidden md:flex flex-col justify-center bg-espresso px-14 py-16 text-ivory">
+    <span className="pointer-events-none absolute inset-[18px] border border-gold/40" />
+
+    <div>
+      <Link to="/" className="font-serif text-[34px] font-semibold text-ivory">
+        Vastra<span className="text-gold">laye</span>
+      </Link>
+      <span className="block text-[9px] uppercase tracking-[0.42em] text-gold mt-1">
+        Handcrafted India
+      </span>
+    </div>
+
+    <p className="font-serif text-[21px] leading-relaxed text-ivory/90 mt-6 max-w-[340px]">
+      Handwoven stories, waiting to be worn &mdash; your wardrobe remembers where it came from.
+    </p>
+
+    <div className="flex items-center gap-2.5 mt-6" aria-hidden="true">
+      <span className="h-px w-11 bg-gold/60" />
+      <span className="h-[7px] w-[7px] rotate-45 border border-gold" />
+      <span className="h-px w-11 bg-gold/60" />
+    </div>
+
+    <ul className="mt-7 space-y-3">
+      <li className="flex items-center gap-3 text-[13px] text-ivory/70">
+        <span className="w-1.5 h-1.5 border border-gold rotate-45 shrink-0" />
+        Artisan-direct sarees, suits &amp; lehengas
+      </li>
+      <li className="flex items-center gap-3 text-[13px] text-ivory/70">
+        <span className="w-1.5 h-1.5 border border-gold rotate-45 shrink-0" />
+        Secure checkout &middot; UPI, cards &amp; COD
+      </li>
+      <li className="flex items-center gap-3 text-[13px] text-ivory/70">
+        <span className="w-1.5 h-1.5 border border-gold rotate-45 shrink-0" />
+        Easy 7-day returns on every order
+      </li>
+    </ul>
+
+    <p className="absolute bottom-9 left-14 text-[11px] uppercase tracking-[0.18em] text-ivory/40">
+      &copy; Vastralaye &middot; Faridabad, India
+    </p>
+  </aside>
+);
 
 const ResetPasswordPage = () => {
   const [searchParams] = useSearchParams();
@@ -106,33 +150,42 @@ const ResetPasswordPage = () => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4 py-16">
-      <div className="w-full max-w-[420px]">
-        {/* Brand */}
-        <div className="mb-8 text-center">
-          <span className="font-serif text-3xl font-semibold text-espresso">
-            Vastra<span className="text-maroon">laye</span>
-          </span>
-          <svg
-            className="mx-auto mt-3"
-            width="130"
-            height="14"
-            viewBox="0 0 130 14"
-            aria-hidden="true"
-          >
-            <g fill="none" stroke="#C99A45">
-              <line x1="0" y1="7" x2="50" y2="7" />
-              <line x1="80" y1="7" x2="130" y2="7" />
-              <rect x="60.5" y="2.5" width="9" height="9" transform="rotate(45 65 7)" />
-            </g>
-            <circle cx="65" cy="7" r="1.5" fill="#C99A45" />
-          </svg>
-        </div>
+    <div className="grid min-h-screen grid-cols-1 md:grid-cols-[44%_56%] bg-background">
+      {/* Espresso brand panel */}
+      <BrandPanel />
 
-        {/* Card */}
-        <div className="rounded-sm border border-border bg-white p-7 sm:p-9">
-          <h1 className="font-serif text-3xl font-medium text-espresso mb-1.5">Reset Password</h1>
-          <p className="text-[14.5px] text-muted-foreground mb-7">
+      {/* Form panel */}
+      <div className="flex items-center justify-center px-4 py-12 md:px-8">
+        <div className="w-full max-w-[400px]">
+          {/* Mobile brand */}
+          <div className="md:hidden text-center mb-8">
+            <span className="font-serif text-3xl font-semibold text-espresso">
+              Vastra<span className="text-maroon">laye</span>
+            </span>
+            <svg
+              className="mx-auto mt-3"
+              width="130"
+              height="14"
+              viewBox="0 0 130 14"
+              aria-hidden="true"
+            >
+              <g fill="none" stroke="#C99A45">
+                <line x1="0" y1="7" x2="50" y2="7" />
+                <line x1="80" y1="7" x2="130" y2="7" />
+                <rect x="60.5" y="2.5" width="9" height="9" transform="rotate(45 65 7)" />
+              </g>
+              <circle cx="65" cy="7" r="1.5" fill="#C99A45" />
+            </svg>
+          </div>
+
+          {/* Heading */}
+          <span className="text-[10.5px] font-semibold uppercase tracking-[0.22em] text-[#8A6414]">
+            Account recovery
+          </span>
+          <h1 className="font-serif text-[28px] font-medium text-espresso mt-1.5">
+            Create a new password
+          </h1>
+          <p className="text-sm text-muted-foreground mt-2 mb-6">
             Enter your new password below.
           </p>
 
@@ -179,11 +232,15 @@ const ResetPasswordPage = () => {
                       {getPasswordStrengthText()}
                     </span>
                   </div>
-                  <div className="h-1 w-full overflow-hidden rounded-full bg-sand">
-                    <div
-                      className={`h-full transition-all duration-300 ${getPasswordStrengthColor()}`}
-                      style={{ width: `${(passwordStrength / 4) * 100}%` }}
-                    />
+                  <div className="flex gap-1.5">
+                    {[0, 1, 2, 3].map((seg) => (
+                      <span
+                        key={seg}
+                        className={`h-1 flex-1 rounded-full transition-colors duration-300 ${
+                          passwordStrength > seg ? 'bg-gold' : 'bg-sand'
+                        }`}
+                      />
+                    ))}
                   </div>
                 </div>
               )}
@@ -303,7 +360,7 @@ const ResetPasswordPage = () => {
               onClick={() => navigate('/login')}
               className="text-[13px] text-muted-foreground hover:text-maroon"
             >
-              ← Back to login
+              &larr; Back to login
             </button>
           </div>
         </div>
