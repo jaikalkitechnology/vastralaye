@@ -4,6 +4,7 @@ import { mediaUrl } from '@/lib/media';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/use-toast';
 import { GalleryHorizontal, UploadCloud, Trash2, Pencil, RefreshCw, X } from 'lucide-react';
+import AdminPageBanners from './AdminPageBanners';
 
 interface Banner {
   id: number;
@@ -309,6 +310,9 @@ const AdminBanners = () => {
           )}
         </div>
       </div>
+
+      {/* Per-page catalogue banners (4 pages: image + text each) */}
+      <AdminPageBanners />
     </div>
   );
 };

@@ -251,6 +251,7 @@ const CategoriesPage = () => {
         title="All Categories"
         subtitle={`Every weave, every occasion · ${filteredCategories.length} categories · ${totalProducts} products`}
         crumb="Categories"
+        page="categories"
       />
 
       <div className="container mx-auto px-4 pt-8 pb-16 lg:pb-20">

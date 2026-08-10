@@ -499,6 +499,35 @@ the content column permanently offset `ml-60`, leaving almost no room on phones.
 
 ---
 
+## 20. Per-page banners — 4 images + text from the admin dashboard
+
+The catalogue banners are now individually managed: **Admin → Banner Control** gains a
+**Page Banners** section with one card per storefront page — **All Products, All
+Categories, New Arrivals, Bestsellers** — each holding an image upload (JPG/PNG/WebP,
+8 MB), a heading, a tagline and an Active toggle.
+
+- **Backend**: new `page_banners` table (auto-created on deploy — new table, no
+  migration), `GET /fronted/page-banners` (active only), `GET /admin/page-banners`,
+  and `PUT /admin/page-banners/{page}` (multipart upsert; replaces/removes the stored
+  file safely; page key validated).
+- **Frontend**: `PageBanner` gains a `page` prop; the per-page banner's image **and
+  text** override the defaults, falling back to the first hero slide's image and then
+  the paisley band — so nothing breaks before the admin uploads anything. Fetched once
+  per session and shared across pages.
+- The four pages pass their slot keys (`products`, `categories`, `new_arrivals`,
+  `best_sellers`).
+
+| File | Change |
+|---|---|
+| `app/models/site_content.py` | New `PageBanner` model |
+| `app/routers/site_content.py` | fronted/admin list + admin upsert endpoints |
+| `src/components/PageBanner.tsx` | `page` prop + page-banner cache + text override |
+| `src/pages/admin/AdminPageBanners.tsx` | New — the 4-card management section |
+| `src/pages/admin/AdminBanners.tsx` | Mounts the Page Banners section |
+| Products/Categories/NewArrivals/BestSellers pages | Pass their slot keys |
+
+---
+
 ## Verification
 
 - `tsc --noEmit` — no errors in any changed file.

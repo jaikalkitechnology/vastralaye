@@ -23,6 +23,22 @@ class HeroBanner(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
 
+class PageBanner(Base):
+    """Per-page catalogue banner (image + text) managed from the admin
+    panel — one row per storefront page (products / categories /
+    new_arrivals / best_sellers)."""
+
+    __tablename__ = "page_banners"
+
+    id = Column(Integer, primary_key=True, index=True)
+    page = Column(String(40), unique=True, nullable=False, index=True)
+    image_url = Column(String(255), nullable=True)
+    title = Column(String(160), nullable=True)
+    subtitle = Column(String(255), nullable=True)
+    is_active = Column(Boolean, default=True)
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+
 class Testimonial(Base):
     """Homepage customer testimonial managed from the admin panel."""
 
