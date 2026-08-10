@@ -11,9 +11,12 @@ interface ProductCardProps {
 }
 
 /**
- * Editorial product card (design.md §5.9): 3:4 image with hover
- * image-swap, flat badges, quick-add bar, quiet typography.
- * Cart/wishlist logic and image normalization preserved.
+ * Matted atelier product card (new_design.md §15): the 3:4 image sits
+ * inside a white "mat" frame with an inner gold hairline that appears
+ * on hover, museum-label typography centered beneath (gold category
+ * overline → serif name → stars → price → gold rule), an espresso
+ * quick-add bar and a framed square wishlist chip. Hover image-swap,
+ * cart/wishlist logic and image normalization preserved.
  */
 const ProductCard = ({ product }: ProductCardProps) => {
   const { addToWishlist, removeFromWishlist, isInWishlist, addToCart } = useStore();
@@ -117,6 +120,9 @@ const ProductCard = ({ product }: ProductCardProps) => {
   const totalReviews = product.reviewCount || (product as any).reviews || 0;
   const hasRating = averageRating !== null && averageRating > 0;
 
+  const categoryName =
+    (product as any).category?.name || (product as any).category_name || null;
+
   const toggleWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
     if (isWishlisted) {
@@ -136,9 +142,12 @@ const ProductCard = ({ product }: ProductCardProps) => {
   };
 
   return (
-    <Link to={`/product/${product.id}`} className="group relative flex flex-col w-full">
-      {/* IMAGE */}
-      <div className="relative aspect-[3/4] overflow-hidden rounded-sm bg-sand">
+    <Link
+      to={`/product/${product.id}`}
+      className="group relative flex w-full flex-col rounded-sm border border-border bg-white p-2.5 transition-all duration-300 hover:border-gold/50 hover:shadow-[0_10px_30px_rgba(43,27,18,0.1)]"
+    >
+      {/* IMAGE — matted inside the card */}
+      <div className="relative aspect-[3/4] overflow-hidden bg-sand">
         <img
           src={imageError ? placeholderDataUrl : imageUrl}
           alt={product.name}
@@ -156,6 +165,12 @@ const ProductCard = ({ product }: ProductCardProps) => {
             className="absolute inset-0 w-full h-full object-cover opacity-0 transition-all duration-500 group-hover:opacity-100 group-hover:scale-[1.04]"
           />
         )}
+
+        {/* Inner gold hairline frame (hover) */}
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-2 z-10 border border-gold/60 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        />
 
         {/* Badges */}
         <div className="absolute top-2.5 left-2.5 flex flex-col gap-1.5 z-10">
@@ -181,11 +196,11 @@ const ProductCard = ({ product }: ProductCardProps) => {
           )}
         </div>
 
-        {/* Wishlist */}
+        {/* Wishlist — framed square chip */}
         <button
           onClick={toggleWishlist}
           aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
-          className="absolute top-2.5 right-2.5 z-10 w-9 h-9 rounded-full bg-white/95 shadow-sm flex items-center justify-center transition-colors hover:bg-white"
+          className="absolute top-2.5 right-2.5 z-10 flex h-8 w-8 items-center justify-center rounded-[3px] border border-border bg-white/95 transition-colors hover:border-maroon"
         >
           <Heart
             className={`h-4 w-4 transition-colors ${
@@ -195,33 +210,30 @@ const ProductCard = ({ product }: ProductCardProps) => {
           />
         </button>
 
-        {/* Quick add — slides up on hover (always visible on touch) */}
+        {/* Quick add — espresso bar, slides up on hover (always visible on touch) */}
         <button
           onClick={handleAddToCart}
           disabled={!isInStock}
-          className="absolute bottom-0 left-0 right-0 z-10 bg-ivory/95 text-espresso text-[11px] font-semibold uppercase tracking-[0.16em] py-3 flex items-center justify-center gap-2 transition-transform duration-200 sm:translate-y-full sm:group-hover:translate-y-0 disabled:text-muted-foreground"
+          className="absolute bottom-0 left-0 right-0 z-10 flex items-center justify-center gap-2 bg-espresso/95 py-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-ivory transition-transform duration-200 sm:translate-y-full sm:group-hover:translate-y-0 disabled:text-ivory/60"
         >
           <ShoppingBag className="h-3.5 w-3.5" strokeWidth={1.6} />
           {isInStock ? "Add to Cart" : "Out of Stock"}
         </button>
       </div>
 
-      {/* INFO */}
-      <div className="pt-3 px-0.5">
-        <h3 className="text-sm text-espresso font-medium leading-snug truncate">{product.name}</h3>
-
-        <div className="flex items-baseline gap-2 mt-1">
-          <span className="text-[15px] font-semibold text-espresso">{INR(finalPrice)}</span>
-          {hasDiscount && (
-            <>
-              <span className="text-[13px] text-muted-foreground line-through">{INR(price)}</span>
-              <span className="text-xs font-semibold text-sale">({discountPercent}% off)</span>
-            </>
-          )}
-        </div>
+      {/* INFO — centered museum label */}
+      <div className="px-1.5 pb-3 pt-3.5 text-center">
+        {categoryName && (
+          <p className="text-[9.5px] font-semibold uppercase tracking-[0.22em] text-[#8A6414]">
+            {categoryName}
+          </p>
+        )}
+        <h3 className="mt-1 truncate font-serif text-[15px] font-medium leading-snug text-espresso transition-colors group-hover:text-maroon">
+          {product.name}
+        </h3>
 
         {hasRating && (
-          <div className="flex items-center gap-1 mt-1">
+          <div className="mt-1.5 flex items-center justify-center gap-1">
             {Array.from({ length: 5 }).map((_, i) => (
               <Star
                 key={i}
@@ -233,10 +245,26 @@ const ProductCard = ({ product }: ProductCardProps) => {
               />
             ))}
             {totalReviews > 0 && (
-              <span className="text-[11px] text-muted-foreground ml-1">({totalReviews})</span>
+              <span className="ml-1 text-[11px] text-muted-foreground">({totalReviews})</span>
             )}
           </div>
         )}
+
+        <div className="mt-1.5 flex items-baseline justify-center gap-2">
+          <span className="text-[15px] font-semibold text-espresso">{INR(finalPrice)}</span>
+          {hasDiscount && (
+            <>
+              <span className="text-[13px] text-muted-foreground line-through">{INR(price)}</span>
+              <span className="text-xs font-semibold text-sale">({discountPercent}% off)</span>
+            </>
+          )}
+        </div>
+
+        {/* Signature gold rule (hover) */}
+        <span
+          aria-hidden
+          className="mx-auto mt-2.5 block h-px w-11 scale-x-0 bg-gold transition-transform duration-300 group-hover:scale-x-100"
+        />
       </div>
     </Link>
   );
