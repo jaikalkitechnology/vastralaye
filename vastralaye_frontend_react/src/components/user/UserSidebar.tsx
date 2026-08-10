@@ -43,6 +43,7 @@ const UserSidebar = () => {
       sessionStorage.clear();
 
       // update global state
+      // @ts-expect-error — pre-existing "LOGOUT" action is not part of the typed reducer union
       dispatch({ type: "LOGOUT" });
 
       toast.success("Signed out successfully");
@@ -60,16 +61,43 @@ const UserSidebar = () => {
     }
   };
 
+  const storeUser = state.currentUser;
+  const fullName = [
+    storeUser?.first_name || storeUser?.firstName,
+    storeUser?.last_name || storeUser?.lastName,
+  ]
+    .filter(Boolean)
+    .join(" ");
+  const displayName = fullName || "My Account";
+  const email = storeUser?.email;
+  const avatarUrl = storeUser?.avatar;
+  const initial = (fullName || email || "M").charAt(0).toUpperCase();
+
   return (
-    <aside className="w-full self-start rounded-sm border border-border bg-white md:w-60">
-      {/* HEADER */}
-      <div className="border-b border-border px-5 py-5">
-        <h2 className="font-serif text-xl font-medium text-espresso">My Account</h2>
-        <p className="mt-1 text-[13px] text-muted-foreground">
-          {state.user?.name
-            ? `Welcome, ${state.user.name}`
-            : "Manage your account settings"}
-        </p>
+    <aside className="w-full self-start rounded-sm border border-border bg-white overflow-hidden md:w-64 md:sticky md:top-24">
+      {/* IDENTITY HEADER */}
+      <div className="flex items-center gap-3 border-b border-border bg-gradient-to-b from-ivory to-white px-5 py-5">
+        <div className="h-11 w-11 shrink-0 overflow-hidden rounded-full border-2 border-white ring-1 ring-gold">
+          {avatarUrl ? (
+            <img
+              src={avatarUrl}
+              alt={displayName}
+              className="h-full w-full rounded-full object-cover"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center rounded-full bg-sand font-serif text-maroon">
+              {initial}
+            </div>
+          )}
+        </div>
+        <div className="min-w-0">
+          <p className="font-serif text-[15.5px] font-medium text-espresso leading-tight">
+            {displayName}
+          </p>
+          {email && (
+            <p className="text-[11.5px] text-muted-foreground truncate">{email}</p>
+          )}
+        </div>
       </div>
 
       {/* NAVIGATION */}
@@ -92,13 +120,15 @@ const UserSidebar = () => {
         ))}
 
         {/* SIGN OUT */}
-        <button
-          onClick={handleSignOut}
-          className="flex w-full items-center gap-3 border-l-2 border-transparent px-5 py-3 text-left text-[13px] uppercase tracking-[0.1em] text-sale transition-colors hover:bg-sale/5"
-        >
-          <LogOut className="h-4 w-4" />
-          Sign Out
-        </button>
+        <div className="border-t border-border mt-1.5 pt-1.5">
+          <button
+            onClick={handleSignOut}
+            className="flex w-full items-center gap-3 border-l-2 border-transparent px-5 py-3 text-left text-[13px] uppercase tracking-[0.1em] text-sale transition-colors hover:bg-sale/5"
+          >
+            <LogOut className="h-4 w-4" />
+            Sign Out
+          </button>
+        </div>
       </nav>
     </aside>
   );

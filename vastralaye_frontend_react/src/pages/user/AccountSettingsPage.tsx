@@ -17,6 +17,7 @@ import {
   Package,
   AlertTriangle,
   CheckCircle2,
+  Shield,
 } from 'lucide-react';
 import {
   AlertDialog,
@@ -213,22 +214,23 @@ const AccountSettingsPage = () => {
       <div className="space-y-8">
         {/* Page header */}
         <div>
-          <h1 className="font-serif text-3xl font-medium text-espresso md:text-4xl">Account Settings</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Manage your account preferences and security settings
-          </p>
+          <span className="overline-label mb-2">Preferences & security</span>
+          <h1 className="font-serif text-3xl md:text-4xl font-medium text-espresso">Account Settings</h1>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 lg:gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
           {/* Main Section */}
           <div className="space-y-6 lg:col-span-2">
             {/* Security Settings */}
             <div className="rounded-sm border border-border bg-white">
-              <div className="border-b border-border bg-ivory px-6 py-4">
-                <h2 className="font-serif text-lg font-medium text-espresso">Security Settings</h2>
-                <p className="mt-0.5 text-[13px] text-muted-foreground">
-                  Keep your account secure with a strong password
-                </p>
+              <div className="flex items-center justify-between border-b border-border bg-ivory px-6 py-4">
+                <div>
+                  <h2 className="font-serif text-lg font-medium text-espresso">Security Settings</h2>
+                  <p className="mt-0.5 text-[13px] text-muted-foreground">
+                    Keep your account secure with a strong password
+                  </p>
+                </div>
+                <Shield className="h-5 w-5 flex-shrink-0 text-gold" />
               </div>
               <div className="p-6">
                 <form onSubmit={handleSubmitPassword} className="space-y-5">
@@ -287,13 +289,13 @@ const AccountSettingsPage = () => {
                       </button>
                     </div>
 
-                    {/* Strength Bar */}
+                    {/* Strength Meter */}
                     {passwordData.newPassword && (
-                      <div className="space-y-3 rounded-sm border border-border bg-blush/60 p-4">
-                        <div className="flex items-center justify-between">
-                          <span className="text-[12px] text-muted-foreground">Password strength</span>
+                      <div className="rounded-sm border border-border bg-blush/60 p-4 space-y-2.5">
+                        <div className="flex justify-between text-xs">
+                          <span className="text-muted-foreground">Password strength</span>
                           <span
-                            className={`text-[12px] font-medium ${
+                            className={`font-medium ${
                               passwordStrength >= 4
                                 ? 'text-[#3E6B4F]'
                                 : passwordStrength >= 3
@@ -304,11 +306,13 @@ const AccountSettingsPage = () => {
                             {getPasswordStrengthText(passwordStrength)}
                           </span>
                         </div>
-                        <div className="h-1 w-full overflow-hidden rounded-full bg-sand">
-                          <div
-                            className={`h-full transition-all duration-300 ${getPasswordStrengthColor(passwordStrength)}`}
-                            style={{ width: `${(passwordStrength / 4) * 100}%` }}
-                          ></div>
+                        <div className="flex gap-1.5">
+                          {[0, 1, 2, 3].map((i) => (
+                            <span
+                              key={i}
+                              className={`h-1 flex-1 rounded-full ${passwordStrength > i ? 'bg-gold' : 'bg-sand'}`}
+                            />
+                          ))}
                         </div>
                         <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
                           <div className="flex items-center gap-2">
@@ -456,19 +460,20 @@ const AccountSettingsPage = () => {
                 </div>
 
                 <div className="rounded-sm border border-border bg-blush/60 p-4">
-                  <div className="mb-3 flex items-center justify-between">
+                  <div className="flex justify-between">
                     <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">
-                      Account Level
+                      Profile completeness
                     </span>
                     <span className="text-xs font-medium text-[#8A6414]">85%</span>
                   </div>
-                  <div className="mb-2 h-1 w-full overflow-hidden rounded-full bg-sand">
-                    <div className="h-full bg-gold" style={{ width: '85%' }}></div>
+                  <div className="flex gap-1.5 mt-2.5">
+                    <span className="h-1 flex-1 rounded-full bg-gold" />
+                    <span className="h-1 flex-1 rounded-full bg-gold" />
+                    <span className="h-1 flex-1 rounded-full bg-gold" />
+                    <span className="h-1 flex-1 rounded-full bg-gold" />
+                    <span className="h-1 flex-1 rounded-full bg-sand" />
                   </div>
-                  <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>Gold Member</span>
-                    <span>85% to Platinum Level</span>
-                  </div>
+                  <p className="text-xs text-muted-foreground mt-2">Add a profile photo to reach 100%</p>
                 </div>
               </div>
             </div>

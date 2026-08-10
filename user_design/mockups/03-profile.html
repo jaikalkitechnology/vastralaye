@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Profile — Vastralaye</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;500;600&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- Storefront navbar (context) -->
+<header class="topstrip">
+  <div class="inner">
+    <div class="wordmark">Vastra<em>laye</em><small>Handcrafted India</small></div>
+    <nav><span>Shop</span><span>New Arrivals</span><span>Bestsellers</span><span>Categories</span></nav>
+    <div class="icons">
+      <svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
+      <svg class="i" viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.5-9A5.5 5.5 0 0 1 12 6.5 5.5 5.5 0 0 1 21.5 12c-2 4.4-9.5 9-9.5 9z"/></svg>
+      <svg class="i" viewBox="0 0 24 24"><path d="M6 7h12l1.5 13h-15L6 7z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg>
+    </div>
+  </div>
+</header>
+
+<!-- Espresso account band -->
+<section class="account-band">
+  <div class="inner">
+    <div>
+      <p class="crumb">Home · <b>My Account</b></p>
+      <h1>Namaste, Ananya</h1>
+    </div>
+    <div class="meta">
+      <span class="member-chip"><span class="dm" style="border-color:var(--gold)"></span> Vastralaye Member</span><br>
+      Member since March 2024
+    </div>
+  </div>
+</section>
+
+<div class="shell">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sb-id">
+      <div class="avatar">A</div>
+      <div>
+        <div class="nm">Ananya Sharma</div>
+        <div class="em">ananya@example.com</div>
+      </div>
+    </div>
+    <nav>
+      <a class="sb-link active" href="#">
+        <svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>
+        My Profile
+      </a>
+      <a class="sb-link" href="#">
+        <svg class="i" viewBox="0 0 24 24"><path d="M6 7h12l1.5 13h-15L6 7z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg>
+        My Orders
+      </a>
+      <a class="sb-link" href="#">
+        <svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M2 12h3M19 12h3M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>
+        Account Settings
+      </a>
+      <div class="sb-out">
+        <a class="sb-link" href="#">
+          <svg class="i" viewBox="0 0 24 24"><path d="M9 4H5.5A1.5 1.5 0 0 0 4 5.5v13A1.5 1.5 0 0 0 5.5 20H9M15 16l4-4-4-4M19 12H9"/></svg>
+          Sign Out
+        </a>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- Content -->
+  <main class="content">
+    <div class="page-head">
+      <div>
+        <span class="overline">Your details</span>
+        <h2>My Profile</h2>
+      </div>
+      <button class="btn primary">Edit Profile</button>
+    </div>
+
+    <div style="display:grid; grid-template-columns: 1fr 2fr; gap: 24px; align-items:start;">
+      <!-- Identity card -->
+      <div class="card id-card">
+        <div class="id-hero">
+          <div class="id-avatar">A</div>
+        </div>
+        <div class="nm">Ananya Sharma</div>
+        <span class="em-chip">
+          <svg class="i" viewBox="0 0 24 24" style="width:13px;height:13px"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+          ananya@example.com
+        </span>
+        <div class="orn"><span class="ln"></span><span class="dm"></span><span class="ln"></span></div>
+        <div class="id-facts">
+          <div class="rw"><span>Phone</span><b>+91 98765 43210</b></div>
+          <div class="rw"><span>City</span><b>Faridabad, Haryana</b></div>
+          <div class="rw"><span>Member since</span><b>March 2024</b></div>
+        </div>
+      </div>
+
+      <!-- Personal information -->
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <h3>Personal Information</h3>
+            <p>Kept private — used only for your orders &amp; delivery</p>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="grid-2">
+            <div class="field"><label>First name</label><input value="Ananya"></div>
+            <div class="field"><label>Last name</label><input value="Sharma"></div>
+          </div>
+
+          <div class="form-sec">
+            <span class="overline">Contact</span>
+            <div class="grid-2">
+              <div class="field">
+                <label>Email address</label>
+                <input value="ananya@example.com" disabled>
+                <p class="hint">
+                  <svg class="i" viewBox="0 0 24 24"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/></svg>
+                  Email cannot be changed for security reasons
+                </p>
+              </div>
+              <div class="field"><label>Phone number</label><input value="9876543210"></div>
+            </div>
+          </div>
+
+          <div class="form-sec">
+            <span class="overline">Address</span>
+            <div class="grid-2">
+              <div class="field"><label>Address line 1</label><input value="14, Weaver's Lane"></div>
+              <div class="field"><label>Address line 2 (optional)</label><input value="Sector 21"></div>
+            </div>
+            <div class="grid-4">
+              <div class="field"><label>City</label><input value="Faridabad"></div>
+              <div class="field"><label>Region</label><input value="Haryana"></div>
+              <div class="field"><label>Postal code</label><input value="121001"></div>
+              <div class="field"><label>Country</label><input value="India"></div>
+            </div>
+          </div>
+
+          <div class="form-sec" style="border-top:none; padding-top:6px;">
+            <div class="strip">
+              <svg class="i" viewBox="0 0 24 24"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/></svg>
+              <div>
+                <p class="tt">Security information</p>
+                <p class="tx">Your personal information is encrypted and securely stored. We never share your data with third parties.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+</body>
+</html>

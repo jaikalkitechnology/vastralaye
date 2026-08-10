@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Invoice — Vastralaye</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;500;600&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- Storefront navbar (context) -->
+<header class="topstrip">
+  <div class="inner">
+    <div class="wordmark">Vastra<em>laye</em><small>Handcrafted India</small></div>
+    <nav><span>Shop</span><span>New Arrivals</span><span>Bestsellers</span><span>Categories</span></nav>
+    <div class="icons">
+      <svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
+      <svg class="i" viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.5-9A5.5 5.5 0 0 1 12 6.5 5.5 5.5 0 0 1 21.5 12c-2 4.4-9.5 9-9.5 9z"/></svg>
+      <svg class="i" viewBox="0 0 24 24"><path d="M6 7h12l1.5 13h-15L6 7z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg>
+    </div>
+  </div>
+</header>
+
+<!-- Espresso account band -->
+<section class="account-band">
+  <div class="inner">
+    <div>
+      <p class="crumb">Home · My Account · <b>Invoice</b></p>
+      <h1>Tax Invoice</h1>
+    </div>
+    <div class="meta">
+      <span class="member-chip"><span class="dm" style="border-color:var(--gold)"></span> Order #1042</span><br>
+      Issued Aug 3, 2026
+    </div>
+  </div>
+</section>
+
+<div class="shell" style="grid-template-columns: 1fr; max-width: 1000px;">
+  <main class="content">
+    <!-- Toolbar -->
+    <div class="inv-toolbar">
+      <a class="back" href="#">
+        <svg class="i" viewBox="0 0 24 24"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+        Back to orders
+      </a>
+      <button class="btn outline">
+        <svg class="i" viewBox="0 0 24 24"><path d="M7 8V3h10v5M7 17H4a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-3M7 14h10v7H7z"/></svg>
+        Print
+      </button>
+      <button class="btn outline">
+        <svg class="i" viewBox="0 0 24 24"><circle cx="6" cy="12" r="2.4"/><circle cx="18" cy="6" r="2.4"/><circle cx="18" cy="18" r="2.4"/><path d="M8.2 10.9l7.6-3.8M8.2 13.1l7.6 3.8"/></svg>
+        Share
+      </button>
+      <button class="btn primary">
+        <svg class="i" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 21h16"/></svg>
+        Download PDF
+      </button>
+    </div>
+
+    <!-- Paper -->
+    <div class="paper">
+      <div class="inv-head">
+        <div>
+          <div class="wordmark">Vastra<em>laye</em><small>Handcrafted India</small></div>
+          <p style="font-size:12px; color:var(--muted); margin-top:10px; line-height:1.6;">
+            14 Weaver's Lane, Faridabad, Haryana 121001<br>
+            support@vastralaye.in · +91 85275 96413<br>
+            GSTIN: 06AAAAA0000A1Z5
+          </p>
+        </div>
+        <div class="right">
+          <p class="inv-title">TAX INVOICE</p>
+          <p class="inv-no">INV-2026-1042</p>
+          <p style="margin-top:9px;"><span class="chip ok big">Paid</span></p>
+        </div>
+      </div>
+
+      <div class="gold-rule"></div>
+
+      <div class="inv-meta">
+        <div class="kv"><p class="k">Invoice date</p><p class="v">August 3, 2026</p></div>
+        <div class="kv"><p class="k">Order no.</p><p class="v">#1042</p></div>
+        <div class="kv"><p class="k">Order date</p><p class="v">August 2, 2026</p></div>
+        <div class="kv"><p class="k">Payment</p><p class="v">UPI Payment</p></div>
+      </div>
+
+      <div class="inv-parties">
+        <div class="p">
+          <p class="k">Bill to</p>
+          <b>Ananya Sharma</b>
+          <span>ananya@example.com</span>
+          <span>+91 98765 43210</span>
+          <span>14, Weaver's Lane, Sector 21, Faridabad, Haryana 121001</span>
+        </div>
+        <div class="p">
+          <p class="k">Ship to</p>
+          <b>Ananya Sharma</b>
+          <span>14, Weaver's Lane, Sector 21</span>
+          <span>Faridabad, Haryana 121001</span>
+          <span>India</span>
+        </div>
+      </div>
+
+      <table class="inv">
+        <thead>
+          <tr>
+            <th>#</th><th>Item</th><th>HSN</th><th class="r">Qty</th><th class="r">Unit price</th><th class="r">Tax</th><th class="r">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>Banarasi Silk Saree — Maroon Zari<div class="sku">SKU VL-SR-114</div></td>
+            <td>5407</td><td class="r">1</td><td class="r">₹4,299.00</td><td class="r">5%</td><td class="r"><b>₹4,513.95</b></td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>Chanderi Kurta Set — Ivory Gold<div class="sku">SKU VL-KS-078</div></td>
+            <td>6204</td><td class="r">1</td><td class="r">₹2,199.00</td><td class="r">5%</td><td class="r"><b>₹2,308.95</b></td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>Zari Border Dupatta — Blush<div class="sku">SKU VL-DP-041</div></td>
+            <td>6214</td><td class="r">2</td><td class="r">₹649.00</td><td class="r">5%</td><td class="r"><b>₹1,362.90</b></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="inv-totals">
+        <div class="rw"><span>Subtotal</span><b>₹7,796.00</b></div>
+        <div class="rw"><span>Shipping</span><b>Free</b></div>
+        <div class="rw"><span>Tax (GST 5%)</span><b>₹389.80</b></div>
+        <div class="rw"><span>Discount</span><b style="color:var(--ok)">− ₹686.80</b></div>
+        <div class="grand"><span class="l">Grand total</span><span class="v">₹7,499.00</span></div>
+      </div>
+
+      <div class="inv-words">
+        Amount in words — <b>Seven Thousand Four Hundred Ninety-Nine Rupees Only</b>
+      </div>
+
+      <div class="inv-foot">
+        <div class="orn" style="margin-bottom:14px;"><span class="ln"></span><span class="dm"></span><span class="ln"></span></div>
+        <p class="thank">Thank you for weaving us into your story.</p>
+        <p class="fine">This is a computer-generated invoice and does not require a signature. · For help, write to support@vastralaye.in</p>
+      </div>
+    </div>
+  </main>
+</div>
+
+</body>
+</html>
