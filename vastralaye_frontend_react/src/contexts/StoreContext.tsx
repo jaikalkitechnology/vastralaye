@@ -480,7 +480,10 @@ useEffect(() => {
       product, // Store product details for display
     };
     dispatch({ type: 'ADD_TO_CART', payload: newCartItem });
-    toast.success('Added to cart');
+    // Success toast is owned by the caller (ProductCard, PDP, Wishlist…)
+    // — toasting here too showed two "Added to cart" boxes per click,
+    // and one per item during the wishlist bulk add. Same convention as
+    // addToWishlist below.
   };
 
   const removeFromCart = (id: string) => {
