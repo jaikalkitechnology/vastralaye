@@ -115,3 +115,6 @@ vastralaye_backend/static/videos/
 *.bak
 *.tmp
 .cache/
+
+# Generated invoice PDFs
+vastralaye_backend/invoices/
