@@ -1,0 +1,88 @@
+<!DOCTYPE html><html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;500;600&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="checkout-base.css">
+<style>
+.sheet{position:relative;width:100%;max-width:480px;background:#fff;border-radius:4px;box-shadow:0 30px 70px rgba(43,27,18,.35);overflow:hidden;display:flex;flex-direction:column;max-height:88vh}
+.hd{position:relative;background:var(--esp);color:var(--ivory);padding:16px 20px;border-bottom:3px solid var(--gold);overflow:hidden;display:flex;align-items:center;gap:12px}
+.hd .p{position:absolute;inset:0;opacity:.07}
+.hd .t{position:relative}
+.hd .ov{font-size:9px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:var(--gold)}
+.hd h2{font-family:'Fraunces',serif;font-size:19px;font-weight:500;margin-top:2px}
+.hd .x{position:relative;margin-left:auto;width:30px;height:30px;border:1px solid rgba(250,246,240,.25);border-radius:3px;display:flex;align-items:center;justify-content:center;color:rgba(250,246,240,.75)}
+.scroll{overflow-y:auto;padding:16px 20px 4px}
+/* collapsed summary bar */
+.osum{border:1px solid var(--bd);border-radius:3px;background:var(--ivory);padding:11px 13px;display:flex;align-items:center;gap:11px}
+.thumbs{display:flex}
+.thumbs span{width:28px;height:37px;background:var(--sand);border:1px solid var(--bd);border-radius:2px;margin-left:-8px}
+.thumbs span:first-child{margin-left:0}
+.osum .tx{font-size:12px;color:var(--mut)}
+.osum .tx b{display:block;color:var(--esp);font-size:13px;font-weight:600}
+.osum .cv{margin-left:auto;font-size:11px;color:var(--mar);text-decoration:underline;text-underline-offset:3px}
+/* section */
+.sec{margin-top:16px}
+.sl{display:flex;align-items:center;gap:9px;margin-bottom:9px}
+.sl .n{width:20px;height:20px;border-radius:50%;background:var(--esp);color:var(--gold);font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center}
+.sl .lb{font-size:10px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--gd)}
+.sl .ed{margin-left:auto;font-size:10.5px;color:var(--mar);text-decoration:underline;text-underline-offset:3px}
+.addr{border:1px solid var(--bd);border-radius:3px;padding:11px 13px;font-size:12.5px;color:var(--mut);line-height:1.7}
+.addr b{color:var(--esp);font-weight:600;font-size:13px}
+.pays{display:flex;flex-direction:column;gap:7px}
+.tile{border:1px solid var(--bd);border-radius:3px;padding:11px 13px;display:flex;align-items:center;gap:11px;position:relative}
+.tile.on{border-color:var(--mar);background:rgba(246,232,228,.5);box-shadow:0 0 0 1px var(--mar)}
+.radio{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--bd);flex:none;display:flex;align-items:center;justify-content:center}
+.tile.on .radio{border-color:var(--mar)}
+.tile.on .radio::after{content:'';width:7.5px;height:7.5px;border-radius:50%;background:var(--mar)}
+.tile .t1{font-size:13px;font-weight:600}
+.tile .t2{font-size:11px;color:var(--mut);margin-top:1px}
+.tile .bd2{margin-left:auto;display:flex;gap:4px}
+.tile .rec{position:absolute;top:-7px;right:11px;background:var(--gold);color:var(--esp);font-size:8px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:2px 7px;border-radius:999px}
+/* sticky footer */
+.ft{border-top:1px solid var(--bd);background:#fff;padding:13px 20px 15px;box-shadow:0 -8px 20px rgba(43,27,18,.06)}
+.rows{margin-bottom:10px}
+.r{display:flex;justify-content:space-between;font-size:12.5px;color:var(--mut);padding:2px 0}
+.r b{color:var(--esp);font-weight:500}
+.gt{border-top:2px solid var(--gold);margin-top:7px;padding-top:9px;display:flex;justify-content:space-between;align-items:baseline}
+.gt .l{font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase}
+.gt .v{font-family:'Fraunces',serif;font-size:22px;color:var(--mar);font-weight:500}
+.place{width:100%;background:var(--mar);color:var(--ivory);border-radius:3px;padding:13px;font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:11px}
+.cn{text-align:center;margin-top:8px;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)}
+</style></head><body>
+<div class="back"></div><div class="stage"><div class="sheet">
+  <div class="hd"><span class="p pais"></span>
+    <div class="t"><div class="ov">Secure checkout</div><h2>Complete Your Order</h2></div>
+    <span class="x">✕</span>
+  </div>
+  <div class="scroll">
+    <div class="osum">
+      <span class="thumbs"><span></span><span></span><span></span></span>
+      <span class="tx"><b>4 items</b>Banarasi Saree, Kurta Set +2</span>
+      <span class="cv">View</span>
+    </div>
+
+    <div class="sec">
+      <div class="sl"><span class="n">1</span><span class="lb">Deliver to</span><span class="ed">Edit</span></div>
+      <div class="addr"><b>Vijay Kumar</b> · +91 88103 18710<br>1384, New Janta Colony, Faridabad, Haryana 121001</div>
+    </div>
+
+    <div class="sec">
+      <div class="sl"><span class="n">2</span><span class="lb">Payment method</span></div>
+      <div class="pays">
+        <div class="tile on"><span class="rec">Recommended</span><span class="radio"></span><span><span class="t1">Cash on Delivery</span><span class="t2" style="display:block">Pay the courier on arrival</span></span><span class="bd2"><span class="pb">COD</span></span></div>
+        <div class="tile"><span class="radio"></span><span><span class="t1">UPI</span><span class="t2" style="display:block">Scan a QR with any UPI app</span></span><span class="bd2"><span class="pb">UPI</span></span></div>
+        <div class="tile"><span class="radio"></span><span><span class="t1">Card</span><span class="t2" style="display:block">Visa, Mastercard &amp; RuPay</span></span><span class="bd2"><span class="pb">VISA</span><span class="pb">MC</span></span></div>
+        <div class="tile"><span class="radio"></span><span><span class="t1">Net Banking</span><span class="t2" style="display:block">All major Indian banks</span></span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ft">
+    <div class="rows">
+      <div class="r"><span>Subtotal</span><b>₹7,696</b></div>
+      <div class="r"><span>Coupon FESTIVE10</span><b style="color:var(--ok)">− ₹500</b></div>
+      <div class="r"><span>Shipping</span><b style="color:var(--ok)">Free</b></div>
+      <div class="gt"><span class="l">Total</span><span class="v">₹7,499</span></div>
+    </div>
+    <div class="place">🔒 Place Order · ₹7,499</div>
+    <div class="cn">Cancel</div>
+  </div>
+</div></div></body></html>

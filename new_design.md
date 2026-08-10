@@ -647,8 +647,63 @@ that domain even on local or staging deploys. It now follows the app config.
 
 ---
 
+## 24. Checkout popup — boutique order slip
+
+The cart's **Proceed to Checkout** popup (`PaymentMethodModal` in `CartPage.tsx`) was a
+narrow `sm:max-w-lg` dialog where contact details, payment tiles, six read-only address
+inputs, the item list, the totals and the buttons all stacked in one scrolling column —
+so on most screens the total and **Place Order** sat well below the fold. Three
+directions were mocked up (compact + sticky footer, boutique order slip, wizard with a
+stepper); the **order slip** was chosen and built.
+
+- **Two columns** (`md:grid-cols-[290px_1fr]`, 900px sheet, native dialog padding and
+  close button removed via `p-0 gap-0 [&>button]:hidden`).
+- **Espresso rail** on the left: `PAISLEY_TILE` at 8%, the wordmark with gold *laye*,
+  *"Almost yours — woven by hand, wrapped with care."*, then each line item as a 34×45
+  thumbnail with a gold quantity bubble, size · colour subline and gold line total. Below
+  it subtotal / coupon / shipping and, under a 2px gold rule, the serif gold **grand
+  total** with an *Inclusive of GST (18%)* note.
+- **Form column** on the right: gold `Review & pay` overline, serif **Complete Your
+  Order**, a bordered square close button, then two gold-ruled section labels.
+  - *Deliver to* collapses the old contact block **and** the six locked address inputs
+    into one ivory card: maroon initials avatar, name, full address · phone, email, and
+    an **Edit** link to `/account/profile`. When no address is on file the card says so
+    in sale red and the link becomes **Add** — previously the user only found out by
+    pressing Place Order and getting a toast.
+  - *Payment method* is a 2-up radio grid; COD carries a gold **Recommended** tag, the
+    online tile carries UPI / VISA / MC / RuPay badges. Selected = maroon border +
+    `ring-1` + blush fill.
+  - A contextual note under the grid says what happens next (keep ₹total ready for the
+    courier / UPI QR on desktop, UPI app on mobile).
+  - The action block is `mt-auto`, so the maroon **Place Order · ₹total** (or **Pay
+    ₹total**) bar and the Secure · 7-day returns · Cancel row always sit at the bottom of
+    the sheet, aligned with the rail.
+- **Mobile**: the grid stacks — rail first (tagline hidden, item list capped at 150px and
+  scrollable so subtotal/total stay on the first screen), form below.
+- The GST row was dropped from the rail: `total` is already GST-inclusive, so listing
+  `subtotal + GST(18%)` above a total that equalled the subtotal read as broken
+  arithmetic. It is now one note under the total. No tax calculation was changed.
+
+`handlePlaceOrder`, the COD/online branches, the profile loader, the QR modal and every
+validation rule are untouched — only the presentation layer was replaced.
+
+| File | Change |
+|---|---|
+| `src/pages/CartPage.tsx` | `PaymentMethodModal` markup replaced with the order-slip layout; `paymentMethods` carry badges + `recommended`; module-level `getProductImageUrl` added (the in-component `getImageUrl` now delegates to it); imports `DialogClose` and `PAISLEY_TILE` |
+
+Mockups: `user_design/mockups/14-checkout-modal.html` (chosen) plus the two alternates.
+Screenshots `user_design/screenshots/14-checkout-modal{,-mobile}.png` are captures of the
+built component, not the mockup.
+
+---
+
 ## Verification
 
 - `tsc --noEmit` — no errors in any changed file.
 - `npm run build` — production build passes.
 - Zero-regression paths: ≤1 reel → no arrows/previews anywhere; no reels and no product video → no sticky player; small catalogs render exactly as before.
+- Checkout popup driven in a real browser against the production build (Playwright,
+  desktop 1440×950 and mobile 420×900): Cancel / ✕ / Escape all close it, the tiles
+  toggle the CTA between *Place Order · ₹total* and *Pay ₹total*, and Place Order posts
+  `{items, payment_method:"cod", shipping_address}` and opens the success modal. No
+  console or page errors.
