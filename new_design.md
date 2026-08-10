@@ -568,6 +568,44 @@ type-checks with **zero** errors (down from its previous count) and the build pa
 
 ---
 
+## 22. Invoice page (`/account/invoices/:orderId`) — A4 document redesign
+
+The standalone invoice was the last page still wearing the old template: a **green
+header**, green accent text and a footer advertising **`support@mizorpaymart.com`**.
+Rebuilt from the approved mockup (`user_design/mockups/12-invoice-page.html`) as a proper
+financial document:
+
+- **Page chrome** — espresso band (breadcrumb, serif "Invoice {number}", gold payment
+  pill, order/issued line) over a **sticky toolbar** (Back to order, Print, maroon
+  Download PDF with its spinner) that stays reachable down a long invoice. The page moved
+  out of the account shell into the storefront frame (NavBar + Footer) so it no longer
+  stacked two espresso bands; it keeps its own auth guard.
+- **A4 paper** — centered sheet with a drop shadow and a rotated **status watermark**
+  (UNPAID red / PAID green at 5% opacity), espresso letterhead over paisley with the
+  Vastralaye address, phone and **GSTIN**, gold "TAX INVOICE" and payment chip.
+- **Three-panel row** (Bill to / Ship to / ivory Invoice details), a **9-column GST items
+  table** (row no., thumbnail, item + SKU, HSN, qty, rate, taxable, GST, amount) with
+  espresso header and zebra rows.
+- **Lower block** — amount-in-words (reusing the existing `numberToWords`, and fixing its
+  duplicated "Rupees Rupees" output), a **Payment details** box (method, status pills,
+  transaction ID, paid-on), and totals closing on the gold-ruled serif maroon grand total
+  plus an espresso **"Amount due on delivery"** band for unpaid/COD.
+- **Notes & terms**, gold-ornament **"For Vastralaye · Authorised signatory"**, thank-you
+  line, fine print, and a maroon→gold→terracotta edge bar.
+- The printed document keeps **inline hex styling** throughout, because html2pdf/html2canvas
+  cannot resolve Tailwind's CSS-variable colors; Tailwind is used only for the chrome,
+  which is marked `no-print`.
+
+Fetching (including the 404 order-fallback), 401 handling, `convertImagesToBase64`, the
+html2pdf config, print, toasts and the invoice types are unchanged. File type-checks with
+zero errors and the build passes.
+
+| File | Change |
+|---|---|
+| `src/pages/InvoiceDetailPage.tsx` | Rebuilt to the A4 document design; old green/mizorpaymart branding removed |
+
+---
+
 ## Verification
 
 - `tsc --noEmit` — no errors in any changed file.
