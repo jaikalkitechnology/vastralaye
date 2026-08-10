@@ -255,16 +255,27 @@ HTML mockups and screenshots live in **[`user_design/`](user_design/README.md)**
 
 ---
 
-## 10. Footer — woven paisley background
+## 10. Footer — illustrated heritage background
 
-The espresso footer now carries a **background motif**: a repeating gold paisley (boteh)
-tile with diamond accents, drawn as an **inline SVG data-URI** — no image request, crisp
-at every size. It sits in an absolutely-positioned layer at **5% opacity** under the
-content (`pointer-events-none`), so link contrast and readability are unchanged.
+The espresso footer now carries a two-layer **background illustration** (inspired by the
+aachho.com footer, drawn as original artwork in the Vastralaye palette):
+
+1. **Woven paisley sky** — a repeating gold boteh tile (inline SVG data-URI) at 5%
+   opacity across the whole footer.
+2. **Heritage panorama** — a full-width Rajasthani skyline band along the base, in
+   zari-style gold line art on the dark ground: tiered Hawa-Mahal-style facade, arched
+   gateway under a rising sun, camel, women carrying pots, teal peacock, village hut and
+   a domed fort on rolling dunes, dotted with terracotta/maroon buti flowers. Drawn as
+   one inline SVG component (`FooterScene`) — no image requests, crisp at any width
+   (`preserveAspectRatio: xMidYMax slice`), `aria-hidden` + `pointer-events-none`.
+
+The panorama gets its own reserved band below the bottom bar (h-36 → h-52 responsive),
+so links and payment badges keep full contrast.
 
 | File | Change |
 |---|---|
-| `src/components/Footer.tsx` | `PAISLEY_TILE` SVG tile + background layer; content lifted with `relative` |
+| `src/components/decor/FooterScene.tsx` | New — the illustrated skyline SVG |
+| `src/components/Footer.tsx` | Paisley tile layer + panorama band at the base |
 
 ---
 

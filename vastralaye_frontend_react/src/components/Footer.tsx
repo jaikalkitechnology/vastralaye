@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { MapPin, Phone, Mail } from 'lucide-react';
 import { useSiteSettings, FALLBACK_WHATSAPP } from '@/hooks/use-site-settings';
 import PaymentBadges from '@/components/PaymentBadges';
+import FooterScene from '@/components/decor/FooterScene';
 import {
   WhatsAppLogo,
   InstagramLogo,
@@ -183,6 +184,11 @@ const Footer = () => {
           <span>© {new Date().getFullYear()} Vastralaye · All rights reserved</span>
           <PaymentBadges />
         </div>
+      </div>
+
+      {/* Illustrated heritage panorama along the base */}
+      <div aria-hidden className="pointer-events-none relative h-36 sm:h-44 md:h-52">
+        <FooterScene />
       </div>
     </footer>
   );
