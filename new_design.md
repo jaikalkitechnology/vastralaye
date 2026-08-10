@@ -528,6 +528,46 @@ Categories, New Arrivals, Bestsellers** — each holding an image upload (JPG/PN
 
 ---
 
+## 21. Order Detail page & Tax Invoice — implemented
+
+Built from the approved mockups (`user_design/mockups/10-order-detail.html`,
+`11-invoice-v2.html`). The page previously carried the old template look and an invoice
+with green accents; both are now on the brand system, and the page renders inside the
+site's NavBar/Footer chrome (the route had neither).
+
+**Order view**
+- **Espresso band**: breadcrumb, serif "Order #N", status pill and a
+  "Placed {date} · N items · ₹total" meta line, closed by the 3px gold rule.
+- **Toolbar**: back link plus Print / View Invoice (outline) and Download Invoice (maroon).
+- **Order Journey card**: the gold four-step timeline (Placed → Processing → Shipped →
+  Delivered) with per-step timestamps and a haloed active dot; latest tracking note and
+  AWB below a hairline; a COD "due on delivery" chip in the header.
+- **Items card**: 3:4 thumbnails, serif names, qty × price lines, line totals, subtotal row.
+- **Tracking History card**: vertical timeline, gold dot on the newest update, keeps its
+  expand/collapse toggle.
+- **Sidebar**: Payment Summary (green coupon savings, gold-ruled serif maroon total,
+  method/status chips, `PaymentBadges`), Delivery Address, an espresso **help strip** with
+  a gold WhatsApp Support button, and the hairline-red Cancel Order button on its existing
+  AlertDialog flow.
+
+**Tax Invoice view**
+- **Espresso letterhead** on the paper: ivory wordmark + address/GSTIN left; gold serif
+  TAX INVOICE, number, "Original for recipient" and a payment chip right, over paisley.
+- Ivory meta strip, Bill To / Ship To panels, espresso-headed items table with product
+  thumbnails and SKU/HSN sublines, blush amount-in-words panel with the "You saved ₹X"
+  line, gold-ruled grand total, and a footer with the gold ornament + "For Vastralaye ·
+  Authorised signatory", serif thank-you and fine print.
+- `no-print` / `print:` classes keep the site chrome and toolbar out of printed output.
+
+All fetching, cancel/print/email/reorder handlers and status maps are unchanged; the file
+type-checks with **zero** errors (down from its previous count) and the build passes.
+
+| File | Change |
+|---|---|
+| `src/pages/OrderDetailPage.tsx` | Rebuilt order view + invoice view to the approved designs |
+
+---
+
 ## Verification
 
 - `tsc --noEmit` — no errors in any changed file.
