@@ -13,6 +13,27 @@ import {
 } from 'lucide-react';
 import { BASE_IMG } from '@/config';
 import PageBanner from '@/components/PageBanner';
+import { PAISLEY_TILE } from '@/components/decor/patterns';
+
+/** Serif gallery numerals for the arch cards (I, II, III …). */
+const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
+const romanNumeral = (n: number) => ROMAN[n] ?? String(n + 1);
+
+const FEATURED_EYEBROWS = ['Most Loved', 'Festive Ready'];
+
+/** Toran garland divider under the section header (new_design.md §17). */
+const ToranDivider = () => (
+  <svg viewBox="0 0 340 26" className="mx-auto mt-3.5 h-[26px] w-[340px] max-w-full" fill="none" stroke="#C99A45" aria-hidden="true">
+    <line x1="0" y1="4" x2="340" y2="4" strokeOpacity=".6" />
+    <g strokeOpacity=".8">
+      <path d="M30 4l7 12 7-12" /><path d="M72 4l7 12 7-12" /><path d="M114 4l7 12 7-12" /><path d="M156 4l7 12 7-12" /><path d="M198 4l7 12 7-12" /><path d="M240 4l7 12 7-12" /><path d="M282 4l7 12 7-12" />
+    </g>
+    <g fill="#B85C38" stroke="none">
+      <circle cx="37" cy="19" r="1.7" /><circle cx="79" cy="19" r="1.7" /><circle cx="121" cy="19" r="1.7" /><circle cx="163" cy="19" r="1.7" /><circle cx="205" cy="19" r="1.7" /><circle cx="247" cy="19" r="1.7" /><circle cx="289" cy="19" r="1.7" />
+    </g>
+    <rect x="166.5" y="0.5" width="7" height="7" transform="rotate(45 170 4)" fill="#FAF6F0" />
+  </svg>
+);
 
 const CategoriesPage = () => {
   const [categories, setCategories] = useState([]);
@@ -153,11 +174,23 @@ const CategoriesPage = () => {
     setCurrentPage(1);
   }, [searchTerm, sortBy, categories, subcategories, products]);
 
-  // Calculate pagination
-  const totalPages = Math.ceil(filteredCategories.length / itemsPerPage);
+  // Featured duo — the two largest categories, pinned above the arch
+  // gallery (hidden while searching so results aren't split).
+  const featured: any[] =
+    !searchTerm && filteredCategories.length > 2
+      ? [...filteredCategories]
+          .sort((a: any, b: any) => getProductsCount(b.id) - getProductsCount(a.id))
+          .slice(0, 2)
+      : [];
+  const archSource = featured.length
+    ? filteredCategories.filter((c: any) => !featured.some((f: any) => f.id === c.id))
+    : filteredCategories;
+
+  // Calculate pagination (over the arch gallery, featured stay pinned)
+  const totalPages = Math.ceil(archSource.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentCategories = filteredCategories.slice(startIndex, endIndex);
+  const currentCategories = archSource.slice(startIndex, endIndex);
 
   // Handle page change
   const handlePageChange = (page: number) => {
@@ -318,18 +351,73 @@ const CategoriesPage = () => {
           </div>
         )}
 
-        {/* Category Grid — arch (mehrab) cards per §5.4 */}
+        {/* Category showcase */}
         {!loading && !error && filteredCategories.length > 0 && (
           <>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-10 mb-12">
-              {currentCategories.map((category: any) => {
+            {/* Featured duo — image banners with gradient, paisley & count chip */}
+            {featured.length === 2 && (
+              <div className="grid gap-5 md:grid-cols-2 mb-14">
+                {featured.map((cat: any, i: number) => (
+                  <Link
+                    key={cat.id}
+                    to={`/category/${cat.slug}`}
+                    className="group relative block aspect-[16/8.5] sm:aspect-[16/7.5] overflow-hidden rounded-sm bg-sand"
+                  >
+                    <img
+                      src={imageUrl(cat)}
+                      alt={cat.name}
+                      loading="lazy"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = '/no-image.png';
+                      }}
+                      className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                    />
+                    <span aria-hidden className="absolute inset-0 bg-gradient-to-r from-espresso/90 via-espresso/45 to-espresso/5" />
+                    <span
+                      aria-hidden
+                      className="absolute inset-y-0 left-0 w-1/2 opacity-10"
+                      style={{ backgroundImage: PAISLEY_TILE, backgroundSize: '120px 120px' }}
+                    />
+                    <span aria-hidden className="absolute inset-2 rounded-[2px] border border-gold/55 pointer-events-none" />
+                    <span className="absolute right-4 top-3.5 rounded-full border border-gold/60 bg-espresso/50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-gold">
+                      {getProductsCount(cat.id)} pieces
+                    </span>
+                    <span className="absolute left-6 md:left-7 top-1/2 max-w-[68%] -translate-y-1/2 text-ivory">
+                      <span className="block text-[9.5px] font-semibold uppercase tracking-[0.24em] text-gold">
+                        {FEATURED_EYEBROWS[i]}
+                      </span>
+                      <span className="mt-1 block font-serif text-2xl md:text-[28px] font-medium leading-tight">
+                        {cat.name}
+                      </span>
+                      <span className="mt-1 block text-xs text-ivory/75">
+                        {getSubcategoryCount(cat.id)} collections · {getProductsCount(cat.id)} products
+                      </span>
+                      <span className="mt-3.5 inline-flex items-center gap-2 rounded-[2px] border border-gold/70 bg-gold/10 px-4 py-2.5 text-[10.5px] font-semibold uppercase tracking-[0.16em] transition-colors group-hover:bg-gold/20">
+                        Explore {cat.name} <ArrowRight className="h-3.5 w-3.5" />
+                      </span>
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            )}
+
+            {/* Section header with toran garland */}
+            <div className="text-center mb-9">
+              <p className="overline-label mb-2">Browse the Loom</p>
+              <h2 className="font-serif text-3xl font-medium text-espresso">Shop by Category</h2>
+              <ToranDivider />
+            </div>
+
+            {/* Jharokha arch gallery — staggered, numbered */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-5 gap-y-10 mb-12 items-start">
+              {currentCategories.map((category: any, idx: number) => {
                 const productsCount = getProductsCount(category.id);
 
                 return (
                   <Link
                     key={category.id}
                     to={`/category/${category.slug}`}
-                    className="group text-center"
+                    className={`group text-center ${idx % 2 === 1 ? 'sm:mt-7' : ''}`}
                   >
                     <div className="relative aspect-[3/4] overflow-hidden rounded-t-[999px] bg-sand">
                       <img
@@ -342,19 +430,27 @@ const CategoriesPage = () => {
                         className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
                       <span
-                        className="absolute inset-[7px] rounded-t-[999px] border border-gold/0 group-hover:border-gold/60 transition-colors duration-300 pointer-events-none"
+                        className="absolute inset-2 rounded-t-[999px] border border-gold/0 group-hover:border-gold/70 transition-colors duration-300 pointer-events-none"
                         aria-hidden="true"
                       />
+                      {/* Espresso veil with Explore on hover */}
+                      <span className="absolute inset-x-0 bottom-0 flex justify-center bg-gradient-to-t from-espresso/75 to-transparent pb-3.5 pt-10 text-[10px] font-semibold uppercase tracking-[0.18em] text-gold opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                        Explore →
+                      </span>
                     </div>
-                    <h3 className="font-serif text-base md:text-lg font-medium text-espresso mt-4">
+                    <p className="mt-3.5 font-serif text-[13px] tracking-[0.14em] text-gold">
+                      {romanNumeral(startIndex + idx)}
+                    </p>
+                    <h3 className="font-serif text-base md:text-lg font-medium text-espresso mt-0.5 transition-colors group-hover:text-maroon">
                       {category.name}
                     </h3>
                     <p className="text-xs text-muted-foreground mt-0.5">
                       {productsCount} products
                     </p>
-                    <span className="inline-flex items-center gap-1 mt-1 text-[11px] uppercase tracking-[0.12em] text-terracotta opacity-80 group-hover:opacity-100">
-                      Shop now <ArrowRight className="h-3 w-3" />
-                    </span>
+                    <span
+                      aria-hidden
+                      className="mx-auto mt-2.5 block h-px w-9 bg-gold opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                    />
                   </Link>
                 );
               })}
@@ -368,9 +464,9 @@ const CategoriesPage = () => {
                   <p className="text-sm text-muted-foreground">
                     Showing{' '}
                     <span className="text-espresso font-medium">
-                      {startIndex + 1}–{Math.min(endIndex, filteredCategories.length)}
+                      {startIndex + 1}–{Math.min(endIndex, archSource.length)}
                     </span>{' '}
-                    of <span className="text-espresso font-medium">{filteredCategories.length}</span> categories
+                    of <span className="text-espresso font-medium">{archSource.length}</span> categories
                   </p>
 
                   {/* Pagination Buttons */}
@@ -410,7 +506,7 @@ const CategoriesPage = () => {
                         disabled={typeof page !== 'number'}
                         className={`inline-flex items-center justify-center w-9 h-9 text-sm rounded-sm border transition-colors ${
                           page === currentPage
-                            ? 'bg-maroon text-ivory border-maroon'
+                            ? 'bg-espresso text-ivory border-espresso'
                             : 'bg-white text-espresso border-border hover:border-espresso'
                         } ${typeof page !== 'number' ? 'pointer-events-none border-transparent bg-transparent text-muted-foreground' : ''}`}
                       >
@@ -467,31 +563,28 @@ const CategoriesPage = () => {
               </div>
             )}
 
-            {/* Bottom CTA */}
-            <div className="mt-16 bg-blush border border-border rounded-sm text-center px-6 py-12 md:py-16">
-              <p className="overline-label mb-2">Keep Exploring</p>
-              <h2 className="font-serif text-2xl md:text-3xl font-medium text-espresso mb-3">
-                Can't Find What You're Looking For?
-              </h2>
-              <p className="text-sm text-muted-foreground max-w-xl mx-auto mb-8">
-                Browse all products or contact our team for personalised recommendations.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            {/* Bottom CTA — espresso strip with paisley & gold frame */}
+            <div className="relative mt-16 overflow-hidden rounded-sm bg-espresso text-ivory">
+              <span
+                aria-hidden
+                className="absolute inset-0 opacity-[0.06]"
+                style={{ backgroundImage: PAISLEY_TILE, backgroundSize: '130px 130px' }}
+              />
+              <span aria-hidden className="pointer-events-none absolute inset-2.5 rounded-[2px] border border-gold/35" />
+              <div className="relative flex flex-col md:flex-row items-center justify-between gap-6 px-8 py-9 md:px-10 text-center md:text-left">
+                <div>
+                  <h2 className="font-serif text-[23px] font-medium">Can't find your weave?</h2>
+                  <p className="mt-1 text-[13px] text-ivory/65">
+                    Browse the full catalogue — every piece, every craft, in one place.
+                  </p>
+                </div>
                 <Link
                   to="/products"
-                  className="inline-flex items-center justify-center gap-2 bg-maroon text-ivory text-xs
-                             font-semibold uppercase tracking-[0.16em] px-8 py-3.5 rounded-sm
-                             hover:bg-terracotta transition-colors"
+                  className="shrink-0 rounded-sm border border-gold px-7 py-3.5 text-[11px] font-semibold
+                             uppercase tracking-[0.16em] text-gold transition-colors
+                             hover:bg-gold hover:text-espresso"
                 >
-                  View All Products <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-                <Link
-                  to="/contact"
-                  className="inline-flex items-center justify-center border border-espresso text-espresso
-                             text-xs font-semibold uppercase tracking-[0.16em] px-8 py-3.5 rounded-sm
-                             hover:bg-espresso hover:text-ivory transition-colors"
-                >
-                  Contact Support
+                  Browse All Products
                 </Link>
               </div>
             </div>

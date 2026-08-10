@@ -424,6 +424,30 @@ Implemented from the approved mockup (`user_design/mockups/07-product-detail.htm
 
 ---
 
+## 17. All Categories — gallery-hall redesign
+
+Implemented from the approved mockup (`user_design/mockups/08-all-categories.html`):
+
+- **Featured duo** — the two largest categories (by product count) pinned above the
+  gallery as wide image banners: espresso gradient + faint paisley, inner gold frame,
+  gold "pieces" count chip, eyebrow (Most Loved / Festive Ready), serif name, collections
+  line and a framed **Explore →** button. Hidden while searching.
+- **Toran garland divider** — a gold pennant-garland SVG with terracotta beads under the
+  centered "Shop by Category" header.
+- **Jharokha arch gallery** — the arch cards now **stagger** (every second card drops on
+  sm+), carry a serif **roman numeral**, and on hover show the inner gold arch ring, an
+  espresso veil rising with "Explore →", a maroon name and a small gold rule.
+- **Espresso CTA strip** — "Can't find your weave?" over paisley with an inner gold frame
+  and a gold-outline Browse All Products button (replaces the blush box).
+- Pagination now runs over the non-featured categories (featured stay pinned); active
+  page fills espresso. Search/sort/count logic and the image normalizer are unchanged.
+
+| File | Change |
+|---|---|
+| `src/pages/AllCategoriesPage.tsx` | Rebuilt to the gallery-hall layout |
+
+---
+
 ## Verification
 
 - `tsc --noEmit` — no errors in any changed file.
