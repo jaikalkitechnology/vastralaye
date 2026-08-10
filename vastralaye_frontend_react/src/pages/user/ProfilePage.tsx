@@ -21,8 +21,8 @@ const fieldClasses =
 const labelClasses =
   "block text-[11px] font-sans font-semibold uppercase tracking-[0.16em] text-espresso";
 
-const sectionTitleClasses =
-  "text-[12px] font-sans font-semibold uppercase tracking-[0.18em] text-espresso";
+const overlineClasses =
+  "block text-[10.5px] font-sans font-semibold uppercase tracking-[0.22em] text-[#8A6414]";
 
 const ProfilePage = () => {
   const { dispatch } = useStore();
@@ -141,13 +141,13 @@ const ProfilePage = () => {
   return (
     <UserLayout>
       <div className="space-y-8">
-        {/* Page header */}
+        {/* Page head */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h1 className="font-serif text-3xl font-medium text-espresso md:text-4xl">My Profile</h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Manage your personal information and preferences
-            </p>
+            <span className={overlineClasses}>Your details</span>
+            <h1 className="mt-1 font-serif text-3xl font-medium text-espresso md:text-4xl">
+              My Profile
+            </h1>
           </div>
 
           {!isEditing ? (
@@ -190,23 +190,21 @@ const ProfilePage = () => {
           )}
         </div>
 
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          {/* Profile Picture Card */}
-          <div className="rounded-sm border border-border bg-white lg:col-span-1">
-            <div className="border-b border-border bg-ivory px-6 py-4">
-              <h3 className="font-serif text-lg font-medium text-espresso">Profile Picture</h3>
-            </div>
-            <div className="flex flex-col items-center space-y-5 p-6">
-              <div className="group relative">
+        <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-3">
+          {/* Identity card */}
+          <div className="overflow-hidden rounded-sm border border-border bg-white text-center lg:col-span-1">
+            {/* Blush hero with avatar */}
+            <div className="bg-gradient-to-b from-blush to-transparent px-5 pt-8">
+              <div className="group relative mx-auto h-28 w-28">
                 <img
                   src={avatarPreview || "/default-avatar.png"}
                   alt="Profile"
-                  className="h-36 w-36 rounded-full border border-border bg-sand object-cover"
+                  className="h-28 w-28 rounded-full border-[3px] border-white bg-sand object-cover ring-2 ring-gold"
                 />
                 {isEditing && (
                   <>
                     <label className="absolute inset-0 flex cursor-pointer touch-manipulation flex-col items-center justify-center rounded-full bg-espresso/60 opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100">
-                      <Camera className="mb-1 h-8 w-8 text-ivory sm:mb-0 sm:h-9 sm:w-9" />
+                      <Camera className="mb-1 h-7 w-7 text-ivory sm:mb-0 sm:h-8 sm:w-8" />
                       <span className="px-2 text-[10px] font-medium uppercase tracking-[0.1em] text-ivory sm:hidden">
                         Tap to upload
                       </span>
@@ -228,28 +226,51 @@ const ProfilePage = () => {
                   </>
                 )}
               </div>
+            </div>
 
-              {!isEditing && (
-                <div className="space-y-1.5 text-center">
-                  <h3 className="font-serif text-xl font-medium text-espresso">
-                    {formData.first_name} {formData.last_name}
-                  </h3>
-                  <p className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-                    <Mail className="h-4 w-4" />
-                    {formData.email}
-                  </p>
-                </div>
-              )}
+            {/* Name, email pill, ornament */}
+            <div className="px-5">
+              <h3 className="mt-3.5 font-serif text-xl font-medium text-espresso">
+                {formData.first_name} {formData.last_name}
+              </h3>
+              <span className="mt-2 inline-flex max-w-full items-center gap-2 rounded-full border border-border bg-ivory px-3.5 py-1.5 text-xs text-muted-foreground">
+                <Mail className="h-3.5 w-3.5 flex-shrink-0" />
+                <span className="truncate">{formData.email}</span>
+              </span>
+              <div className="my-4 flex items-center justify-center gap-2.5">
+                <span className="h-px w-11 bg-gold opacity-60" />
+                <span className="h-[7px] w-[7px] rotate-45 border border-gold" />
+                <span className="h-px w-11 bg-gold opacity-60" />
+              </div>
+            </div>
+
+            {/* Fact rows */}
+            <div className="border-t border-border text-[12.5px]">
+              <div className="flex items-center justify-between px-5 py-2.5">
+                <span className="text-muted-foreground">Phone</span>
+                <span className="font-medium text-espresso">{formData.phone || "—"}</span>
+              </div>
+              <div className="flex items-center justify-between border-t border-border px-5 py-2.5">
+                <span className="text-muted-foreground">City</span>
+                <span className="font-medium text-espresso">
+                  {formData.city
+                    ? `${formData.city}${formData.region ? ", " + formData.region : ""}`
+                    : "—"}
+                </span>
+              </div>
             </div>
           </div>
 
-          {/* Personal Information Card */}
+          {/* Personal Information card */}
           <div className="rounded-sm border border-border bg-white lg:col-span-2">
             <div className="border-b border-border bg-ivory px-6 py-4">
               <h3 className="font-serif text-lg font-medium text-espresso">Personal Information</h3>
+              <p className="mt-0.5 text-[12px] text-muted-foreground">
+                Kept private — used only for your orders & delivery
+              </p>
             </div>
             <div className="p-6">
-              <form id="profile-form" onSubmit={handleSubmit} className="space-y-8">
+              <form id="profile-form" onSubmit={handleSubmit} className="space-y-6">
                 {/* Name Fields */}
                 <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
                   <div className="space-y-2">
@@ -280,9 +301,9 @@ const ProfilePage = () => {
                   </div>
                 </div>
 
-                {/* Contact Information */}
-                <div className="space-y-5 border-t border-border pt-6">
-                  <h4 className={sectionTitleClasses}>Contact Information</h4>
+                {/* Contact */}
+                <div className="mt-2 space-y-5 border-t border-border pt-6">
+                  <span className={overlineClasses}>Contact</span>
 
                   <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
                     <div className="space-y-2">
@@ -323,9 +344,9 @@ const ProfilePage = () => {
                   </div>
                 </div>
 
-                {/* Address Information */}
-                <div className="space-y-5 border-t border-border pt-6">
-                  <h4 className={sectionTitleClasses}>Address Information</h4>
+                {/* Address */}
+                <div className="mt-2 space-y-5 border-t border-border pt-6">
+                  <span className={overlineClasses}>Address</span>
 
                   <div className="space-y-5">
                     <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
