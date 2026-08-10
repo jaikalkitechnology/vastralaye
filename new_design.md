@@ -245,6 +245,16 @@ requests, no external icon fonts:
 
 ---
 
+## 9. Account & auth pages redesigned → see `user_design/`
+
+Every page in `src/pages/user/` (Profile, Orders, Account Settings, Forgot/Reset
+Password, Invoice) plus the shared account shell (`UserLayout`/`UserSidebar`) was
+redesigned to the editorial theme — espresso greeting band, identity sidebar, order
+status timelines, split-panel auth stage, branded invoice paper. Full design docs,
+HTML mockups and screenshots live in **[`user_design/`](user_design/README.md)**.
+
+---
+
 ## Verification
 
 - `tsc --noEmit` — no errors in any changed file.

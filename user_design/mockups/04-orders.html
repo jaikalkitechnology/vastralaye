@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Orders — Vastralaye</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;500;600&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- Storefront navbar (context) -->
+<header class="topstrip">
+  <div class="inner">
+    <div class="wordmark">Vastra<em>laye</em><small>Handcrafted India</small></div>
+    <nav><span>Shop</span><span>New Arrivals</span><span>Bestsellers</span><span>Categories</span></nav>
+    <div class="icons">
+      <svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
+      <svg class="i" viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.5-9A5.5 5.5 0 0 1 12 6.5 5.5 5.5 0 0 1 21.5 12c-2 4.4-9.5 9-9.5 9z"/></svg>
+      <svg class="i" viewBox="0 0 24 24"><path d="M6 7h12l1.5 13h-15L6 7z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg>
+    </div>
+  </div>
+</header>
+
+<!-- Espresso account band -->
+<section class="account-band">
+  <div class="inner">
+    <div>
+      <p class="crumb">Home · <b>My Account</b></p>
+      <h1>Namaste, Ananya</h1>
+    </div>
+    <div class="meta">
+      <span class="member-chip"><span class="dm" style="border-color:var(--gold)"></span> Vastralaye Member</span><br>
+      Member since March 2024
+    </div>
+  </div>
+</section>
+
+<div class="shell">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sb-id">
+      <div class="avatar">A</div>
+      <div>
+        <div class="nm">Ananya Sharma</div>
+        <div class="em">ananya@example.com</div>
+      </div>
+    </div>
+    <nav>
+      <a class="sb-link" href="#">
+        <svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>
+        My Profile
+      </a>
+      <a class="sb-link active" href="#">
+        <svg class="i" viewBox="0 0 24 24"><path d="M6 7h12l1.5 13h-15L6 7z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg>
+        My Orders
+      </a>
+      <a class="sb-link" href="#">
+        <svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M2 12h3M19 12h3M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>
+        Account Settings
+      </a>
+      <div class="sb-out">
+        <a class="sb-link" href="#">
+          <svg class="i" viewBox="0 0 24 24"><path d="M9 4H5.5A1.5 1.5 0 0 0 4 5.5v13A1.5 1.5 0 0 0 5.5 20H9M15 16l4-4-4-4M19 12H9"/></svg>
+          Sign Out
+        </a>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- Content -->
+  <main class="content">
+    <div class="page-head">
+      <div>
+        <span class="overline">Order history</span>
+        <h2>My Orders</h2>
+        <p class="sub">12 orders placed with Vastralaye</p>
+      </div>
+      <button class="btn outline">Continue Shopping</button>
+    </div>
+
+    <!-- Stat band -->
+    <div class="stat-band">
+      <div class="stat-cell">
+        <span class="lbl"><svg class="i" viewBox="0 0 24 24"><path d="M6 7h12l1.5 13h-15L6 7z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg> Total Orders</span>
+        <span class="val">12</span>
+      </div>
+      <div class="stat-cell">
+        <span class="lbl"><svg class="i" viewBox="0 0 24 24"><path d="M6 3h12M6 8h12M9 13c0 4 2 8 3 8s3-4 3-8"/><path d="M6 8c0 2.8 2.7 5 6 5s6-2.2 6-5"/></svg> Total Spent</span>
+        <span class="val">₹48,350</span>
+      </div>
+      <div class="stat-cell">
+        <span class="lbl"><svg class="i" viewBox="0 0 24 24"><path d="M3 7h13v10H3zM16 10h3l2 3v4h-5"/><circle cx="7" cy="19" r="1.6"/><circle cx="18" cy="19" r="1.6"/></svg> Active</span>
+        <span class="val">2</span>
+      </div>
+      <div class="stat-cell">
+        <span class="lbl"><svg class="i" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg> Delivered</span>
+        <span class="val">9</span>
+      </div>
+    </div>
+
+    <!-- Filter bar -->
+    <div class="filter-bar">
+      <div class="search">
+        <svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
+        <input placeholder="Search by order ID or product name…">
+      </div>
+      <div class="select">All Status <svg class="i" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></div>
+      <div class="select">All Payment <svg class="i" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></div>
+      <div class="select">Newest First <svg class="i" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></div>
+    </div>
+
+    <!-- Order 1: in transit -->
+    <div class="order-card">
+      <div class="oc-head">
+        <span class="no">Order #1042</span>
+        <span class="diamond"></span>
+        <span class="kv">Placed<b>Aug 2, 2026</b></span>
+        <span class="kv">Total<b>₹7,499.00</b></span>
+        <span class="chips">
+          <span class="chip ok">Paid</span>
+          <span class="chip">UPI</span>
+          <span class="chip gold big">In Transit</span>
+        </span>
+      </div>
+      <div class="oc-body">
+        <div class="thumbs"><span class="thumb"></span><span class="thumb"></span><span class="thumb more">+2</span></div>
+        <div class="txt">
+          <p class="t">4 items</p>
+          <p class="s">Banarasi Silk Saree · Chanderi Kurta Set · Zari Dupatta …</p>
+        </div>
+        <div class="oc-actions">
+          <button class="btn primary">View Order</button>
+          <button class="btn outline">Invoice</button>
+        </div>
+      </div>
+      <div class="oc-track">
+        <div class="timeline">
+          <div class="tl-step done"><span class="bar"></span><span class="tl-dot"></span><span class="lb">Placed</span></div>
+          <div class="tl-step done"><span class="bar"></span><span class="tl-dot"></span><span class="lb">Processing</span></div>
+          <div class="tl-step now"><span class="bar"></span><span class="tl-dot"></span><span class="lb">Shipped</span></div>
+          <div class="tl-step"><span class="bar"></span><span class="tl-dot"></span><span class="lb">Delivered</span></div>
+        </div>
+        <div class="tl-note">
+          <span><b style="color:var(--espresso); font-weight:500">Out for delivery</b> · Reached Faridabad facility</span>
+          <span>14, Weaver's Lane, Faridabad 121001</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Order 2: delivered -->
+    <div class="order-card">
+      <div class="oc-head">
+        <span class="no">Order #1027</span>
+        <span class="diamond"></span>
+        <span class="kv">Placed<b>Jul 18, 2026</b></span>
+        <span class="kv">Total<b>₹3,299.00</b></span>
+        <span class="chips">
+          <span class="chip ok">Paid</span>
+          <span class="chip">Card</span>
+          <span class="chip ok big">Delivered</span>
+        </span>
+      </div>
+      <div class="oc-body">
+        <div class="thumbs"><span class="thumb"></span></div>
+        <div class="txt">
+          <p class="t">Ajrakh Print Cotton Suit</p>
+          <p class="s">Qty: 1 × ₹3,299.00</p>
+        </div>
+        <div class="oc-actions">
+          <button class="btn primary">View Order</button>
+          <button class="btn outline">Invoice</button>
+        </div>
+      </div>
+      <div class="oc-track">
+        <div class="timeline">
+          <div class="tl-step done"><span class="bar"></span><span class="tl-dot"></span><span class="lb">Placed</span></div>
+          <div class="tl-step done"><span class="bar"></span><span class="tl-dot"></span><span class="lb">Processing</span></div>
+          <div class="tl-step done"><span class="bar"></span><span class="tl-dot"></span><span class="lb">Shipped</span></div>
+          <div class="tl-step done"><span class="bar"></span><span class="tl-dot"></span><span class="lb">Delivered</span></div>
+        </div>
+        <div class="tl-note">
+          <span><b style="color:var(--ok); font-weight:500">Delivered Jul 21</b> · Signed by A. Sharma</span>
+          <span>14, Weaver's Lane, Faridabad 121001</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Order 3: cancelled (compact — no timeline) -->
+    <div class="order-card">
+      <div class="oc-head">
+        <span class="no">Order #1013</span>
+        <span class="diamond"></span>
+        <span class="kv">Placed<b>Jun 30, 2026</b></span>
+        <span class="kv">Total<b>₹1,899.00</b></span>
+        <span class="chips">
+          <span class="chip">Refunded</span>
+          <span class="chip">COD</span>
+          <span class="chip err big">Cancelled</span>
+        </span>
+      </div>
+      <div class="oc-body">
+        <div class="thumbs"><span class="thumb"></span></div>
+        <div class="txt">
+          <p class="t">Bandhani Georgette Dupatta</p>
+          <p class="s">Qty: 1 × ₹1,899.00</p>
+        </div>
+        <div class="oc-actions">
+          <button class="btn primary">View Order</button>
+          <button class="btn outline">Invoice</button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+</body>
+</html>
