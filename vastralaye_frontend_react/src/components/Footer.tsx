@@ -186,8 +186,9 @@ const Footer = () => {
         </div>
       </div>
 
-      {/* Illustrated heritage panorama along the base */}
-      <div aria-hidden className="pointer-events-none relative h-36 sm:h-44 md:h-52">
+      {/* Illustrated heritage panorama along the base; extra bottom room
+          on mobile so the fixed bottom nav doesn't cover the artwork */}
+      <div aria-hidden className="pointer-events-none relative h-36 sm:h-44 md:h-52 mb-14 md:mb-0">
         <FooterScene />
       </div>
     </footer>

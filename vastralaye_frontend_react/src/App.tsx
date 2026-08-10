@@ -7,6 +7,7 @@ import { StoreProvider, useStore } from "@/contexts/StoreContext";
 import { lazy, Suspense } from "react";
 import GlobalLoader from "@/components/GlobalLoader";
 import WhatsAppFloat from "@/components/WhatsAppFloat";
+import MobileBottomNav from "@/components/MobileBottomNav";
 
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
@@ -257,6 +258,7 @@ const AppContent = () => {
       </Suspense>
 
       {!isAdminRoute && <WhatsAppFloat />}
+      {!isAdminRoute && <MobileBottomNav />}
       <ScrollToTop />
       <ScrollToTopButton />
     </>

@@ -331,6 +331,25 @@ tabs, a gray toggle group, a mega CTA with ping/scale animations, and an invalid
 
 ---
 
+## 13. Mobile bottom navigation
+
+Phones get a fixed **bottom tab bar** (suta-style): five tabs on white over a top
+hairline — **Login/Account** (switches by auth state), **Categories**, a **raised
+espresso Search circle** at the center (gold ring, white cut-out border, links to the
+catalogue), **New Arrivals**, and **Cart** with a maroon count badge. Active tab turns
+maroon. Mobile only (`md:hidden`), mounted globally; it hides itself on admin pages,
+product detail (which owns the sticky add-to-cart bar), checkout and the split-panel
+auth screens. The footer's panorama band gains mobile bottom clearance so the artwork
+isn't covered.
+
+| File | Change |
+|---|---|
+| `src/components/MobileBottomNav.tsx` | New — the bottom tab bar |
+| `src/App.tsx` | Mounts the nav for non-admin routes |
+| `src/components/Footer.tsx` | Panorama band gets `mb-14` on mobile |
+
+---
+
 ## Verification
 
 - `tsc --noEmit` — no errors in any changed file.
