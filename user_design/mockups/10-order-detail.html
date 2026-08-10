@@ -1,0 +1,184 @@
+<!DOCTYPE html><html><head><meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--ivory:#FAF6F0;--esp:#2B1B12;--mar:#7A1F2B;--terra:#B85C38;--gold:#C99A45;--gd:#8A6414;--sand:#EFE7DB;--blush:#F6E8E4;--bd:#E7DFD3;--mut:#6E5F53;--sale:#C62828;--ok:#3E6B4F}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Jost',sans-serif;background:var(--ivory);color:var(--esp);font-size:14px;line-height:1.55}
+.wrap{max-width:1180px;margin:0 auto;padding:0 32px}
+.nav{background:#fff;border-bottom:1px solid var(--bd);padding:14px 0}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between}
+.wm{font-family:'Fraunces',serif;font-size:22px;font-weight:600}.wm em{font-style:normal;color:var(--mar)}
+.wm small{display:block;font-size:8px;letter-spacing:.42em;text-transform:uppercase;color:var(--gd)}
+.nav nav{display:flex;gap:26px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut)}
+.band{background:var(--esp);border-bottom:3px solid var(--gold);color:var(--ivory)}
+.band .wrap{padding:30px 32px;display:flex;align-items:flex-end;justify-content:space-between;gap:20px}
+.band .crumb{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:rgba(250,246,240,.55)}
+.band .crumb b{color:var(--gold);font-weight:500}
+.band h1{font-family:'Fraunces',serif;font-size:30px;font-weight:500;margin-top:8px}
+.band .meta{text-align:right;font-size:12.5px;color:rgba(250,246,240,.66)}
+.chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;border:1px solid var(--bd);background:rgba(239,231,219,.6);color:var(--mut);font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:4px 12px}
+.chip.gold{background:rgba(201,154,69,.15);border-color:rgba(201,154,69,.4);color:var(--gold)}
+.chip.ok{background:rgba(62,107,79,.12);border-color:rgba(62,107,79,.3);color:#9fd3b2}
+.toolbar{display:flex;align-items:center;gap:10px;padding:22px 0 0}
+.back{display:inline-flex;align-items:center;gap:8px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut);margin-right:auto}
+.btn{display:inline-flex;align-items:center;gap:8px;border-radius:3px;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;padding:11px 20px;border:1px solid var(--bd);background:#fff}
+.btn.mar{background:var(--mar);color:var(--ivory);border-color:var(--mar)}
+.lay{display:grid;grid-template-columns:2fr 1fr;gap:24px;padding:22px 0 60px;align-items:start}
+.card{background:#fff;border:1px solid var(--bd);border-radius:3px;margin-bottom:22px}
+.ch{padding:13px 20px;border-bottom:1px solid var(--bd);background:var(--ivory);display:flex;align-items:center;justify-content:space-between}
+.ch h3{font-family:'Fraunces',serif;font-size:16px;font-weight:500}
+.cb{padding:20px}
+/* journey */
+.timeline{display:flex;align-items:flex-start;margin:6px 0 4px}
+.tl{flex:1;position:relative;text-align:center}
+.tl .bar{position:absolute;top:7px;left:-50%;width:100%;height:2px;background:var(--sand)}
+.tl.done .bar,.tl.now .bar{background:var(--gold)}
+.tl:first-child .bar{display:none}
+.tl .dot{display:block;position:relative;z-index:1;width:15px;height:15px;margin:0 auto;border-radius:50%;background:#fff;border:2px solid var(--sand)}
+.tl.done .dot{background:var(--gold);border-color:var(--gold)}
+.tl.now .dot{border-color:var(--gold);box-shadow:0 0 0 5px rgba(201,154,69,.2)}
+.tl .lb{display:block;margin-top:8px;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut)}
+.tl.done .lb,.tl.now .lb{color:var(--esp);font-weight:600}
+.tl .dt{display:block;font-size:10.5px;color:var(--mut);margin-top:2px}
+.note{margin-top:16px;display:flex;justify-content:space-between;font-size:12.5px;color:var(--mut);border-top:1px solid var(--bd);padding-top:13px}
+.note b{color:var(--esp);font-weight:500}
+/* items */
+.item{display:flex;align-items:center;gap:14px;padding:13px 0;border-bottom:1px solid var(--bd)}
+.item:last-of-type{border-bottom:none}
+.thumb{width:52px;aspect-ratio:3/4;background:var(--sand);border:1px solid var(--bd);border-radius:3px;flex:none}
+.item .nm{font-family:'Fraunces',serif;font-size:14.5px}
+.item .mt{font-size:12px;color:var(--mut);margin-top:2px}
+.item .tt{margin-left:auto;font-weight:600;font-size:14px}
+.isub{display:flex;justify-content:space-between;border-top:1px solid var(--bd);padding-top:12px;margin-top:2px;font-size:13px;color:var(--mut)}
+.isub b{color:var(--esp)}
+/* history */
+.h-row{display:flex;gap:14px;position:relative;padding-bottom:18px}
+.h-row::before{content:'';position:absolute;left:6px;top:16px;bottom:-2px;width:1px;background:var(--bd)}
+.h-row:last-child::before{display:none}
+.h-dot{width:13px;height:13px;border-radius:50%;background:var(--gold);border:2px solid #fff;outline:1px solid var(--gold);flex:none;margin-top:2px}
+.h-row.dim .h-dot{background:var(--sand);outline-color:var(--bd)}
+.h-row .t{font-size:13.5px;font-weight:600}
+.h-row .m{font-size:12.5px;color:var(--mut);margin-top:1px}
+.h-row .ts{font-size:11px;color:var(--mut);margin-top:2px;letter-spacing:.04em}
+/* summary */
+.srow{display:flex;justify-content:space-between;padding:5.5px 0;font-size:13.5px;color:var(--mut)}
+.srow b{color:var(--esp);font-weight:500}
+.grand{border-top:2px solid var(--gold);margin-top:8px;padding-top:11px;display:flex;justify-content:space-between;align-items:baseline}
+.grand .l{font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase}
+.grand .v{font-family:'Fraunces',serif;font-size:23px;color:var(--mar);font-weight:500}
+.paychips{display:flex;gap:8px;margin-top:13px}
+.chip2{border:1px solid var(--bd);border-radius:999px;background:rgba(239,231,219,.6);color:var(--mut);font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:4px 12px}
+.chip2.err{background:rgba(198,40,40,.08);border-color:rgba(198,40,40,.25);color:var(--sale)}
+.badges{display:flex;gap:6px;margin-top:14px;border-top:1px solid var(--bd);padding-top:13px}
+.pb{height:24px;padding:0 8px;background:#fff;border:1px solid var(--bd);border-radius:3px;display:flex;align-items:center;font-size:9px;font-weight:700;color:var(--mut)}
+/* address */
+.addr{font-size:13px;color:var(--mut);line-height:1.7}
+.addr b{color:var(--esp);font-weight:600;font-size:13.5px}
+/* help */
+.help{position:relative;background:var(--esp);border-radius:3px;color:var(--ivory);padding:20px;overflow:hidden;margin-bottom:22px}
+.help::after{content:'';position:absolute;inset:8px;border:1px solid rgba(201,154,69,.35);border-radius:2px;pointer-events:none}
+.help h4{font-family:'Fraunces',serif;font-size:16.5px;font-weight:500}
+.help p{font-size:12px;color:rgba(250,246,240,.65);margin-top:3px}
+.help .b{display:inline-flex;margin-top:13px;border:1px solid var(--gold);color:var(--gold);border-radius:3px;padding:9px 16px;font-size:10.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase}
+.cancel{width:100%;border:1px solid rgba(198,40,40,.4);color:var(--sale);background:#fff;border-radius:3px;padding:12px;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;text-align:center}
+</style></head><body>
+
+<div class="nav"><div class="wrap">
+  <div class="wm">Vastra<em>laye</em><small>Handcrafted India</small></div>
+  <nav><span>Home</span><span>Shop</span><span>All Categories</span><span>All Products</span></nav>
+  <div style="font-size:12px;letter-spacing:.1em;color:var(--mut)">SEARCH · ♡ · CART</div>
+</div></div>
+
+<div class="band"><div class="wrap">
+  <div>
+    <p class="crumb">Home · My Account · <b>Order #1042</b></p>
+    <h1>Order #1042</h1>
+  </div>
+  <div class="meta">
+    <span class="chip gold">◆ In Transit</span><br>
+    Placed Aug 2, 2026 · 4 items · ₹7,499
+  </div>
+</div></div>
+
+<div class="wrap">
+  <div class="toolbar">
+    <span class="back">← Back to orders</span>
+    <span class="btn">⎙ Print</span>
+    <span class="btn">🧾 View Invoice</span>
+    <span class="btn mar">⬇ Download Invoice</span>
+  </div>
+
+  <div class="lay">
+    <!-- LEFT -->
+    <div>
+      <div class="card">
+        <div class="ch"><h3>Order Journey</h3><span class="chip2">COD · ₹7,499 due on delivery</span></div>
+        <div class="cb">
+          <div class="timeline">
+            <div class="tl done"><span class="bar"></span><span class="dot"></span><span class="lb">Placed</span><span class="dt">Aug 2, 6:14 pm</span></div>
+            <div class="tl done"><span class="bar"></span><span class="dot"></span><span class="lb">Processing</span><span class="dt">Aug 3, 9:02 am</span></div>
+            <div class="tl now"><span class="bar"></span><span class="dot"></span><span class="lb">Shipped</span><span class="dt">Aug 5, 1:47 pm</span></div>
+            <div class="tl"><span class="bar"></span><span class="dot"></span><span class="lb">Delivered</span><span class="dt">Expected Aug 11</span></div>
+          </div>
+          <div class="note"><span><b>Out for delivery</b> · Reached Faridabad facility</span><span>AWB DL2216408831</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="ch"><h3>Items</h3><span style="font-size:12px;color:var(--mut)">4 items</span></div>
+        <div class="cb" style="padding-top:8px">
+          <div class="item"><span class="thumb"></span><span><span class="nm">Banarasi Silk Saree — Maroon Zari</span><span class="mt" style="display:block">Qty 1 × ₹4,299 · Free size</span></span><span class="tt">₹4,299</span></div>
+          <div class="item"><span class="thumb"></span><span><span class="nm">Chanderi Kurta Set — Ivory Gold</span><span class="mt" style="display:block">Qty 1 × ₹2,099 · Size M</span></span><span class="tt">₹2,099</span></div>
+          <div class="item"><span class="thumb"></span><span><span class="nm">Zari Border Dupatta — Blush</span><span class="mt" style="display:block">Qty 2 × ₹649</span></span><span class="tt">₹1,298</span></div>
+          <div class="isub"><span>Subtotal (4 items)</span><b>₹7,696</b></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="ch"><h3>Tracking History</h3><span style="font-size:12px;color:var(--mut)">3 updates</span></div>
+        <div class="cb">
+          <div class="h-row"><span class="h-dot"></span><span><span class="t">Out for delivery</span><span class="m" style="display:block">Courier reached Faridabad delivery facility</span><span class="ts" style="display:block">Aug 8, 2026 · 8:32 am</span></span></div>
+          <div class="h-row dim"><span class="h-dot"></span><span><span class="t">Shipped</span><span class="m" style="display:block">Package handed to Delhivery · AWB DL2216408831</span><span class="ts" style="display:block">Aug 5, 2026 · 1:47 pm</span></span></div>
+          <div class="h-row dim"><span class="h-dot"></span><span><span class="t">Order placed</span><span class="m" style="display:block">Payment: Cash on Delivery. Amount ₹7,499 collected on delivery.</span><span class="ts" style="display:block">Aug 2, 2026 · 6:14 pm</span></span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT -->
+    <div>
+      <div class="card">
+        <div class="ch"><h3>Payment Summary</h3></div>
+        <div class="cb">
+          <div class="srow"><span>Subtotal</span><b>₹7,696</b></div>
+          <div class="srow"><span>Coupon (FESTIVE10)</span><b style="color:var(--ok)">− ₹500</b></div>
+          <div class="srow"><span>GST (incl.)</span><b>₹1,144</b></div>
+          <div class="srow"><span>Shipping</span><b>Free</b></div>
+          <div class="grand"><span class="l">Total</span><span class="v">₹7,499</span></div>
+          <div class="paychips"><span class="chip2">💵 Cash on Delivery</span><span class="chip2 err">Unpaid</span></div>
+          <div class="badges"><span class="pb">UPI</span><span class="pb">VISA</span><span class="pb">MC</span><span class="pb">RuPay</span><span class="pb">COD</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="ch"><h3>Delivery Address</h3></div>
+        <div class="cb addr">
+          <b>Vijay Kumar</b> · +91 88103 18710<br>
+          1384, New Janta Colony,<br>
+          Faridabad, Haryana 121001<br>
+          India
+        </div>
+      </div>
+
+      <div class="help">
+        <h4>Need help with this order?</h4>
+        <p>Chat with us on WhatsApp or write to support@vastralaye.in</p>
+        <span class="b">WhatsApp Support</span>
+      </div>
+
+      <div class="cancel">✕ Cancel Order</div>
+      <p style="font-size:11px;color:var(--mut);text-align:center;margin-top:8px">Cancellation available until the order ships</p>
+    </div>
+  </div>
+</div>
+</body></html>
