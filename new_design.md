@@ -338,9 +338,11 @@ hairline — **Login/Account** (switches by auth state), **Categories**, a **rai
 espresso Search circle** at the center (gold ring, white cut-out border, links to the
 catalogue), **New Arrivals**, and **Cart** with a maroon count badge. Active tab turns
 maroon. Mobile only (`md:hidden`), mounted globally; it hides itself on admin pages,
-product detail (which owns the sticky add-to-cart bar), checkout and the split-panel
-auth screens. The footer's panorama band gains mobile bottom clearance so the artwork
-isn't covered.
+checkout and the split-panel auth screens. On the **product page** the nav stays and the
+mobile sticky add-to-cart bar **stacks directly above it** (`bottom-[53px]` below md);
+the sticky reel and scroll-to-top float up accordingly (124px clearance on phones, 84px
+for the reel on tablets where only the bar shows). The footer's panorama band gains
+mobile bottom clearance so the artwork isn't covered.
 
 | File | Change |
 |---|---|

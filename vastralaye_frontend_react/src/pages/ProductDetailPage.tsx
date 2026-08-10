@@ -1175,7 +1175,7 @@ return (
     />
 
     {/* Sticky mobile add-to-cart bar */}
-    <div className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-border px-4 py-3">
+    <div className="lg:hidden fixed bottom-[53px] md:bottom-0 inset-x-0 z-40 bg-white border-t border-border px-4 py-3">
       <div className="flex items-center gap-3">
         <div className="min-w-0">
           <div className="text-base font-semibold text-espresso leading-tight">

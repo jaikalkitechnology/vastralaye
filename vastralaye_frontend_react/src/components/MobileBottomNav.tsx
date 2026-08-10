@@ -5,13 +5,12 @@ import { useStore } from '@/contexts/StoreContext';
 /**
  * Mobile bottom navigation (design.md §5 family) — five tabs with a
  * raised espresso Search button at the center, like premium ethnic-wear
- * stores. Mobile only (`md:hidden`); hides itself on admin pages, the
- * product page (which owns a sticky add-to-cart bar), checkout and the
- * standalone auth screens.
+ * stores. Mobile only (`md:hidden`); hides itself on admin pages,
+ * checkout and the standalone auth screens. On the product page the
+ * sticky add-to-cart bar stacks directly above this nav.
  */
 const HIDDEN_PREFIXES = [
   '/admin',
-  '/product/',
   '/checkout',
   '/forgot-password',
   '/reset-password',
