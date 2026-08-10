@@ -398,6 +398,32 @@ card**:
 
 ---
 
+## 16. Product details page — atelier redesign
+
+Implemented from the approved mockup (`user_design/mockups/07-product-detail.html`):
+
+- **Gallery**: thumbnails moved from a side rail to a **filmstrip under the main image**
+  (active thumb gold-ringed, video keeps its play mark); the stage gets the inner gold
+  hairline frame, flat badges and a "Hover to zoom" chip. Zoom/media logic unchanged.
+- **Info column**: gold category overline + live stock dot → serif 33px title → star row
+  with a "N reviews" anchor that scrolls to the reviews section + SKU → **blush price
+  panel** (serif price, struck MRP, red % off, tax microcopy) → gold ornament → **colour
+  swatches** (gold outline when active) → **size chips** (espresso fill when selected) →
+  flat quantity stepper → CTA grid (maroon Add to Cart, outline **Buy Now** — a new
+  minimal flow: same validation, adds to cart and navigates to it — wishlist + share
+  chips) → 3-cell **trust strip** → serif accordion with gold ± markers.
+- **Full-width sections** replace the old desktop/mobile duplicates: Watch It Styled
+  (unchanged), **You Might Also Like** — existing slider mechanics now rendering the
+  shared matted `ProductCard` — and a single **Reviews** section (`#reviews`).
+- Sticky reel, mobile add-to-cart bar stacking and all fetch/cart/wishlist logic
+  preserved; the file's pre-existing type errors dropped 16 → 15.
+
+| File | Change |
+|---|---|
+| `src/pages/ProductDetailPage.tsx` | Rebuilt to the atelier layout (presentation + minimal Buy Now flow) |
+
+---
+
 ## Verification
 
 - `tsc --noEmit` — no errors in any changed file.
