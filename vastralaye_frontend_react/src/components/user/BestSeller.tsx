@@ -118,6 +118,7 @@ const BestSellers = () => {
         title="Bestsellers"
         subtitle={`Most-loved weaves, chosen by our shoppers · ${allProducts.length} products`}
         crumb="Bestsellers"
+        page="best_sellers"
       />
 
       <div className="container mx-auto px-4 pt-8 pb-16 lg:pb-20">

@@ -133,6 +133,7 @@ const NewArrivals = () => {
         title="New Arrivals"
         subtitle={`Fresh off the loom, just for you · ${allProducts.length} products`}
         crumb="New Arrivals"
+        page="new_arrivals"
       />
 
       <div className="container mx-auto px-4 pt-8 pb-16 lg:pb-20">

@@ -328,6 +328,7 @@ const ProductsPage = () => {
         title="All Products"
         subtitle={`Browse our complete catalogue · ${allProducts.length} products`}
         crumb="Shop"
+        page="products"
       />
 
       <div className="container mx-auto px-4 pt-8 pb-16 lg:pb-20">

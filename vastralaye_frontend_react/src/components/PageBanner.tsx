@@ -38,6 +38,42 @@ const fetchBannerImage = (): Promise<string | null> => {
   return inflight;
 };
 
+/* Per-page banners (Admin → Banner Control → Page Banners): one image +
+ * title + subtitle per catalogue page. Fetched once and shared. */
+export type PageBannerKey = 'products' | 'categories' | 'new_arrivals' | 'best_sellers';
+
+interface PageBannerData {
+  page: string;
+  image_url?: string | null;
+  title?: string | null;
+  subtitle?: string | null;
+}
+
+let cachedPageBanners: Record<string, PageBannerData> | null = null;
+let pageBannersInflight: Promise<Record<string, PageBannerData>> | null = null;
+
+const fetchPageBanners = (): Promise<Record<string, PageBannerData>> => {
+  if (cachedPageBanners) return Promise.resolve(cachedPageBanners);
+  if (!pageBannersInflight) {
+    pageBannersInflight = (async () => {
+      let map: Record<string, PageBannerData> = {};
+      try {
+        const res = await api.get('/fronted/page-banners');
+        if (Array.isArray(res.data)) {
+          map = Object.fromEntries(
+            res.data.filter((b: any) => b && b.page).map((b: any) => [b.page, b])
+          );
+        }
+      } catch {
+        /* banners are optional */
+      }
+      cachedPageBanners = map;
+      return map;
+    })();
+  }
+  return pageBannersInflight;
+};
+
 interface PageBannerProps {
   /** Serif headline, e.g. "All Products". */
   title: string;
@@ -45,27 +81,42 @@ interface PageBannerProps {
   subtitle?: string;
   /** Current-page label for the breadcrumb, e.g. "Shop". */
   crumb: string;
+  /** Admin page-banner slot; its image/title/subtitle override the props. */
+  page?: PageBannerKey;
 }
 
-const PageBanner = ({ title, subtitle, crumb }: PageBannerProps) => {
+const PageBanner = ({ title, subtitle, crumb, page }: PageBannerProps) => {
   const [image, setImage] = useState<string | null>(cachedImage);
+  const [pageData, setPageData] = useState<PageBannerData | null>(
+    page && cachedPageBanners ? cachedPageBanners[page] ?? null : null
+  );
 
   useEffect(() => {
     let cancelled = false;
     fetchBannerImage().then((img) => {
       if (!cancelled) setImage(img);
     });
+    if (page) {
+      fetchPageBanners().then((map) => {
+        if (!cancelled) setPageData(map[page] ?? null);
+      });
+    }
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [page]);
+
+  /* Page banner wins; hero-banner image, then paisley, as fallbacks. */
+  const shownImage = pageData?.image_url ? mediaUrl(pageData.image_url) : image;
+  const shownTitle = pageData?.title || title;
+  const shownSubtitle = pageData?.subtitle || subtitle;
 
   return (
     <section className="relative overflow-hidden bg-espresso border-b-[3px] border-gold">
-      {image ? (
+      {shownImage ? (
         <>
           <img
-            src={image}
+            src={shownImage}
             alt=""
             aria-hidden
             className="absolute inset-0 h-full w-full object-cover"
@@ -96,9 +147,9 @@ const PageBanner = ({ title, subtitle, crumb }: PageBannerProps) => {
         </nav>
 
         <h1 className="font-serif text-3xl md:text-4xl font-medium text-ivory mt-2.5">
-          {title}
+          {shownTitle}
         </h1>
-        {subtitle && <p className="text-sm text-ivory/70 mt-2 max-w-xl">{subtitle}</p>}
+        {shownSubtitle && <p className="text-sm text-ivory/70 mt-2 max-w-xl">{shownSubtitle}</p>}
 
         {/* Gold ornament */}
         <span aria-hidden className="mt-5 flex items-center gap-2.5">

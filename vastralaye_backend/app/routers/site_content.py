@@ -9,14 +9,19 @@ from sqlalchemy.orm import Session
 from app.authentication import get_current_admin_user
 from app.database import get_db
 from app.models import User
-from app.models.site_content import HeroBanner, SiteSetting, Testimonial
+from app.models.site_content import HeroBanner, PageBanner, SiteSetting, Testimonial
 
 router = APIRouter(tags=["Site Content"])
 
 BANNERS_DIR = os.path.join("static", "uploads", "banners")
+PAGE_BANNERS_DIR = os.path.join("static", "uploads", "page_banners")
 TESTIMONIALS_DIR = os.path.join("static", "uploads", "testimonials")
 os.makedirs(BANNERS_DIR, exist_ok=True)
+os.makedirs(PAGE_BANNERS_DIR, exist_ok=True)
 os.makedirs(TESTIMONIALS_DIR, exist_ok=True)
+
+# Storefront pages that can carry an admin-managed banner
+PAGE_BANNER_PAGES = ["products", "categories", "new_arrivals", "best_sellers"]
 
 ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp"}
 MAX_IMAGE_BYTES = 8 * 1024 * 1024  # 8 MB
@@ -202,6 +207,72 @@ def delete_banner(
     db.delete(banner)
     db.commit()
     return {"detail": "Banner deleted"}
+
+
+# ---------------------------------------------------------------
+# Page banners (catalogue pages: products / categories /
+# new_arrivals / best_sellers — one image + text per page)
+# ---------------------------------------------------------------
+
+def _page_banner_out(b: PageBanner) -> dict:
+    return {
+        "id": b.id,
+        "page": b.page,
+        "image_url": b.image_url,
+        "title": b.title,
+        "subtitle": b.subtitle,
+        "is_active": b.is_active,
+    }
+
+
+@router.get("/api/v1/fronted/page-banners")
+def list_public_page_banners(db: Session = Depends(get_db)):
+    banners = db.query(PageBanner).filter(PageBanner.is_active.is_(True)).all()
+    return [_page_banner_out(b) for b in banners]
+
+
+@router.get("/api/v1/admin/page-banners")
+def list_admin_page_banners(
+    db: Session = Depends(get_db),
+    admin: User = Depends(get_current_admin_user),
+):
+    banners = db.query(PageBanner).all()
+    return [_page_banner_out(b) for b in banners]
+
+
+@router.put("/api/v1/admin/page-banners/{page}")
+def upsert_page_banner(
+    page: str,
+    title: Optional[str] = Form(None),
+    subtitle: Optional[str] = Form(None),
+    is_active: bool = Form(True),
+    remove_image: bool = Form(False),
+    image_file: Optional[UploadFile] = File(None),
+    db: Session = Depends(get_db),
+    admin: User = Depends(get_current_admin_user),
+):
+    if page not in PAGE_BANNER_PAGES:
+        raise HTTPException(status_code=400, detail=f"Unknown page. Use one of: {', '.join(PAGE_BANNER_PAGES)}")
+
+    banner = db.query(PageBanner).filter(PageBanner.page == page).first()
+    if not banner:
+        banner = PageBanner(page=page)
+        db.add(banner)
+
+    banner.title = (title or "").strip() or None
+    banner.subtitle = (subtitle or "").strip() or None
+    banner.is_active = is_active
+
+    if image_file is not None:
+        _remove_file(banner.image_url)
+        banner.image_url = _save_image(image_file, PAGE_BANNERS_DIR, f"page_{page}")
+    elif remove_image:
+        _remove_file(banner.image_url)
+        banner.image_url = None
+
+    db.commit()
+    db.refresh(banner)
+    return _page_banner_out(banner)
 
 
 # ---------------------------------------------------------------
