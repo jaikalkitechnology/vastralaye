@@ -350,6 +350,29 @@ isn't covered.
 
 ---
 
+## 14. New Arrivals & Bestsellers pages — redesigned with banners
+
+Both listing pages still wore the gray template (bold gray headings on `bg-gray-50`,
+default controls, red error screens). Now, matching §11's catalogue pages:
+
+- **`PageBanner` on top** — same admin-driven image band (Admin → Banner Control, espresso
+  gradient, paisley fallback) with the page title, breadcrumb and a live product count
+  ("Fresh off the loom…" / "Most-loved weaves…").
+- **Controls bar** — hairline `border-y` row: muted "Showing X to Y of N" left, uppercase
+  "Per page" + flat select right.
+- **Pagination** — square `rounded-sm` page buttons with the current page filled espresso,
+  hairline uppercase Previous/Next, muted ellipses and page-info line.
+- **States** — maroon ring spinner; serif error screen with themed retry; empty states get
+  the gold ornament + serif title.
+- Fetching, pagination math and `ProductCard` grid are untouched.
+
+| File | Change |
+|---|---|
+| `src/components/user/Newarrival.tsx` | Banner + themed chrome (visuals only) |
+| `src/components/user/BestSeller.tsx` | Banner + themed chrome (visuals only) |
+
+---
+
 ## Verification
 
 - `tsc --noEmit` — no errors in any changed file.

@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import PageBanner from "@/components/PageBanner";
 
 const NewArrivals = () => {
   const [allProducts, setAllProducts] = useState<Product[]>([]);
@@ -99,10 +100,10 @@ const NewArrivals = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-gray-600">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
-          <p>Loading new arrivals...</p>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <span className="h-10 w-10 animate-spin rounded-full border-2 border-maroon border-t-transparent" />
+          <p className="text-sm text-muted-foreground">Loading new arrivals…</p>
         </div>
       </div>
     );
@@ -110,11 +111,14 @@ const NewArrivals = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center text-red-600">
-        {error}
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4 text-center">
+        <h2 className="font-serif text-2xl font-medium text-espresso mb-2">
+          Unable to load new arrivals
+        </h2>
+        <p className="text-sm text-muted-foreground mb-6">{error}</p>
         <button
           onClick={() => window.location.reload()}
-          className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+          className="rounded-sm bg-maroon px-6 py-2.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-ivory transition-colors hover:bg-terracotta"
         >
           Try Again
         </button>
@@ -123,32 +127,29 @@ const NewArrivals = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            New Arrivals
-          </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Discover our latest collection of fresh products just for you
-          </p>
-        </div>
+    <div className="min-h-screen bg-background">
+      {/* Admin-driven banner (Admin → Banner Control) */}
+      <PageBanner
+        title="New Arrivals"
+        subtitle={`Fresh off the loom, just for you · ${allProducts.length} products`}
+        crumb="New Arrivals"
+      />
 
+      <div className="container mx-auto px-4 pt-8 pb-16 lg:pb-20">
         {/* Controls Bar */}
-        <div className="flex flex-col sm:flex-row items-center justify-between mb-6 gap-4">
-          <div className="text-sm text-gray-600">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-y border-border py-3 mb-8">
+          <div className="text-sm text-muted-foreground">
             Showing {displayProducts.length > 0 ? (currentPage - 1) * productsPerPage + 1 : 0} to{" "}
             {Math.min(currentPage * productsPerPage, allProducts.length)} of {allProducts.length} products
           </div>
 
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-600">Products per page:</span>
+          <div className="flex items-center gap-2.5">
+            <span className="text-[12px] uppercase tracking-[0.1em] text-muted-foreground">Per page</span>
             <Select
               value={productsPerPage.toString()}
               onValueChange={handlePerPageChange}
             >
-              <SelectTrigger className="w-[100px]">
+              <SelectTrigger className="w-[90px] rounded-sm border-input bg-white">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -178,9 +179,9 @@ const NewArrivals = () => {
                   variant="outline"
                   onClick={handlePrevious}
                   disabled={currentPage === 1}
-                  className="w-full sm:w-auto"
+                  className="h-auto w-full rounded-sm px-5 py-2.5 text-[11px] font-medium uppercase tracking-[0.12em] sm:w-auto"
                 >
-                  <ChevronLeft className="h-4 w-4 mr-2" />
+                  <ChevronLeft className="h-3.5 w-3.5 mr-1.5" />
                   Previous
                 </Button>
 
@@ -190,14 +191,14 @@ const NewArrivals = () => {
                   {currentPage > 3 && (
                     <>
                       <Button
-                        variant={currentPage === 1 ? "default" : "outline"}
+                        variant="outline"
                         onClick={() => handlePageClick(1)}
-                        className="w-10 h-10 p-0"
+                        className="w-9 h-9 p-0 rounded-sm text-[13px]"
                       >
                         1
                       </Button>
                       {currentPage > 4 && (
-                        <span className="text-gray-500">...</span>
+                        <span className="text-muted-foreground">…</span>
                       )}
                     </>
                   )}
@@ -217,7 +218,11 @@ const NewArrivals = () => {
                         key={page}
                         variant={currentPage === page ? "default" : "outline"}
                         onClick={() => handlePageClick(page)}
-                        className="w-10 h-10 p-0"
+                        className={`w-9 h-9 p-0 rounded-sm text-[13px] ${
+                          currentPage === page
+                            ? "bg-espresso text-ivory hover:bg-espresso"
+                            : ""
+                        }`}
                       >
                         {page}
                       </Button>
@@ -227,12 +232,12 @@ const NewArrivals = () => {
                   {currentPage < totalPages - 2 && (
                     <>
                       {currentPage < totalPages - 3 && (
-                        <span className="text-gray-500">...</span>
+                        <span className="text-muted-foreground">…</span>
                       )}
                       <Button
-                        variant={currentPage === totalPages ? "default" : "outline"}
+                        variant="outline"
                         onClick={() => handlePageClick(totalPages)}
-                        className="w-10 h-10 p-0"
+                        className="w-9 h-9 p-0 rounded-sm text-[13px]"
                       >
                         {totalPages}
                       </Button>
@@ -245,22 +250,30 @@ const NewArrivals = () => {
                   variant="outline"
                   onClick={handleNext}
                   disabled={currentPage === totalPages}
-                  className="w-full sm:w-auto"
+                  className="h-auto w-full rounded-sm px-5 py-2.5 text-[11px] font-medium uppercase tracking-[0.12em] sm:w-auto"
                 >
                   Next
-                  <ChevronRight className="h-4 w-4 ml-2" />
+                  <ChevronRight className="h-3.5 w-3.5 ml-1.5" />
                 </Button>
               </div>
             )}
 
             {/* Page Info */}
-            <div className="text-center mt-4 text-sm text-gray-600">
+            <div className="text-center mt-4 text-[12px] uppercase tracking-[0.12em] text-muted-foreground">
               Page {currentPage} of {totalPages}
             </div>
           </>
         ) : (
-          <div className="text-center py-12">
-            <p className="text-gray-500 text-lg">No new arrivals found</p>
+          <div className="text-center py-16">
+            <span aria-hidden className="mb-5 flex items-center justify-center gap-2.5">
+              <span className="h-px w-11 bg-gold/60" />
+              <span className="h-[7px] w-[7px] rotate-45 border border-gold" />
+              <span className="h-px w-11 bg-gold/60" />
+            </span>
+            <h3 className="font-serif text-xl font-medium text-espresso">No new arrivals yet</h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Fresh pieces are on the loom — check back soon.
+            </p>
           </div>
         )}
       </div>
