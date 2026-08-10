@@ -448,6 +448,32 @@ Implemented from the approved mockup (`user_design/mockups/08-all-categories.htm
 
 ---
 
+## 18. All Products — catalogue-room redesign
+
+Implemented from the approved mockup (`user_design/mockups/09-all-products.html`):
+
+- **"Refine" filter panel** — the sidebar became a white card with an ivory serif header
+  ("Refine" + maroon Clear-all), hairline sections under gold overlines: **Category**
+  (counts right, active = maroon + gold diamond, subcategories kept), **Price** (gold
+  slider + flat min/max inputs), **Availability** and **Highlights** as gold-check
+  boxes. Mobile drawer behavior unchanged.
+- **Toolbar-integrated search** — the standalone search field moved into the hairline
+  toolbar's right cluster on desktop (compact 240–280px field with clear-X); mobile keeps
+  a full-width field above the toolbar.
+- **Active filter chips row** — every applied filter renders as a dismissible blush pill
+  (quoted search, `₹min–₹max` price, In stock, Featured, Bestsellers, New arrivals,
+  category/subcategory names resolved from loaded products), each × removing just that
+  filter and syncing the sidebar via a new optional backward-compatible `value` prop;
+  "Clear all filters" resets everything. The old inline "Clear N filters" link retired.
+- Fetching, sorting, pagination, `ProductGrid` and `PageBanner` untouched.
+
+| File | Change |
+|---|---|
+| `src/components/FilterSidebar.tsx` | Restyled to the Refine panel + optional `value` sync prop |
+| `src/pages/ProductsPage.tsx` | Toolbar search, chips row, default-filter reset wiring |
+
+---
+
 ## Verification
 
 - `tsc --noEmit` — no errors in any changed file.

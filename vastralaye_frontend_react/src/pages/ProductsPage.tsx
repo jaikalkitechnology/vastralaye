@@ -28,6 +28,19 @@ interface Filters {
   new_arrival?: boolean | null;
 }
 
+/** Neutral filter state — mirrors FilterSidebar's defaults (key order matters for
+ *  the JSON.stringify fetch guard, so keep it identical to the sidebar's). */
+const DEFAULT_FILTERS: Filters = {
+  category_id:    null,
+  subcategory_id: null,
+  min_price:      0,
+  max_price:      5000,
+  in_stock:       null,
+  featured:       null,
+  best_seller:    null,
+  new_arrival:    null,
+};
+
 const ProductsPage = () => {
   const { state, dispatch } = useStore();
   const { products } = state;
@@ -215,16 +228,98 @@ const ProductsPage = () => {
   };
 
   const clearFilters = () => {
-    setFilters({});
+    setFilters({ ...DEFAULT_FILTERS });
     setSearchQuery("");
     setDebouncedSearch("");
     setCurrentPage(1);
   };
 
-  // Calculate active filter count
-  const activeFilterCount = Object.values(filters).filter(val =>
-    val !== null && val !== undefined && val !== false
-  ).length;
+  // Remove a single active filter chip (also syncs the sidebar via its `value` prop)
+  const removeChip = (key: string) => {
+    if (key === "search") {
+      setSearchQuery("");
+      setDebouncedSearch("");
+      setCurrentPage(1);
+      return;
+    }
+    setFilters((prev) => {
+      if (key === "priceRange") {
+        return { ...prev, min_price: 0, max_price: 5000 };
+      }
+      return { ...prev, [key]: null } as Filters;
+    });
+    setCurrentPage(1);
+  };
+
+  // Resolve display names for category/subcategory chips from loaded products
+  const resolveCategoryName = (id: number): string => {
+    for (const p of allProducts) {
+      const pa = p as any;
+      const pid =
+        pa.category_id ??
+        pa.categoryId ??
+        (typeof pa.category === "object" ? pa.category?.id : pa.category);
+      if (pid !== null && pid !== undefined && String(pid) === String(id)) {
+        const name =
+          pa.category_name ??
+          pa.categoryName ??
+          (typeof pa.category === "object" ? pa.category?.name : undefined);
+        if (name) return String(name);
+      }
+    }
+    return "Category";
+  };
+
+  const resolveSubcategoryName = (id: number): string => {
+    for (const p of allProducts) {
+      const pa = p as any;
+      const pid =
+        pa.subcategory_id ??
+        pa.sub_category_id ??
+        pa.subcategoryId ??
+        (typeof pa.subcategory === "object" ? pa.subcategory?.id : pa.subcategory) ??
+        (typeof pa.sub_category === "object" ? pa.sub_category?.id : undefined);
+      if (pid !== null && pid !== undefined && String(pid) === String(id)) {
+        const name =
+          pa.subcategory_name ??
+          pa.sub_category_name ??
+          (typeof pa.subcategory === "object" ? pa.subcategory?.name : undefined) ??
+          (typeof pa.sub_category === "object" ? pa.sub_category?.name : undefined);
+        if (name) return String(name);
+      }
+    }
+    return "Collection";
+  };
+
+  // Active filter chips (search + every non-default filter)
+  const minPriceActive = filters.min_price ?? 0;
+  const maxPriceActive = filters.max_price ?? 5000;
+  const priceActive = minPriceActive > 0 || maxPriceActive < 5000;
+  const priceLabel =
+    minPriceActive > 0 && maxPriceActive < 5000
+      ? `₹${minPriceActive}–₹${maxPriceActive}`
+      : maxPriceActive < 5000
+      ? `Under ₹${maxPriceActive}`
+      : `₹${minPriceActive}+`;
+
+  const activeChips: { key: string; label: string }[] = [];
+  if (debouncedSearch.trim()) {
+    activeChips.push({ key: "search", label: `“${debouncedSearch.trim()}”` });
+  }
+  if (filters.category_id !== null && filters.category_id !== undefined) {
+    activeChips.push({ key: "category_id", label: resolveCategoryName(filters.category_id) });
+  }
+  if (filters.subcategory_id !== null && filters.subcategory_id !== undefined) {
+    activeChips.push({ key: "subcategory_id", label: resolveSubcategoryName(filters.subcategory_id) });
+  }
+  if (priceActive) activeChips.push({ key: "priceRange", label: priceLabel });
+  if (filters.in_stock)    activeChips.push({ key: "in_stock",    label: "In stock" });
+  if (filters.featured)    activeChips.push({ key: "featured",    label: "Featured" });
+  if (filters.best_seller) activeChips.push({ key: "best_seller", label: "Bestsellers" });
+  if (filters.new_arrival) activeChips.push({ key: "new_arrival", label: "New arrivals" });
+
+  // Mobile Filter-trigger badge counts filter chips (search shows as its own chip)
+  const activeFilterCount = activeChips.filter((c) => c.key !== "search").length;
 
   return (
     <div className="min-h-screen bg-background">
@@ -274,13 +369,14 @@ const ProductsPage = () => {
             onClose={() => setIsFilterOpen(false)}
             products={allProducts || []}
             onFilterChange={handleFilterChange}
+            value={filters}
             className="lg:w-64 lg:flex-shrink-0"
           />
 
           {/* Main Content */}
           <div className="flex-1 min-w-0">
-            {/* Search */}
-            <form onSubmit={handleSearch} className="relative mb-5">
+            {/* Search — mobile only (desktop search lives in the toolbar) */}
+            <form onSubmit={handleSearch} className="relative mb-4 md:hidden">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 type="search"
@@ -324,7 +420,7 @@ const ProductsPage = () => {
 
               {/* Desktop: result count */}
               {showResultsInfo && (
-                <p className="hidden lg:block text-sm text-muted-foreground">
+                <p className="hidden lg:block text-sm text-muted-foreground truncate">
                   {allProducts.length > 0 ? (
                     <>
                       Showing{" "}
@@ -337,26 +433,46 @@ const ProductsPage = () => {
                   ) : (
                     <>0 products</>
                   )}
-                  {activeFilterCount > 0 && (
-                    <button
-                      type="button"
-                      onClick={clearFilters}
-                      className="ml-3 text-[12px] underline underline-offset-4 hover:text-espresso transition-colors"
-                    >
-                      Clear {activeFilterCount} filter{activeFilterCount !== 1 ? "s" : ""}
-                    </button>
-                  )}
                 </p>
               )}
 
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4 shrink-0">
+                {/* Search — compact, in-toolbar (≥md) */}
+                <form
+                  onSubmit={handleSearch}
+                  className="hidden md:flex h-10 w-[240px] lg:w-[280px] items-center rounded-sm
+                             border border-border bg-white px-3 transition-colors
+                             focus-within:border-maroon"
+                >
+                  <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
+                  <Input
+                    type="search"
+                    placeholder="Search products..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="h-full w-full rounded-none border-0 bg-transparent px-2 py-0
+                               text-[13px] shadow-none placeholder:text-muted-foreground
+                               focus-visible:ring-0 focus-visible:ring-offset-0 md:text-[13px]"
+                  />
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setSearchQuery("")}
+                      className="shrink-0 text-muted-foreground hover:text-espresso transition-colors"
+                      aria-label="Clear search"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                </form>
+
                 {/* Per page */}
                 <Select
                   value={productsPerPage.toString()}
                   onValueChange={handlePerPageChange}
                 >
                   <SelectTrigger
-                    className="hidden md:flex h-auto w-auto gap-1.5 border-0 bg-transparent px-0 py-1
+                    className="hidden xl:flex h-auto w-auto gap-1.5 border-0 bg-transparent px-0 py-1
                                text-[13px] uppercase tracking-[0.06em] text-muted-foreground
                                hover:text-espresso focus:ring-0 focus:ring-offset-0 rounded-none"
                   >
@@ -390,7 +506,7 @@ const ProductsPage = () => {
                                text-[13px] uppercase tracking-[0.06em] text-muted-foreground
                                hover:text-espresso focus:ring-0 focus:ring-offset-0 rounded-none"
                   >
-                    <span className="hidden sm:inline">Sort by:&nbsp;</span>
+                    <span className="hidden sm:inline lg:hidden xl:inline">Sort by:&nbsp;</span>
                     <SelectValue placeholder="Sort by" />
                   </SelectTrigger>
                   <SelectContent align="end" className="rounded-sm border-border bg-white shadow-md">
@@ -431,6 +547,34 @@ const ProductsPage = () => {
                 </div>
               </div>
             </div>
+
+            {/* Active filter chips */}
+            {activeChips.length > 0 && (
+              <div className="flex flex-wrap items-center gap-2.5 mb-6 -mt-3">
+                {activeChips.map((chip) => (
+                  <button
+                    key={chip.key}
+                    type="button"
+                    onClick={() => removeChip(chip.key)}
+                    aria-label={`Remove filter: ${chip.label}`}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-border
+                               bg-blush px-3 py-1.5 text-[12px] text-espresso
+                               hover:border-maroon transition-colors"
+                  >
+                    {chip.label}
+                    <X className="h-3 w-3 text-maroon" />
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  onClick={clearFilters}
+                  className="text-[11.5px] text-muted-foreground underline underline-offset-[3px]
+                             hover:text-espresso transition-colors"
+                >
+                  Clear all filters
+                </button>
+              </div>
+            )}
 
             {/* Loading State */}
             {loading ? (
