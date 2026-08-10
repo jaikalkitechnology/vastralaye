@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { User, ShoppingBag, Settings, LogOut } from "lucide-react";
 import { toast } from "sonner";
@@ -13,7 +14,8 @@ interface SidebarItem {
 const UserSidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { state, dispatch } = useStore();
+  const { state, logout } = useStore();
+  const [signingOut, setSigningOut] = useState(false);
 
   const navItems: SidebarItem[] = [
     {
@@ -35,30 +37,30 @@ const UserSidebar = () => {
 
   const isActive = (path: string) => location.pathname === path;
 
-  // ✅ FIXED LOGOUT FUNCTION
+  // Smooth SPA sign-out: the context's logout() resets auth state in
+  // memory (so the navbar updates instantly) — no hard page reload.
   const handleSignOut = () => {
-    try {
-      // clear storage
-      localStorage.clear();
-      sessionStorage.clear();
+    if (signingOut) return;
+    setSigningOut(true);
 
-      // update global state
-      // @ts-expect-error — pre-existing "LOGOUT" action is not part of the typed reducer union
-      dispatch({ type: "LOGOUT" });
+    // Brief pause so the "Signing out…" feedback is visible instead of
+    // the view vanishing mid-click.
+    setTimeout(() => {
+      try {
+        // Legacy token keys not covered by the context's logout()
+        ["access_token", "userToken", "accessToken"].forEach((k) =>
+          localStorage.removeItem(k)
+        );
+        sessionStorage.clear();
 
-      toast.success("Signed out successfully");
-
-      // redirect user
-      navigate("/login", { replace: true });
-
-      // optional reload to reset app state
-      setTimeout(() => {
-        window.location.reload();
-      }, 300);
-    } catch (error) {
-      console.error("Logout error:", error);
-      toast.error("Failed to sign out");
-    }
+        logout();
+        navigate("/login", { replace: true });
+      } catch (error) {
+        console.error("Logout error:", error);
+        toast.error("Failed to sign out");
+        setSigningOut(false);
+      }
+    }, 400);
   };
 
   const storeUser = state.currentUser;
@@ -123,10 +125,15 @@ const UserSidebar = () => {
         <div className="border-t border-border mt-1.5 pt-1.5">
           <button
             onClick={handleSignOut}
-            className="flex w-full items-center gap-3 border-l-2 border-transparent px-5 py-3 text-left text-[13px] uppercase tracking-[0.1em] text-sale transition-colors hover:bg-sale/5"
+            disabled={signingOut}
+            className="flex w-full items-center gap-3 border-l-2 border-transparent px-5 py-3 text-left text-[13px] uppercase tracking-[0.1em] text-sale transition-colors hover:bg-sale/5 disabled:opacity-60"
           >
-            <LogOut className="h-4 w-4" />
-            Sign Out
+            {signingOut ? (
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-sale border-t-transparent" />
+            ) : (
+              <LogOut className="h-4 w-4" />
+            )}
+            {signingOut ? "Signing Out…" : "Sign Out"}
           </button>
         </div>
       </nav>
