@@ -1,0 +1,190 @@
+<!DOCTYPE html><html><head><meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--ivory:#FAF6F0;--esp:#2B1B12;--mar:#7A1F2B;--terra:#B85C38;--gold:#C99A45;--gd:#8A6414;--sand:#EFE7DB;--blush:#F6E8E4;--bd:#E7DFD3;--mut:#6E5F53}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Jost',sans-serif;background:var(--ivory);color:var(--esp);font-size:14px;line-height:1.55}
+.wrap{max-width:1280px;margin:0 auto;padding:0 32px}
+.ovl{font-size:10.5px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--gd)}
+.nav{background:#fff;border-bottom:1px solid var(--bd);padding:14px 0}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between}
+.wm{font-family:'Fraunces',serif;font-size:22px;font-weight:600}.wm em{font-style:normal;color:var(--mar)}
+.wm small{display:block;font-family:'Jost';font-size:8px;letter-spacing:.42em;text-transform:uppercase;color:var(--gd)}
+.nav nav{display:flex;gap:26px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut)}
+/* banner */
+.banner{position:relative;background:linear-gradient(100deg,#2B1B12 30%,#4a2c1c 70%,#7A1F2B 100%);border-bottom:3px solid var(--gold);color:var(--ivory);overflow:hidden}
+.banner::after{content:'';position:absolute;right:0;top:0;bottom:0;width:45%;background:radial-gradient(circle at 70% 40%, rgba(201,154,69,.25), transparent 60%)}
+.banner .wrap{position:relative;padding:40px 32px 44px;z-index:1}
+.banner .crumb{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:rgba(250,246,240,.55)}
+.banner .crumb b{color:var(--gold);font-weight:500}
+.banner h1{font-family:'Fraunces',serif;font-size:34px;font-weight:500;margin-top:9px}
+.banner p{font-size:13.5px;color:rgba(250,246,240,.7);margin-top:7px}
+.banner .orn{display:flex;align-items:center;gap:10px;margin-top:16px}
+.banner .ln{height:1px;width:44px;background:var(--gold);opacity:.6}.banner .dm{width:7px;height:7px;border:1px solid var(--gold);transform:rotate(45deg)}
+.banner .hint{position:absolute;right:60px;top:50%;transform:translateY(-50%);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(250,246,240,.35);border:1px dashed rgba(201,154,69,.4);padding:26px 22px;border-radius:3px}
+/* toolbar */
+.bar{display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--bd);padding:14px 0;margin-top:8px}
+.srch{display:flex;align-items:center;gap:9px;border:1px solid var(--bd);border-radius:3px;background:#fff;height:40px;padding:0 13px;width:300px;color:var(--mut);font-size:13px}
+.sp{flex:1}.cnt{font-size:13px;color:var(--mut)}
+.sel{height:40px;border:1px solid var(--bd);border-radius:3px;background:#fff;display:flex;align-items:center;gap:10px;padding:0 13px;font-size:13px}
+/* featured duo v2 */
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:28px}
+.feat{position:relative;aspect-ratio:16/7.4;border-radius:3px;overflow:hidden;background:var(--sand)}
+.feat .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-style:italic;color:var(--mut);font-size:24px}
+.feat .grad{position:absolute;inset:0;background:linear-gradient(92deg,rgba(43,27,18,.9) 22%,rgba(43,27,18,.45) 55%,rgba(43,27,18,.05) 82%)}
+.feat .pais{position:absolute;left:0;top:0;bottom:0;width:45%;opacity:.12;background-size:120px 120px;background-image:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'><g fill='none' stroke='%23C99A45'><path d='M30 10c13 5 20 17 18 30-2 11-10 20-20 22-7 2-12-2-13-7-1-6 3-10 8-10 5 0 8 3 8 7'/><rect x='84' y='24' width='6' height='6' transform='rotate(45 87 27)'/><path d='M90 110c-13-5-20-17-18-30 2-11 10-20 20-22 7-2 12 2 13 7 1 6-3 10-8 10-5 0-8-3-8-7'/><rect x='27' y='87' width='6' height='6' transform='rotate(45 30 90)'/></g></svg>")}
+.feat .frame{position:absolute;inset:9px;border:1px solid rgba(201,154,69,.55);border-radius:2px}
+.feat .tx{position:absolute;left:28px;top:50%;transform:translateY(-50%);color:var(--ivory);z-index:1;max-width:60%}
+.feat .tx .o{font-size:9.5px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:var(--gold)}
+.feat .tx h3{font-family:'Fraunces',serif;font-size:28px;font-weight:500;margin-top:5px}
+.feat .tx .c{font-size:12px;color:rgba(250,246,240,.75);margin-top:4px}
+.feat .tx .go{display:inline-flex;align-items:center;gap:8px;margin-top:14px;font-size:10.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--ivory);border:1px solid rgba(201,154,69,.7);border-radius:2px;padding:9px 16px;background:rgba(201,154,69,.12)}
+.feat .chip{position:absolute;right:16px;top:14px;z-index:1;font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(201,154,69,.6);border-radius:999px;padding:4px 12px;background:rgba(43,27,18,.5)}
+/* section head + toran */
+.shead{text-align:center;margin:46px 0 0}
+.shead h2{font-family:'Fraunces',serif;font-size:28px;font-weight:500;margin-top:6px}
+.toran{display:flex;justify-content:center;margin-top:14px}
+.toran svg{width:340px;height:26px}
+/* arch gallery */
+.arches{display:grid;grid-template-columns:repeat(4,1fr);gap:28px;margin-top:30px;align-items:start}
+.arch{text-align:center}
+.arch:nth-child(even){margin-top:26px}
+.acard{position:relative;aspect-ratio:3/4;background:var(--sand);border-radius:999px 999px 3px 3px;overflow:hidden}
+.acard .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-style:italic;color:var(--mut);font-size:17px}
+.acard .ring{position:absolute;inset:8px;border:1px solid rgba(201,154,69,0);border-radius:999px 999px 3px 3px;transition:.3s}
+.arch.hov .acard .ring{border-color:rgba(201,154,69,.7)}
+.acard .veil{position:absolute;left:0;right:0;bottom:0;padding:38px 0 14px;background:linear-gradient(transparent,rgba(43,27,18,.75));opacity:0;text-align:center}
+.arch.hov .acard .veil{opacity:1}
+.acard .veil span{font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--gold)}
+.num{font-family:'Fraunces',serif;font-size:13px;color:var(--gold);letter-spacing:.14em;margin-top:15px}
+.arch .n{font-family:'Fraunces',serif;font-size:17.5px;font-weight:500;margin-top:2px}
+.arch.hov .n{color:var(--mar)}
+.arch .c{font-size:11.5px;color:var(--mut);margin-top:2px}
+.arch .rl{width:38px;height:1px;background:var(--gold);margin:10px auto 0;opacity:0;transition:.3s}
+.arch.hov .rl{opacity:1}
+/* pagination */
+.pag{display:flex;align-items:center;justify-content:center;gap:8px;margin:34px 0 8px}
+.pag .pb{min-width:36px;height:36px;border:1px solid var(--bd);border-radius:3px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px}
+.pag .pb.on{background:var(--esp);color:var(--ivory);border-color:var(--esp)}
+.pag .nav2{padding:0 16px;font-size:10.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase}
+/* espresso CTA */
+.cta{position:relative;margin:40px 0 0;background:var(--esp);border-radius:3px;overflow:hidden;color:var(--ivory);border:1px solid var(--esp)}
+.cta .pais{position:absolute;inset:0;opacity:.06;background-size:130px 130px;background-image:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='130' height='130' viewBox='0 0 130 130'><g fill='none' stroke='%23C99A45'><path d='M33 11c14 6 22 18 20 32-2 12-11 22-22 24-8 2-13-2-14-8-1-6 3-11 9-11 5 0 9 3 9 8'/><rect x='92' y='26' width='6' height='6' transform='rotate(45 95 29)'/><path d='M97 119c-14-6-22-18-20-32 2-12 11-22 22-24 8-2 13 2 14 8 1 6-3 11-9 11-5 0-9-3-9-8'/><rect x='29' y='94' width='6' height='6' transform='rotate(45 32 97)'/></g></svg>")}
+.cta .in{position:relative;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:34px 38px}
+.cta .frame{position:absolute;inset:10px;border:1px solid rgba(201,154,69,.35);border-radius:2px;pointer-events:none}
+.cta h3{font-family:'Fraunces',serif;font-size:23px;font-weight:500}
+.cta p{font-size:13px;color:rgba(250,246,240,.65);margin-top:4px}
+.cta .btn{border:1px solid var(--gold);border-radius:3px;padding:14px 28px;font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);background:transparent;white-space:nowrap}
+.foot-hint{background:var(--esp);color:rgba(250,246,240,.5);text-align:center;padding:14px;font-size:11px;letter-spacing:.2em;text-transform:uppercase;margin-top:44px;border-top:3px solid var(--gold)}
+</style></head><body>
+
+<div class="nav"><div class="wrap">
+  <div class="wm">Vastra<em>laye</em><small>Handcrafted India</small></div>
+  <nav><span>Home</span><span>Shop</span><span>All Categories</span><span>All Products</span></nav>
+  <div style="font-size:12px;letter-spacing:.1em;color:var(--mut)">SEARCH · ♡ · CART</div>
+</div></div>
+
+<div class="banner">
+  <div class="wrap">
+    <div class="crumb">Home · <b>Categories</b></div>
+    <h1>All Categories</h1>
+    <p>Every weave, every occasion · 9 categories · 128 products</p>
+    <div class="orn"><span class="ln"></span><span class="dm"></span><span class="ln"></span></div>
+  </div>
+  <div class="hint">Admin banner image</div>
+</div>
+
+<div class="wrap">
+  <div class="bar">
+    <span class="srch">🔍 Search categories…</span>
+    <span class="sp"></span>
+    <span class="cnt">9 categories</span>
+    <span class="sel">Sort: Featured ▾</span>
+  </div>
+
+  <!-- Featured duo v2 -->
+  <div class="duo">
+    <div class="feat">
+      <span class="ph">Vastralaye</span>
+      <div class="grad"></div><div class="pais"></div><div class="frame"></div>
+      <span class="chip">42 pieces</span>
+      <div class="tx">
+        <div class="o">Most Loved</div>
+        <h3>Sarees</h3>
+        <div class="c">Banarasi, Chanderi &amp; hand-woven zari</div>
+        <span class="go">Explore Sarees →</span>
+      </div>
+    </div>
+    <div class="feat">
+      <span class="ph">Vastralaye</span>
+      <div class="grad"></div><div class="pais"></div><div class="frame"></div>
+      <span class="chip">31 pieces</span>
+      <div class="tx">
+        <div class="o">Festive Ready</div>
+        <h3>Kurta Sets</h3>
+        <div class="c">Cotton, silk &amp; hand-block prints</div>
+        <span class="go">Explore Kurta Sets →</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section head with toran garland -->
+  <div class="shead">
+    <span class="ovl">Browse the Loom</span>
+    <h2>Shop by Category</h2>
+    <div class="toran">
+      <svg viewBox="0 0 340 26" fill="none" stroke="#C99A45">
+        <line x1="0" y1="4" x2="340" y2="4" stroke-opacity=".6"/>
+        <g stroke-opacity=".8">
+          <path d="M30 4l7 12 7-12"/><path d="M72 4l7 12 7-12"/><path d="M114 4l7 12 7-12"/><path d="M156 4l7 12 7-12"/><path d="M198 4l7 12 7-12"/><path d="M240 4l7 12 7-12"/><path d="M282 4l7 12 7-12"/>
+        </g>
+        <g fill="#B85C38" stroke="none">
+          <circle cx="37" cy="19" r="1.7"/><circle cx="79" cy="19" r="1.7"/><circle cx="121" cy="19" r="1.7"/><circle cx="163" cy="19" r="1.7"/><circle cx="205" cy="19" r="1.7"/><circle cx="247" cy="19" r="1.7"/><circle cx="289" cy="19" r="1.7"/>
+        </g>
+        <rect x="166.5" y="0.5" width="7" height="7" transform="rotate(45 170 4)" fill="#FAF6F0"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Jharokha arch gallery (staggered) -->
+  <div class="arches">
+    <div class="arch">
+      <div class="acard"><span class="ph">Vastralaye</span><span class="ring"></span><div class="veil"><span>Explore →</span></div></div>
+      <div class="num">I</div><div class="n">Lehengas</div><div class="c">18 products</div><div class="rl"></div>
+    </div>
+    <div class="arch hov">
+      <div class="acard"><span class="ph">Vastralaye</span><span class="ring"></span><div class="veil"><span>Explore →</span></div></div>
+      <div class="num">II</div><div class="n">Dupattas</div><div class="c">22 products</div><div class="rl"></div>
+    </div>
+    <div class="arch">
+      <div class="acard"><span class="ph">Vastralaye</span><span class="ring"></span><div class="veil"><span>Explore →</span></div></div>
+      <div class="num">III</div><div class="n">Menswear</div><div class="c">15 products</div><div class="rl"></div>
+    </div>
+    <div class="arch">
+      <div class="acard"><span class="ph">Vastralaye</span><span class="ring"></span><div class="veil"><span>Explore →</span></div></div>
+      <div class="num">IV</div><div class="n">Jewellery</div><div class="c">12 products</div><div class="rl"></div>
+    </div>
+  </div>
+
+  <div class="pag">
+    <span class="pb nav2">‹ Prev</span>
+    <span class="pb on">1</span><span class="pb">2</span>
+    <span class="pb nav2">Next ›</span>
+  </div>
+
+  <!-- Espresso CTA -->
+  <div class="cta">
+    <div class="pais"></div><div class="frame"></div>
+    <div class="in">
+      <div>
+        <h3>Can't find your weave?</h3>
+        <p>Browse the full catalogue — every piece, every craft, in one place.</p>
+      </div>
+      <span class="btn">Browse All Products</span>
+    </div>
+  </div>
+</div>
+
+<div class="foot-hint">Footer · India panorama</div>
+</body></html>
