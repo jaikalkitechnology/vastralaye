@@ -830,6 +830,9 @@ async def create_order(
             Coupon.active == True
         ).first()
 
+        if not coupon:
+            raise HTTPException(status_code=400, detail="Invalid or expired coupon code")
+
         if coupon.discount_type == "percentage":
             coupon_discount = (coupon.discount_value / 100) * subtotal
         else:
