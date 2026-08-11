@@ -40,6 +40,10 @@ class PageBanner(Base):
     # edge-to-edge at its own aspect ratio, with no espresso wash and no
     # heading painted over it.
     full_bleed = Column(Boolean, default=False)
+    # Wash laid over the image (and the band colour when no image is set),
+    # as "#RRGGBB" plus a 0-100 strength. NULL falls back to espresso @ 95.
+    overlay_color = Column(String(7), nullable=True)
+    overlay_opacity = Column(Integer, nullable=True)
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
 

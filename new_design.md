@@ -769,12 +769,36 @@ Each page-banner slot gains a **Full-width artwork** toggle:
 `full_bleed` is a new nullable boolean on `page_banners`; existing databases pick it up
 through `schema_sync` at startup, so there's no migration to run.
 
+### Overlay colour control
+
+The wash over a banner photo was hard-coded `from-espresso/95 via-espresso/75
+to-espresso/35`. It's now admin-controlled per page, in the same card:
+
+- **Colour** — a native colour picker, a hex field, and five brand swatches (espresso,
+  maroon, terracotta, deep gold, black). The hex field is free text, so the swatch,
+  preview and gradient fall back to espresso while a partial value is being typed;
+  the backend normalises `#abc` → `#AABBCC` and rejects anything that isn't hex.
+- **Strength** — a 0–100 slider with a live percentage. The gradient keeps the original
+  95 / 75 / 35 fall-off as a *ratio* (`peak`, `peak × 0.79`, `peak × 0.37`), so 95
+  reproduces the previous espresso wash exactly and lower values thin the whole ramp
+  evenly rather than flattening it.
+- The colour is also the **band background** — behind a transparent image, and on the
+  paisley fallback when no image is uploaded.
+- The card's image area became a **live preview** of the storefront band: the wash, the
+  breadcrumb, the serif heading and the gold ornament, all at the current settings. The
+  controls hide under Full-width artwork, which draws no overlay.
+- `hexToRgba` / `overlayGradient` / the defaults are exported from `PageBanner` so the
+  admin preview and the storefront cannot drift apart.
+
+`overlay_color` (`varchar(7)`) and `overlay_opacity` (`int`) are both nullable and fall
+back to espresso / 95, so existing rows render exactly as before.
+
 | File | Change |
 |---|---|
-| `app/models/site_content.py` | `PageBanner.full_bleed` |
-| `app/routers/site_content.py` | `full_bleed` in the payload and the multipart upsert |
-| `src/components/PageBanner.tsx` | Full-bleed branch, mobile centre-crop, `sr-only` heading |
-| `src/pages/admin/AdminPageBanners.tsx` | Toggle, helper copy, contain-preview, disabled tagline |
+| `app/models/site_content.py` | `PageBanner.full_bleed`, `.overlay_color`, `.overlay_opacity` |
+| `app/routers/site_content.py` | New fields in the payload and multipart upsert; hex normalise/validate, opacity clamped 0–100 |
+| `src/components/PageBanner.tsx` | Full-bleed branch, mobile centre-crop, `sr-only` heading, overlay colour/strength applied to wash + band, exported colour helpers |
+| `src/pages/admin/AdminPageBanners.tsx` | Full-width toggle, colour picker + hex + swatches, strength slider, live band preview |
 
 ---
 
@@ -795,3 +819,7 @@ through `schema_sync` at startup, so there's no migration to run.
   with a `full_bleed` banner renders the artwork whole with no wash and no painted
   heading, keeps the `sr-only` `<h1>`, and centre-crops below `md`; the admin card shows
   the toggle, the contained preview and the disabled tagline. No console or page errors.
+- Overlay control driven against the production build at three settings — espresso 95
+  (pixel-identical to the previous hard-coded wash), maroon 70 and black 40 — plus the
+  admin card showing the picker, swatches, slider and live preview. No console or page
+  errors.
