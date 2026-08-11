@@ -26,6 +26,15 @@ from fastapi.responses import FileResponse
 # ---------------------- DB Setup ----------------------
 Base.metadata.create_all(bind=engine)
 
+# Add any model columns missing from pre-existing tables. create_all only
+# creates new *tables*, so a model that gains a field leaves older databases
+# raising "Unknown column" on every insert (see app/schema_sync.py). This is
+# the deployed entrypoint — mizormart.service runs `run:app` from here — so
+# the sync has to happen in this file, not only in app/run.py.
+from app.schema_sync import sync_missing_columns  # noqa: E402
+
+sync_missing_columns()
+
 
 # ---------------------- Lifespan: Startup Events ----------------------
 @asynccontextmanager
@@ -49,8 +58,15 @@ async def lifespan(app: FastAPI):
 
 # ---------------------- App Initialization ----------------------
 app = FastAPI(
-    title="Mizor API",
-    description="Mizor — API Docs",
+    title="Vastralaye API",
+    description=(
+        "Vastralaye — storefront and admin API.\n\n"
+        "Handcrafted ethnic wear: catalogue, cart, orders, invoices, coupons, "
+        "reels and site content.\n\n"
+        "Payments are processed by the Mizorpay gateway, so gateway-owned field "
+        "names (`mizor_pay_txn_id`, `merchant_ref`) appear verbatim in the payment "
+        "and webhook payloads below."
+    ),
     version="1.0.0",
     lifespan=lifespan,
 )

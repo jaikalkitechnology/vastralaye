@@ -17,7 +17,10 @@ logger = logging.getLogger(__name__)
 @router.post("/webhook")
 async def payment_webhook(request: Request, db: Session = Depends(get_db)):
     """
-    Payment Webhook Handler for Mizorpay Payments
+    Vastralaye payment webhook.
+
+    Called by the Mizorpay gateway when a payin settles; the gateway's own
+    field names (`mizor_pay_txn_id`, `merchant_ref`) are kept verbatim.
     """
 
     try:
