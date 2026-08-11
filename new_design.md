@@ -697,6 +697,51 @@ built component, not the mockup.
 
 ---
 
+## 25. Home hero banner — illustrated artisan courtyard
+
+The homepage hero (`HeroSection.tsx`, slides fed by the admin Banner Control page) sat
+on a flat blush→ivory→sand gradient. It now carries an original illustrated scene
+behind the banner, in the same zari line-art language as the footer panorama — but
+where the footer draws a pan-India skyline of landmarks, the hero tells the *making-of*
+story instead, so the two never repeat each other.
+
+`src/components/decor/HeroScene.tsx` (new):
+
+- **Toran** across the top — five marigold swags between pegs, each peg trailing mango
+  leaves, with a pair of birds off the garland. Marigold positions are computed on the
+  quadratic swag curve rather than hand-placed, so they sit true on the sag.
+- **Courtyard of craft** along the bottom — a pit handloom with stretched warp threads,
+  reed and cloth beam, a **seated weaver** drawn as a draped figure at the shuttle, a
+  charkha with a drive band to its spindle, thread spools with a loose trailing thread,
+  a rangoli chalked in perspective on the floor, three lit diyas on a step, a tulsi pot
+  and a stack of folded weaves.
+- **Jharokha arches** at the far left and right (≥`lg`), stripped to a clean outline
+  with merlons and a sill — the balustrade grid read as clutter behind the CTAs.
+- **Butis** — block-print motifs scattered through the mid-field at percentage
+  positions, deliberately routed around the headline block.
+
+Composition notes that matter if this is ever edited:
+
+- The scene is built as **separately anchored bands** (top / bottom / left / right),
+  each an SVG sized by its own intrinsic ratio, rather than one full-bleed drawing. A
+  single `xMidYMid slice` layer scaled to cover the hero and cropped the courtyard off
+  at both edges as the section grew taller.
+- Everything on the right of the courtyard stays under ~90px above the ground line, so
+  the campaign image floating above it never clips a tall element.
+- Below `md` the courtyard is hidden: the copy fills a narrow hero and the scene would
+  land under the buttons. The toran and paisley carry it there.
+- A soft radial wash sits over the art under the headline, and the slide indicators
+  gained `z-10` so they stay above the scene.
+
+| File | Change |
+|---|---|
+| `src/components/decor/HeroScene.tsx` | New — toran, courtyard, arches, butis |
+| `src/components/HeroSection.tsx` | Paisley tile + `HeroScene` + headline wash layered behind the banner; content wrapper made `relative`; indicators `z-10` |
+
+Screenshots: `user_design/screenshots/15-home-hero-scene{,-mobile}.png`.
+
+---
+
 ## Verification
 
 - `tsc --noEmit` — no errors in any changed file.
@@ -707,3 +752,6 @@ built component, not the mockup.
   toggle the CTA between *Place Order · ₹total* and *Pay ₹total*, and Place Order posts
   `{items, payment_method:"cod", shipping_address}` and opens the success modal. No
   console or page errors.
+- Home hero checked in a real browser at 1440 / 820 / 420 px: the toran renders at all
+  three, the courtyard sits clear of the CTAs from `md` up and is hidden below it, and
+  no band is cropped. No console or page errors.
