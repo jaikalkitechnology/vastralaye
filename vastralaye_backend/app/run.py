@@ -162,7 +162,9 @@ app.include_router(newsletter.router)
 
 from app.routers import site_content
 from app.routers import payment_gateway
+from app.routers import google_auth
 app.include_router(payment_gateway.router)   # ✅ admin payment integration
+app.include_router(google_auth.router)   # ✅ Sign in with Google
 app.include_router(site_content.router)
 
 

@@ -239,6 +239,13 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
 
     user = get_user_by_email(db, form_data.username)
 
+    # Google-only accounts have no password hash to compare against.
+    if user and not user.password:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="This account uses Google sign-in. Use the Continue with Google button.",
+        )
+
     if not user or not verify_password(form_data.password, user.password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

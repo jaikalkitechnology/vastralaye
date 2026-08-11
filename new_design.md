@@ -892,6 +892,47 @@ checkout, so it is reported rather than done. The page surfaces the count.
 
 ---
 
+## 29. Sign in with Google, switched from the admin dashboard
+
+**Admin → Settings → Login Methods** (`/admin/login-methods`) holds a switch, the Google
+**Client ID**, and a "let new customers sign up with Google" toggle. Turn it on and a
+**Continue with Google** button appears above the email/password form on `/login`; turn
+it off and the button disappears entirely. Password sign-in is never affected.
+
+- **ID-token flow, so there is no client secret to store.** The browser gets a signed
+  JWT from Google Identity Services and posts it to `POST /api/v1/users/auth/google`.
+  The server validates it with Google and then checks it was issued *for us* —
+  `aud` equals our client ID, `iss` is a Google issuer, `email_verified` is true.
+  A valid Google token minted for a different app is rejected.
+- **The button is Google's own**, rendered by GIS — their branding rules require the
+  official mark, and it brings locale and accessibility with it. The script is loaded
+  once, lazily, and only when the feature is on.
+- **`enabled` is never advertised without a client ID**, so the button can't render and
+  then fail on click; saving `enabled` with a blank ID is rejected, as is an ID that
+  doesn't end in `.apps.googleusercontent.com`.
+- **Account linking**: signing in with Google using an email that already has a password
+  account links the two rather than creating a duplicate — same customer, one account,
+  orders and wishlist intact.
+- **Google-only accounts have no password.** `users.password` is now explicitly nullable,
+  and the password login path returns *"This account uses Google sign-in"* instead of
+  throwing when it finds a NULL hash.
+- Settings live in `site_settings` under keys the public settings endpoint doesn't
+  expose, so nothing leaks through `/fronted/settings`.
+
+| File | Change |
+|---|---|
+| `app/models/user.py` | `password` nullable, `google_id`, `auth_provider` |
+| `app/routers/google_auth.py` | New — public config, admin config, token verification, sign-in |
+| `app/routers/user.py` | Password login guards against a NULL hash |
+| `run.py`, `app/run.py` | Register the router |
+| `src/components/auth/GoogleSignInButton.tsx` | New — config fetch, GIS loader, rendered button |
+| `src/pages/LoginPage.tsx` | Button + "or" divider above the form |
+| `src/contexts/StoreContext.tsx` | `loginWithGoogle()` |
+| `src/pages/admin/AdminLoginMethods.tsx` | New admin page |
+| `src/App.tsx`, `src/components/admin/AdminSidebar.tsx` | Route + Settings → Login Methods |
+
+---
+
 ## Verification
 
 - `tsc --noEmit` — no errors in any changed file.
@@ -902,6 +943,11 @@ checkout, so it is reported rather than done. The page surfaces the count.
   toggle the CTA between *Place Order · ₹total* and *Pay ₹total*, and Place Order posts
   `{items, payment_method:"cod", shipping_address}` and opens the success modal. No
   console or page errors.
+- Google sign-in driven against the production build with the config stubbed on and
+  off: the button renders above the form with the "or" divider when on and is absent
+  when off, the email/password form is unaffected either way, and neither state logs a
+  console error. The admin page renders its switch, client-ID field, setup steps and
+  account count.
 - Banner form driven in a real browser against the production build: a fully untouched
   form is blocked with "Nothing to show yet" and sends no request; a title with no image
   posts successfully; the storefront renders no-image, title-only and image-only slides
