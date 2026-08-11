@@ -396,7 +396,9 @@ def get_all_users(
 
     # ACTIVE STATUS FILTER
     if is_active is not None:
-        query = query.filter(User.active == is_active)
+        query = query.filter(
+            User.deleted_at.is_(None) if is_active else User.deleted_at.isnot(None)
+        )
 
     # DATE RANGE FILTERS
     if created_after:
@@ -435,15 +437,18 @@ def get_users_stats(
         admin: User = Depends(get_current_admin_user),
 ):
     """Get user statistics"""
+    # The column is `active`, not `is_active` — but count on `deleted_at`:
+    # it is what login actually enforces, the activate/deactivate endpoints
+    # set it first, and it can't be NULL-ambiguous on rows that predate the
+    # `active` boolean. Deriving `inactive` keeps the numbers reconciling.
     total = db.query(User).count()
-    active = db.query(User).filter(User.is_active == True).count()
-    inactive = db.query(User).filter(User.is_active == False).count()
+    active = db.query(User).filter(User.deleted_at.is_(None)).count()
     admins = db.query(User).filter(User.role == 'admin').count()
 
     return {
         "total": total,
         "active": active,
-        "inactive": inactive,
+        "inactive": total - active,
         "admins": admins
     }
 
