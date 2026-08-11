@@ -798,6 +798,43 @@ back to espresso / 95, so existing rows render exactly as before.
 
 ---
 
+## 27. Add New Banner — every field optional
+
+The hero-slide form in Admin → Banners refused to save unless **Title line 1** was
+filled and an image was chosen, and the API enforced the same two (`Form(...)` /
+`File(...)`). Both are now optional, on the client and the server.
+
+- The only remaining check is that a *new* slide has **an image or some text** —
+  overline, either title line, or the description. The CTA fields don't count towards
+  it: they arrive pre-filled with "Shop Now" → `/products`, so counting them would have
+  made the check unreachable, and a hero of nothing but a button isn't a slide.
+- The `*` is gone from the Title line 1 label and the upload prompt now says
+  *"(optional)"*.
+
+The storefront had to learn to cope with the gaps:
+
+- **No image** → the arch visual isn't rendered at all and the grid drops to a single
+  column, instead of a broken `<img src="">`.
+- **No title** → the `<h1>` is skipped rather than rendering empty; the `<br>` between
+  the two title lines only appears when both exist; the image's `alt` is built from
+  whichever lines exist.
+- **No description** → the paragraph is skipped.
+- The banner list in admin shows a *No image* placeholder and an italic *Untitled slide*
+  where those are missing, and the delete confirmation falls back to `#id`.
+
+**No migration.** `hero_banners.image_url` and `.title_line_1` are `NOT NULL`, so "not
+set" is written as an **empty string** rather than NULL — which the storefront already
+treats as absent. Relaxing the columns would have meant another `ALTER` on a live table
+for no behavioural gain.
+
+| File | Change |
+|---|---|
+| `app/routers/site_content.py` | `title_line_1` and `image_file` optional on create and update; missing values stored as `""` |
+| `src/pages/admin/AdminBanners.tsx` | Required-field guards replaced with a single has-content check; label/prompt copy; list placeholders |
+| `src/components/HeroSection.tsx` | Arch visual, `<h1>` and description each render only when present; single-column layout without an image |
+
+---
+
 ## Verification
 
 - `tsc --noEmit` — no errors in any changed file.
@@ -808,6 +845,10 @@ back to espresso / 95, so existing rows render exactly as before.
   toggle the CTA between *Place Order · ₹total* and *Pay ₹total*, and Place Order posts
   `{items, payment_method:"cod", shipping_address}` and opens the success modal. No
   console or page errors.
+- Banner form driven in a real browser against the production build: a fully untouched
+  form is blocked with "Nothing to show yet" and sends no request; a title with no image
+  posts successfully; the storefront renders no-image, title-only and image-only slides
+  with zero broken images and no console errors.
 - Home hero background driven against the production build at four settings — ivory 90,
   ivory 65, espresso 80 (copy correctly flips to ivory/gold) and no image (unchanged
   blush → sand gradient) — plus the admin hero card with its own preview and light-first

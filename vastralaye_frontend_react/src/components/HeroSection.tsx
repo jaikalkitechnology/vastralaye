@@ -169,7 +169,11 @@ const HeroSection = () => {
       )}
 
       <div className="relative container mx-auto px-4">
-        <div className="grid grid-cols-1 lg:grid-cols-2 items-center gap-10 lg:gap-16 py-12 md:py-20 lg:py-24 min-h-[60vh]">
+        <div
+          className={`grid grid-cols-1 items-center gap-10 lg:gap-16 py-12 md:py-20 lg:py-24 min-h-[60vh] ${
+            slide.image ? 'lg:grid-cols-2' : ''
+          }`}
+        >
           {/* Copy */}
           <AnimatePresence mode="wait">
             <motion.div
@@ -181,20 +185,24 @@ const HeroSection = () => {
               className="order-2 lg:order-1 text-center lg:text-left"
             >
               {slide.overline && <span className="overline-label mb-4">{slide.overline}</span>}
-              <h1
-                className={`font-serif text-4xl md:text-5xl xl:text-6xl font-medium leading-[1.12] mb-5 ${headingClass}`}
-              >
-                {slide.titleA}
-                {slide.titleB && (
-                  <>
-                    <br />
-                    <em className={`italic ${accentClass}`}>{slide.titleB}</em>
-                  </>
-                )}
-              </h1>
-              <p className={`text-base md:text-lg max-w-xl mx-auto lg:mx-0 mb-8 ${bodyClass}`}>
-                {slide.description}
-              </p>
+              {(slide.titleA || slide.titleB) && (
+                <h1
+                  className={`font-serif text-4xl md:text-5xl xl:text-6xl font-medium leading-[1.12] mb-5 ${headingClass}`}
+                >
+                  {slide.titleA}
+                  {slide.titleB && (
+                    <>
+                      {slide.titleA && <br />}
+                      <em className={`italic ${accentClass}`}>{slide.titleB}</em>
+                    </>
+                  )}
+                </h1>
+              )}
+              {slide.description && (
+                <p className={`text-base md:text-lg max-w-xl mx-auto lg:mx-0 mb-8 ${bodyClass}`}>
+                  {slide.description}
+                </p>
+              )}
               <div className="flex flex-wrap justify-center lg:justify-start gap-4">
                 <Link
                   to={slide.ctaPrimary.to}
@@ -214,7 +222,8 @@ const HeroSection = () => {
             </motion.div>
           </AnimatePresence>
 
-          {/* Arch visual */}
+          {/* Arch visual — omitted when the slide carries no image */}
+          {slide.image && (
           <div className="order-1 lg:order-2 flex justify-center">
             <div className="relative w-[240px] sm:w-[300px] lg:w-[380px]">
               <div className="absolute -inset-4 border border-gold rounded-t-[999px] rounded-b-none pointer-events-none" aria-hidden="true" />
@@ -223,7 +232,7 @@ const HeroSection = () => {
                   <motion.img
                     key={`img-${slide.id}`}
                     src={slide.image}
-                    alt={`${slide.titleA} ${slide.titleB}`}
+                    alt={[slide.titleA, slide.titleB].filter(Boolean).join(' ')}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
@@ -234,6 +243,7 @@ const HeroSection = () => {
               </div>
             </div>
           </div>
+          )}
         </div>
       </div>
 
