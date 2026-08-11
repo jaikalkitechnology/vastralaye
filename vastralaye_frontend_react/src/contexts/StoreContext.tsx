@@ -2,6 +2,7 @@ import React, { createContext, useContext, useReducer, useEffect, useCallback } 
 import { Product, User, CartItem, WishlistItem, Coupon, LoginResponse } from '@/types';
 import { toast } from 'sonner';
 import axios from 'axios';
+import { BASE_URL } from '@/config';
 
 // Import all API functions from apihelper
 import {
@@ -249,6 +250,7 @@ interface StoreContextType {
   removeFromWishlist: (productId: string) => Promise<void>;
   isInWishlist: (productId: string) => boolean;
   login: (email: string, password: string, rememberMe: boolean, userType?: 'user' | 'admin') => Promise<boolean>;
+  loginWithGoogle: (credential: string) => Promise<boolean>;
   register: (formData: FormData) => Promise<boolean>;
   logout: () => void;
   applyFilters: () => void;
@@ -656,6 +658,41 @@ return state.wishlist.some(item =>
 
 
 
+  /** Exchange a Google ID token for our own session. Users only — an admin
+      still signs in with a password. */
+  const loginWithGoogle = async (credential: string): Promise<boolean> => {
+    try {
+      dispatch({ type: "SET_LOADING_STATE", payload: true });
+      dispatch({ type: "SET_AUTH_ERROR", payload: null });
+
+      const res = await axios.post<any>(`${BASE_URL}/users/auth/google`, { credential });
+      const token = res.data?.access_token;
+      if (!token) throw new Error("Google sign-in did not return a session");
+
+      localStorage.setItem("token", token);
+      localStorage.setItem("isAdmin", "false");
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+      const userData = await getUserMe();
+      dispatch({ type: "SET_CURRENT_USER", payload: userData });
+      dispatch({ type: "SET_ADMIN_STATUS", payload: false });
+      saveToStorage("currentUser", userData);
+      await syncWishlistFromServer();
+
+      toast.success("Signed in with Google");
+      return true;
+    } catch (error: any) {
+      const msg =
+        error?.response?.data?.detail || error?.message || "Google sign-in failed";
+      dispatch({ type: "SET_AUTH_ERROR", payload: msg });
+      toast.error(msg);
+      return false;
+    } finally {
+      dispatch({ type: "SET_LOADING_STATE", payload: false });
+    }
+  };
+
+
   // Registration function (only for regular users)
   const register = async (formData: FormData): Promise<boolean> => {
     try {
@@ -805,6 +842,7 @@ return state.wishlist.some(item =>
       removeFromWishlist,
       isInWishlist,
       login,
+      loginWithGoogle,
       register,
       logout,
       applyFilters,

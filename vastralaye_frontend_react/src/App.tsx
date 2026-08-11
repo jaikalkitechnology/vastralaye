@@ -46,6 +46,7 @@ const AdminOrder = lazy(() => import("@/pages/admin/AdminOrder"));
 const AdminReels = lazy(() => import("@/pages/admin/AdminReels"));
 const AdminBanners = lazy(() => import("@/pages/admin/AdminBanners"));
 const AdminPayments = lazy(() => import("@/pages/admin/AdminPayments"));
+const AdminLoginMethods = lazy(() => import("@/pages/admin/AdminLoginMethods"));
 const AdminTestimonials = lazy(() => import("@/pages/admin/AdminTestimonials"));
 const AdminSettings = lazy(() => import("@/pages/admin/AdminSettings"));
 const Reviews = lazy(() => import("@/pages/admin/CustomerReviews"));
@@ -93,6 +94,7 @@ const AppContent = () => {
         <Route path="/admin/reels" element={<AdminLayout><AdminReels /></AdminLayout>} />
         <Route path="/admin/banners" element={<AdminLayout><AdminBanners /></AdminLayout>} />
         <Route path="/admin/payments" element={<AdminLayout><AdminPayments /></AdminLayout>} />
+        <Route path="/admin/login-methods" element={<AdminLayout><AdminLoginMethods /></AdminLayout>} />
         <Route path="/admin/testimonials" element={<AdminLayout><AdminTestimonials /></AdminLayout>} />
         <Route path="/admin/settings" element={<AdminLayout><AdminSettings /></AdminLayout>} />
 

@@ -12,7 +12,11 @@ class User(Base):
     first_name = Column(String(250))
     last_name = Column(String(250))
     email = Column(String(250), unique=True, index=True)
-    password = Column(String(250))
+    # NULL for accounts created through Google — they have no password to check.
+    password = Column(String(250), nullable=True)
+    google_id = Column(String(64), nullable=True, index=True)
+    # "password" | "google" — how the account was first created.
+    auth_provider = Column(String(20), nullable=True)
     avatar = Column(String(255), nullable=True)  # 👈 only filename/path stored here
     role = Column(String(250), default="user")
     phone = Column(String(50), nullable=True)  # new field

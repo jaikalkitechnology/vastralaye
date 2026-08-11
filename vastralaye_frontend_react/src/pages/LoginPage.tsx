@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
+import GoogleSignInButton from '@/components/auth/GoogleSignInButton';
 
 const fieldClasses =
   'h-11 bg-white border-input rounded-sm text-[14.5px] focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-maroon';
@@ -135,6 +136,8 @@ const LoginPage = () => {
               <div className="text-sm">{authError}</div>
             </div>
           )}
+
+          <GoogleSignInButton text="continue_with" />
 
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* EMAIL */}
