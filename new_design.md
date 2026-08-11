@@ -1061,6 +1061,47 @@ everyone. The admin toggle says both things where they'll be read.
 
 ---
 
+## 33. Google avatars 404'd against the API
+
+The backend log filled with:
+
+```
+GET /https%3A//lh3.googleusercontent.com/a/ACg8oc… HTTP/1.1  404 Not Found
+```
+
+`GET /users/get_profile` unconditionally prefixed the stored avatar with the API origin:
+
+```python
+user.avatar = f"{base_url}/{user.avatar.lstrip('/')}"
+```
+
+Fine for a locally uploaded `/static/avatars/u7.jpg`. But a Google sign-in stores the
+absolute `https://lh3.googleusercontent.com/…`, which became
+`http://api/https://lh3.googleusercontent.com/…` — the browser percent-encodes the `:` in
+a path segment, and the request lands back on the API as `/https%3A//lh3…` → 404, and the
+customer sees no profile picture.
+
+**The line also mutated a live ORM object.** `user` comes from the session, so that
+assignment was one autoflush away from writing the prefixed URL back to the database —
+after which every subsequent read would prefix it again, compounding. The fix detaches
+with `db.expunge(user)` before touching the field, so a display concern can't reach the
+stored data at all.
+
+The mirror of this existed on the frontend: `/users/me` returns the stored path
+untouched, and `UserSidebar` used it directly as `src`. Google URLs worked there;
+locally uploaded avatars resolved against the *storefront* origin and 404'd quietly.
+Both surfaces now go through `mediaUrl()`, which also learned to pass `blob:` and
+`data:` through — `ProfilePage` shows a `URL.createObjectURL` preview while picking a
+new photo, and prefixing that would have broken it.
+
+| File | Change |
+|---|---|
+| `app/routers/user.py` | `get_profile` leaves absolute URLs alone and expunges before mutating |
+| `src/lib/media.ts` | `blob:` / `data:` pass through alongside `http(s):` |
+| `src/components/user/UserSidebar.tsx`, `src/pages/user/ProfilePage.tsx` | Resolve avatars via `mediaUrl` |
+
+---
+
 ## Verification
 
 - `tsc --noEmit` — no errors in any changed file.
@@ -1071,6 +1112,11 @@ everyone. The admin toggle says both things where they'll be read.
   toggle the CTA between *Place Order · ₹total* and *Pay ₹total*, and Place Order posts
   `{items, payment_method:"cod", shipping_address}` and opens the success modal. No
   console or page errors.
+- Avatar resolution tested on both sides. Server branch over seven stored shapes: a
+  Google URL passes through, a local path gains the API origin with or without a leading
+  slash, and empty/None/whitespace all fall back to the default. `mediaUrl` over seven
+  more: `http(s):`, `blob:` and `data:` untouched, stored paths prefixed, empty stays
+  empty.
 - Google profile fetch tested both halves. The mapping module against seven payload
   shapes: home/mobile beat work, typed values are never overwritten while blanks are
   still filled, an unstructured address falls back to `formattedValue`, an empty payload

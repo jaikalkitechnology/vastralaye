@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { mediaUrl } from "@/lib/media";
 import { useStore } from "@/contexts/StoreContext";
 import UserLayout from "@/components/user/UserLayout";
 import { Button } from "@/components/ui/button";
@@ -197,7 +198,7 @@ const ProfilePage = () => {
             <div className="bg-gradient-to-b from-blush to-transparent px-5 pt-8">
               <div className="group relative mx-auto h-28 w-28">
                 <img
-                  src={avatarPreview || "/default-avatar.png"}
+                  src={avatarPreview ? mediaUrl(avatarPreview) : "/default-avatar.png"}
                   alt="Profile"
                   className="h-28 w-28 rounded-full border-[3px] border-white bg-sand object-cover ring-2 ring-gold"
                 />

@@ -22,7 +22,9 @@ export const mediaUrl = (path?: string | null): string => {
   if (!path) return '';
   let s = String(path).trim();
   if (!s) return '';
-  if (/^https?:\/\//i.test(s)) return s;
+  // Already a full URL (a Google profile picture, say), or a local preview
+  // from URL.createObjectURL / a data URI — all must pass through untouched.
+  if (/^(https?:|blob:|data:)/i.test(s)) return s;
   if (!s.startsWith('/')) s = `/${s}`;
   if (!s.startsWith('/static/')) s = `/static${s}`;
   return `${(BASE_IMG || BASE_URL || '').replace(/\/$/, '')}${s}`;

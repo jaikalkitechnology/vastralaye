@@ -382,14 +382,23 @@ def get_profile(
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
-    # Build full image URL
-    if user.avatar:
-        base_url = str(request.base_url).rstrip("/")
-        user.avatar = f"{base_url}/{user.avatar.lstrip('/')}"
-    else:
-        # Default image if user has no avatar
-        base_url = str(request.base_url).rstrip("/")
+    base_url = str(request.base_url).rstrip("/")
+
+    # Detach before touching the avatar. This object is live in the session,
+    # so assigning to it could be flushed back and permanently rewrite the
+    # stored path into an absolute URL — which would then get prefixed again
+    # on the next read.
+    db.expunge(user)
+
+    stored = (user.avatar or "").strip()
+    if not stored:
         user.avatar = f"{base_url}/static/defaults/user.png"
+    elif stored.startswith(("http://", "https://")):
+        # Already absolute — a Google profile picture, for instance. Prefixing
+        # it produced "<api>/https://lh3.googleusercontent.com/..." and a 404.
+        user.avatar = stored
+    else:
+        user.avatar = f"{base_url}/{stored.lstrip('/')}"
 
     return user
 

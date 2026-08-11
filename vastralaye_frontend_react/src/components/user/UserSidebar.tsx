@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { User, ShoppingBag, Settings, LogOut } from "lucide-react";
 import { toast } from "sonner";
+import { mediaUrl } from '@/lib/media';
 import { useStore } from "@/contexts/StoreContext";
 
 interface SidebarItem {
@@ -72,7 +73,9 @@ const UserSidebar = () => {
     .join(" ");
   const displayName = fullName || "My Account";
   const email = storeUser?.email;
-  const avatarUrl = storeUser?.avatar;
+  // /users/me returns the stored path as-is, so resolve it here: local
+  // uploads need the API origin, Google picture URLs must not be touched.
+  const avatarUrl = mediaUrl(storeUser?.avatar);
   const initial = (fullName || email || "M").charAt(0).toUpperCase();
 
   return (
