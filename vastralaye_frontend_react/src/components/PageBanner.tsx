@@ -49,7 +49,36 @@ interface PageBannerData {
   subtitle?: string | null;
   /** Artwork that carries its own headline — show it edge-to-edge, no wash. */
   full_bleed?: boolean;
+  /** Wash over the image / band colour, "#RRGGBB". */
+  overlay_color?: string | null;
+  /** Wash strength, 0–100. */
+  overlay_opacity?: number | null;
 }
+
+/* Espresso @ 95 — the look before the overlay became admin-controlled. */
+export const DEFAULT_OVERLAY_COLOR = '#2B1B12';
+export const DEFAULT_OVERLAY_OPACITY = 95;
+
+/** "#RRGGBB" + 0–1 alpha → "rgba(r, g, b, a)". */
+export const hexToRgba = (hex: string, alpha: number): string => {
+  const m = /^#?([0-9a-f]{6})$/i.exec((hex || '').trim());
+  const int = m ? parseInt(m[1], 16) : parseInt(DEFAULT_OVERLAY_COLOR.slice(1), 16);
+  const a = Math.max(0, Math.min(1, alpha));
+  return `rgba(${(int >> 16) & 255}, ${(int >> 8) & 255}, ${int & 255}, ${a.toFixed(3)})`;
+};
+
+/**
+ * Left-to-right wash at the admin's colour and strength. Keeps the original
+ * 95 / 75 / 35 fall-off, so strength 95 reproduces the old espresso gradient
+ * exactly and lower values thin the whole ramp evenly.
+ */
+export const overlayGradient = (color: string, strength: number): string => {
+  const peak = Math.max(0, Math.min(100, strength)) / 100;
+  return `linear-gradient(to right, ${hexToRgba(color, peak)} 0%, ${hexToRgba(
+    color,
+    peak * 0.79
+  )} 50%, ${hexToRgba(color, peak * 0.37)} 100%)`;
+};
 
 let cachedPageBanners: Record<string, PageBannerData> | null = null;
 let pageBannersInflight: Promise<Record<string, PageBannerData>> | null = null;
@@ -114,13 +143,20 @@ const PageBanner = ({ title, subtitle, crumb, page }: PageBannerProps) => {
   const shownTitle = pageData?.title || title;
   const shownSubtitle = pageData?.subtitle || subtitle;
 
+  /* Admin-set wash; also the band colour behind/without an image. */
+  const overlayColor = pageData?.overlay_color || DEFAULT_OVERLAY_COLOR;
+  const overlayOpacity =
+    typeof pageData?.overlay_opacity === 'number'
+      ? pageData.overlay_opacity
+      : DEFAULT_OVERLAY_OPACITY;
+
   /* Uploaded artwork that already contains its own headline and background:
      show it as-is under a slim breadcrumb strip. Only ever applies to the
      page's own upload — never to the shared hero-banner fallback. */
   if (pageData?.full_bleed && pageImage) {
     return (
       <section className="border-b-[3px] border-gold">
-        <div className="bg-espresso">
+        <div style={{ backgroundColor: overlayColor }}>
           <div className="container mx-auto px-4 py-2.5">
             <nav
               aria-label="Breadcrumb"
@@ -148,7 +184,10 @@ const PageBanner = ({ title, subtitle, crumb, page }: PageBannerProps) => {
   }
 
   return (
-    <section className="relative overflow-hidden bg-espresso border-b-[3px] border-gold">
+    <section
+      className="relative overflow-hidden border-b-[3px] border-gold"
+      style={{ backgroundColor: overlayColor }}
+    >
       {shownImage ? (
         <>
           <img
@@ -159,7 +198,8 @@ const PageBanner = ({ title, subtitle, crumb, page }: PageBannerProps) => {
           />
           <span
             aria-hidden
-            className="absolute inset-0 bg-gradient-to-r from-espresso/95 via-espresso/75 to-espresso/35"
+            className="absolute inset-0"
+            style={{ backgroundImage: overlayGradient(overlayColor, overlayOpacity) }}
           />
         </>
       ) : (

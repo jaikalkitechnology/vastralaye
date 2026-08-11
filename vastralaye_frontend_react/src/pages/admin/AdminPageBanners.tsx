@@ -3,6 +3,11 @@ import { api } from '@/api/api';
 import { mediaUrl } from '@/lib/media';
 import { toast } from '@/components/ui/use-toast';
 import { ImageIcon, Trash2, UploadCloud } from 'lucide-react';
+import {
+  DEFAULT_OVERLAY_COLOR,
+  DEFAULT_OVERLAY_OPACITY,
+  overlayGradient,
+} from '@/components/PageBanner';
 
 /**
  * Page Banners — one image + title + subtitle per catalogue page
@@ -19,11 +24,22 @@ const PAGES = [
   { key: 'best_sellers', label: 'Bestsellers', route: '/best-sellers' },
 ] as const;
 
+/** Brand-palette shortcuts for the overlay colour. */
+const OVERLAY_PRESETS = [
+  { hex: '#2B1B12', label: 'Espresso' },
+  { hex: '#7A1F2B', label: 'Maroon' },
+  { hex: '#B85C38', label: 'Terracotta' },
+  { hex: '#8A6414', label: 'Deep gold' },
+  { hex: '#000000', label: 'Black' },
+] as const;
+
 interface Draft {
   title: string;
   subtitle: string;
   is_active: boolean;
   full_bleed: boolean;
+  overlay_color: string;
+  overlay_opacity: number;
   image_url: string | null;
   file: File | null;
   preview: string | null;
@@ -35,6 +51,8 @@ const emptyDraft = (): Draft => ({
   subtitle: '',
   is_active: true,
   full_bleed: false,
+  overlay_color: DEFAULT_OVERLAY_COLOR,
+  overlay_opacity: DEFAULT_OVERLAY_OPACITY,
   image_url: null,
   file: null,
   preview: null,
@@ -66,6 +84,11 @@ const AdminPageBanners = () => {
                 subtitle: b.subtitle || '',
                 is_active: b.is_active !== false,
                 full_bleed: b.full_bleed === true,
+                overlay_color: b.overlay_color || DEFAULT_OVERLAY_COLOR,
+                overlay_opacity:
+                  typeof b.overlay_opacity === 'number'
+                    ? b.overlay_opacity
+                    : DEFAULT_OVERLAY_OPACITY,
                 image_url: b.image_url || null,
               };
             }
@@ -95,6 +118,8 @@ const AdminPageBanners = () => {
       fd.append('subtitle', d.subtitle);
       fd.append('is_active', String(d.is_active));
       fd.append('full_bleed', String(d.full_bleed));
+      fd.append('overlay_color', d.overlay_color);
+      fd.append('overlay_opacity', String(d.overlay_opacity));
       if (removeImage) fd.append('remove_image', 'true');
       if (!removeImage && d.file) fd.append('image_file', d.file);
 
@@ -111,6 +136,11 @@ const AdminPageBanners = () => {
         subtitle: saved.subtitle || '',
         is_active: saved.is_active !== false,
         full_bleed: saved.full_bleed === true,
+        overlay_color: saved.overlay_color || DEFAULT_OVERLAY_COLOR,
+        overlay_opacity:
+          typeof saved.overlay_opacity === 'number'
+            ? saved.overlay_opacity
+            : DEFAULT_OVERLAY_OPACITY,
       });
       toast({ title: 'Page banner saved' });
     } catch (err: any) {
@@ -136,6 +166,11 @@ const AdminPageBanners = () => {
         {PAGES.map((p) => {
           const d = drafts[p.key];
           const shown = d.preview || (d.image_url ? mediaUrl(d.image_url) : null);
+          /* The hex field is free text, so keep swatch/preview on a valid value
+             while the admin is still typing. */
+          const safeColor = /^#[0-9a-fA-F]{6}$/.test(d.overlay_color)
+            ? d.overlay_color
+            : DEFAULT_OVERLAY_COLOR;
           return (
             <div key={p.key} className="rounded-sm border border-border bg-white">
               {/* Card head */}
@@ -155,9 +190,12 @@ const AdminPageBanners = () => {
                 </label>
               </div>
 
-              {/* Image */}
-              <div className="relative aspect-[16/5] bg-sand overflow-hidden">
-                {shown ? (
+              {/* Live preview of the storefront band */}
+              <div
+                className="relative aspect-[16/5] overflow-hidden"
+                style={{ backgroundColor: d.full_bleed ? '#EFE7DB' : safeColor }}
+              >
+                {shown && (
                   <img
                     src={shown}
                     alt=""
@@ -165,10 +203,32 @@ const AdminPageBanners = () => {
                       d.full_bleed ? 'object-contain' : 'object-cover'
                     }`}
                   />
-                ) : (
-                  <span className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 text-muted-foreground">
-                    <ImageIcon className="h-5 w-5" />
-                    <span className="text-[11px] uppercase tracking-[0.12em]">No image yet</span>
+                )}
+                {!d.full_bleed && shown && (
+                  <span
+                    aria-hidden
+                    className="absolute inset-0"
+                    style={{ backgroundImage: overlayGradient(safeColor, d.overlay_opacity) }}
+                  />
+                )}
+                {!d.full_bleed && (
+                  <div className="absolute inset-0 flex flex-col justify-center px-4">
+                    <span className="text-[8px] uppercase tracking-[0.16em] text-ivory/55">
+                      Home · {p.label}
+                    </span>
+                    <span className="font-serif text-[16px] leading-tight text-ivory mt-0.5">
+                      {d.title || p.label}
+                    </span>
+                    <span aria-hidden className="mt-1.5 flex items-center gap-1.5">
+                      <span className="h-px w-6 bg-gold/60" />
+                      <span className="h-[5px] w-[5px] rotate-45 border border-gold" />
+                      <span className="h-px w-6 bg-gold/60" />
+                    </span>
+                  </div>
+                )}
+                {!shown && (
+                  <span className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-sm bg-black/35 px-2 py-1 text-[9px] uppercase tracking-[0.12em] text-ivory/80">
+                    <ImageIcon className="h-3 w-3" /> No image
                   </span>
                 )}
               </div>
@@ -193,6 +253,80 @@ const AdminPageBanners = () => {
                     </span>
                   </span>
                 </label>
+
+                {!d.full_bleed && (
+                  <div className="space-y-2.5 rounded-sm border border-border p-3">
+                    <p className="text-[12.5px] font-medium text-espresso">
+                      Overlay colour
+                    </p>
+
+                    <div className="flex flex-wrap items-center gap-2">
+                      <input
+                        type="color"
+                        value={safeColor}
+                        onChange={(e) =>
+                          patchDraft(p.key, { overlay_color: e.target.value.toUpperCase() })
+                        }
+                        aria-label="Overlay colour"
+                        className="h-9 w-12 cursor-pointer rounded-sm border border-border bg-white p-1"
+                      />
+                      <input
+                        type="text"
+                        value={d.overlay_color}
+                        onChange={(e) =>
+                          patchDraft(p.key, { overlay_color: e.target.value.toUpperCase() })
+                        }
+                        maxLength={7}
+                        spellCheck={false}
+                        aria-label="Overlay colour hex"
+                        className="h-9 w-[104px] rounded-sm border border-border bg-white px-2.5 font-mono text-[12.5px] uppercase text-espresso focus:outline-none focus:border-maroon"
+                      />
+                      <div className="ml-auto flex items-center gap-1.5">
+                        {OVERLAY_PRESETS.map((c) => (
+                          <button
+                            key={c.hex}
+                            type="button"
+                            title={c.label}
+                            onClick={() => patchDraft(p.key, { overlay_color: c.hex })}
+                            style={{ backgroundColor: c.hex }}
+                            className={`h-6 w-6 rounded-full border transition-transform hover:scale-110 ${
+                              safeColor === c.hex
+                                ? 'border-espresso ring-1 ring-espresso ring-offset-1'
+                                : 'border-border'
+                            }`}
+                          >
+                            <span className="sr-only">{c.label}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <label className="block">
+                      <span className="flex items-center justify-between text-[11px] text-muted-foreground">
+                        <span>Strength</span>
+                        <span className="font-medium text-espresso">
+                          {d.overlay_opacity}%
+                        </span>
+                      </span>
+                      <input
+                        type="range"
+                        min={0}
+                        max={100}
+                        value={d.overlay_opacity}
+                        onChange={(e) =>
+                          patchDraft(p.key, { overlay_opacity: Number(e.target.value) })
+                        }
+                        className="mt-1 w-full accent-[#C99A45]"
+                      />
+                    </label>
+
+                    <p className="text-[11px] leading-relaxed text-muted-foreground">
+                      Tints the photo so the heading stays readable — drop the strength to
+                      let more of the image through. With no image uploaded, this is the
+                      band colour.
+                    </p>
+                  </div>
+                )}
 
                 <input
                   value={d.title}

@@ -1,4 +1,5 @@
 import os
+import re
 import time
 from typing import Dict, Optional
 
@@ -214,6 +215,28 @@ def delete_banner(
 # new_arrivals / best_sellers — one image + text per page)
 # ---------------------------------------------------------------
 
+HEX_COLOR_RE = re.compile(r"^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$")
+DEFAULT_OVERLAY_COLOR = "#2B1B12"  # espresso
+DEFAULT_OVERLAY_OPACITY = 95
+
+
+def _normalize_hex(value: Optional[str]) -> Optional[str]:
+    """'#abc' / '#AABBCC' → '#AABBCC'. Anything else raises."""
+    s = (value or "").strip()
+    if not s:
+        return None
+    if not s.startswith("#"):
+        s = f"#{s}"
+    if not HEX_COLOR_RE.match(s):
+        raise HTTPException(
+            status_code=400,
+            detail="Overlay colour must be a hex value like #2B1B12",
+        )
+    if len(s) == 4:  # expand #abc → #aabbcc
+        s = "#" + "".join(c * 2 for c in s[1:])
+    return s.upper()
+
+
 def _page_banner_out(b: PageBanner) -> dict:
     return {
         "id": b.id,
@@ -223,6 +246,10 @@ def _page_banner_out(b: PageBanner) -> dict:
         "subtitle": b.subtitle,
         "is_active": b.is_active,
         "full_bleed": bool(b.full_bleed),
+        "overlay_color": b.overlay_color or DEFAULT_OVERLAY_COLOR,
+        "overlay_opacity": (
+            b.overlay_opacity if b.overlay_opacity is not None else DEFAULT_OVERLAY_OPACITY
+        ),
     }
 
 
@@ -248,6 +275,8 @@ def upsert_page_banner(
     subtitle: Optional[str] = Form(None),
     is_active: bool = Form(True),
     full_bleed: bool = Form(False),
+    overlay_color: Optional[str] = Form(None),
+    overlay_opacity: Optional[int] = Form(None),
     remove_image: bool = Form(False),
     image_file: Optional[UploadFile] = File(None),
     db: Session = Depends(get_db),
@@ -265,6 +294,10 @@ def upsert_page_banner(
     banner.subtitle = (subtitle or "").strip() or None
     banner.is_active = is_active
     banner.full_bleed = full_bleed
+    banner.overlay_color = _normalize_hex(overlay_color)
+    banner.overlay_opacity = (
+        None if overlay_opacity is None else max(0, min(100, int(overlay_opacity)))
+    )
 
     if image_file is not None:
         _remove_file(banner.image_url)
