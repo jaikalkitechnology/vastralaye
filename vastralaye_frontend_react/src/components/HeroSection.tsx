@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { api } from '@/api/api';
 import { mediaUrl } from '@/lib/media';
+import HeroScene from '@/components/decor/HeroScene';
+import { PAISLEY_TILE } from '@/components/decor/patterns';
 
 /**
  * Light editorial hero (design.md §5.2) — warm ivory/blush canvas,
@@ -107,7 +109,22 @@ const HeroSection = () => {
 
   return (
     <section className="relative overflow-hidden bg-gradient-to-r from-blush via-ivory to-sand">
-      <div className="container mx-auto px-4">
+      {/* Illustrated artisan courtyard behind the banner */}
+      <div
+        className="absolute inset-0 opacity-[0.07] pointer-events-none"
+        style={{ backgroundImage: PAISLEY_TILE }}
+        aria-hidden="true"
+      />
+      <div className="absolute inset-0 opacity-90 pointer-events-none">
+        <HeroScene />
+      </div>
+      {/* Softens the art directly under the headline without flattening the scene */}
+      <div
+        className="absolute inset-0 pointer-events-none bg-[radial-gradient(72%_52%_at_24%_45%,rgba(250,246,240,0.9)_0%,rgba(250,246,240,0.45)_42%,rgba(250,246,240,0)_72%)]"
+        aria-hidden="true"
+      />
+
+      <div className="relative container mx-auto px-4">
         <div className="grid grid-cols-1 lg:grid-cols-2 items-center gap-10 lg:gap-16 py-12 md:py-20 lg:py-24 min-h-[60vh]">
           {/* Copy */}
           <AnimatePresence mode="wait">
@@ -175,7 +192,7 @@ const HeroSection = () => {
       </div>
 
       {/* Slide indicators */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2.5">
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2.5">
         {slides.map((s, i) => (
           <button
             key={s.id}
