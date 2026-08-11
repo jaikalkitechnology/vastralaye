@@ -23,6 +23,7 @@ interface Draft {
   title: string;
   subtitle: string;
   is_active: boolean;
+  full_bleed: boolean;
   image_url: string | null;
   file: File | null;
   preview: string | null;
@@ -33,6 +34,7 @@ const emptyDraft = (): Draft => ({
   title: '',
   subtitle: '',
   is_active: true,
+  full_bleed: false,
   image_url: null,
   file: null,
   preview: null,
@@ -63,6 +65,7 @@ const AdminPageBanners = () => {
                 title: b.title || '',
                 subtitle: b.subtitle || '',
                 is_active: b.is_active !== false,
+                full_bleed: b.full_bleed === true,
                 image_url: b.image_url || null,
               };
             }
@@ -91,6 +94,7 @@ const AdminPageBanners = () => {
       fd.append('title', d.title);
       fd.append('subtitle', d.subtitle);
       fd.append('is_active', String(d.is_active));
+      fd.append('full_bleed', String(d.full_bleed));
       if (removeImage) fd.append('remove_image', 'true');
       if (!removeImage && d.file) fd.append('image_file', d.file);
 
@@ -106,6 +110,7 @@ const AdminPageBanners = () => {
         title: saved.title || '',
         subtitle: saved.subtitle || '',
         is_active: saved.is_active !== false,
+        full_bleed: saved.full_bleed === true,
       });
       toast({ title: 'Page banner saved' });
     } catch (err: any) {
@@ -153,7 +158,13 @@ const AdminPageBanners = () => {
               {/* Image */}
               <div className="relative aspect-[16/5] bg-sand overflow-hidden">
                 {shown ? (
-                  <img src={shown} alt="" className="absolute inset-0 h-full w-full object-cover" />
+                  <img
+                    src={shown}
+                    alt=""
+                    className={`absolute inset-0 h-full w-full ${
+                      d.full_bleed ? 'object-contain' : 'object-cover'
+                    }`}
+                  />
                 ) : (
                   <span className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 text-muted-foreground">
                     <ImageIcon className="h-5 w-5" />
@@ -164,6 +175,25 @@ const AdminPageBanners = () => {
 
               {/* Fields */}
               <div className="space-y-3 p-4">
+                <label className="flex items-start gap-2.5 rounded-sm border border-border bg-ivory px-3 py-2.5 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={d.full_bleed}
+                    onChange={(e) => patchDraft(p.key, { full_bleed: e.target.checked })}
+                    className="mt-[3px] h-3.5 w-3.5 accent-[#C99A45]"
+                  />
+                  <span>
+                    <span className="block text-[12.5px] font-medium text-espresso">
+                      Full-width artwork
+                    </span>
+                    <span className="block text-[11px] text-muted-foreground leading-relaxed">
+                      For a ready-made banner that already has its own text and
+                      background. Shows the image whole, at its own shape — no dark
+                      wash and no heading printed over it.
+                    </span>
+                  </span>
+                </label>
+
                 <input
                   value={d.title}
                   onChange={(e) => patchDraft(p.key, { title: e.target.value })}
@@ -176,8 +206,15 @@ const AdminPageBanners = () => {
                   onChange={(e) => patchDraft(p.key, { subtitle: e.target.value })}
                   placeholder="Tagline under the heading (optional)"
                   maxLength={255}
-                  className="w-full h-10 rounded-sm border border-border bg-white px-3 text-[13.5px] text-espresso placeholder:text-muted-foreground focus:outline-none focus:border-maroon"
+                  disabled={d.full_bleed}
+                  className="w-full h-10 rounded-sm border border-border bg-white px-3 text-[13.5px] text-espresso placeholder:text-muted-foreground focus:outline-none focus:border-maroon disabled:bg-ivory disabled:text-muted-foreground"
                 />
+                {d.full_bleed && (
+                  <p className="text-[11px] text-muted-foreground -mt-1">
+                    With full-width artwork the heading is kept for search engines and
+                    screen readers only, and the tagline is not shown.
+                  </p>
+                )}
 
                 <div className="flex flex-wrap items-center gap-2 pt-1">
                   <input
