@@ -953,6 +953,38 @@ non-loopback host (never accepted); and lists what each of Google's error codes 
 
 ---
 
+## 30. Admin user stats — `User.is_active` crash
+
+`GET /admin/users/stats` raised
+`AttributeError: type object 'User' has no attribute 'is_active'` on every call — the
+column is `active`, not `is_active`. The user-list filter twenty lines earlier already
+used the right name, so the two had simply drifted.
+
+Both now count on **`deleted_at`** rather than either boolean, because that is the column
+that actually decides anything:
+
+- login rejects on `user.deleted_at is not None`, not on `active`;
+- `PUT /user/{id}/deactivate` sets `deleted_at` first and mirrors it into `active`;
+- `deleted_at` has existed since the original schema, so it can't be NULL-ambiguous the
+  way `active` can on rows that predate the boolean — `schema_sync` adds new columns as
+  NULL, and `NULL == False` is NULL in SQL, so those rows would have vanished from *both*
+  counts and the totals would not have reconciled.
+
+`inactive` is therefore derived as `total - active` instead of being counted separately,
+so the four numbers always add up. The list filter uses the same expression, so the stats
+band and the table below it can no longer disagree.
+
+Five more `User.is_active` references live in `app/routers/authenticate.py`, alongside
+`User.contactNo`, `User.countryCode` and `User.is_deleted` — none of which exist on this
+model. That file is leftover from a different project and is registered in neither
+entrypoint, so it is dead code rather than a latent crash.
+
+| File | Change |
+|---|---|
+| `app/routers/admin.py` | `get_users_stats` counts on `deleted_at`, derives `inactive`; list filter matched to it |
+
+---
+
 ## Verification
 
 - `tsc --noEmit` — no errors in any changed file.
@@ -963,6 +995,11 @@ non-loopback host (never accepted); and lists what each of Google's error codes 
   toggle the CTA between *Place Order · ₹total* and *Pay ₹total*, and Place Order posts
   `{items, payment_method:"cod", shipping_address}` and opens the success modal. No
   console or page errors.
+- User stats queries exercised against a real SQLAlchemy session (4 fixture users, one
+  soft-deleted, one admin, one Google-only): stats return
+  `{total: 4, active: 3, inactive: 1, admins: 1}` and reconcile, the list filter returns
+  3 and 1 for the two states, and `User.is_active` still raises — confirming the fix
+  addressed a genuine missing attribute.
 - Google sign-in driven against the production build with the config stubbed on and
   off: the button renders above the form with the "or" divider when on and is absent
   when off, the email/password form is unaffected either way, and neither state logs a
