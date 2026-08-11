@@ -931,6 +931,14 @@ it off and the button disappears entirely. Password sign-in is never affected.
 | `src/pages/admin/AdminLoginMethods.tsx` | New admin page |
 | `src/App.tsx`, `src/components/admin/AdminSidebar.tsx` | Route + Settings → Login Methods |
 
+**Setup diagnostics.** Google returns *"Access blocked: Authorization Error"* before any
+token reaches us, so the app can't catch it — the fix is always in Google Cloud Console.
+The admin page therefore prints the **exact origin** to paste into *Authorised JavaScript
+origins*, read live from `window.location.origin` rather than described in prose, with a
+copy button; warns when that origin is a LAN IP (never accepted) or plain `http` on a
+non-loopback host (never accepted); and lists what each of Google's error codes —
+`origin_mismatch`, `access_denied`, `invalid_client` — actually means.
+
 ---
 
 ## Verification
