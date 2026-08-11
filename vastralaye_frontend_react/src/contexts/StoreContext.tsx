@@ -251,6 +251,7 @@ interface StoreContextType {
   isInWishlist: (productId: string) => boolean;
   login: (email: string, password: string, rememberMe: boolean, userType?: 'user' | 'admin') => Promise<boolean>;
   loginWithGoogle: (credential: string) => Promise<boolean>;
+  applyGoogleSession: (token: string) => Promise<boolean>;
   register: (formData: FormData) => Promise<boolean>;
   logout: () => void;
   applyFilters: () => void;
@@ -658,6 +659,33 @@ return state.wishlist.some(item =>
 
 
 
+  /** Adopt a session the Google callback already minted (redirect flow). */
+  const applyGoogleSession = async (token: string): Promise<boolean> => {
+    try {
+      dispatch({ type: "SET_LOADING_STATE", payload: true });
+      localStorage.setItem("token", token);
+      localStorage.setItem("isAdmin", "false");
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+      const userData = await getUserMe();
+      dispatch({ type: "SET_CURRENT_USER", payload: userData });
+      dispatch({ type: "SET_ADMIN_STATUS", payload: false });
+      saveToStorage("currentUser", userData);
+      await syncWishlistFromServer();
+
+      toast.success("Signed in with Google");
+      return true;
+    } catch (error: any) {
+      localStorage.removeItem("token");
+      const msg = error?.response?.data?.detail || "Google sign-in failed";
+      dispatch({ type: "SET_AUTH_ERROR", payload: msg });
+      toast.error(msg);
+      return false;
+    } finally {
+      dispatch({ type: "SET_LOADING_STATE", payload: false });
+    }
+  };
+
   /** Exchange a Google ID token for our own session. Users only — an admin
       still signs in with a password. */
   const loginWithGoogle = async (credential: string): Promise<boolean> => {
@@ -843,6 +871,7 @@ return state.wishlist.some(item =>
       isInWishlist,
       login,
       loginWithGoogle,
+      applyGoogleSession,
       register,
       logout,
       applyFilters,

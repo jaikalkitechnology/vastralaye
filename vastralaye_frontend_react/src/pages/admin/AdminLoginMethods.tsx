@@ -25,6 +25,9 @@ interface Config {
   client_id: string;
   allow_signup: boolean;
   google_users: number;
+  /** Callback the API exposes — Google Cloud Console's redirect URI field. */
+  redirect_uri: string;
+  storefront_origin: string;
 }
 
 const inputCls =
@@ -40,7 +43,7 @@ const AdminLoginMethods = () => {
   const [enabled, setEnabled] = useState(false);
   const [clientId, setClientId] = useState('');
   const [allowSignup, setAllowSignup] = useState(true);
-  const [copiedOrigin, setCopiedOrigin] = useState(false);
+  const [copied, setCopied] = useState<string | null>(null);
 
   /* The exact string Google wants in "Authorised JavaScript origins" —
      scheme + host + port, no path. Guessing this is the usual reason for
@@ -52,15 +55,37 @@ const AdminLoginMethods = () => {
   const originIsPrivateIp = /^(?:\d{1,3}\.){3}\d{1,3}$/.test(host) && !isLoopback;
   const originIsInsecure = origin.startsWith('http://') && !isLoopback && !originIsPrivateIp;
 
-  const copyOrigin = async () => {
+  const copy = async (value: string, key: string) => {
     try {
-      await navigator.clipboard.writeText(origin);
-      setCopiedOrigin(true);
-      setTimeout(() => setCopiedOrigin(false), 1800);
+      await navigator.clipboard.writeText(value);
+      setCopied(key);
+      setTimeout(() => setCopied(null), 1800);
     } catch {
-      toast({ title: 'Copy failed', description: origin });
+      toast({ title: 'Copy failed', description: value });
     }
   };
+
+  /** One labelled, copyable value to paste into Google Cloud Console. */
+  const ConsoleValue = ({ id, value }: { id: string; value: string }) => (
+    <span className="mt-2 flex items-center gap-2">
+      <code className="flex-1 truncate rounded-sm border border-border bg-ivory px-2 py-1.5 font-mono text-[12px] text-espresso">
+        {value || '—'}
+      </code>
+      <button
+        type="button"
+        onClick={() => copy(value, id)}
+        disabled={!value}
+        className="inline-flex flex-none items-center gap-1.5 rounded-sm border border-border px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-espresso transition-colors hover:border-maroon hover:text-maroon disabled:opacity-50"
+      >
+        {copied === id ? (
+          <Check className="h-3 w-3 text-green-700" />
+        ) : (
+          <Copy className="h-3 w-3" />
+        )}
+        {copied === id ? 'Copied' : 'Copy'}
+      </button>
+    </span>
+  );
 
   const load = async () => {
     setLoading(true);
@@ -91,6 +116,9 @@ const AdminLoginMethods = () => {
       fd.append('enabled', String(enabled));
       fd.append('client_id', clientId.trim());
       fd.append('allow_signup', String(allowSignup));
+      // The callback needs somewhere to send the browser back to; this page
+      // is served from the storefront, so its own origin is the answer.
+      fd.append('storefront_origin', origin);
       await api.put('/admin/auth/google', fd, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
@@ -245,23 +273,7 @@ const AdminLoginMethods = () => {
                 </span>
                 . Google rejects sign-in from any origin not listed, character for
                 character — no trailing slash, no path.
-                <span className="mt-2 flex items-center gap-2">
-                  <code className="flex-1 truncate rounded-sm border border-border bg-ivory px-2 py-1.5 font-mono text-[12px] text-espresso">
-                    {origin}
-                  </code>
-                  <button
-                    type="button"
-                    onClick={copyOrigin}
-                    className="inline-flex flex-none items-center gap-1.5 rounded-sm border border-border px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-espresso transition-colors hover:border-maroon hover:text-maroon"
-                  >
-                    {copiedOrigin ? (
-                      <Check className="h-3 w-3 text-green-700" />
-                    ) : (
-                      <Copy className="h-3 w-3" />
-                    )}
-                    {copiedOrigin ? 'Copied' : 'Copy'}
-                  </button>
-                </span>
+                <ConsoleValue id="origin" value={origin} />
                 {originIsPrivateIp && (
                   <span className="mt-2 block rounded-sm border border-sale/35 bg-sale/5 p-2.5 text-[11.5px] text-espresso">
                     Google does not accept a LAN IP address as an origin — only{' '}
@@ -279,7 +291,16 @@ const AdminLoginMethods = () => {
                 )}
               </li>
               <li>
-                <span className="font-medium text-espresso">3.</span> Paste the Client ID
+                <span className="font-medium text-espresso">3.</span> Add this to{' '}
+                <span className="font-medium text-espresso">Authorised redirect URIs</span>.
+                The button uses a popup, which never redirects — so this is{' '}
+                <span className="font-medium text-espresso">optional today</span>, and only
+                comes into play if sign-in is switched to redirect mode. Add it anyway and
+                the field is never the thing that's wrong.
+                <ConsoleValue id="redirect" value={cfg?.redirect_uri || ''} />
+              </li>
+              <li>
+                <span className="font-medium text-espresso">4.</span> Paste the Client ID
                 here, tick the box and save.
               </li>
             </ol>

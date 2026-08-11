@@ -931,11 +931,23 @@ it off and the button disappears entirely. Password sign-in is never affected.
 | `src/pages/admin/AdminLoginMethods.tsx` | New admin page |
 | `src/App.tsx`, `src/components/admin/AdminSidebar.tsx` | Route + Settings → Login Methods |
 
+**Callback endpoint.** The popup flow never redirects, so nothing here needed a callback
+URL — but Google Cloud Console has an *Authorised redirect URIs* field and leaving it
+blank invites guessing. `POST /api/v1/users/auth/google/callback` now genuinely
+implements the redirect (`login_uri`) flow: it validates Google's double-submit
+`g_csrf_token`, verifies the credential through the same path as the popup, and hands
+the session back to the storefront in the **URL fragment** — fragments never reach a
+server and don't appear in referrers or access logs, unlike a query parameter. `GET` on
+the same path returns a plain-text explanation instead of a bare 405. `GoogleSignInButton`
+consumes `#google_token` / `#google_error` on mount and scrubs it from history. The
+storefront origin the callback returns to is saved automatically when the admin page
+saves, since that page is served from the storefront and knows it.
+
 **Setup diagnostics.** Google returns *"Access blocked: Authorization Error"* before any
 token reaches us, so the app can't catch it — the fix is always in Google Cloud Console.
 The admin page therefore prints the **exact origin** to paste into *Authorised JavaScript
-origins*, read live from `window.location.origin` rather than described in prose, with a
-copy button; warns when that origin is a LAN IP (never accepted) or plain `http` on a
+origins*, read live from `window.location.origin` rather than described in prose, **and**
+the callback URL for *Authorised redirect URIs*, each with a copy button; warns when that origin is a LAN IP (never accepted) or plain `http` on a
 non-loopback host (never accepted); and lists what each of Google's error codes —
 `origin_mismatch`, `access_denied`, `invalid_client` — actually means.
 

@@ -49,10 +49,25 @@ interface Props {
 }
 
 const GoogleSignInButton = ({ text = 'continue_with' }: Props) => {
-  const { loginWithGoogle } = useStore();
+  const { loginWithGoogle, applyGoogleSession } = useStore();
   const [clientId, setClientId] = useState('');
   const [failed, setFailed] = useState(false);
   const holder = useRef<HTMLDivElement>(null);
+
+  /* Redirect flow: the callback hands the session back in the URL fragment,
+     which never reaches a server or a referrer. Consume it and wipe it. */
+  useEffect(() => {
+    const hash = window.location.hash.replace(/^#/, '');
+    if (!hash) return;
+    const params = new URLSearchParams(hash);
+    const token = params.get('google_token');
+    const error = params.get('google_error');
+    if (!token && !error) return;
+
+    window.history.replaceState(null, '', window.location.pathname + window.location.search);
+    if (token) applyGoogleSession(token);
+    else if (error) setFailed(true);
+  }, [applyGoogleSession]);
 
   /* Is it switched on, and with which client ID? */
   useEffect(() => {
