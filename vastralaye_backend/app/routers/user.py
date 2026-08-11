@@ -2786,7 +2786,7 @@ def log_payment_attempt(merchant_ref: str, status: str, details: dict = None):
 # ─────────────────────────────────────────────
 @router.get("/")
 async def home():
-    return {"message": "Mizorpay FastAPI is running"}
+    return {"message": "Vastralaye API is running"}
 
 
 # ─────────────────────────────────────────────

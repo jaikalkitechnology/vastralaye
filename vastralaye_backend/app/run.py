@@ -50,8 +50,15 @@ async def lifespan(app: FastAPI):
 
 # ---------------------- App Initialization ----------------------
 app = FastAPI(
-    title="Mizor API",
-    description="Mizor — API Docs",
+    title="Vastralaye API",
+    description=(
+        "Vastralaye — storefront and admin API.\n\n"
+        "Handcrafted ethnic wear: catalogue, cart, orders, invoices, coupons, "
+        "reels and site content.\n\n"
+        "Payments are processed by the Mizorpay gateway, so gateway-owned field "
+        "names (`mizor_pay_txn_id`, `merchant_ref`) appear verbatim in the payment "
+        "and webhook payloads below."
+    ),
     version="1.0.0",
     lifespan=lifespan,
 )
