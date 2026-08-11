@@ -28,6 +28,7 @@ interface Config {
   /** Callback the API exposes — Google Cloud Console's redirect URI field. */
   redirect_uri: string;
   storefront_origin: string;
+  fetch_profile: boolean;
 }
 
 const inputCls =
@@ -43,6 +44,7 @@ const AdminLoginMethods = () => {
   const [enabled, setEnabled] = useState(false);
   const [clientId, setClientId] = useState('');
   const [allowSignup, setAllowSignup] = useState(true);
+  const [fetchProfile, setFetchProfile] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
 
   /* The exact string Google wants in "Authorised JavaScript origins" —
@@ -95,6 +97,7 @@ const AdminLoginMethods = () => {
       setEnabled(Boolean(res.data.switch_on));
       setClientId(res.data.client_id || '');
       setAllowSignup(res.data.allow_signup !== false);
+      setFetchProfile(Boolean(res.data.fetch_profile));
     } catch (err: any) {
       toast({
         title: 'Could not load login settings',
@@ -116,6 +119,7 @@ const AdminLoginMethods = () => {
       fd.append('enabled', String(enabled));
       fd.append('client_id', clientId.trim());
       fd.append('allow_signup', String(allowSignup));
+      fd.append('fetch_profile', String(fetchProfile));
       // The callback needs somewhere to send the browser back to; this page
       // is served from the storefront, so its own origin is the answer.
       fd.append('storefront_origin', origin);
@@ -233,6 +237,39 @@ const AdminLoginMethods = () => {
               </span>
             </span>
           </label>
+
+          <label className="mt-3 flex cursor-pointer items-start gap-2.5 rounded-sm border border-border p-3">
+            <input
+              type="checkbox"
+              checked={fetchProfile}
+              onChange={(e) => setFetchProfile(e.target.checked)}
+              className="mt-[3px] accent-[#7A1F2B]"
+            />
+            <span>
+              <span className="block text-[12.5px] font-medium text-espresso">
+                Also fetch phone &amp; address from Google
+              </span>
+              <span className="block text-[11px] leading-relaxed text-muted-foreground">
+                After signing in, asks for the People API scopes and fills any{' '}
+                <em>blank</em> phone or address fields on the account — anything the
+                customer already entered is left alone. Adds a second consent prompt,
+                and many Google profiles have no address saved, so treat it as a
+                shortcut rather than a replacement for the checkout form.
+              </span>
+            </span>
+          </label>
+
+          {fetchProfile && (
+            <div className="mt-3 flex items-start gap-2.5 rounded-sm border border-gold/40 bg-gold/5 p-3">
+              <AlertTriangle className="mt-0.5 h-4 w-4 flex-none text-[#8A6414]" />
+              <p className="text-[12px] leading-relaxed text-espresso">
+                These are <span className="font-medium">sensitive scopes</span>. Until
+                Google verifies your app it is capped at 100 users and shows a warning on
+                the consent screen — start verification in Cloud Console → OAuth consent
+                screen before relying on this in production.
+              </p>
+            </div>
+          )}
 
           {misconfigured && (
             <div className="mt-4 flex items-start gap-2.5 rounded-sm border border-sale/35 bg-sale/5 p-3">

@@ -1021,6 +1021,46 @@ order history with it.
 
 ---
 
+## 32. Google sign-in — fetch phone & address from the Google profile
+
+Optional, off by default, switched from **Admin → Settings → Login Methods**. With it on,
+a customer who signs in with Google is asked for two extra scopes and their **blank**
+phone/address fields are filled from their Google profile.
+
+- **A second token, not the ID token.** The ID token that signs the customer in carries
+  only email, name and picture — no contact details. The People API needs an OAuth
+  *access* token, minted in the browser by `google.accounts.oauth2.initTokenClient`, so
+  there is still no client secret and no server-side code exchange.
+- **`GET people.googleapis.com/v1/people/me?personFields=addresses,phoneNumbers`** on the
+  server, with our own JWT identifying which account to fill.
+- **Blanks only.** Anything the customer has already typed wins — they entered it for a
+  reason, and Google's copy is frequently stale. A whitespace-only value counts as blank;
+  a blank value from Google is dropped rather than written.
+- **Shape-tolerant.** Google returns lists, so the mapping prefers the `home` address and
+  `mobile` number, falls back to whichever entry is marked primary, then to the first. When
+  an address has no structured parts — common — the `formattedValue` blob goes into line 1
+  rather than leaving the form empty.
+- **Enrichment, never a gate.** A declined consent, a blocked popup, an unreachable
+  People API or an empty Google profile all end in a quiet no-op. The customer is already
+  signed in by then and nothing here can undo that.
+
+The mapping lives in `app/services/google_profile.py` as pure functions — no HTTP, no
+ORM — because Google's payload shapes vary enough to be worth testing directly.
+
+**Expect partial results.** These are *sensitive* scopes: until Google verifies the app it
+is capped at 100 users and shows a warning on the consent screen. And most people never
+save an address to their Google profile, so the checkout form still has to work for
+everyone. The admin toggle says both things where they'll be read.
+
+| File | Change |
+|---|---|
+| `app/services/google_profile.py` | New — scopes, `pick_entry`, `profile_fields`, `fill_blanks` |
+| `app/routers/google_auth.py` | `google_fetch_profile` setting; `POST /users/auth/google/profile`; public config exposes the scopes |
+| `src/components/auth/GoogleSignInButton.tsx` | Requests the scopes after sign-in and posts the access token |
+| `src/pages/admin/AdminLoginMethods.tsx` | Toggle + sensitive-scope warning |
+
+---
+
 ## Verification
 
 - `tsc --noEmit` — no errors in any changed file.
@@ -1031,6 +1071,13 @@ order history with it.
   toggle the CTA between *Place Order · ₹total* and *Pay ₹total*, and Place Order posts
   `{items, payment_method:"cod", shipping_address}` and opens the success modal. No
   console or page errors.
+- Google profile fetch tested both halves. The mapping module against seven payload
+  shapes: home/mobile beat work, typed values are never overwritten while blanks are
+  still filled, an unstructured address falls back to `formattedValue`, an empty payload
+  is a clean no-op, `primary` is the fallback when there's no `home`, a whitespace-only
+  existing value counts as blank, and blank Google values are dropped. In a real browser
+  with GIS stubbed: with the toggle on the correct scope string is requested and the
+  access token posted; with it off neither happens. No console errors.
 - Admin user edit/delete exercised twice over. Against a real SQLAlchemy session: users
   with orders (409), self-delete (400), last-admin (400), duplicate email (409),
   malformed email (400) and self-demotion (400) are all refused, a clean delete leaves

@@ -20,10 +20,11 @@ from fastapi.responses import PlainTextResponse, RedirectResponse
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from app.authentication import create_access_token, get_current_admin_user
+from app.authentication import create_access_token, get_current_admin_user, get_current_user
 from app.database import get_db
 from app.models import User
 from app.models.site_content import SiteSetting
+from app.services.google_profile import PROFILE_SCOPES, fill_blanks
 
 router = APIRouter(tags=["Google Login"])
 log = logging.getLogger("google_auth")
@@ -34,9 +35,13 @@ ALLOW_SIGNUP_KEY = "google_allow_signup"
 # Where the callback sends the browser back to. Saved automatically from the
 # admin page, which knows its own origin.
 STOREFRONT_KEY = "storefront_origin"
+# Opt-in: ask for the People API scopes after sign-in and fill in blanks.
+FETCH_PROFILE_KEY = "google_fetch_profile"
 
 TOKENINFO_URL = "https://oauth2.googleapis.com/tokeninfo"
 VALID_ISSUERS = {"accounts.google.com", "https://accounts.google.com"}
+
+PEOPLE_API_URL = "https://people.googleapis.com/v1/people/me"
 
 
 # ---------------------------------------------------------------
@@ -75,6 +80,7 @@ def _config(db: Session) -> dict:
         "client_id": client_id,
         "allow_signup": _flag(_get(db, ALLOW_SIGNUP_KEY), default=True),
         "storefront_origin": _get(db, STOREFRONT_KEY).strip(),
+        "fetch_profile": _flag(_get(db, FETCH_PROFILE_KEY)),
     }
 
 
@@ -85,7 +91,14 @@ def _config(db: Session) -> dict:
 @router.get("/api/v1/fronted/auth/google")
 def public_google_config(db: Session = Depends(get_db)):
     cfg = _config(db)
-    return {"enabled": cfg["enabled"], "client_id": cfg["client_id"] if cfg["enabled"] else ""}
+    if not cfg["enabled"]:
+        return {"enabled": False, "client_id": "", "fetch_profile": False, "profile_scopes": ""}
+    return {
+        "enabled": True,
+        "client_id": cfg["client_id"],
+        "fetch_profile": cfg["fetch_profile"],
+        "profile_scopes": PROFILE_SCOPES if cfg["fetch_profile"] else "",
+    }
 
 
 # ---------------------------------------------------------------
@@ -117,6 +130,7 @@ def update_google_config(
     enabled: bool = Form(False),
     client_id: Optional[str] = Form(None),
     allow_signup: bool = Form(True),
+    fetch_profile: bool = Form(False),
     storefront_origin: Optional[str] = Form(None),
     db: Session = Depends(get_db),
     admin: User = Depends(get_current_admin_user),
@@ -136,6 +150,7 @@ def update_google_config(
     _set(db, ENABLED_KEY, "true" if enabled else "false")
     _set(db, CLIENT_ID_KEY, cleaned)
     _set(db, ALLOW_SIGNUP_KEY, "true" if allow_signup else "false")
+    _set(db, FETCH_PROFILE_KEY, "true" if fetch_profile else "false")
     if (storefront_origin or "").strip():
         _set(db, STOREFRONT_KEY, storefront_origin.strip().rstrip("/"))
     db.commit()
@@ -286,3 +301,54 @@ async def google_callback(
         )
 
     return RedirectResponse(f"{storefront}/login#google_token={quote(token)}", status_code=303)
+
+
+# ---------------------------------------------------------------
+# People API — pull phone + address into the blanks after sign-in
+# ---------------------------------------------------------------
+
+class GoogleProfileIn(BaseModel):
+    """OAuth access token minted in the browser for the People API scopes."""
+    access_token: str
+
+
+@router.post("/api/v1/users/auth/google/profile")
+async def google_fetch_profile(
+    payload: GoogleProfileIn,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    """Fill this account's empty phone/address fields from their Google profile.
+
+    Only ever writes into blanks — anything the customer has already entered
+    wins, because they typed it for a reason and Google's copy is often stale.
+    Enrichment, not a gate: every failure here returns a quiet no-op so a
+    declined consent or an empty Google profile can't break sign-in.
+    """
+    cfg = _config(db)
+    if not (cfg["enabled"] and cfg["fetch_profile"]):
+        return {"updated": False, "reason": "disabled", "fields": []}
+
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            res = await client.get(
+                PEOPLE_API_URL,
+                params={"personFields": "addresses,phoneNumbers"},
+                headers={"Authorization": f"Bearer {payload.access_token}"},
+            )
+    except httpx.HTTPError as exc:
+        log.warning("People API unreachable: %s", exc)
+        return {"updated": False, "reason": "unreachable", "fields": []}
+
+    if res.status_code != 200:
+        # 401/403 just means the customer declined the extra consent.
+        log.info("People API returned %s", res.status_code)
+        return {"updated": False, "reason": f"http_{res.status_code}", "fields": []}
+
+    filled = fill_blanks(user, res.json())
+    if filled:
+        db.commit()
+        db.refresh(user)
+        log.info("Filled %s for %s from Google", ", ".join(filled), user.email)
+
+    return {"updated": bool(filled), "reason": "ok", "fields": filled}
