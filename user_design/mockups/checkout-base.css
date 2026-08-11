@@ -1,0 +1,10 @@
+:root{--ivory:#FAF6F0;--esp:#2B1B12;--mar:#7A1F2B;--terra:#B85C38;--gold:#C99A45;--gd:#8A6414;--sand:#EFE7DB;--blush:#F6E8E4;--bd:#E7DFD3;--mut:#6E5F53;--sale:#C62828;--ok:#3E6B4F}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Jost',sans-serif;color:var(--esp);font-size:14px;line-height:1.55;background:var(--ivory)}
+.back{position:fixed;inset:0;background:rgba(43,27,18,.72);backdrop-filter:blur(3px)}
+.stage{position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:26px}
+.pais{background-size:130px 130px;background-image:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='130' height='130' viewBox='0 0 130 130'><g fill='none' stroke='%23C99A45'><path d='M33 11c14 6 22 18 20 32-2 12-11 22-22 24-8 2-13-2-14-8-1-6 3-11 9-11 5 0 9 3 9 8'/><rect x='92' y='26' width='6' height='6' transform='rotate(45 95 29)'/><path d='M97 119c-14-6-22-18-20-32 2-12 11-22 22-24 8-2 13 2 14 8 1 6-3 11-9 11-5 0-9-3-9-8'/><rect x='29' y='94' width='6' height='6' transform='rotate(45 32 97)'/></g></svg>")}
+.pb{height:21px;padding:0 7px;background:#fff;border:1px solid var(--bd);border-radius:2px;display:inline-flex;align-items:center;font-size:8px;font-weight:700;color:var(--mut)}
+.orn{display:flex;align-items:center;gap:9px}
+.orn .ln{width:34px;height:1px;background:var(--gold);opacity:.6}
+.orn .dm{width:6px;height:6px;border:1px solid var(--gold);transform:rotate(45deg)}

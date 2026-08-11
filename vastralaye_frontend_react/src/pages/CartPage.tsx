@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -25,6 +26,7 @@ import {
 import { toast } from 'sonner';
 import PaymentBadges from '@/components/PaymentBadges';
 import ProductGrid from '@/components/ProductGrid';
+import { PAISLEY_TILE } from '@/components/decor/patterns';
 import { BASE_URL } from '../config';
 import QRCode from 'qrcode';
 
@@ -52,6 +54,24 @@ const isMobileDevice = () => {
   return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
     navigator.userAgent
   );
+};
+
+// ═══════════════════════════════════════════════════════════
+//  HELPER: First product image → absolute URL
+// ═══════════════════════════════════════════════════════════
+const getProductImageUrl = (product: Product): string => {
+  try {
+    const imagesArray =
+      typeof product.images === 'string'
+        ? JSON.parse(product.images)
+        : product.images;
+    const firstImage = imagesArray?.[0];
+    return firstImage
+      ? `${BASE_URL.replace('/api/v1', '')}/${String(firstImage).replace(/^\/+/, '')}`
+      : '/placeholder.svg';
+  } catch {
+    return '/placeholder.svg';
+  }
 };
 
 // ═══════════════════════════════════════════════════════════
@@ -816,24 +836,18 @@ const PaymentMethodModal: React.FC<PaymentMethodModalProps> = ({
     {
       id: 'cod',
       name: 'Cash on Delivery',
-      description: 'Pay when you receive your order',
-      icon: Package,
+      description: 'Pay the courier on arrival',
+      badges: ['COD'],
+      recommended: true,
       active: true,
-      gradient: 'bg-espresso',
-      bgGradient: 'bg-ivory',
-      borderColor: 'border-border',
-      selectedBorder: 'border-maroon',
     },
     {
       id: 'online',
       name: 'Online Payment',
-      description: 'UPI, Credit Card, Debit Card, Net Banking',
-      icon: Smartphone,
+      description: 'UPI, card & net banking',
+      badges: ['UPI', 'VISA', 'MC', 'RuPay'],
+      recommended: false,
       active: true,
-      gradient: 'bg-maroon',
-      bgGradient: 'bg-ivory',
-      borderColor: 'border-border',
-      selectedBorder: 'border-maroon',
     },
   ];
 
@@ -1053,317 +1067,362 @@ const PaymentMethodModal: React.FC<PaymentMethodModalProps> = ({
     }
   };
 
+  // ── Derived display values for the order-slip layout ──────
+  const initials =
+    (detectedUser?.name || '')
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((w) => w.charAt(0).toUpperCase())
+      .join('') || 'U';
+
+  const addressComplete = Boolean(
+    addressLine1.trim() && city.trim() && addressState.trim() && zipCode.trim()
+  );
+
+  const addressSummary = [
+    addressLine1,
+    addressLine2,
+    city,
+    addressState,
+    zipCode,
+  ]
+    .map((s) => (s || '').trim())
+    .filter(Boolean)
+    .join(', ');
+
+  const goToProfile = () => {
+    onClose();
+    navigate('/account/profile');
+  };
+
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <div className="mx-auto mb-4 w-16 h-16 bg-blush rounded-full flex items-center justify-center">
-              <Shield className="h-8 w-8 text-maroon" strokeWidth={1.5} />
-            </div>
-            <DialogTitle className="font-serif text-2xl font-medium text-center text-espresso">
-              Select Payment Method
-            </DialogTitle>
-            <DialogDescription className="text-center text-muted-foreground pt-2">
-              Choose how you'd like to pay
-            </DialogDescription>
-          </DialogHeader>
+        <DialogContent
+          className="p-0 gap-0 border-border rounded-[4px] sm:rounded-[4px] overflow-y-auto
+                     w-[calc(100vw-1.5rem)] sm:max-w-[900px] max-h-[92vh] [&>button]:hidden"
+        >
+          <div className="grid grid-cols-1 md:grid-cols-[290px_1fr]">
+            {/* ═════════ ESPRESSO ORDER RAIL ═════════ */}
+            <aside className="relative bg-espresso text-ivory px-6 py-7 flex flex-col overflow-hidden">
+              <div
+                className="absolute inset-0 opacity-[0.08] pointer-events-none"
+                style={{ backgroundImage: PAISLEY_TILE }}
+                aria-hidden="true"
+              />
+              <div className="relative flex flex-col flex-1 min-h-0">
+                <div>
+                  <p className="font-serif text-[21px] font-semibold leading-none">
+                    Vastra<span className="text-gold">laye</span>
+                  </p>
+                  <p className="text-[8px] uppercase tracking-[0.42em] text-gold mt-1.5">
+                    Handcrafted India
+                  </p>
+                </div>
 
-          {/* Contact Details */}
-          <div className="bg-ivory p-4 rounded-sm border border-border mb-2">
-            <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-[0.12em] mb-3 flex items-center gap-1.5">
-              <User className="w-3.5 h-3.5" /> Contact Details
-            </h4>
-            {isLoadingProfile && !detectedUser ? (
-              <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground py-2">
-                <Loader2 className="w-4 h-4 animate-spin" /> Detecting user info...
-              </div>
-            ) : detectedUser ? (
-              <div className="space-y-2.5">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-maroon rounded-full flex items-center justify-center flex-shrink-0">
-                    <span className="text-ivory text-xs font-semibold">
-                      {detectedUser.name?.charAt(0)?.toUpperCase() || 'U'}
+                <p className="hidden md:block font-serif text-[15px] leading-[1.55] text-ivory/90 mt-5">
+                  Almost yours — woven by hand, wrapped with care.
+                </p>
+
+                {/* Items */}
+                <div className="mt-3.5 pt-3.5 md:mt-4 border-t border-ivory/15 flex-1 min-h-0 max-h-[150px] md:max-h-[220px] overflow-y-auto space-y-2.5 pr-0.5">
+                  {cartItems.map((item) => (
+                    <div key={item.id} className="flex items-center gap-2.5">
+                      <div className="relative flex-none">
+                        <div className="w-[34px] h-[45px] rounded-[2px] border border-gold/30 bg-ivory/10 overflow-hidden">
+                          <img
+                            src={getProductImageUrl(item.product)}
+                            alt={item.product.name}
+                            className="w-full h-full object-cover"
+                            loading="lazy"
+                            onError={(e) => {
+                              e.currentTarget.style.visibility = 'hidden';
+                            }}
+                          />
+                        </div>
+                        <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-gold text-espresso text-[9px] font-bold flex items-center justify-center">
+                          {item.quantity}
+                        </span>
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[11.5px] leading-[1.4] text-ivory/85 line-clamp-2">
+                          {item.product.name}
+                        </p>
+                        {(item.size || item.color) && (
+                          <p className="text-[10px] text-ivory/50 mt-0.5 truncate">
+                            {[item.size, item.color].filter(Boolean).join(' · ')}
+                          </p>
+                        )}
+                      </div>
+                      <span className="text-[12px] font-semibold text-gold flex-none">
+                        {formatPrice(
+                          (item.product.discountPrice || item.product.price) *
+                            item.quantity
+                        )}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Totals */}
+                <div className="mt-3 pt-3 md:mt-4 md:pt-3.5 border-t border-ivory/15">
+                  <div className="flex justify-between text-[12px] text-ivory/60 py-[3px]">
+                    <span>Subtotal</span>
+                    <span className="text-ivory/95 font-medium">
+                      {formatPrice(modalSubtotal)}
                     </span>
                   </div>
-                  <span className="font-semibold text-espresso text-sm">
-                    {detectedUser.name}
-                  </span>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pl-11">
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <Mail className="w-3.5 h-3.5 text-muted-foreground/70 flex-shrink-0" />
-                    <span className="truncate">{detectedUser.email}</span>
-                  </div>
-                  {detectedUser.phone && (
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <Phone className="w-3.5 h-3.5 text-muted-foreground/70 flex-shrink-0" />
-                      <span>{detectedUser.phone}</span>
+                  {discount > 0 && (
+                    <div className="flex justify-between text-[12px] text-ivory/60 py-[3px]">
+                      <span>Coupon</span>
+                      <span className="text-gold font-medium">
+                        − {formatPrice(discount)}
+                      </span>
                     </div>
                   )}
+                  <div className="flex justify-between text-[12px] text-ivory/60 py-[3px]">
+                    <span>Shipping</span>
+                    <span className="text-ivory/95 font-medium">
+                      {modalShipping === 0 ? 'Free' : formatPrice(modalShipping)}
+                    </span>
+                  </div>
+
+                  <div className="flex items-baseline justify-between border-t-2 border-gold mt-2 pt-2.5">
+                    <span className="text-[9.5px] font-semibold uppercase tracking-[0.18em] text-ivory/70">
+                      Total
+                    </span>
+                    <span className="font-serif text-2xl font-medium text-gold">
+                      {formatPrice(total)}
+                    </span>
+                  </div>
+                  <p className="text-[9px] text-ivory/45 text-right mt-1">
+                    Inclusive of GST (18%)
+                  </p>
                 </div>
               </div>
-            ) : (
-              <div className="flex items-center justify-center gap-2 text-xs text-sale italic py-2">
-                <AlertCircle className="w-3.5 h-3.5" /> Could not load user details.
-              </div>
-            )}
-          </div>
+            </aside>
 
-          {/* Payment Methods */}
-          <div className="space-y-3 py-2">
-            {paymentMethods.map((method) => {
-              const IconComponent = method.icon;
-              const isSelected = selectedMethod === method.id;
-              return (
-                <button
-                  key={method.id}
-                  onClick={() => {
-                    if (method.active) setSelectedMethod(method.id);
-                  }}
-                  disabled={!method.active || isPlacingOrder}
-                  className={`w-full p-4 rounded-sm border transition-colors duration-200 text-left ${
-                    method.active
-                      ? isSelected
-                        ? `${method.bgGradient} ${method.selectedBorder}`
-                        : `bg-white hover:bg-ivory ${method.borderColor} hover:border-espresso/40 cursor-pointer`
-                      : 'bg-ivory border-border cursor-not-allowed opacity-60'
-                  }`}
-                >
-                  <div className="flex items-center gap-4">
-                    <div
-                      className={`w-10 h-10 ${method.gradient} rounded-sm flex items-center justify-center flex-shrink-0`}
-                    >
-                      <IconComponent className="h-5 w-5 text-ivory" strokeWidth={1.5} />
+            {/* ═════════ FORM COLUMN ═════════ */}
+            <div className="bg-white px-6 py-7 sm:px-7 flex flex-col">
+              <DialogHeader className="space-y-0 text-left">
+                <div className="flex items-start gap-3">
+                  <div className="min-w-0">
+                    <p className="text-[9.5px] font-semibold uppercase tracking-[0.24em] text-[#8A6414]">
+                      Review &amp; pay
+                    </p>
+                    <DialogTitle className="font-serif text-2xl font-medium text-espresso mt-1 text-left">
+                      Complete Your Order
+                    </DialogTitle>
+                    <DialogDescription className="sr-only">
+                      Confirm your delivery address and choose a payment method
+                      to place your order.
+                    </DialogDescription>
+                  </div>
+                  <DialogClose
+                    className="ml-auto flex-none w-8 h-8 border border-border rounded-[3px] flex items-center justify-center
+                               text-muted-foreground hover:text-espresso hover:border-espresso/40 transition-colors
+                               focus:outline-none focus-visible:ring-2 focus-visible:ring-maroon/30"
+                    disabled={isPlacingOrder}
+                  >
+                    <X className="w-4 h-4" />
+                    <span className="sr-only">Close</span>
+                  </DialogClose>
+                </div>
+              </DialogHeader>
+
+              {/* Deliver to */}
+              <div className="flex items-center gap-2.5 mt-5 mb-2.5">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8A6414]">
+                  Deliver to
+                </span>
+                <span className="flex-1 h-px bg-border" />
+              </div>
+
+              <div className="border border-border rounded-[3px] bg-ivory px-4 py-3.5">
+                {isLoadingProfile && !detectedUser ? (
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground py-1.5">
+                    <Loader2 className="w-4 h-4 animate-spin" /> Loading your
+                    details…
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-3">
+                    <span className="w-[34px] h-[34px] rounded-full bg-maroon text-ivory text-xs font-semibold flex items-center justify-center flex-none">
+                      {initials}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[13.5px] font-semibold text-espresso truncate">
+                        {detectedUser?.name || 'Valued Customer'}
+                      </p>
+                      {addressComplete ? (
+                        <p className="text-[11.5px] text-muted-foreground mt-0.5 line-clamp-2">
+                          {addressSummary}
+                          {detectedUser?.phone ? ` · ${detectedUser.phone}` : ''}
+                        </p>
+                      ) : (
+                        <p className="text-[11.5px] text-sale mt-0.5 flex items-start gap-1.5">
+                          <AlertCircle className="w-3.5 h-3.5 flex-none mt-[1px]" />
+                          <span>
+                            No delivery address on file — add one to continue.
+                          </span>
+                        </p>
+                      )}
+                      {detectedUser?.email && (
+                        <p className="text-[11px] text-muted-foreground/80 mt-0.5 flex items-center gap-1.5">
+                          <Mail className="w-3 h-3 flex-none" />
+                          <span className="truncate">{detectedUser.email}</span>
+                        </p>
+                      )}
                     </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <p
-                          className={`font-medium ${
-                            method.active ? 'text-espresso' : 'text-muted-foreground'
+                    <button
+                      type="button"
+                      onClick={goToProfile}
+                      disabled={isPlacingOrder}
+                      className="ml-auto flex-none text-[10.5px] text-maroon underline underline-offset-[3px] hover:text-terracotta transition-colors disabled:opacity-50"
+                    >
+                      {addressComplete ? 'Edit' : 'Add'}
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Payment method */}
+              <div className="flex items-center gap-2.5 mt-5 mb-3">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8A6414]">
+                  Payment method
+                </span>
+                <span className="flex-1 h-px bg-border" />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                {paymentMethods.map((method) => {
+                  const isSelected = selectedMethod === method.id;
+                  return (
+                    <button
+                      key={method.id}
+                      type="button"
+                      onClick={() => {
+                        if (method.active) setSelectedMethod(method.id);
+                      }}
+                      disabled={!method.active || isPlacingOrder}
+                      className={`relative text-left rounded-[3px] border p-3.5 transition-colors ${
+                        isSelected
+                          ? 'border-maroon ring-1 ring-maroon bg-blush/50'
+                          : 'border-border bg-white hover:border-espresso/40'
+                      } ${
+                        method.active
+                          ? 'cursor-pointer'
+                          : 'opacity-60 cursor-not-allowed'
+                      }`}
+                    >
+                      {method.recommended && (
+                        <span className="absolute -top-[7px] right-2.5 bg-gold text-espresso text-[8px] font-bold uppercase tracking-[0.12em] px-2 py-[2px] rounded-full">
+                          Recommended
+                        </span>
+                      )}
+                      <span className="flex items-center gap-2.5">
+                        <span
+                          className={`w-[15px] h-[15px] rounded-full border-[1.5px] flex items-center justify-center flex-none ${
+                            isSelected ? 'border-maroon' : 'border-border'
                           }`}
                         >
+                          {isSelected && (
+                            <span className="w-[7px] h-[7px] rounded-full bg-maroon" />
+                          )}
+                        </span>
+                        <span className="text-[13px] font-semibold text-espresso">
                           {method.name}
-                        </p>
-                        {method.active && isSelected && (
-                          <CheckCircle className="h-5 w-5 text-maroon" />
-                        )}
-                      </div>
-                      <p
-                        className={`text-[13px] ${
-                          method.active ? 'text-muted-foreground' : 'text-muted-foreground/60'
-                        }`}
-                      >
+                        </span>
+                      </span>
+                      <span className="block text-[11px] text-muted-foreground pl-[25px] mt-1">
                         {method.description}
-                      </p>
-                    </div>
-                    {method.active && (
-                      <div
-                        className={`w-4 h-4 rounded-full border flex items-center justify-center transition-colors ${
-                          isSelected
-                            ? 'border-maroon bg-maroon'
-                            : 'border-border'
-                        }`}
-                      >
-                        {isSelected && (
-                          <div className="w-1.5 h-1.5 bg-ivory rounded-full" />
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </button>
-              );
-            })}
-          </div>
+                      </span>
+                      {method.badges.length > 0 && (
+                        <span className="flex flex-wrap gap-1 pl-[25px] mt-1.5">
+                          {method.badges.map((badge) => (
+                            <span
+                              key={badge}
+                              className="border border-border rounded-[2px] bg-white px-1.5 py-[1px] text-[8.5px] font-semibold uppercase tracking-[0.08em] text-muted-foreground"
+                            >
+                              {badge}
+                            </span>
+                          ))}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
 
-          {/* Shipping Address - Read Only */}
-          <div className="space-y-3">
-            <Label className="text-xs font-semibold uppercase tracking-[0.12em] text-espresso flex items-center gap-2 justify-between">
-              <span className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-muted-foreground" /> Shipping Address
-              </span>
-              <div className="flex items-center gap-2">
-                {(addressLine1 || city || addressState || zipCode) && (
-                  <span className="text-[10px] normal-case tracking-normal text-green-700 flex items-center gap-1 bg-green-50 px-2 py-0.5 rounded-sm">
-                    <Sparkles className="w-3 h-3" /> Auto-filled
-                  </span>
+              {/* What happens next */}
+              <div className="mt-3 flex items-start gap-2 rounded-[3px] border border-border bg-ivory px-3.5 py-2.5 text-[11.5px] leading-relaxed text-muted-foreground">
+                {selectedMethod === 'cod' ? (
+                  <>
+                    <Package className="w-3.5 h-3.5 text-[#8A6414] flex-none mt-[2px]" />
+                    <span>
+                      Nothing to pay now — keep{' '}
+                      <span className="font-semibold text-espresso">
+                        {formatPrice(total)}
+                      </span>{' '}
+                      ready for the courier when your parcel arrives.
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <Smartphone className="w-3.5 h-3.5 text-[#8A6414] flex-none mt-[2px]" />
+                    <span>
+                      You'll get a UPI QR code to scan on desktop, or be taken
+                      straight to your UPI app on mobile. Payment is handled by
+                      the gateway — we never see your card details.
+                    </span>
+                  </>
                 )}
-                <span className="text-[10px] normal-case tracking-normal text-muted-foreground flex items-center gap-1 bg-sand px-2 py-0.5 rounded-sm">
-                  <Lock className="w-3 h-3" /> Read only
-                </span>
               </div>
-            </Label>
-            <div className="grid grid-cols-1 gap-3">
-              {[
-                { value: addressLine1, placeholder: 'Address Line 1 (House No, Street)' },
-                { value: addressLine2, placeholder: 'Address Line 2 (Landmark, Area)' },
-              ].map(({ value, placeholder }) => (
-                <div key={placeholder} className="relative">
-                  <input
-                    type="text"
-                    placeholder={placeholder}
-                    className="w-full p-3 border border-input rounded-sm text-sm bg-ivory text-muted-foreground cursor-not-allowed"
-                    value={value}
-                    readOnly
-                    disabled
-                    tabIndex={-1}
-                  />
-                  <Lock className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/50" />
-                </div>
-              ))}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {[
-                  { value: city, placeholder: 'City' },
-                  { value: addressState, placeholder: 'State' },
-                ].map(({ value, placeholder }) => (
-                  <div key={placeholder} className="relative">
-                    <input
-                      type="text"
-                      placeholder={placeholder}
-                      className="w-full p-3 border border-input rounded-sm text-sm bg-ivory text-muted-foreground cursor-not-allowed"
-                      value={value}
-                      readOnly
-                      disabled
-                      tabIndex={-1}
-                    />
-                    <Lock className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/50" />
-                  </div>
-                ))}
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {[
-                  { value: zipCode, placeholder: 'PIN Code' },
-                  { value: country, placeholder: 'Country' },
-                ].map(({ value, placeholder }) => (
-                  <div key={placeholder} className="relative">
-                    <input
-                      type="text"
-                      placeholder={placeholder}
-                      className="w-full p-3 border border-input rounded-sm text-sm bg-ivory text-muted-foreground cursor-not-allowed"
-                      value={value}
-                      readOnly
-                      disabled
-                      tabIndex={-1}
-                    />
-                    <Lock className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/50" />
-                  </div>
-                ))}
-              </div>
-              {isLoadingProfile &&
-                !(addressLine1 || city || addressState || zipCode) && (
-                  <div className="flex items-center justify-center py-2">
-                    <Loader2 className="w-5 h-5 animate-spin text-maroon" />
-                  </div>
-                )}
-            </div>
-          </div>
 
-          {/* Order Summary */}
-          <div className="p-3 bg-ivory rounded-sm border border-border">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-espresso mb-2">
-              Order Summary ({cartItems.length}{' '}
-              {cartItems.length === 1 ? 'item' : 'items'})
-            </p>
-            <div className="space-y-1 max-h-28 overflow-y-auto">
-              {cartItems.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex justify-between text-xs text-muted-foreground"
+              {/* Action */}
+              <div className="mt-auto pt-5">
+                <Button
+                  onClick={handlePlaceOrder}
+                  disabled={isPlacingOrder || !selectedMethod}
+                  className="w-full h-auto py-3.5 bg-maroon hover:bg-terracotta text-ivory rounded-[3px]
+                             text-[11.5px] font-semibold uppercase tracking-[0.16em] transition-colors"
                 >
-                  <span className="truncate flex-1 mr-2">
-                    {item.product.name} × {item.quantity}
-                  </span>
-                  <span className="font-medium text-espresso">
-                    {formatPrice(
-                      (item.product.discountPrice || item.product.price) *
-                        item.quantity
-                    )}
-                  </span>
-                </div>
-              ))}
-            </div>
-            <div className="mt-2 pt-2 border-t border-dashed border-border space-y-1.5">
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <span>Subtotal</span>
-                <span>{formatPrice(modalSubtotal)}</span>
-              </div>
-              <div className="flex justify-between text-xs font-medium text-espresso">
-                <span>GST (18%)</span>
-                <span>{formatPrice((modalSubtotal * 18) / 100)}</span>
-              </div>
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <span>Shipping</span>
-                <span>
-                  {modalShipping === 0 ? (
-                    <span className="text-green-700">Free</span>
+                  {isPlacingOrder ? (
+                    <>
+                      <Loader2 className="mr-2.5 h-4 w-4 animate-spin" />
+                      {selectedMethod === 'cod'
+                        ? 'Placing order…'
+                        : 'Processing…'}
+                    </>
                   ) : (
-                    formatPrice(modalShipping)
+                    <>
+                      <Lock className="mr-2.5 h-3.5 w-3.5" />
+                      {selectedMethod === 'cod'
+                        ? `Place Order · ${formatPrice(total)}`
+                        : `Pay ${formatPrice(total)}`}
+                    </>
                   )}
-                </span>
-              </div>
-              {discount > 0 && (
-                <div className="flex justify-between items-center text-xs font-medium text-green-700 bg-green-50 p-1.5 rounded-sm border border-green-200 mt-1">
-                  <span className="flex items-center gap-1">
-                    <Percent className="w-3 h-3" /> Coupon Applied
+                </Button>
+
+                <div className="flex items-center justify-center gap-4 mt-3 text-[10px] uppercase tracking-[0.08em] text-muted-foreground">
+                  <span className="flex items-center gap-1.5">
+                    <Shield className="w-3 h-3 text-[#8A6414]" /> Secure
                   </span>
-                  <span>- {formatPrice(discount)}</span>
+                  <span className="flex items-center gap-1.5">
+                    <Truck className="w-3 h-3 text-[#8A6414]" /> 7-day returns
+                  </span>
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    disabled={isPlacingOrder}
+                    className="uppercase tracking-[0.08em] hover:text-espresso transition-colors disabled:opacity-50"
+                  >
+                    Cancel
+                  </button>
                 </div>
-              )}
+              </div>
             </div>
-          </div>
-
-          {/* Total */}
-          <div className="p-4 bg-ivory rounded-sm border border-border">
-            <div className="flex justify-between items-center">
-              <span className="font-medium text-espresso">Order Total</span>
-              <span className="font-serif text-xl font-medium text-espresso">
-                {formatPrice(total)}
-              </span>
-            </div>
-            <p className="text-[10px] text-muted-foreground text-right mt-0.5">
-              Inclusive of GST
-            </p>
-            {selectedMethod === 'cod' ? (
-              <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
-                <AlertCircle className="h-3 w-3" /> Pay cash when your order is
-                delivered
-              </p>
-            ) : (
-              <p className="text-xs text-green-700 mt-2 flex items-center gap-1">
-                <Shield className="h-3 w-3" /> Secure payment via UPI/Payment Gateway
-              </p>
-            )}
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex gap-3 pt-2">
-            <Button
-              onClick={handlePlaceOrder}
-              disabled={isPlacingOrder || !selectedMethod}
-              className="flex-1 bg-maroon hover:bg-terracotta text-ivory text-xs font-semibold uppercase tracking-[0.16em] rounded-sm transition-colors"
-            >
-              {isPlacingOrder ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {selectedMethod === 'cod' ? 'Placing Order...' : 'Processing...'}
-                </>
-              ) : (
-                <>
-                  <CheckCircle className="mr-2 h-4 w-4" />
-                  {selectedMethod === 'cod'
-                    ? 'Place Order'
-                    : `Pay ${formatPrice(total)}`}
-                </>
-              )}
-            </Button>
-            <Button
-              onClick={onClose}
-              variant="outline"
-              className="text-xs font-semibold uppercase tracking-[0.16em] rounded-sm"
-              disabled={isPlacingOrder}
-            >
-              Cancel
-            </Button>
           </div>
         </DialogContent>
       </Dialog>
@@ -1730,20 +1789,7 @@ const CartPage: React.FC = () => {
 
   const formatPrice = (price: number) => `₹${price.toLocaleString('en-IN')}`;
 
-  const getImageUrl = (product: Product) => {
-    try {
-      const imagesArray =
-        typeof product.images === 'string'
-          ? JSON.parse(product.images)
-          : product.images;
-      const firstImage = imagesArray?.[0];
-      return firstImage
-        ? `${BASE_URL.replace('/api/v1', '')}/${firstImage.replace(/^\/+/, '')}`
-        : '/placeholder.svg';
-    } catch {
-      return '/placeholder.svg';
-    }
-  };
+  const getImageUrl = (product: Product) => getProductImageUrl(product);
 
   const handleApplyCouponAPI = async (code: string) => {
     const token = getTokenFromStorage();

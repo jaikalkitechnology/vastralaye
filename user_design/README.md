@@ -21,9 +21,14 @@ ivory canvas, espresso band, maroon/gold accents, Fraunces serif + Jost sans.
 | 11 | Tax Invoice v2 | (order invoice view) | [`screenshots/11-invoice-v2.png`](screenshots/11-invoice-v2.png) |
 | 12 | Invoice Page | `/account/invoices/:orderId` | [`screenshots/12-invoice-page.png`](screenshots/12-invoice-page.png) |
 | 13 | Admin Print Invoice | Admin → Orders → Print | [`screenshots/13-admin-invoice.png`](screenshots/13-admin-invoice.png) |
+| 14 | Checkout popup | `/cart` → Proceed to Checkout | [`screenshots/14-checkout-modal.png`](screenshots/14-checkout-modal.png) · [mobile](screenshots/14-checkout-modal-mobile.png) |
 
 Mockup sources live in [`mockups/`](mockups) — plain HTML + one shared stylesheet
 (`styles.css`) using the design.md tokens. Open any `.html` in a browser to inspect.
+The checkout popup has its own base sheet (`checkout-base.css`) and keeps the two
+directions that weren't chosen alongside the one that was
+(`14-checkout-modal-alt-compact.html`, `14-checkout-modal-alt-wizard.html`).
+Screenshots 14a/14b are captures of the **shipped** component, not the mockup.
 
 ## The design
 
@@ -66,6 +71,19 @@ Mockup sources live in [`mockups/`](mockups) — plain HTML + one shared stylesh
   tagline, gold-diamond benefit list, footer line; right ivory form panel — gold
   overline (**Account recovery**), serif question headline, themed fields, maroon
   submit, blush tips card, hairline back-to-login row. Panel hides on mobile.
+
+### Checkout popup
+- **Boutique order slip**: a 900px sheet split into a 290px espresso rail and a white
+  form column. The rail carries the paisley tile, the wordmark, the line *"Almost yours
+  — woven by hand, wrapped with care."*, the item list (gold quantity bubbles on 34×45
+  thumbnails) and the totals, closed by a 2px gold rule under a serif gold grand total.
+- **Form column**: gold overline + serif **Complete Your Order**, a *Deliver to* card
+  (maroon initials avatar, address, email, Edit → profile), *Payment method* as a
+  2-up radio grid with scheme badges and a gold **Recommended** tag, a contextual
+  "what happens next" note, then the maroon **Place Order · ₹total** bar and a
+  Secure / 7-day returns / Cancel trust row.
+- **Mobile**: the two columns stack — rail on top (tagline hidden, item list capped and
+  scrollable so the total stays above the fold), form below.
 
 ### Invoice
 - **Toolbar**: back link + Print / Share (outline) and Download PDF (maroon).
