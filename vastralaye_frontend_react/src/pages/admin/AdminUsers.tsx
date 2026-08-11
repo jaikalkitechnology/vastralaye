@@ -22,6 +22,10 @@ import {
   Power,
   Download,
   Users,
+  Pencil,
+  Trash2,
+  Loader2,
+  AlertTriangle,
   UserCheck,
   UserX,
   TrendingUp,
@@ -60,7 +64,42 @@ interface User {
   active_at?: string | null;
   is_active?: boolean;
   is_verified?: boolean;
+  address_line1?: string | null;
+  address_line2?: string | null;
+  city?: string | null;
+  region?: string | null;
+  postal_code?: string | null;
+  country?: string | null;
 }
+
+/** Fields the admin can change. Mirrors AdminUserUpdate on the API. */
+type EditableUser = {
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: string;
+  role: string;
+  address_line1: string;
+  address_line2: string;
+  city: string;
+  region: string;
+  postal_code: string;
+  country: string;
+};
+
+const blankEdit = (u: User): EditableUser => ({
+  first_name: u.first_name || '',
+  last_name: u.last_name || '',
+  email: u.email || '',
+  phone: u.phone || '',
+  role: u.role || 'user',
+  address_line1: u.address_line1 || '',
+  address_line2: u.address_line2 || '',
+  city: u.city || '',
+  region: u.region || '',
+  postal_code: u.postal_code || '',
+  country: u.country || '',
+});
 
 // Status chip pill (admin_design.md §3.4)
 const StatusChip = ({ tint, label }: { tint: string; label: string }) => (
@@ -88,6 +127,11 @@ const AdminUsers = () => {
   const [sortOrder, setSortOrder] = useState<string>('desc');
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editUser, setEditUser] = useState<User | null>(null);
+  const [editForm, setEditForm] = useState<EditableUser | null>(null);
+  const [savingEdit, setSavingEdit] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<User | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   // Stats (calculated from all users, not paginated)
   const [stats, setStats] = useState({
@@ -247,6 +291,47 @@ const AdminUsers = () => {
       fetchStats();
     } catch (error: any) {
       toast.error(error.response?.data?.detail || "Deactivation failed");
+    }
+  };
+
+  const openEdit = (user: User) => {
+    setEditUser(user);
+    setEditForm(blankEdit(user));
+  };
+
+  const saveEdit = async () => {
+    if (!editUser || !editForm) return;
+    setSavingEdit(true);
+    try {
+      await axios.put(`${BASE_URL}/admin/user/${editUser.id}`, editForm, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+      });
+      toast.success('User updated');
+      setEditUser(null);
+      setEditForm(null);
+      fetchUsers();
+    } catch (err: any) {
+      // The API explains refusals (duplicate email, last admin…) — show it.
+      toast.error(err?.response?.data?.detail || 'Could not update this user');
+    } finally {
+      setSavingEdit(false);
+    }
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    try {
+      await axios.delete(`${BASE_URL}/admin/user/${deleteTarget.id}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+      });
+      toast.success(`Deleted ${deleteTarget.email || 'user'}`);
+      setDeleteTarget(null);
+      fetchUsers();
+    } catch (err: any) {
+      toast.error(err?.response?.data?.detail || 'Could not delete this user');
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -690,6 +775,22 @@ const AdminUsers = () => {
                               <Power className="h-3 w-3" />
                               {user.is_active ? 'Deactivate' : 'Activate'}
                             </Button>
+                            <button
+                              type="button"
+                              title="Edit details"
+                              className="w-7 h-7 border border-border rounded-[5px] inline-flex items-center justify-center text-muted-foreground bg-white hover:text-espresso hover:border-espresso transition-colors"
+                              onClick={() => openEdit(user)}
+                            >
+                              <Pencil className="h-3.5 w-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              title="Delete user"
+                              className="w-7 h-7 border border-sale/40 rounded-[5px] inline-flex items-center justify-center text-sale bg-white hover:bg-sale hover:text-ivory transition-colors"
+                              onClick={() => setDeleteTarget(user)}
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
                           </div>
                         </td>
                       </tr>
@@ -765,6 +866,199 @@ const AdminUsers = () => {
             )}
           </>
         )}
+
+        {/* Edit user */}
+        <Dialog
+          open={Boolean(editUser)}
+          onOpenChange={(open) => {
+            if (!open && !savingEdit) {
+              setEditUser(null);
+              setEditForm(null);
+            }
+          }}
+        >
+          <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-lg">
+                <Pencil className="h-4 w-4 text-maroon" />
+                Edit user {editUser ? `#${editUser.id}` : ''}
+              </DialogTitle>
+            </DialogHeader>
+
+            {editForm && (
+              <div className="space-y-4 pt-1">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <Label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                      First name
+                    </Label>
+                    <Input
+                      className="mt-1.5"
+                      value={editForm.first_name}
+                      onChange={(e) => setEditForm({ ...editForm, first_name: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                      Last name
+                    </Label>
+                    <Input
+                      className="mt-1.5"
+                      value={editForm.last_name}
+                      onChange={(e) => setEditForm({ ...editForm, last_name: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                      Email
+                    </Label>
+                    <Input
+                      className="mt-1.5"
+                      type="email"
+                      value={editForm.email}
+                      onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                      Phone
+                    </Label>
+                    <Input
+                      className="mt-1.5"
+                      value={editForm.phone}
+                      onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <Label className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                    Role
+                  </Label>
+                  <select
+                    className="mt-1.5 h-10 w-full rounded-md border border-input bg-white px-3 text-sm"
+                    value={editForm.role}
+                    onChange={(e) => setEditForm({ ...editForm, role: e.target.value })}
+                  >
+                    <option value="user">Customer</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                  <p className="mt-1.5 text-[11px] text-muted-foreground">
+                    Admins get full dashboard access. You can't remove your own admin
+                    rights, or those of the last remaining admin.
+                  </p>
+                </div>
+
+                <div className="border-t border-border pt-4">
+                  <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8A6414]">
+                    Address
+                  </p>
+                  <div className="space-y-3">
+                    <Input
+                      placeholder="Address line 1"
+                      value={editForm.address_line1}
+                      onChange={(e) => setEditForm({ ...editForm, address_line1: e.target.value })}
+                    />
+                    <Input
+                      placeholder="Address line 2"
+                      value={editForm.address_line2}
+                      onChange={(e) => setEditForm({ ...editForm, address_line2: e.target.value })}
+                    />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <Input
+                        placeholder="City"
+                        value={editForm.city}
+                        onChange={(e) => setEditForm({ ...editForm, city: e.target.value })}
+                      />
+                      <Input
+                        placeholder="State / region"
+                        value={editForm.region}
+                        onChange={(e) => setEditForm({ ...editForm, region: e.target.value })}
+                      />
+                      <Input
+                        placeholder="PIN code"
+                        value={editForm.postal_code}
+                        onChange={(e) => setEditForm({ ...editForm, postal_code: e.target.value })}
+                      />
+                      <Input
+                        placeholder="Country"
+                        value={editForm.country}
+                        onChange={(e) => setEditForm({ ...editForm, country: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-2 border-t border-border pt-4">
+                  <Button
+                    variant="outline"
+                    disabled={savingEdit}
+                    onClick={() => {
+                      setEditUser(null);
+                      setEditForm(null);
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    className="bg-maroon text-ivory hover:bg-terracotta"
+                    disabled={savingEdit}
+                    onClick={saveEdit}
+                  >
+                    {savingEdit && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {savingEdit ? 'Saving…' : 'Save changes'}
+                  </Button>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Delete confirmation */}
+        <Dialog
+          open={Boolean(deleteTarget)}
+          onOpenChange={(open) => {
+            if (!open && !deleting) setDeleteTarget(null);
+          }}
+        >
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-lg text-sale">
+                <AlertTriangle className="h-4 w-4" />
+                Delete this user?
+              </DialogTitle>
+            </DialogHeader>
+
+            <div className="space-y-4 pt-1">
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                <span className="font-medium text-espresso">
+                  {deleteTarget?.first_name} {deleteTarget?.last_name}
+                </span>{' '}
+                ({deleteTarget?.email}) will be removed permanently, along with their
+                cart, wishlist, saved addresses and reviews. This cannot be undone.
+              </p>
+              <p className="rounded-sm border border-border bg-ivory p-3 text-[12.5px] leading-relaxed text-muted-foreground">
+                Customers who have placed an order can't be deleted — their order history
+                is accounting data. Use <span className="font-medium text-espresso">Deactivate</span>{' '}
+                for those; it blocks sign-in and keeps the records.
+              </p>
+
+              <div className="flex justify-end gap-2 border-t border-border pt-4">
+                <Button variant="outline" disabled={deleting} onClick={() => setDeleteTarget(null)}>
+                  Cancel
+                </Button>
+                <Button
+                  className="bg-sale text-ivory hover:bg-sale/90"
+                  disabled={deleting}
+                  onClick={confirmDelete}
+                >
+                  {deleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {deleting ? 'Deleting…' : 'Delete permanently'}
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
 
         {/* User Details Dialog */}
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

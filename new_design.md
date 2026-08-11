@@ -985,6 +985,42 @@ entrypoint, so it is dead code rather than a latent crash.
 
 ---
 
+## 31. Admin › Users — edit and delete
+
+The Users table could only view a customer and toggle them active. It now has **Edit**
+and **Delete** on every row.
+
+**Edit** opens a dialog over the row: name, email, phone, role, and the full address
+block. `PUT /admin/user/{id}` applies it, refusing on:
+
+- a malformed email, or one another account already uses (409);
+- a role outside `user` / `admin`;
+- removing **your own** admin rights, or those of the **last remaining** admin — either
+  would lock everyone out of the dashboard.
+
+The API's refusal text is what the toast shows, so the admin reads the actual reason
+rather than a generic failure.
+
+**Delete** is a permanent removal, and deliberately narrower than it looks.
+`DELETE /admin/user/{id}` **refuses anyone who has orders or invoices** — that history is
+accounting data and outlives the account — and answers with the count plus a pointer to
+Deactivate instead. It also refuses self-deletion and the last admin. For everyone else
+it clears the rows that would otherwise trip a foreign key (addresses, settings, cart,
+wishlist, support messages, reviews and review replies, and password-reset tokens, which
+key on email rather than `user_id`) before removing the account. The confirm dialog spells
+out what goes and why order-holders can't be deleted.
+
+`orders.user_id` is `NOT NULL` with no `ON DELETE`, so without that guard the first
+delete of a real customer would have been a foreign-key 500 — or, worse, taken their
+order history with it.
+
+| File | Change |
+|---|---|
+| `app/routers/admin.py` | `AdminUserUpdate`, `PUT /user/{id}`, `DELETE /user/{id}`, `_count_admins` |
+| `src/pages/admin/AdminUsers.tsx` | Edit + Delete row actions, edit dialog, delete confirmation |
+
+---
+
 ## Verification
 
 - `tsc --noEmit` — no errors in any changed file.
@@ -995,6 +1031,13 @@ entrypoint, so it is dead code rather than a latent crash.
   toggle the CTA between *Place Order · ₹total* and *Pay ₹total*, and Place Order posts
   `{items, payment_method:"cod", shipping_address}` and opens the success modal. No
   console or page errors.
+- Admin user edit/delete exercised twice over. Against a real SQLAlchemy session: users
+  with orders (409), self-delete (400), last-admin (400), duplicate email (409),
+  malformed email (400) and self-demotion (400) are all refused, a clean delete leaves
+  zero orphan child rows and zero reset tokens, and plain field updates apply. In a real
+  browser against the production build: both row actions render, the edit dialog
+  prefills, `PUT` carries the changed name and role, `DELETE` hits the right URL, and a
+  409 from the API surfaces its own message in the UI. No console errors.
 - User stats queries exercised against a real SQLAlchemy session (4 fixture users, one
   soft-deleted, one admin, one Google-only): stats return
   `{total: 4, active: 3, inactive: 1, admins: 1}` and reconcile, the list filter returns
