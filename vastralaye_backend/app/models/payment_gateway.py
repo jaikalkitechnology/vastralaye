@@ -15,6 +15,14 @@ class PaymentGatewayCredential(Base):
     base_url = Column(String(255), nullable=False)
     endpoint_path = Column(String(255), nullable=False, default="/api/collection-v7-payment")
     is_active = Column(Boolean, default=True)
+    # Shared secret the gateway must echo back on the webhook. NULL/empty
+    # leaves the webhook open, which is how it has always behaved — set it
+    # here and in the gateway dashboard to lock it down.
+    webhook_secret = Column(String(255), nullable=True)
+    # Refuse to mark an order paid when the settled amount doesn't match the
+    # order total. Off by default: if the gateway reports in a different unit
+    # this would block every confirmation, so it needs verifying once first.
+    verify_amount = Column(Boolean, default=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     created_by = Column(Integer, nullable=True)

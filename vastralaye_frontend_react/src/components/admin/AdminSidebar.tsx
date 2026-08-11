@@ -13,6 +13,7 @@ import {
   Clapperboard,
   ExternalLink,
   GalleryHorizontal,
+  CreditCard,
   Quote,
   Settings,
   X,
@@ -88,6 +89,7 @@ const AdminSidebar = ({ isOpen = false, onClose }: AdminSidebarProps) => {
       label: 'Sales',
       items: [
         { name: 'Orders', path: '/admin/orders', icon: <TrendingUp className={ICON_CLASS} /> },
+        { name: 'Payments', path: '/admin/payments', icon: <CreditCard className={ICON_CLASS} /> },
         { name: 'Reviews', path: '/admin/reviews', icon: <MessageSquare className={ICON_CLASS} /> },
       ],
     },

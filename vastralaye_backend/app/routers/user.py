@@ -2726,16 +2726,54 @@ BASE_URL   = os.getenv("PAYMENT_BASE_URL", "https://payin.mizorpay.in")
 ENDPOINT   = f"{BASE_URL}/api/collection-v9-payment"
 
 
-# ✅ Validate credentials on startup
+# Credentials may live in the database instead (Admin → Payment Integration),
+# so a missing .env is a warning, not a boot failure — raising here took the
+# whole API down rather than just the payment endpoint.
 if not TOKEN_ID or not SECRET_KEY:
-    raise ValueError("❌ PAYMENT_TOKEN_ID and PAYMENT_SECRET_KEY must be set in .env")
+    print(
+        "⚠️  PAYMENT_TOKEN_ID / PAYMENT_SECRET_KEY not set in .env — "
+        "falling back to the credentials stored in Admin → Payment Integration."
+    )
 
 
 HEADERS = {
-    "Token-Id": TOKEN_ID,
-    "Secret-Key": SECRET_KEY,
+    "Token-Id": TOKEN_ID or "",
+    "Secret-Key": SECRET_KEY or "",
     "Content-Type": "application/json",
 }
+
+
+def resolve_gateway(db: Session):
+    """(endpoint, headers) for the live gateway.
+
+    An active credential row wins; .env is the fallback so existing
+    deployments keep working untouched.
+    """
+    from app.models.payment_gateway import PaymentGatewayCredential
+
+    cred = (
+        db.query(PaymentGatewayCredential)
+        .filter(
+            PaymentGatewayCredential.gateway_name == "mizorpay",
+            PaymentGatewayCredential.is_active.is_(True),
+        )
+        .first()
+    )
+    if cred and cred.token_id and cred.secret_key:
+        return (
+            f"{(cred.base_url or '').rstrip('/')}{cred.endpoint_path or ''}",
+            {
+                "Token-Id": cred.token_id,
+                "Secret-Key": cred.secret_key,
+                "Content-Type": "application/json",
+            },
+        )
+    if not TOKEN_ID or not SECRET_KEY:
+        raise HTTPException(
+            status_code=503,
+            detail="Payment gateway is not configured. Add credentials in Admin → Payment Integration.",
+        )
+    return ENDPOINT, HEADERS
 
 
 # ─────────────────────────────────────────────
@@ -2793,12 +2831,13 @@ async def home():
 #  INITIATE PAYMENT ENDPOINT
 # ─────────────────────────────────────────────
 @router.post("/initiate-payment")
-async def initiate_payment(data: PaymentRequest):
+async def initiate_payment(data: PaymentRequest, db: Session = Depends(get_db)):
     """
     Initiates a payment, determines the payment flow
     (Redirect vs. QR Code), and returns a structured
     response for the frontend to handle.
     """
+    endpoint, headers = resolve_gateway(db)
     merchant_ref = generate_merchant_ref()
 
     payload = {
@@ -2818,8 +2857,8 @@ async def initiate_payment(data: PaymentRequest):
     try:
         async with httpx.AsyncClient(timeout=30.0) as client:
             response = await client.post(
-                ENDPOINT,
-                headers=HEADERS,
+                endpoint,
+                headers=headers,
                 json=payload
             )
             response.raise_for_status()

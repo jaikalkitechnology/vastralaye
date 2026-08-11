@@ -835,6 +835,63 @@ for no behavioural gain.
 
 ---
 
+## 28. Admin › Payment Integration + webhook audit
+
+New page at `/admin/payments` (Sales → Payments) and a hardened webhook.
+
+### The page
+
+- **Gateway credentials** — Token ID, Secret Key, Base URL, Endpoint path, and a
+  live/disabled toggle. Stored secrets come back **masked** (`••••••••a91f`); leaving a
+  secret field blank keeps what's saved, so the form round-trips without re-typing them.
+- **Webhook** — the exact URL to paste into the gateway dashboard, with a copy button;
+  a **shared secret** field; and a **verify settled amount** switch.
+- **Recent online payments** — the last 25 non-COD orders with merchant ref, txn id,
+  status, total and paid amount, plus a red banner counting online orders that have **no
+  merchant reference at all**.
+
+Credentials now actually drive payments: `initiate-payment` resolves the active
+credential row first and falls back to `.env`, so the page isn't decorative. The
+module-level `raise ValueError` on missing `.env` keys is gone — it took the whole API
+down at import rather than just the payment endpoint.
+
+### Webhook findings
+
+Audited `POST /api/v1/webhook`. What was wrong, and what changed:
+
+| Finding | Severity | Status |
+|---|---|---|
+| No authentication — any caller who guesses a `merchant_ref` could mark an order **paid** | Critical | Opt-in shared secret added |
+| `/webhook/test` was public and ran the real handler — a second unauthenticated way to mark orders paid | Critical | Now admin-only |
+| Every request header logged at INFO, including the gateway's auth token; full body (customer PII) too | High | Redacted; both moved to DEBUG |
+| Settled amount was written to the order with no check against the total | High | Mismatch always logged; blocking is opt-in |
+| Unknown `txn_status` returned 400, so the gateway retried a payload that could never succeed | Medium | Returns 200 + `ignored` |
+| No audit trail — `PaymentLog` and `create_or_update_payment_log` existed but nothing called them | Medium | Every webhook now writes a `payment_logs` row |
+
+Both new controls default to **off** so live payments behave exactly as before; the page
+explains what each one does and warns while the webhook is unauthenticated.
+
+### Not fixed — the flow is broken upstream
+
+`initiate-payment` generates a `merchant_ref`, sends it to the gateway and returns it to
+the browser, but **never writes it to an order** — it has no `db` session and no cart
+items, and nothing else sets `Order.merchant_ref`. The webhook matches on exactly that
+column, so it 404s on every real callback: online payments can be taken and never
+confirmed. Fixing it means creating the pending order at initiate time, which changes
+checkout, so it is reported rather than done. The page surfaces the count.
+
+| File | Change |
+|---|---|
+| `app/models/payment_gateway.py` | `webhook_secret`, `verify_amount` |
+| `app/routers/payment_gateway.py` | New — admin GET/PUT credentials, GET payment logs |
+| `app/routers/webhook.py` | Secret check, redacted logging, amount check, audit rows, admin-only test endpoint |
+| `app/routers/user.py` | `resolve_gateway()`; DB credentials with `.env` fallback; no boot-time crash |
+| `run.py`, `app/run.py` | Register the router |
+| `src/pages/admin/AdminPayments.tsx` | New page |
+| `src/App.tsx`, `src/components/admin/AdminSidebar.tsx` | Route + Sales → Payments |
+
+---
+
 ## Verification
 
 - `tsc --noEmit` — no errors in any changed file.
