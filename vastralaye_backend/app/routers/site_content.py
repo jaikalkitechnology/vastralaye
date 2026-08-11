@@ -21,8 +21,15 @@ os.makedirs(BANNERS_DIR, exist_ok=True)
 os.makedirs(PAGE_BANNERS_DIR, exist_ok=True)
 os.makedirs(TESTIMONIALS_DIR, exist_ok=True)
 
-# Storefront pages that can carry an admin-managed banner
-PAGE_BANNER_PAGES = ["products", "categories", "new_arrivals", "best_sellers"]
+# Storefront slots that can carry an admin-managed banner. "home_hero" is the
+# background behind the homepage hero slides; the rest are catalogue bands.
+PAGE_BANNER_PAGES = [
+    "products",
+    "categories",
+    "new_arrivals",
+    "best_sellers",
+    "home_hero",
+]
 
 ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp"}
 MAX_IMAGE_BYTES = 8 * 1024 * 1024  # 8 MB
@@ -216,8 +223,14 @@ def delete_banner(
 # ---------------------------------------------------------------
 
 HEX_COLOR_RE = re.compile(r"^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$")
-DEFAULT_OVERLAY_COLOR = "#2B1B12"  # espresso
+DEFAULT_OVERLAY_COLOR = "#2B1B12"  # espresso — dark wash under ivory headings
 DEFAULT_OVERLAY_OPACITY = 95
+# The homepage hero prints espresso copy, so its wash defaults to ivory instead.
+OVERLAY_DEFAULTS = {"home_hero": ("#FAF6F0", 90)}
+
+
+def _overlay_defaults(page: str) -> tuple:
+    return OVERLAY_DEFAULTS.get(page, (DEFAULT_OVERLAY_COLOR, DEFAULT_OVERLAY_OPACITY))
 
 
 def _normalize_hex(value: Optional[str]) -> Optional[str]:
@@ -238,6 +251,7 @@ def _normalize_hex(value: Optional[str]) -> Optional[str]:
 
 
 def _page_banner_out(b: PageBanner) -> dict:
+    default_color, default_opacity = _overlay_defaults(b.page)
     return {
         "id": b.id,
         "page": b.page,
@@ -246,9 +260,9 @@ def _page_banner_out(b: PageBanner) -> dict:
         "subtitle": b.subtitle,
         "is_active": b.is_active,
         "full_bleed": bool(b.full_bleed),
-        "overlay_color": b.overlay_color or DEFAULT_OVERLAY_COLOR,
+        "overlay_color": b.overlay_color or default_color,
         "overlay_opacity": (
-            b.overlay_opacity if b.overlay_opacity is not None else DEFAULT_OVERLAY_OPACITY
+            b.overlay_opacity if b.overlay_opacity is not None else default_opacity
         ),
     }
 

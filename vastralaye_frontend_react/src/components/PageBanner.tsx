@@ -40,9 +40,15 @@ const fetchBannerImage = (): Promise<string | null> => {
 
 /* Per-page banners (Admin → Banner Control → Page Banners): one image +
  * title + subtitle per catalogue page. Fetched once and shared. */
-export type PageBannerKey = 'products' | 'categories' | 'new_arrivals' | 'best_sellers';
+export type PageBannerKey =
+  | 'products'
+  | 'categories'
+  | 'new_arrivals'
+  | 'best_sellers'
+  /** Background behind the homepage hero slides. */
+  | 'home_hero';
 
-interface PageBannerData {
+export interface PageBannerData {
   page: string;
   image_url?: string | null;
   title?: string | null;
@@ -58,6 +64,30 @@ interface PageBannerData {
 /* Espresso @ 95 — the look before the overlay became admin-controlled. */
 export const DEFAULT_OVERLAY_COLOR = '#2B1B12';
 export const DEFAULT_OVERLAY_OPACITY = 95;
+
+/* The homepage hero prints espresso copy, so its wash defaults to ivory. */
+export const HOME_HERO_OVERLAY_COLOR = '#FAF6F0';
+export const HOME_HERO_OVERLAY_OPACITY = 90;
+
+/** Per-slot overlay defaults, mirroring the backend. */
+export const overlayDefaults = (page?: string) =>
+  page === 'home_hero'
+    ? { color: HOME_HERO_OVERLAY_COLOR, opacity: HOME_HERO_OVERLAY_OPACITY }
+    : { color: DEFAULT_OVERLAY_COLOR, opacity: DEFAULT_OVERLAY_OPACITY };
+
+/**
+ * Rec. 709 luminance test — decides whether copy over this wash should be
+ * espresso or ivory, so a dark overlay can't hide dark text.
+ */
+export const isLightColor = (hex: string): boolean => {
+  const m = /^#?([0-9a-f]{6})$/i.exec((hex || '').trim());
+  if (!m) return true;
+  const int = parseInt(m[1], 16);
+  const r = (int >> 16) & 255;
+  const g = (int >> 8) & 255;
+  const b = int & 255;
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b > 140;
+};
 
 /** "#RRGGBB" + 0–1 alpha → "rgba(r, g, b, a)". */
 export const hexToRgba = (hex: string, alpha: number): string => {
@@ -83,7 +113,7 @@ export const overlayGradient = (color: string, strength: number): string => {
 let cachedPageBanners: Record<string, PageBannerData> | null = null;
 let pageBannersInflight: Promise<Record<string, PageBannerData>> | null = null;
 
-const fetchPageBanners = (): Promise<Record<string, PageBannerData>> => {
+export const fetchPageBanners = (): Promise<Record<string, PageBannerData>> => {
   if (cachedPageBanners) return Promise.resolve(cachedPageBanners);
   if (!pageBannersInflight) {
     pageBannersInflight = (async () => {

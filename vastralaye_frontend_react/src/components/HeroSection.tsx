@@ -3,8 +3,13 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { api } from '@/api/api';
 import { mediaUrl } from '@/lib/media';
-import HeroScene from '@/components/decor/HeroScene';
-import { PAISLEY_TILE } from '@/components/decor/patterns';
+import {
+  fetchPageBanners,
+  isLightColor,
+  overlayDefaults,
+  overlayGradient,
+  type PageBannerData,
+} from '@/components/PageBanner';
 
 /**
  * Light editorial hero (design.md §5.2) — warm ivory/blush canvas,
@@ -64,6 +69,18 @@ const fallbackSlides: HeroSlide[] = [
 const HeroSection = () => {
   const [slides, setSlides] = useState<HeroSlide[]>(fallbackSlides);
   const [current, setCurrent] = useState(0);
+  /* Background image + wash, from Admin → Banner Control → Homepage hero. */
+  const [background, setBackground] = useState<PageBannerData | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchPageBanners().then((map) => {
+      if (!cancelled) setBackground(map.home_hero ?? null);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   /* Admin-managed banners; fall back to the static slides when none exist. */
   useEffect(() => {
@@ -107,22 +124,49 @@ const HeroSection = () => {
 
   const slide = slides[Math.min(current, slides.length - 1)];
 
+  const bgImage = background?.image_url ? mediaUrl(background.image_url) : null;
+  const fallback = overlayDefaults('home_hero');
+  const overlayColor = background?.overlay_color || fallback.color;
+  const overlayOpacity =
+    typeof background?.overlay_opacity === 'number'
+      ? background.overlay_opacity
+      : fallback.opacity;
+
+  /* Copy flips to ivory over a dark wash so it can never disappear. */
+  const onLight = isLightColor(overlayColor);
+  const headingClass = onLight ? 'text-espresso' : 'text-ivory';
+  const accentClass = onLight ? 'text-maroon' : 'text-gold';
+  const bodyClass = onLight ? 'text-muted-foreground' : 'text-ivory/80';
+  const outlineBtnClass = onLight
+    ? 'border-espresso text-espresso hover:bg-espresso hover:text-ivory'
+    : 'border-ivory text-ivory hover:bg-ivory hover:text-espresso';
+  const dotIdleClass = onLight
+    ? 'bg-espresso/25 hover:bg-espresso/40'
+    : 'bg-ivory/30 hover:bg-ivory/55';
+
   return (
-    <section className="relative overflow-hidden bg-gradient-to-r from-blush via-ivory to-sand">
-      {/* Illustrated artisan courtyard behind the banner */}
-      <div
-        className="absolute inset-0 opacity-[0.07] pointer-events-none"
-        style={{ backgroundImage: PAISLEY_TILE }}
-        aria-hidden="true"
-      />
-      <div className="absolute inset-0 opacity-90 pointer-events-none">
-        <HeroScene />
-      </div>
-      {/* Softens the art directly under the headline without flattening the scene */}
-      <div
-        className="absolute inset-0 pointer-events-none bg-[radial-gradient(72%_52%_at_24%_45%,rgba(250,246,240,0.9)_0%,rgba(250,246,240,0.45)_42%,rgba(250,246,240,0)_72%)]"
-        aria-hidden="true"
-      />
+    <section
+      className={`relative overflow-hidden ${
+        bgImage ? '' : 'bg-gradient-to-r from-blush via-ivory to-sand'
+      }`}
+      style={bgImage ? { backgroundColor: overlayColor } : undefined}
+    >
+      {/* Admin-managed background image + wash */}
+      {bgImage && (
+        <>
+          <img
+            src={bgImage}
+            alt=""
+            aria-hidden="true"
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+          <span
+            aria-hidden="true"
+            className="absolute inset-0"
+            style={{ backgroundImage: overlayGradient(overlayColor, overlayOpacity) }}
+          />
+        </>
+      )}
 
       <div className="relative container mx-auto px-4">
         <div className="grid grid-cols-1 lg:grid-cols-2 items-center gap-10 lg:gap-16 py-12 md:py-20 lg:py-24 min-h-[60vh]">
@@ -137,16 +181,18 @@ const HeroSection = () => {
               className="order-2 lg:order-1 text-center lg:text-left"
             >
               {slide.overline && <span className="overline-label mb-4">{slide.overline}</span>}
-              <h1 className="font-serif text-4xl md:text-5xl xl:text-6xl font-medium leading-[1.12] text-espresso mb-5">
+              <h1
+                className={`font-serif text-4xl md:text-5xl xl:text-6xl font-medium leading-[1.12] mb-5 ${headingClass}`}
+              >
                 {slide.titleA}
                 {slide.titleB && (
                   <>
                     <br />
-                    <em className="italic text-maroon">{slide.titleB}</em>
+                    <em className={`italic ${accentClass}`}>{slide.titleB}</em>
                   </>
                 )}
               </h1>
-              <p className="text-muted-foreground text-base md:text-lg max-w-xl mx-auto lg:mx-0 mb-8">
+              <p className={`text-base md:text-lg max-w-xl mx-auto lg:mx-0 mb-8 ${bodyClass}`}>
                 {slide.description}
               </p>
               <div className="flex flex-wrap justify-center lg:justify-start gap-4">
@@ -159,7 +205,7 @@ const HeroSection = () => {
                 {slide.ctaSecondary && (
                   <Link
                     to={slide.ctaSecondary.to}
-                    className="inline-block border border-espresso text-espresso text-xs font-semibold uppercase tracking-[0.16em] px-9 py-4 rounded-sm hover:bg-espresso hover:text-ivory transition-colors"
+                    className={`inline-block border text-xs font-semibold uppercase tracking-[0.16em] px-9 py-4 rounded-sm transition-colors ${outlineBtnClass}`}
                   >
                     {slide.ctaSecondary.label}
                   </Link>
@@ -199,7 +245,7 @@ const HeroSection = () => {
             aria-label={`Go to slide ${i + 1}`}
             onClick={() => setCurrent(i)}
             className={`h-[2.5px] rounded-full transition-all duration-300 ${
-              i === current ? 'w-7 bg-gold' : 'w-4 bg-espresso/25 hover:bg-espresso/40'
+              i === current ? 'w-7 bg-gold' : `w-4 ${dotIdleClass}`
             }`}
           />
         ))}

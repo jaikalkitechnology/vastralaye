@@ -22,7 +22,7 @@ ivory canvas, espresso band, maroon/gold accents, Fraunces serif + Jost sans.
 | 12 | Invoice Page | `/account/invoices/:orderId` | [`screenshots/12-invoice-page.png`](screenshots/12-invoice-page.png) |
 | 13 | Admin Print Invoice | Admin → Orders → Print | [`screenshots/13-admin-invoice.png`](screenshots/13-admin-invoice.png) |
 | 14 | Checkout popup | `/cart` → Proceed to Checkout | [`screenshots/14-checkout-modal.png`](screenshots/14-checkout-modal.png) · [mobile](screenshots/14-checkout-modal-mobile.png) |
-| 15 | Home hero banner | `/` | [`screenshots/15-home-hero-scene.png`](screenshots/15-home-hero-scene.png) · [mobile](screenshots/15-home-hero-scene-mobile.png) |
+| 15 | Home hero background | `/` | [`screenshots/15-home-hero-scene.png`](screenshots/15-home-hero-scene.png) |
 
 Mockup sources live in [`mockups/`](mockups) — plain HTML + one shared stylesheet
 (`styles.css`) using the design.md tokens. Open any `.html` in a browser to inspect.
@@ -73,17 +73,15 @@ Screenshots 14a/14b are captures of the **shipped** component, not the mockup.
   overline (**Account recovery**), serif question headline, themed fields, maroon
   submit, blush tips card, hairline back-to-login row. Panel hides on mobile.
 
-### Home hero banner
-- **Illustrated artisan courtyard** behind the admin-managed hero slides: a marigold
-  **toran** strung across the top, and along the bottom a courtyard of craft — pit
-  handloom with a seated weaver, charkha, thread spools, rangoli, lit diyas, a tulsi
-  pot and a stack of folded weaves. Jharokha arches hold the far edges on wide screens,
-  block-print **butis** float through the mid-field, and a paisley tile carries the
-  texture between them.
-- Warm terracotta/gold line art on the existing blush→ivory→sand gradient; a soft
-  radial wash under the headline keeps the copy clean without flattening the art.
-- Below `md` only the toran and the paisley remain — the copy fills a narrow hero, so
-  the courtyard would land under the buttons.
+### Home hero background
+- The hero sits on an **admin-uploaded photograph** (Admin → Banner Control → Homepage
+  hero background) with a colour wash laid over it — the same left-to-right ramp as the
+  catalogue bands, so the copy side is tinted and the campaign-image side shows more
+  photo.
+- The wash defaults to **ivory at 90** because the hero prints espresso copy. Choose a
+  dark colour and the heading, accent line, body copy, outline button and slide dots all
+  flip to ivory/gold automatically.
+- With no image uploaded the section keeps its original blush → ivory → sand gradient.
 
 ### Checkout popup
 - **Boutique order slip**: a 900px sheet split into a 290px espresso rail and a white
