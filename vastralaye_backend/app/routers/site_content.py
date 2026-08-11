@@ -222,6 +222,7 @@ def _page_banner_out(b: PageBanner) -> dict:
         "title": b.title,
         "subtitle": b.subtitle,
         "is_active": b.is_active,
+        "full_bleed": bool(b.full_bleed),
     }
 
 
@@ -246,6 +247,7 @@ def upsert_page_banner(
     title: Optional[str] = Form(None),
     subtitle: Optional[str] = Form(None),
     is_active: bool = Form(True),
+    full_bleed: bool = Form(False),
     remove_image: bool = Form(False),
     image_file: Optional[UploadFile] = File(None),
     db: Session = Depends(get_db),
@@ -262,6 +264,7 @@ def upsert_page_banner(
     banner.title = (title or "").strip() or None
     banner.subtitle = (subtitle or "").strip() or None
     banner.is_active = is_active
+    banner.full_bleed = full_bleed
 
     if image_file is not None:
         _remove_file(banner.image_url)

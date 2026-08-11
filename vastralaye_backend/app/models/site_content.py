@@ -36,6 +36,10 @@ class PageBanner(Base):
     title = Column(String(160), nullable=True)
     subtitle = Column(String(255), nullable=True)
     is_active = Column(Boolean, default=True)
+    # Artwork that already carries its own headline/background: show it
+    # edge-to-edge at its own aspect ratio, with no espresso wash and no
+    # heading painted over it.
+    full_bleed = Column(Boolean, default=False)
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
 

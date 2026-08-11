@@ -742,6 +742,42 @@ Screenshots: `user_design/screenshots/15-home-hero-scene{,-mobile}.png`.
 
 ---
 
+## 26. Page banners — full-width artwork mode
+
+The page-banner slots from §20 assume a *photo*: the image is washed with an espresso
+gradient and the page's heading, tagline and breadcrumb are painted over it. That's
+wrong for a **ready-made banner** — artwork that already carries its own headline and
+its own (often light) background. Uploading one gave a near-black left edge and two
+competing headlines.
+
+Each page-banner slot gains a **Full-width artwork** toggle:
+
+- **On** — the image is shown whole, at its own aspect ratio, with no gradient and no
+  heading over it. A slim espresso strip above it carries the breadcrumb, the gold rule
+  still closes the band, and the heading is kept as an `sr-only` `<h1>` so the page
+  still has a real heading for search engines and screen readers. The tagline is not
+  rendered, and the admin field is disabled to say so.
+- **Off** (default) — unchanged behaviour, so existing banners are unaffected.
+- The mode only ever applies to a page's **own** upload, never to the shared hero-banner
+  fallback — a hero photo inherited by a catalogue page still gets the wash it needs.
+- Wide artwork shrinks below legibility on a phone (a 4:1 strip is ~100px tall at
+  420px), so below `md` the image is cropped to its centre at a fixed 150px instead of
+  scaling down; from `md` up it runs at full height.
+- The admin preview switches to `object-contain` when the toggle is on, so the card
+  shows what the storefront will show.
+
+`full_bleed` is a new nullable boolean on `page_banners`; existing databases pick it up
+through `schema_sync` at startup, so there's no migration to run.
+
+| File | Change |
+|---|---|
+| `app/models/site_content.py` | `PageBanner.full_bleed` |
+| `app/routers/site_content.py` | `full_bleed` in the payload and the multipart upsert |
+| `src/components/PageBanner.tsx` | Full-bleed branch, mobile centre-crop, `sr-only` heading |
+| `src/pages/admin/AdminPageBanners.tsx` | Toggle, helper copy, contain-preview, disabled tagline |
+
+---
+
 ## Verification
 
 - `tsc --noEmit` — no errors in any changed file.
@@ -755,3 +791,7 @@ Screenshots: `user_design/screenshots/15-home-hero-scene{,-mobile}.png`.
 - Home hero checked in a real browser at 1440 / 820 / 420 px: the toran renders at all
   three, the courtyard sits clear of the CTAs from `md` up and is hidden below it, and
   no band is cropped. No console or page errors.
+- Full-width artwork mode driven end to end against the production build: `/categories`
+  with a `full_bleed` banner renders the artwork whole with no wash and no painted
+  heading, keeps the `sr-only` `<h1>`, and centre-crops below `md`; the admin card shows
+  the toggle, the contained preview and the disabled tagline. No console or page errors.

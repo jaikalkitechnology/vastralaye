@@ -47,6 +47,8 @@ interface PageBannerData {
   image_url?: string | null;
   title?: string | null;
   subtitle?: string | null;
+  /** Artwork that carries its own headline — show it edge-to-edge, no wash. */
+  full_bleed?: boolean;
 }
 
 let cachedPageBanners: Record<string, PageBannerData> | null = null;
@@ -107,9 +109,43 @@ const PageBanner = ({ title, subtitle, crumb, page }: PageBannerProps) => {
   }, [page]);
 
   /* Page banner wins; hero-banner image, then paisley, as fallbacks. */
-  const shownImage = pageData?.image_url ? mediaUrl(pageData.image_url) : image;
+  const pageImage = pageData?.image_url ? mediaUrl(pageData.image_url) : null;
+  const shownImage = pageImage || image;
   const shownTitle = pageData?.title || title;
   const shownSubtitle = pageData?.subtitle || subtitle;
+
+  /* Uploaded artwork that already contains its own headline and background:
+     show it as-is under a slim breadcrumb strip. Only ever applies to the
+     page's own upload — never to the shared hero-banner fallback. */
+  if (pageData?.full_bleed && pageImage) {
+    return (
+      <section className="border-b-[3px] border-gold">
+        <div className="bg-espresso">
+          <div className="container mx-auto px-4 py-2.5">
+            <nav
+              aria-label="Breadcrumb"
+              className="text-[11px] uppercase tracking-[0.16em] text-ivory/55"
+            >
+              <Link to="/" className="hover:text-gold transition-colors">
+                Home
+              </Link>
+              <span className="mx-2">·</span>
+              <span className="text-gold font-medium">{crumb}</span>
+            </nav>
+          </div>
+        </div>
+        <h1 className="sr-only">{shownTitle}</h1>
+        {/* Wide banner artwork shrinks below legibility on a phone, so crop to
+            the middle there and only go full-height from md up. */}
+        <img
+          src={pageImage}
+          alt=""
+          aria-hidden
+          className="block w-full h-[150px] object-cover object-center md:h-auto bg-ivory"
+        />
+      </section>
+    );
+  }
 
   return (
     <section className="relative overflow-hidden bg-espresso border-b-[3px] border-gold">
