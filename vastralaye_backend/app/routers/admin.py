@@ -1984,6 +1984,166 @@ def admin_activate_user(user_id: int, db: Session = Depends(get_db)):
     return {"message": f"User {user_id} activated successfully"}
 
 
+class AdminUserUpdate(BaseModel):
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    role: Optional[str] = None
+    address_line1: Optional[str] = None
+    address_line2: Optional[str] = None
+    city: Optional[str] = None
+    region: Optional[str] = None
+    postal_code: Optional[str] = None
+    country: Optional[str] = None
+
+
+EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+
+def _count_admins(db: Session) -> int:
+    return db.query(User).filter(User.role == "admin", User.deleted_at.is_(None)).count()
+
+
+@router.put("/user/{user_id}", dependencies=[Depends(get_current_admin_user)])
+def admin_update_user(
+    user_id: int,
+    payload: AdminUserUpdate,
+    db: Session = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+):
+    """Edit a customer's details from the admin dashboard."""
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    data = payload.dict(exclude_unset=True)
+
+    if "email" in data:
+        email = (data["email"] or "").strip().lower()
+        if not EMAIL_RE.match(email):
+            raise HTTPException(status_code=400, detail="Enter a valid email address")
+        clash = (
+            db.query(User)
+            .filter(func.lower(User.email) == email, User.id != user_id)
+            .first()
+        )
+        if clash:
+            raise HTTPException(status_code=409, detail="Another account already uses that email")
+        user.email = email
+
+    if "role" in data:
+        role = (data["role"] or "").strip().lower()
+        if role not in {"user", "admin"}:
+            raise HTTPException(status_code=400, detail="Role must be 'user' or 'admin'")
+        # Don't let an admin lock everyone out of the dashboard.
+        if user.role == "admin" and role != "admin":
+            if user.id == admin_user.id:
+                raise HTTPException(status_code=400, detail="You can't remove your own admin access")
+            if _count_admins(db) <= 1:
+                raise HTTPException(status_code=400, detail="This is the only admin — promote someone else first")
+        user.role = role
+
+    for field in (
+        "first_name", "last_name", "phone",
+        "address_line1", "address_line2", "city", "region", "postal_code", "country",
+    ):
+        if field in data:
+            value = (data[field] or "").strip()
+            setattr(user, field, value or None)
+
+    db.commit()
+    db.refresh(user)
+    return {
+        "message": "User updated",
+        "user": {
+            "id": user.id,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "email": user.email,
+            "phone": user.phone,
+            "role": user.role,
+            "address_line1": user.address_line1,
+            "address_line2": user.address_line2,
+            "city": user.city,
+            "region": user.region,
+            "postal_code": user.postal_code,
+            "country": user.country,
+        },
+    }
+
+
+@router.delete("/user/{user_id}", dependencies=[Depends(get_current_admin_user)])
+def admin_delete_user(
+    user_id: int,
+    db: Session = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+):
+    """Permanently delete a customer.
+
+    Refused for anyone with orders or invoices — that history is accounting
+    data and outlives the account. Deactivate those instead, which blocks
+    login while keeping the record.
+    """
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    if user.id == admin_user.id:
+        raise HTTPException(status_code=400, detail="You can't delete your own account")
+    if user.role == "admin" and _count_admins(db) <= 1:
+        raise HTTPException(status_code=400, detail="This is the only admin — promote someone else first")
+
+    order_count = db.query(Order).filter(Order.user_id == user_id).count()
+    if order_count:
+        raise HTTPException(
+            status_code=409,
+            detail=(
+                f"This customer has {order_count} order(s). Deleting them would take the "
+                "order history with it — deactivate the account instead."
+            ),
+        )
+
+    from app.models.invoice import Invoice
+
+    invoice_count = db.query(Invoice).filter(Invoice.user_id == user_id).count()
+    if invoice_count:
+        raise HTTPException(
+            status_code=409,
+            detail=(
+                f"This customer has {invoice_count} invoice(s). Deactivate the account "
+                "instead so the records are kept."
+            ),
+        )
+
+    # Clear the rows that would otherwise trip a foreign key.
+    from app.models.address import Address
+    from app.models.cart import CartItem as _CartItem
+    from app.models.product import ProductReview, ProductReviewReply
+    from app.models.user import SupportMessage as _SupportMessage, UserSettings, PasswordResetToken
+    from app.models.wishlist import WishlistItem as _WishlistItem
+
+    for model in (
+        Address, UserSettings, _CartItem, _WishlistItem, _SupportMessage, ProductReview,
+    ):
+        try:
+            db.query(model).filter(model.user_id == user_id).delete(synchronize_session=False)
+        except Exception:
+            db.rollback()
+            raise HTTPException(status_code=500, detail=f"Could not clear {model.__name__} rows")
+    db.query(ProductReviewReply).filter(ProductReviewReply.admin_id == user_id).delete(
+        synchronize_session=False
+    )
+    # This one is keyed by email rather than user_id.
+    db.query(PasswordResetToken).filter(PasswordResetToken.email == user.email).delete(
+        synchronize_session=False
+    )
+
+    email = user.email
+    db.delete(user)
+    db.commit()
+    return {"message": f"Deleted {email}", "id": user_id}
+
+
 @router.put("/user/{user_id}/deactivate", dependencies=[Depends(get_current_admin_user)])
 def admin_deactivate_user(user_id: int, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.id == user_id).first()
