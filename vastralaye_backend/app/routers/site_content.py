@@ -113,7 +113,7 @@ def list_admin_banners(
 
 @router.post("/api/v1/admin/banners")
 def create_banner(
-    title_line_1: str = Form(...),
+    title_line_1: Optional[str] = Form(None),
     title_line_2: Optional[str] = Form(None),
     overline: Optional[str] = Form(None),
     description: Optional[str] = Form(None),
@@ -123,15 +123,18 @@ def create_banner(
     cta_secondary_link: Optional[str] = Form(None),
     sort_order: int = Form(0),
     is_active: bool = Form(True),
-    image_file: UploadFile = File(...),
+    image_file: Optional[UploadFile] = File(None),
     db: Session = Depends(get_db),
     admin: User = Depends(get_current_admin_user),
 ):
-    image_url = _save_image(image_file, BANNERS_DIR, "banner")
+    # Every field is optional. image_url / title_line_1 are NOT NULL in the
+    # database, so "not set" is stored as an empty string — which the
+    # storefront already treats as absent — rather than needing a migration.
+    image_url = _save_image(image_file, BANNERS_DIR, "banner") if image_file else ""
     banner = HeroBanner(
         image_url=image_url,
         overline=(overline or "").strip() or None,
-        title_line_1=title_line_1.strip(),
+        title_line_1=(title_line_1 or "").strip(),
         title_line_2=(title_line_2 or "").strip() or None,
         description=(description or "").strip() or None,
         cta_primary_label=(cta_primary_label or "").strip() or None,
@@ -150,7 +153,7 @@ def create_banner(
 @router.put("/api/v1/admin/banners/{banner_id}")
 def update_banner(
     banner_id: int,
-    title_line_1: str = Form(...),
+    title_line_1: Optional[str] = Form(None),
     title_line_2: Optional[str] = Form(None),
     overline: Optional[str] = Form(None),
     description: Optional[str] = Form(None),
@@ -172,7 +175,7 @@ def update_banner(
         _remove_file(banner.image_url)
         banner.image_url = _save_image(image_file, BANNERS_DIR, "banner")
 
-    banner.title_line_1 = title_line_1.strip()
+    banner.title_line_1 = (title_line_1 or "").strip()
     banner.title_line_2 = (title_line_2 or "").strip() or None
     banner.overline = (overline or "").strip() or None
     banner.description = (description or "").strip() or None

@@ -94,8 +94,23 @@ const AdminBanners = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.title_line_1.trim()) return toast({ title: 'Title line 1 is required' });
-    if (!editingId && !imageFile) return toast({ title: 'Please choose a banner image' });
+    /* Every field is optional — only block a slide with nothing to show at all.
+       The CTA fields don't count: they're pre-filled, and a hero of nothing but
+       a button isn't a slide. */
+    const editing = editingId ? banners.find((b) => b.id === editingId) : null;
+    const hasImage = Boolean(imageFile) || Boolean(editing?.image_url);
+    const hasText = [
+      form.overline,
+      form.title_line_1,
+      form.title_line_2,
+      form.description,
+    ].some((v) => v.trim());
+    if (!hasImage && !hasText) {
+      return toast({
+        title: 'Nothing to show yet',
+        description: 'Every field is optional, but a slide needs an image or some text.',
+      });
+    }
 
     const fd = new FormData();
     Object.entries(form).forEach(([k, v]) => fd.append(k, String(v)));
@@ -135,7 +150,7 @@ const AdminBanners = () => {
   };
 
   const deleteBanner = async (b: Banner) => {
-    if (!window.confirm(`Delete banner "${b.title_line_1}"?`)) return;
+    if (!window.confirm(`Delete banner "${b.title_line_1 || `#${b.id}`}"?`)) return;
     try {
       await api.delete(`/admin/banners/${b.id}`);
       setBanners((prev) => prev.filter((x) => x.id !== b.id));
@@ -186,7 +201,11 @@ const AdminBanners = () => {
           >
             <UploadCloud className="h-7 w-7 mx-auto text-maroon mb-2" strokeWidth={1.5} />
             <span className="block text-sm font-medium text-espresso">
-              {imageFile ? imageFile.name : editingId ? 'Choose a new image (optional)' : 'Click to choose banner image'}
+              {imageFile
+                ? imageFile.name
+                : editingId
+                ? 'Choose a new image (optional)'
+                : 'Click to choose banner image (optional)'}
             </span>
             <span className="block text-xs text-muted-foreground mt-1">JPG/PNG/WebP · max 8 MB · portrait 3:4 works best</span>
           </label>
@@ -204,7 +223,7 @@ const AdminBanners = () => {
             <input className={inputCls} value={form.overline} onChange={(e) => set('overline', e.target.value)} placeholder="The Festive Edit '26" />
           </div>
           <div className="mt-4">
-            <label className={labelCls}>Title line 1 *</label>
+            <label className={labelCls}>Title line 1</label>
             <input className={inputCls} value={form.title_line_1} onChange={(e) => set('title_line_1', e.target.value)} placeholder="Woven for the" />
           </div>
           <div className="mt-4">
@@ -227,7 +246,7 @@ const AdminBanners = () => {
             </div>
             <div>
               <label className={labelCls}>Button 2 label</label>
-              <input className={inputCls} value={form.cta_secondary_label} onChange={(e) => set('cta_secondary_label', e.target.value)} placeholder="New Arrivals (optional)" />
+              <input className={inputCls} value={form.cta_secondary_label} onChange={(e) => set('cta_secondary_label', e.target.value)} placeholder="New Arrivals" />
             </div>
             <div>
               <label className={labelCls}>Button 2 link</label>
@@ -267,7 +286,14 @@ const AdminBanners = () => {
               {banners.map((b) => (
                 <div key={b.id} className="bg-white border border-border rounded-md overflow-hidden">
                   <div className="relative h-40 bg-sand">
-                    <img src={mediaUrl(b.image_url)} alt={b.title_line_1} className="absolute inset-0 w-full h-full object-cover" />
+                    {b.image_url ? (
+                      <img src={mediaUrl(b.image_url)} alt={b.title_line_1 || ''} className="absolute inset-0 w-full h-full object-cover" />
+                    ) : (
+                      <span className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 text-muted-foreground">
+                        <GalleryHorizontal className="h-6 w-6" strokeWidth={1.2} />
+                        <span className="text-[10px] uppercase tracking-[0.12em]">No image</span>
+                      </span>
+                    )}
                     <span className={`absolute top-2 left-2 text-[10px] font-semibold uppercase tracking-[0.1em] px-2 py-0.5 rounded-full bg-white/95 ${b.is_active ? 'text-green-700' : 'text-muted-foreground'}`}>
                       {b.is_active ? 'Active' : 'Hidden'}
                     </span>
@@ -280,7 +306,14 @@ const AdminBanners = () => {
                       <div className="text-[10px] uppercase tracking-[0.2em] text-gold font-semibold">{b.overline}</div>
                     )}
                     <div className="font-serif text-[15px] text-espresso leading-snug">
-                      {b.title_line_1} {b.title_line_2 && <em className="text-maroon">{b.title_line_2}</em>}
+                      {b.title_line_1 || b.title_line_2 ? (
+                        <>
+                          {b.title_line_1}{' '}
+                          {b.title_line_2 && <em className="text-maroon">{b.title_line_2}</em>}
+                        </>
+                      ) : (
+                        <span className="text-muted-foreground italic">Untitled slide</span>
+                      )}
                     </div>
                     {b.description && (
                       <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{b.description}</p>
