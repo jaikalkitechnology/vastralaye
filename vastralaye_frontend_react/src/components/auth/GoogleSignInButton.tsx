@@ -51,6 +51,7 @@ interface Props {
 const GoogleSignInButton = ({ text = 'continue_with' }: Props) => {
   const { loginWithGoogle, applyGoogleSession } = useStore();
   const [clientId, setClientId] = useState('');
+  const [profileScopes, setProfileScopes] = useState('');
   const [failed, setFailed] = useState(false);
   const holder = useRef<HTMLDivElement>(null);
 
@@ -76,7 +77,12 @@ const GoogleSignInButton = ({ text = 'continue_with' }: Props) => {
       .get<any>('/fronted/auth/google')
       .then((res) => {
         if (cancelled) return;
-        if (res.data?.enabled && res.data?.client_id) setClientId(res.data.client_id);
+        if (res.data?.enabled && res.data?.client_id) {
+          setClientId(res.data.client_id);
+          if (res.data.fetch_profile && res.data.profile_scopes) {
+            setProfileScopes(res.data.profile_scopes);
+          }
+        }
       })
       .catch(() => {
         /* off, or the endpoint isn't deployed yet — render nothing */
@@ -85,6 +91,32 @@ const GoogleSignInButton = ({ text = 'continue_with' }: Props) => {
       cancelled = true;
     };
   }, []);
+
+  /**
+   * Ask for the People API scopes and let the server fill any blank phone /
+   * address fields. Entirely best-effort: a declined consent, a blocked popup
+   * or an empty Google profile all end here quietly, because the customer is
+   * already signed in and nothing about this should be able to undo that.
+   */
+  const enrichFromGoogle = (id: string, scope: string) => {
+    try {
+      const client = window.google?.accounts?.oauth2?.initTokenClient?.({
+        client_id: id,
+        scope,
+        callback: (response: any) => {
+          if (!response?.access_token) return;
+          api
+            .post('/users/auth/google/profile', { access_token: response.access_token })
+            .catch(() => {
+              /* enrichment only — never surface this */
+            });
+        },
+      });
+      client?.requestAccessToken();
+    } catch {
+      /* GIS missing initTokenClient, or the popup was blocked */
+    }
+  };
 
   useEffect(() => {
     if (!clientId) return;
@@ -96,7 +128,10 @@ const GoogleSignInButton = ({ text = 'continue_with' }: Props) => {
         window.google.accounts.id.initialize({
           client_id: clientId,
           callback: (response: any) => {
-            if (response?.credential) loginWithGoogle(response.credential);
+            if (!response?.credential) return;
+            loginWithGoogle(response.credential).then((ok) => {
+              if (ok && profileScopes) enrichFromGoogle(clientId, profileScopes);
+            });
           },
         });
         holder.current.innerHTML = '';
@@ -117,7 +152,7 @@ const GoogleSignInButton = ({ text = 'continue_with' }: Props) => {
     return () => {
       cancelled = true;
     };
-  }, [clientId, text, loginWithGoogle]);
+  }, [clientId, text, profileScopes, loginWithGoogle]);
 
   if (!clientId) return null;
 
