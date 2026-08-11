@@ -1,7 +1,10 @@
 from fastapi import APIRouter, Request, Depends, HTTPException
 from sqlalchemy.orm import Session
+from app.authentication import get_current_admin_user
 from app.database import get_db
-from app.models import Order
+from app.models import Order, User
+from app.models.payment_gateway import PaymentGatewayCredential, PaymentLog
+import hmac
 import json
 import logging
 from datetime import datetime
@@ -12,6 +15,53 @@ router = APIRouter(
 )
 
 logger = logging.getLogger(__name__)
+
+# Headers a gateway might carry the shared secret in. Whichever one Mizorpay
+# is configured to send, one of these (or ?secret=) will match.
+SECRET_HEADERS = ("x-webhook-secret", "x-webhook-token", "x-api-key")
+
+
+def _gateway_settings(db: Session) -> PaymentGatewayCredential | None:
+    return (
+        db.query(PaymentGatewayCredential)
+        .filter(PaymentGatewayCredential.gateway_name == "mizorpay")
+        .first()
+    )
+
+
+def _presented_secret(request: Request) -> str:
+    for header in SECRET_HEADERS:
+        value = request.headers.get(header)
+        if value:
+            return value.strip()
+    auth = request.headers.get("authorization", "")
+    if auth.lower().startswith("bearer "):
+        return auth[7:].strip()
+    return (request.query_params.get("secret") or "").strip()
+
+
+def _record_event(db: Session, merchant_ref: str, status: str, payload: dict) -> None:
+    """Append-only audit row. Never allowed to break webhook handling."""
+    try:
+        entry = (
+            db.query(PaymentLog).filter(PaymentLog.merchant_ref == merchant_ref).first()
+        )
+        if entry:
+            entry.status = status
+            entry.gateway_response = payload
+        else:
+            db.add(
+                PaymentLog(
+                    merchant_ref=merchant_ref,
+                    status=status,
+                    amount=payload.get("converted_amount"),
+                    request_payload=payload,
+                )
+            )
+        db.commit()
+    except Exception as exc:  # pragma: no cover - audit must never be fatal
+        db.rollback()
+        logger.error("Could not record payment log for %s: %s", merchant_ref, exc)
 
 
 @router.post("/webhook")
@@ -31,24 +81,23 @@ async def payment_webhook(request: Request, db: Session = Depends(get_db)):
         # ---------------------------
         # 📋 Log Full Request Details
         # ---------------------------
-        logger.info(f"📌 REQUEST DETAILS:")
-        logger.info(f"   URL: {request.url}")
-        logger.info(f"   Method: {request.method}")
-        logger.info(f"   Client: {request.client}")
-        logger.info(f"   Content-Type: {request.headers.get('content-type')}")
-        logger.info(f"   Content-Length: {request.headers.get('content-length')}")
+        logger.info("📌 %s from %s (%s bytes)", request.url.path, request.client,
+                    request.headers.get("content-length"))
+        # Headers carry the gateway's auth token and the body carries customer
+        # details, so neither is written at INFO. Turn on DEBUG to see them.
+        logger.debug("📋 HEADERS: %s", dict(request.headers))
 
-        # Log all headers
-        logger.info(f"📋 HEADERS:")
-        for key, value in request.headers.items():
-            logger.info(f"   {key}: {value}")
-
-        # ---------------------------
-        # 📦 Try to Get Body
-        # ---------------------------
         body = await request.body()
-        logger.info(f"📦 RAW BODY SIZE: {len(body)} bytes")
-        logger.info(f"📦 RAW BODY: {body}")
+        logger.debug("📦 RAW BODY: %s", body)
+
+        # ---------------------------
+        # 🔐 Shared secret (only enforced once one is configured)
+        # ---------------------------
+        settings = _gateway_settings(db)
+        expected = (settings.webhook_secret or "") if settings else ""
+        if expected and not hmac.compare_digest(_presented_secret(request), expected):
+            logger.error("❌ Webhook rejected: shared secret missing or wrong")
+            raise HTTPException(status_code=401, detail="Invalid webhook secret")
 
         # Check if body is empty
         if not body:
@@ -107,8 +156,14 @@ async def payment_webhook(request: Request, db: Session = Depends(get_db)):
             raise HTTPException(status_code=400, detail="Missing mizor_pay_txn_id")
 
         if txn_status not in ["success", "failed", "pending"]:
-            logger.error(f"❌ Invalid txn_status: {txn_status}")
-            raise HTTPException(status_code=400, detail=f"Invalid txn_status: {txn_status}")
+            # Acknowledge it — a retry would deliver the same unknown status.
+            logger.error(f"❌ Unhandled txn_status: {txn_status}")
+            _record_event(db, merchant_ref, f"IGNORED_{txn_status or 'BLANK'}", payin)
+            return {
+                "status": "ignored",
+                "message": f"Unhandled txn_status: {txn_status}",
+                "merchant_ref": merchant_ref,
+            }
 
         # ---------------------------
         # 🔎 Find Order
@@ -140,7 +195,22 @@ async def payment_webhook(request: Request, db: Session = Depends(get_db)):
         # 💾 Update Order
         # ---------------------------
         try:
-            if txn_status == "success":
+            expected_total = float(order.total_amount or 0)
+            settled = float(converted_amount or 0)
+            mismatch = abs(settled - expected_total) > 1.0
+
+            if txn_status == "success" and mismatch:
+                logger.error(
+                    "⚠️ Amount mismatch on order %s: settled %s vs total %s",
+                    order.id, settled, expected_total,
+                )
+
+            if txn_status == "success" and mismatch and settings and settings.verify_amount:
+                # Held for a human rather than confirmed on a wrong amount.
+                order.payment_status = "pending"
+                order.is_paid = False
+                logger.error("⛔ Order %s held — amount verification is on", order.id)
+            elif txn_status == "success":
                 order.payment_status = "paid"
                 order.is_paid = True
                 order.status = "confirmed"
@@ -183,6 +253,7 @@ async def payment_webhook(request: Request, db: Session = Depends(get_db)):
             "processed_at": datetime.utcnow().isoformat()
         }
 
+        _record_event(db, merchant_ref, txn_status.upper(), payin)
         logger.info(f"✅ WEBHOOK PROCESSED SUCCESSFULLY")
         logger.info(f"📤 RESPONSE: {json.dumps(response, indent=2)}")
         logger.info("=" * 80)
@@ -200,9 +271,14 @@ async def payment_webhook(request: Request, db: Session = Depends(get_db)):
 
 
 @router.post("/webhook/test")
-async def test_webhook(request: Request, db: Session = Depends(get_db)):
+async def test_webhook(
+    request: Request,
+    db: Session = Depends(get_db),
+    admin: User = Depends(get_current_admin_user),
+):
     """
-    🧪 TEST YOUR WEBHOOK - Use this to test
+    🧪 Replay a webhook payload by hand. **Admin only** — it runs the real
+    handler, so leaving it open would be a second way to mark orders paid.
 
     Send this data:
     {

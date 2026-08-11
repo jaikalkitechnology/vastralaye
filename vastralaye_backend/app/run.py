@@ -161,6 +161,8 @@ from app.routers import newsletter
 app.include_router(newsletter.router)
 
 from app.routers import site_content
+from app.routers import payment_gateway
+app.include_router(payment_gateway.router)   # ✅ admin payment integration
 app.include_router(site_content.router)
 
 
