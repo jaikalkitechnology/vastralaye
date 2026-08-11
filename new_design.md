@@ -697,48 +697,44 @@ built component, not the mockup.
 
 ---
 
-## 25. Home hero banner — illustrated artisan courtyard
+## 25. Home hero background — admin-managed image + wash
 
-The homepage hero (`HeroSection.tsx`, slides fed by the admin Banner Control page) sat
-on a flat blush→ivory→sand gradient. It now carries an original illustrated scene
-behind the banner, in the same zari line-art language as the footer panorama — but
-where the footer draws a pan-India skyline of landmarks, the hero tells the *making-of*
-story instead, so the two never repeat each other.
+The homepage hero (`HeroSection.tsx`, slides fed by Banner Control) briefly carried an
+original illustrated artisan courtyard — a marigold toran, a pit handloom with a
+weaver, a charkha, a rangoli — drawn in the same zari line art as the footer panorama.
+It has been **replaced with a photograph the admin uploads**, because a real campaign
+image is what the hero is for. The illustration lives on in history at commit
+`42921b8` (`src/components/decor/HeroScene.tsx`) if it is ever wanted back.
 
-`src/components/decor/HeroScene.tsx` (new):
+The hero now reuses the page-banner machinery from §20 through a fifth slot,
+**`home_hero`** — no new table, no new endpoints, and the same upload/overlay controls
+as the catalogue bands:
 
-- **Toran** across the top — five marigold swags between pegs, each peg trailing mango
-  leaves, with a pair of birds off the garland. Marigold positions are computed on the
-  quadratic swag curve rather than hand-placed, so they sit true on the sag.
-- **Courtyard of craft** along the bottom — a pit handloom with stretched warp threads,
-  reed and cloth beam, a **seated weaver** drawn as a draped figure at the shuttle, a
-  charkha with a drive band to its spindle, thread spools with a loose trailing thread,
-  a rangoli chalked in perspective on the floor, three lit diyas on a step, a tulsi pot
-  and a stack of folded weaves.
-- **Jharokha arches** at the far left and right (≥`lg`), stripped to a clean outline
-  with merlons and a sill — the balustrade grid read as clutter behind the CTAs.
-- **Butis** — block-print motifs scattered through the mid-field at percentage
-  positions, deliberately routed around the headline block.
+- **Background image** — uploaded in Admin → Banner Control → *Homepage hero
+  background*, drawn `object-cover` behind the whole section.
+- **Overlay colour + strength** — the same left-to-right wash as the catalogue banners,
+  so the copy side is tinted and the campaign-image side shows more photo.
+- **Copy flips automatically.** The hero prints espresso copy on a light canvas, so
+  `home_hero` defaults to an **ivory** wash at 90 rather than espresso at 95. If the
+  admin picks a dark colour, `isLightColor()` (Rec. 709 luminance) flips the heading to
+  ivory, the accent line to gold, the body copy to `ivory/80`, the outline button to
+  ivory and the slide dots to `ivory/30` — so a dark wash can never swallow dark text.
+- **No image = no change.** The section keeps its original blush → ivory → sand
+  gradient and espresso copy, so the homepage looks exactly as before until something
+  is uploaded.
 
-Composition notes that matter if this is ever edited:
-
-- The scene is built as **separately anchored bands** (top / bottom / left / right),
-  each an SVG sized by its own intrinsic ratio, rather than one full-bleed drawing. A
-  single `xMidYMid slice` layer scaled to cover the hero and cropped the courtyard off
-  at both edges as the section grew taller.
-- Everything on the right of the courtyard stays under ~90px above the ground line, so
-  the campaign image floating above it never clips a tall element.
-- Below `md` the courtyard is hidden: the copy fills a narrow hero and the scene would
-  land under the buttons. The toran and paisley carry it there.
-- A soft radial wash sits over the art under the headline, and the slide indicators
-  gained `z-10` so they stay above the scene.
+The admin card for this slot drops the heading, tagline and full-width-artwork fields
+(the hero's text comes from the slides above it) and previews the hero itself — overline,
+serif headline, Shop-now button and the arch frame — at the current wash. Its colour
+swatches lead with the light tints (ivory / blush / sand) instead of the dark ones.
 
 | File | Change |
 |---|---|
-| `src/components/decor/HeroScene.tsx` | New — toran, courtyard, arches, butis |
-| `src/components/HeroSection.tsx` | Paisley tile + `HeroScene` + headline wash layered behind the banner; content wrapper made `relative`; indicators `z-10` |
-
-Screenshots: `user_design/screenshots/15-home-hero-scene{,-mobile}.png`.
+| `src/components/HeroSection.tsx` | Illustration removed; admin background image + wash; copy colours derived from the wash |
+| `src/components/decor/HeroScene.tsx` | Deleted |
+| `src/components/PageBanner.tsx` | `home_hero` key, exported `fetchPageBanners`, `overlayDefaults`, `isLightColor` |
+| `src/pages/admin/AdminPageBanners.tsx` | Card extracted to `renderCard(slot, isHero)`; hero card with its own preview and presets |
+| `app/routers/site_content.py` | `home_hero` page key + per-slot overlay defaults |
 
 ---
 
@@ -812,9 +808,10 @@ back to espresso / 95, so existing rows render exactly as before.
   toggle the CTA between *Place Order · ₹total* and *Pay ₹total*, and Place Order posts
   `{items, payment_method:"cod", shipping_address}` and opens the success modal. No
   console or page errors.
-- Home hero checked in a real browser at 1440 / 820 / 420 px: the toran renders at all
-  three, the courtyard sits clear of the CTAs from `md` up and is hidden below it, and
-  no band is cropped. No console or page errors.
+- Home hero background driven against the production build at four settings — ivory 90,
+  ivory 65, espresso 80 (copy correctly flips to ivory/gold) and no image (unchanged
+  blush → sand gradient) — plus the admin hero card with its own preview and light-first
+  swatches. No console or page errors.
 - Full-width artwork mode driven end to end against the production build: `/categories`
   with a `full_bleed` banner renders the artwork whole with no wash and no painted
   heading, keeps the `sr-only` `<h1>`, and centre-crops below `md`; the admin card shows
