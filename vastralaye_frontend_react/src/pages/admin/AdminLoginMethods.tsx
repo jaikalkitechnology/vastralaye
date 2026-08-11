@@ -1,7 +1,15 @@
 import { useEffect, useState } from 'react';
 import { api } from '@/api/api';
 import { toast } from '@/components/ui/use-toast';
-import { AlertTriangle, ExternalLink, KeyRound, RefreshCw, Users } from 'lucide-react';
+import {
+  AlertTriangle,
+  Check,
+  Copy,
+  ExternalLink,
+  KeyRound,
+  RefreshCw,
+  Users,
+} from 'lucide-react';
 
 /**
  * Admin › Settings › Login Methods — switch "Continue with Google" on and off
@@ -32,6 +40,27 @@ const AdminLoginMethods = () => {
   const [enabled, setEnabled] = useState(false);
   const [clientId, setClientId] = useState('');
   const [allowSignup, setAllowSignup] = useState(true);
+  const [copiedOrigin, setCopiedOrigin] = useState(false);
+
+  /* The exact string Google wants in "Authorised JavaScript origins" —
+     scheme + host + port, no path. Guessing this is the usual reason for
+     "Access blocked: Authorization Error". */
+  const origin = typeof window !== 'undefined' ? window.location.origin : '';
+  const host = typeof window !== 'undefined' ? window.location.hostname : '';
+  // Google allows loopback (localhost / 127.0.0.1) over http, but no other bare IP.
+  const isLoopback = host === 'localhost' || host === '127.0.0.1' || host === '::1';
+  const originIsPrivateIp = /^(?:\d{1,3}\.){3}\d{1,3}$/.test(host) && !isLoopback;
+  const originIsInsecure = origin.startsWith('http://') && !isLoopback && !originIsPrivateIp;
+
+  const copyOrigin = async () => {
+    try {
+      await navigator.clipboard.writeText(origin);
+      setCopiedOrigin(true);
+      setTimeout(() => setCopiedOrigin(false), 1800);
+    } catch {
+      toast({ title: 'Copy failed', description: origin });
+    }
+  };
 
   const load = async () => {
     setLoading(true);
@@ -209,18 +238,91 @@ const AdminLoginMethods = () => {
                 type <em>Web application</em> in Google Cloud Console.
               </li>
               <li>
-                <span className="font-medium text-espresso">2.</span> Add your storefront
-                origin to{' '}
-                <span className="font-medium text-espresso">Authorised JavaScript origins</span>{' '}
-                — scheme and host only, no path, e.g.{' '}
-                <code className="rounded-sm bg-ivory px-1">https://vastralaye.in</code>. Google
-                rejects sign-in from any origin not listed here.
+                <span className="font-medium text-espresso">2.</span> Add{' '}
+                <span className="font-medium text-espresso">this exact origin</span> to{' '}
+                <span className="font-medium text-espresso">
+                  Authorised JavaScript origins
+                </span>
+                . Google rejects sign-in from any origin not listed, character for
+                character — no trailing slash, no path.
+                <span className="mt-2 flex items-center gap-2">
+                  <code className="flex-1 truncate rounded-sm border border-border bg-ivory px-2 py-1.5 font-mono text-[12px] text-espresso">
+                    {origin}
+                  </code>
+                  <button
+                    type="button"
+                    onClick={copyOrigin}
+                    className="inline-flex flex-none items-center gap-1.5 rounded-sm border border-border px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-espresso transition-colors hover:border-maroon hover:text-maroon"
+                  >
+                    {copiedOrigin ? (
+                      <Check className="h-3 w-3 text-green-700" />
+                    ) : (
+                      <Copy className="h-3 w-3" />
+                    )}
+                    {copiedOrigin ? 'Copied' : 'Copy'}
+                  </button>
+                </span>
+                {originIsPrivateIp && (
+                  <span className="mt-2 block rounded-sm border border-sale/35 bg-sale/5 p-2.5 text-[11.5px] text-espresso">
+                    Google does not accept a LAN IP address as an origin — only{' '}
+                    <code className="rounded-sm bg-ivory px-1">localhost</code>,{' '}
+                    <code className="rounded-sm bg-ivory px-1">127.0.0.1</code> or a real
+                    domain. Sign-in will always be blocked from here.
+                  </span>
+                )}
+                {originIsInsecure && (
+                  <span className="mt-2 block rounded-sm border border-sale/35 bg-sale/5 p-2.5 text-[11.5px] text-espresso">
+                    Google only allows <code className="rounded-sm bg-ivory px-1">http://</code>{' '}
+                    for <code className="rounded-sm bg-ivory px-1">localhost</code>. Any
+                    other host has to be HTTPS.
+                  </span>
+                )}
               </li>
               <li>
                 <span className="font-medium text-espresso">3.</span> Paste the Client ID
                 here, tick the box and save.
               </li>
             </ol>
+          </div>
+
+          <div className="rounded-md border border-border bg-white p-5">
+            <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.16em]">
+              "Access blocked: Authorization Error"
+            </h2>
+            <p className="mb-3 text-[12.5px] leading-relaxed text-muted-foreground">
+              That page comes from Google, before any token reaches us. Open{' '}
+              <span className="font-medium text-espresso">Error details</span> on it — the
+              code tells you which of these it is.
+            </p>
+            <dl className="space-y-2.5 text-[12.5px] leading-relaxed">
+              <div>
+                <dt className="font-mono text-[11.5px] font-medium text-espresso">
+                  origin_mismatch / redirect_uri_mismatch
+                </dt>
+                <dd className="text-muted-foreground">
+                  The origin above isn't in Authorised JavaScript origins. Add it exactly,
+                  then wait — Google can take a few minutes to apply the change.
+                </dd>
+              </div>
+              <div>
+                <dt className="font-mono text-[11.5px] font-medium text-espresso">
+                  access_denied · "app is being tested"
+                </dt>
+                <dd className="text-muted-foreground">
+                  The OAuth consent screen is in <em>Testing</em>. Either publish it, or
+                  add the signing-in address under <em>Test users</em>.
+                </dd>
+              </div>
+              <div>
+                <dt className="font-mono text-[11.5px] font-medium text-espresso">
+                  invalid_client / invalid_request
+                </dt>
+                <dd className="text-muted-foreground">
+                  The Client ID is wrong or belongs to a client that isn't of type{' '}
+                  <em>Web application</em>.
+                </dd>
+              </div>
+            </dl>
           </div>
 
           <div className="rounded-md border border-border bg-white p-5">
