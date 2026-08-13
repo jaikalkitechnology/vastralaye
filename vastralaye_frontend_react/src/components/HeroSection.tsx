@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { api } from '@/api/api';
 import { mediaUrl } from '@/lib/media';
+import { readCache, writeCache } from '@/lib/persistentCache';
 import {
   fetchPageBanners,
   isLightColor,
@@ -66,8 +67,16 @@ const fallbackSlides: HeroSlide[] = [
   },
 ];
 
+const SLIDES_CACHE = 'hero-slides';
+
 const HeroSection = () => {
-  const [slides, setSlides] = useState<HeroSlide[]>(fallbackSlides);
+  /* Seeded from the last resolved set, so a refresh paints the admin's banner
+     immediately. `null` means genuinely nothing known yet — only on a first
+     ever visit — and renders a hero-shaped placeholder rather than the stock
+     slides, which would otherwise flash and get swapped a moment later. */
+  const [slides, setSlides] = useState<HeroSlide[] | null>(
+    () => readCache<HeroSlide[]>(SLIDES_CACHE)
+  );
   const [current, setCurrent] = useState(0);
   /* Background image + wash, from Admin → Banner Control → Homepage hero. */
   const [background, setBackground] = useState<PageBannerData | null>(null);
@@ -85,10 +94,24 @@ const HeroSection = () => {
   /* Admin-managed banners; fall back to the static slides when none exist. */
   useEffect(() => {
     let cancelled = false;
+
+    /* Whatever we settle on gets cached — including the fallback, so a store
+       with no banners configured also skips the placeholder next time. */
+    const resolve = (next: HeroSlide[]) => {
+      if (cancelled) return;
+      setSlides(next);
+      setCurrent(0);
+      writeCache(SLIDES_CACHE, next);
+    };
+
     api
       .get('/fronted/banners')
       .then((res) => {
-        if (cancelled || !Array.isArray(res.data) || res.data.length === 0) return;
+        if (cancelled) return;
+        if (!Array.isArray(res.data) || res.data.length === 0) {
+          resolve(fallbackSlides);
+          return;
+        }
         const mapped: HeroSlide[] = res.data.map((b: any) => ({
           id: b.id,
           overline: b.overline || '',
@@ -104,11 +127,15 @@ const HeroSection = () => {
             ? { label: b.cta_secondary_label, to: b.cta_secondary_link || '/products' }
             : null,
         }));
-        setSlides(mapped);
-        setCurrent(0);
+        resolve(mapped);
       })
       .catch(() => {
-        /* keep fallback slides */
+        // Offline or the API is down — show something rather than a hole, but
+        // don't cache it: a failed request isn't evidence the store has no
+        // banners, and persisting the stock set would flash it on the next
+        // refresh, which is the very thing the cache exists to prevent.
+        if (cancelled) return;
+        setSlides((prev) => prev ?? fallbackSlides);
       });
     return () => {
       cancelled = true;
@@ -116,13 +143,14 @@ const HeroSection = () => {
   }, []);
 
   useEffect(() => {
+    if (!slides || slides.length < 2) return;
     const timer = setInterval(() => {
       setCurrent((prev) => (prev + 1) % slides.length);
     }, 6000);
     return () => clearInterval(timer);
-  }, [slides.length]);
+  }, [slides]);
 
-  const slide = slides[Math.min(current, slides.length - 1)];
+  const slide = slides ? slides[Math.min(current, slides.length - 1)] : null;
 
   const bgImage = background?.image_url ? mediaUrl(background.image_url) : null;
   const fallback = overlayDefaults('home_hero');
@@ -143,6 +171,42 @@ const HeroSection = () => {
   const dotIdleClass = onLight
     ? 'bg-espresso/25 hover:bg-espresso/40'
     : 'bg-ivory/30 hover:bg-ivory/55';
+
+  /* First ever visit, nothing cached yet: hold the hero's exact footprint in
+     the brand gradient. Showing the stock slides here would flash and swap;
+     showing nothing would collapse the page and jump. */
+  if (!slide) {
+    return (
+      <section
+        className="relative overflow-hidden bg-gradient-to-r from-blush via-ivory to-sand"
+        aria-busy="true"
+      >
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 items-center gap-10 py-12 min-h-[60vh] md:py-20 lg:grid-cols-2 lg:gap-16 lg:py-24">
+            <div className="order-2 space-y-5 lg:order-1">
+              <div className="h-3 w-40 animate-pulse rounded-sm bg-espresso/10" />
+              <div className="h-11 w-3/4 animate-pulse rounded-sm bg-espresso/10" />
+              <div className="h-11 w-2/3 animate-pulse rounded-sm bg-espresso/10" />
+              <div className="h-4 w-full max-w-xl animate-pulse rounded-sm bg-espresso/[0.07]" />
+              <div className="flex gap-4 pt-2">
+                <div className="h-12 w-40 animate-pulse rounded-sm bg-espresso/10" />
+                <div className="h-12 w-40 animate-pulse rounded-sm bg-espresso/[0.07]" />
+              </div>
+            </div>
+            <div className="order-1 flex justify-center lg:order-2">
+              <div className="relative w-[240px] sm:w-[300px] lg:w-[380px]">
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute -inset-4 rounded-b-none rounded-t-[999px] border border-gold/40"
+                />
+                <div className="aspect-[3/4] animate-pulse rounded-t-[999px] bg-sand" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section
@@ -249,7 +313,7 @@ const HeroSection = () => {
 
       {/* Slide indicators */}
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2.5">
-        {slides.map((s, i) => (
+        {(slides || []).map((s, i) => (
           <button
             key={s.id}
             aria-label={`Go to slide ${i + 1}`}
