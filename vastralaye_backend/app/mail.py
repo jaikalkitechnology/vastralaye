@@ -166,6 +166,7 @@ def send_custom_email(
     smtp_host: str = None,
     smtp_port: int = None,
     smtp_ssl: bool = None,
+    cc: list = None,
 ):
     """Send via SMTP, with the account and server passed in rather than read from .env.
 
@@ -184,6 +185,11 @@ def send_custom_email(
 
     `reply_to` matters for forwarded mail: an enquiry announced to the shop's
     inbox should reply to the customer, not to the shop's own sender address.
+
+    `cc` is a list of extra recipients. `send_message` derives the envelope
+    from the To/Cc headers, so setting the header is all that's needed — but
+    it also means one malformed address fails the whole send, which is why
+    callers validate the list rather than passing raw input through.
     """
     sender = (sender_email or SENDER_EMAIL or "").strip()
     password = (app_password or APP_PASSWORD or "").strip()
@@ -212,6 +218,9 @@ def send_custom_email(
     msg["From"] = f"{display} <{sender}>" if display else sender
     msg["To"] = to_email
     msg["Subject"] = subject
+    cc_list = [a for a in (cc or []) if a]
+    if cc_list:
+        msg["Cc"] = ", ".join(cc_list)
     if reply_to:
         msg["Reply-To"] = reply_to
 
@@ -231,7 +240,10 @@ def send_custom_email(
                 smtp.starttls()
                 smtp.login(sender, password)
                 smtp.send_message(msg)
-        logger.info(f"✅ Email sent successfully to {to_email} | Subject: {subject}")
+        logger.info(
+            "✅ Email sent successfully to %s%s | Subject: %s",
+            to_email, f" (cc {len(cc_list)})" if cc_list else "", subject,
+        )
         return True
     except Exception as e:
         logger.error(f"❌ Email failed to send to {to_email} via {host}:{port}: {e}", exc_info=True)

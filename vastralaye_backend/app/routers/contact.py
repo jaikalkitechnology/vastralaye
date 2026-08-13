@@ -91,6 +91,7 @@ def resolve_email_config(db: Session) -> dict:
             row.notify_email if row and row.notify_email
             else os.getenv("CONTACT_NOTIFY_EMAIL") or DEFAULT_NOTIFY_EMAIL
         ).strip(),
+        "notify_cc": (row.notify_cc if row and row.notify_cc else "").strip(),
         "notify_enabled": bool(row.notify_enabled) if row else True,
         # NULL means "never decided" — a column schema_sync just added — so it
         # falls back to on rather than silently switching acknowledgements off.
@@ -99,6 +100,36 @@ def resolve_email_config(db: Session) -> dict:
         "smtp_port": port,
         "smtp_ssl": bool(ssl),
     }
+
+
+MAX_CC = 5
+
+
+def parse_cc(raw: Optional[str], exclude: str = "") -> list:
+    """Split a typed CC list into clean, valid, de-duplicated addresses.
+
+    Accepts commas, semicolons or newlines, because people paste from all
+    three. Anything that isn't a valid address is dropped rather than sent:
+    the whole message fails if the server rejects one recipient, and losing a
+    notification to someone's stray comma would be a poor trade.
+    """
+    if not raw:
+        return []
+    parts = re.split(r"[,;\n\r]+", raw)
+    seen, out = set(), []
+    skip = (exclude or "").strip().lower()
+    for part in parts:
+        address = part.strip().lower()
+        if not address or not EMAIL_RE.match(address):
+            continue
+        # No point copying the address it's already addressed to.
+        if address == skip or address in seen:
+            continue
+        seen.add(address)
+        out.append(address)
+        if len(out) >= MAX_CC:
+            break
+    return out
 
 
 def _mask(value: str) -> str:
@@ -222,6 +253,9 @@ def _notify(config: dict, row: ContactMessage) -> tuple:
             smtp_host=config["smtp_host"],
             smtp_port=config["smtp_port"],
             smtp_ssl=config["smtp_ssl"],
+            # Extra people who want to see enquiries as they come in. Only on
+            # this one — a customer must never receive the shop's CC list.
+            cc=parse_cc(config["notify_cc"], exclude=config["notify_email"]),
             # So hitting Reply in the inbox answers the customer, not the shop.
             reply_to=row.email,
         )
@@ -518,6 +552,7 @@ class EmailConfigIn(BaseModel):
     app_password: Optional[str] = None
     sender_name: Optional[str] = None
     notify_email: Optional[str] = None
+    notify_cc: Optional[str] = None
     notify_enabled: Optional[bool] = None
     ack_enabled: Optional[bool] = None
     smtp_host: Optional[str] = None
@@ -535,6 +570,7 @@ def _config_out(db: Session) -> dict:
         "sender_email": (row.sender_email if row else "") or "",
         "sender_name": (row.sender_name if row else "") or "",
         "notify_email": (row.notify_email if row else "") or "",
+        "notify_cc": (row.notify_cc if row else "") or "",
         "notify_enabled": bool(row.notify_enabled) if row else True,
         "ack_enabled": bool(row.ack_enabled) if row and row.ack_enabled is not None else True,
         "smtp_host": (row.smtp_host if row else "") or "",
@@ -547,6 +583,9 @@ def _config_out(db: Session) -> dict:
             "sender_email": resolved["sender_email"],
             "sender_name": resolved["sender_name"],
             "notify_email": resolved["notify_email"],
+            # The parsed list, so the page can show what will really be copied
+            # rather than whatever was typed into the box.
+            "notify_cc": parse_cc(resolved["notify_cc"], exclude=resolved["notify_email"]),
             "smtp_host": resolved["smtp_host"],
             "smtp_port": resolved["smtp_port"],
             "smtp_ssl": resolved["smtp_ssl"],
@@ -593,6 +632,21 @@ def update_email_config(
         row.sender_name = payload.sender_name.strip()[:120] or None
     if payload.notify_email is not None:
         row.notify_email = payload.notify_email.strip() or None
+    if payload.notify_cc is not None:
+        raw = payload.notify_cc.strip()
+        typed = [x.strip() for x in re.split(r"[,;\n\r]+", raw) if x.strip()]
+        bad = [x for x in typed if not EMAIL_RE.match(x.lower())]
+        if bad:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Not a valid email address: {bad[0]}",
+            )
+        if len(typed) > MAX_CC:
+            raise HTTPException(
+                status_code=400,
+                detail=f"At most {MAX_CC} CC addresses.",
+            )
+        row.notify_cc = ", ".join(parse_cc(raw)) or None
     if payload.notify_enabled is not None:
         row.notify_enabled = bool(payload.notify_enabled)
     if payload.ack_enabled is not None:
@@ -655,6 +709,9 @@ def send_test_email(
             smtp_host=config["smtp_host"],
             smtp_port=config["smtp_port"],
             smtp_ssl=config["smtp_ssl"],
+            # Copy the CC list too, so the test proves those addresses work
+            # rather than only the primary one.
+            cc=parse_cc(config["notify_cc"], exclude=target),
         )
     except Exception as exc:  # noqa: BLE001 - the message is the whole point here
         raise HTTPException(status_code=400, detail=f"Could not send: {exc}")
