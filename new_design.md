@@ -1474,6 +1474,46 @@ sender field is the mailbox and the page says so.
 
 ---
 
+## 42. Replying to an enquiry from the dashboard
+
+The Reply button was a `mailto:` link — it opened whatever mail client the
+browser was configured for, replied from the admin's *personal* address, and left
+no record. It's now a composer: type the reply, hit send, it goes out from the
+shop's mailbox over the configured SMTP server.
+
+`POST /api/v1/admin/contact-messages/{id}/reply`.
+
+### A failure here is surfaced, not swallowed
+
+The opposite of §40's enquiry notification, deliberately. There, the customer
+could do nothing about a mail problem, so it was hidden from them and recorded
+for the shop. Here the admin *is* the shop, is looking at the screen, and can fix
+it — so a send that didn't happen returns an error and **nothing is written**.
+A stored reply always means an email actually left. The dialog stays open with
+the typed text intact so it can be retried.
+
+Three details:
+
+- **Reply-To is the notification inbox**, not the sender address. The shop sends
+  from `noreply@`, and a customer answering into a noreply box is a dead end.
+- **The original message is quoted underneath**, so the customer knows what
+  they're being answered about days later.
+- **Both halves are escaped** — the reply and the quoted original. The original
+  is customer-typed text being put back into HTML.
+
+Replying marks the enquiry read (answering is a stronger signal than opening),
+records who sent it and when, and badges the row **replied** in the list. Sending
+again replaces the stored text; the previous reply stays visible above the
+composer while the dialog is open.
+
+| File | Change |
+|---|---|
+| `app/models/contact.py` | `reply`, `replied_at`, `replied_by` |
+| `app/routers/contact.py` | `POST …/{id}/reply`; reply fields in the list payload |
+| `src/pages/admin/AdminEnquiries.tsx` | Composer, previous-reply block, "replied" badge |
+
+---
+
 ## Verification
 
 - `tsc --noEmit` — no errors in any changed file.
@@ -1484,6 +1524,21 @@ sender field is the mailbox and the page says so.
   toggle the CTA between *Place Order · ₹total* and *Pay ₹total*, and Place Order posts
   `{items, payment_method:"cod", shipping_address}` and opens the success modal. No
   console or page errors.
+- Replies tested at both levels. The endpoint against a live session, 35 checks:
+  with no sending account it refuses and records nothing; an unknown enquiry 404s;
+  blank and one-character replies are refused with nothing sent; a real reply
+  reaches the customer from the shop's mailbox through the configured server, with
+  `Reply-To` pointing at the monitored inbox rather than `noreply@`, greeting them
+  by name and quoting their original; it is then stored, timestamped, attributed
+  and marked read. Crucially both failure modes — a server that returns false and
+  one that raises — return 400 and leave **no** stored reply and no read flag, so
+  a recorded reply always means an email left. The reply, the quoted original and
+  the sender's name are all escaped. Replying again replaces the text and sends a
+  second email. In the browser, 49 checks over the whole page: the composer
+  replaces the mailto link, send is disabled while empty or one character, a
+  failed send surfaces the server's message and keeps the dialog open with the
+  typed text intact, a successful one clears the box, shows the sent reply back,
+  invites another, and badges the row as replied. No console errors.
 - SMTP resolution tested against a live session, 24 checks: a
   `@vastraliya.com` sender resolves to `smtp.hostinger.com:465` with implicit TLS
   and a real submission is sent through it, logging in as that mailbox with a

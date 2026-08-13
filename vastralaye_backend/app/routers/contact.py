@@ -235,6 +235,8 @@ def _message_out(row: ContactMessage) -> dict:
         "emailed": bool(row.emailed),
         "email_error": row.email_error,
         "created_at": row.created_at.isoformat() if row.created_at else None,
+        "reply": row.reply,
+        "replied_at": row.replied_at.isoformat() if row.replied_at else None,
     }
 
 
@@ -293,6 +295,104 @@ def mark_contact_message(message_id: int, payload: ReadFlag, db: Session = Depen
     row.is_read = bool(payload.is_read)
     db.commit()
     return _message_out(row)
+
+
+class ReplyIn(BaseModel):
+    message: str
+
+
+MIN_REPLY = 2
+MAX_REPLY = 5000
+
+
+@router.post("/api/v1/admin/contact-messages/{message_id}/reply")
+def reply_to_enquiry(
+    message_id: int,
+    payload: ReplyIn,
+    db: Session = Depends(get_db),
+    admin: User = Depends(get_current_admin_user),
+):
+    """Email a reply straight to whoever sent the enquiry.
+
+    Unlike the enquiry notification, a failure here is **not** swallowed. The
+    admin is the one acting, they can see the result, and they can fix it — so
+    a send that didn't happen returns an error and nothing is recorded. A
+    stored reply always means an email actually left.
+    """
+    row = db.query(ContactMessage).filter(ContactMessage.id == message_id).first()
+    if not row:
+        raise HTTPException(status_code=404, detail="Message not found")
+
+    body = (payload.message or "").strip()[:MAX_REPLY]
+    if len(body) < MIN_REPLY:
+        raise HTTPException(status_code=400, detail="Write a reply before sending.")
+
+    config = resolve_email_config(db)
+    if not config["sender_email"] or not config["app_password"]:
+        raise HTTPException(
+            status_code=400,
+            detail="No sending account configured — set one in Email settings first.",
+        )
+    if not EMAIL_RE.match(row.email or ""):
+        raise HTTPException(status_code=400, detail="This enquiry has no usable email address.")
+
+    shop = config["sender_name"] or DEFAULT_SENDER_NAME
+    subject = f"Re: your message to {shop}"
+
+    plain = (
+        f"Hi {row.name},\n\n"
+        f"{body}\n\n"
+        f"— {shop}\n\n"
+        "-------- your original message --------\n"
+        f"{row.message}"
+    )
+    html = (
+        '<div style="font-family:Segoe UI,Arial,sans-serif;color:#2B1B12;line-height:1.6">'
+        f"<p>Hi {_esc(row.name)},</p>"
+        f'<p style="white-space:pre-wrap">{_esc(body)}</p>'
+        f'<p style="color:#7A1F2B;margin-top:24px">— {_esc(shop)}</p>'
+        '<hr style="border:none;border-top:1px solid #EFE7DB;margin:24px 0">'
+        '<p style="font-size:12px;color:#8a7a6d;margin-bottom:6px">Your original message:</p>'
+        f'<p style="font-size:13px;color:#8a7a6d;white-space:pre-wrap">{_esc(row.message)}</p>'
+        "</div>"
+    )
+
+    try:
+        ok = send_custom_email(
+            to_email=row.email,
+            subject=subject,
+            plain_text=plain,
+            html_content=html,
+            sender_email=config["sender_email"],
+            app_password=config["app_password"],
+            sender_name=shop,
+            smtp_host=config["smtp_host"],
+            smtp_port=config["smtp_port"],
+            smtp_ssl=config["smtp_ssl"],
+            # The shop may well send from a noreply@ box; point the customer's
+            # reply at the inbox a person actually reads.
+            reply_to=config["notify_email"] or config["sender_email"],
+        )
+    except Exception as exc:  # noqa: BLE001 - the admin needs to see this
+        logger.error("Reply to enquiry %s failed: %s", row.id, exc)
+        raise HTTPException(status_code=400, detail=f"Could not send: {exc}")
+
+    if not ok:
+        raise HTTPException(
+            status_code=400,
+            detail="The mail server rejected the message. Check Email settings.",
+        )
+
+    row.reply = body
+    row.replied_at = datetime.utcnow()
+    row.replied_by = admin.id
+    # Answering something is a stronger signal than opening it.
+    row.is_read = True
+    db.commit()
+    db.refresh(row)
+
+    logger.info("Admin %s replied to enquiry %s", admin.id, row.id)
+    return {"detail": f"Reply sent to {row.email}", "message": _message_out(row)}
 
 
 @router.delete("/api/v1/admin/contact-messages/{message_id}",

@@ -26,6 +26,13 @@ class ContactMessage(Base):
 
     is_read = Column(Boolean, default=False, nullable=False, index=True)
     emailed = Column(Boolean, default=False, nullable=False)
+
+    # The most recent reply sent from the dashboard. Only ever written after
+    # the email actually left — an unsent reply is not a reply, and showing
+    # one would be worse than showing none.
+    reply = Column(Text, nullable=True)
+    replied_at = Column(DateTime(timezone=True), nullable=True)
+    replied_by = Column(Integer, nullable=True)
     # Why the notification failed, kept so the admin page can say more than
     # "not sent". Never shown to the sender.
     email_error = Column(String(255), nullable=True)

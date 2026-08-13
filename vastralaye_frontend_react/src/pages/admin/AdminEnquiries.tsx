@@ -44,6 +44,8 @@ interface Enquiry {
   emailed: boolean;
   email_error: string | null;
   created_at: string | null;
+  reply: string | null;
+  replied_at: string | null;
 }
 
 interface EmailConfig {
@@ -102,6 +104,9 @@ const AdminEnquiries = () => {
   const [open, setOpen] = useState<Enquiry | null>(null);
   const [deleting, setDeleting] = useState<Enquiry | null>(null);
   const [busy, setBusy] = useState(false);
+  /* Reply composer, inside the open enquiry */
+  const [replyText, setReplyText] = useState('');
+  const [sendingReply, setSendingReply] = useState(false);
 
   /* Email configuration */
   const [config, setConfig] = useState<EmailConfig | null>(null);
@@ -171,6 +176,7 @@ const AdminEnquiries = () => {
   /** Opening an enquiry marks it read — that's what opening it means. */
   const openEnquiry = async (row: Enquiry) => {
     setOpen(row);
+    setReplyText('');
     if (row.is_read) return;
     try {
       await api.patch(`/admin/contact-messages/${row.id}/read`, { is_read: true });
@@ -228,6 +234,33 @@ const AdminEnquiries = () => {
       toast.error(err?.response?.data?.detail || 'Could not save the configuration');
     } finally {
       setSavingConfig(false);
+    }
+  };
+
+  /**
+   * Send the reply. A failure here is surfaced, not swallowed: unlike the
+   * enquiry notification, whoever is looking at this can act on it.
+   */
+  const sendReply = async () => {
+    if (!open) return;
+    setSendingReply(true);
+    try {
+      const res = await api.post<{ detail: string; message: Enquiry }>(
+        `/admin/contact-messages/${open.id}/reply`,
+        { message: replyText }
+      );
+      const updated = res.data?.message;
+      if (updated) {
+        setOpen(updated);
+        setRows((prev) => prev.map((r) => (r.id === updated.id ? updated : r)));
+        if (!open.is_read) setUnread((n) => Math.max(0, n - 1));
+      }
+      setReplyText('');
+      toast.success(res.data?.detail || 'Reply sent');
+    } catch (err: any) {
+      toast.error(err?.response?.data?.detail || 'Could not send the reply');
+    } finally {
+      setSendingReply(false);
     }
   };
 
@@ -558,6 +591,11 @@ const AdminEnquiries = () => {
                       {row.name}
                     </span>
                     <span className="text-[12.5px] text-muted-foreground">{row.email}</span>
+                    {row.reply && (
+                      <span className="inline-flex items-center gap-1 rounded-full border border-gold/40 bg-[#FBF8F3] px-2 py-0.5 text-[11px] font-medium text-[#8A6414]">
+                        <MailCheck className="h-3 w-3" /> replied
+                      </span>
+                    )}
                     {!row.emailed && (
                       <span
                         title={row.email_error || 'Not emailed'}
@@ -603,8 +641,8 @@ const AdminEnquiries = () => {
         )}
 
         {/* One enquiry */}
-        <Dialog open={Boolean(open)} onOpenChange={(v) => !v && setOpen(null)}>
-          <DialogContent className="sm:max-w-lg">
+        <Dialog open={Boolean(open)} onOpenChange={(v) => !v && !sendingReply && setOpen(null)}>
+          <DialogContent className="max-h-[92vh] overflow-y-auto sm:max-w-lg">
             <DialogHeader>
               <DialogTitle className="font-serif text-xl font-medium text-espresso">
                 {open?.name}
@@ -642,16 +680,54 @@ const AdminEnquiries = () => {
                 </p>
               )}
 
+              {/* What was already said, so a second reply has context */}
+              {open?.reply && (
+                <div className="rounded-sm border-l-[3px] border-gold bg-[#FBF8F3] p-4">
+                  <p className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8A6414]">
+                    <MailCheck className="h-3.5 w-3.5" />
+                    Replied {formatDate(open.replied_at)}
+                  </p>
+                  <p className="whitespace-pre-wrap text-[13px] leading-relaxed text-espresso">
+                    {open.reply}
+                  </p>
+                </div>
+              )}
+
+              {/* Reply composer — sends from the shop's mailbox, no mail client */}
+              <div>
+                <label
+                  htmlFor="enquiry-reply"
+                  className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso"
+                >
+                  {open?.reply ? 'Reply again' : 'Reply'}
+                </label>
+                <textarea
+                  id="enquiry-reply"
+                  rows={5}
+                  value={replyText}
+                  onChange={(e) => setReplyText(e.target.value)}
+                  disabled={sendingReply}
+                  placeholder={`Write back to ${open?.name || 'them'}…`}
+                  className="w-full resize-none rounded-md border border-border bg-white px-3 py-2.5 text-[13px] leading-relaxed text-espresso focus:border-maroon focus:outline-none"
+                />
+                <p className="mt-1.5 text-[12px] text-muted-foreground">
+                  Sent to <span className="text-espresso">{open?.email}</span> from the shop's
+                  mailbox, with their original message quoted underneath.
+                </p>
+              </div>
+
               <div className="flex justify-end gap-2 border-t border-border pt-4">
-                <Button variant="outline" onClick={() => setOpen(null)}>
+                <Button variant="outline" disabled={sendingReply} onClick={() => setOpen(null)}>
                   Close
                 </Button>
-                <a
-                  href={`mailto:${open?.email}?subject=${encodeURIComponent('Re: your enquiry')}`}
-                  className="inline-flex items-center gap-2 rounded-sm bg-maroon px-4 py-2 text-[13px] font-medium text-ivory transition-colors hover:bg-terracotta"
+                <Button
+                  onClick={sendReply}
+                  disabled={sendingReply || replyText.trim().length < 2}
+                  className="gap-2 bg-maroon text-ivory hover:bg-terracotta"
                 >
-                  <Send className="h-3.5 w-3.5" /> Reply
-                </a>
+                  <Send className="h-3.5 w-3.5" />
+                  {sendingReply ? 'Sending…' : 'Send reply'}
+                </Button>
               </div>
             </div>
           </DialogContent>
