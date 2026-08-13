@@ -2839,7 +2839,7 @@ def log_payment_attempt(merchant_ref: str, status: str, details: dict = None):
 # ─────────────────────────────────────────────
 @router.get("/")
 async def home():
-    return {"message": "Vastralaye API is running"}
+    return {"message": "Vastraliya API is running"}
 
 
 # ─────────────────────────────────────────────

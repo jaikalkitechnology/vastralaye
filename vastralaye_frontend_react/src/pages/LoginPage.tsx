@@ -225,7 +225,7 @@ const LoginPage = () => {
 
           {/* REGISTER LINK */}
           <p className="mt-6 text-center text-sm text-muted-foreground">
-            New to Vastralaye?{' '}
+            New to Vastraliya?{' '}
             <Link
               to="/register"
               className="font-medium text-maroon underline underline-offset-[3px] hover:text-terracotta"

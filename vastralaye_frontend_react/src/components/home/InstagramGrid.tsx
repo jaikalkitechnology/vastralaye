@@ -72,7 +72,7 @@ const InstagramGrid = () => {
             >
               <img
                 src={src}
-                alt="Vastralaye customer style"
+                alt="Vastraliya customer style"
                 loading="lazy"
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />

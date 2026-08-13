@@ -62,7 +62,7 @@ const Footer = () => {
           <div>
             <Link to="/" className="inline-block">
               <span className="font-serif text-2xl font-semibold text-ivory">
-                Vastra<span className="text-gold">laye</span>
+                Vastra<span className="text-gold">liya</span>
               </span>
               <span className="block text-[9px] font-sans uppercase tracking-[0.42em] text-gold mt-0.5">
                 Handcrafted India
@@ -181,7 +181,7 @@ const Footer = () => {
 
         {/* Bottom bar */}
         <div className="border-t border-ivory/15 py-5 flex flex-col md:flex-row items-center justify-between gap-4 text-[13px]">
-          <span>© {new Date().getFullYear()} Vastralaye · All rights reserved</span>
+          <span>© {new Date().getFullYear()} Vastraliya · All rights reserved</span>
           <PaymentBadges />
         </div>
       </div>

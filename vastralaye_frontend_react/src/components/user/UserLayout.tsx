@@ -46,7 +46,7 @@ const UserLayout = ({ children }: UserLayoutProps) => {
           <div className="hidden sm:block text-right">
             <span className="inline-flex items-center gap-2 rounded-full border border-gold/55 px-3.5 py-1 text-[10.5px] font-semibold uppercase tracking-[0.16em] text-gold">
               <span className="w-1.5 h-1.5 border border-gold rotate-45" />
-              Vastralaye Member
+              Vastraliya Member
             </span>
             <p className="text-[12.5px] text-ivory/65 mt-1.5">Handcrafted wardrobe, managed here</p>
           </div>

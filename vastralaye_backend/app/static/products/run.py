@@ -43,9 +43,9 @@ async def lifespan(app: FastAPI):
 
 # ---------------------- App Initialization ----------------------
 app = FastAPI(
-    title="Vastralaye API",
+    title="Vastraliya API",
     description=(
-        "Vastralaye — storefront and admin API.\n\n"
+        "Vastraliya — storefront and admin API.\n\n"
         "Handcrafted ethnic wear: catalogue, cart, orders, invoices, coupons, "
         "reels and site content.\n\n"
         "Payments are processed by the Mizorpay gateway, so gateway-owned field "

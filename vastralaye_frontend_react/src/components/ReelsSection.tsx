@@ -65,7 +65,7 @@ interface ReelsSectionProps {
 const ReelsSection = ({
   placement = 'home',
   productId,
-  title = 'Vastralaye in Motion',
+  title = 'Vastraliya in Motion',
   overline = 'Watch & Shop',
   id,
 }: ReelsSectionProps) => {

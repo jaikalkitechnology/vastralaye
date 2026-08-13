@@ -1115,7 +1115,7 @@ const PaymentMethodModal: React.FC<PaymentMethodModalProps> = ({
               <div className="relative flex flex-col flex-1 min-h-0">
                 <div>
                   <p className="font-serif text-[21px] font-semibold leading-none">
-                    Vastra<span className="text-gold">laye</span>
+                    Vastra<span className="text-gold">liya</span>
                   </p>
                   <p className="text-[8px] uppercase tracking-[0.42em] text-gold mt-1.5">
                     Handcrafted India

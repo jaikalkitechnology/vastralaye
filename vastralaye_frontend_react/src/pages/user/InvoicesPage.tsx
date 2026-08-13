@@ -785,7 +785,7 @@ const InvoicesPage: React.FC = () => {
           <div className="flex flex-col sm:flex-row justify-between gap-6">
             <div>
               <p className="font-serif text-2xl font-semibold text-espresso">
-                Vastra<span className="text-maroon">laye</span>
+                Vastra<span className="text-maroon">liya</span>
               </p>
               <span className="block text-[9px] uppercase tracking-[0.42em] text-[#8A6414] mt-0.5">
                 Handcrafted India

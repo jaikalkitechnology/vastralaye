@@ -151,7 +151,7 @@ const AdminTopBarControl = () => {
               </div>
               <div className="flex items-center gap-2 bg-white px-4 py-3">
                 <span className="font-serif text-[15px] font-semibold text-espresso">
-                  Vastra<span className="text-maroon">laye</span>
+                  Vastra<span className="text-maroon">liya</span>
                 </span>
                 <span className="text-[11px] text-muted-foreground">— the header sits here</span>
               </div>

@@ -447,7 +447,7 @@ const InvoicePageView: React.FC<{
                             />
                             <div className="relative">
                                 <p className="font-serif text-2xl font-semibold leading-none text-ivory">
-                                    Vastra<span className="text-gold">laye</span>
+                                    Vastra<span className="text-gold">liya</span>
                                 </p>
                                 <p className="mt-1.5 text-[8.5px] uppercase tracking-[0.42em] text-gold">Handcrafted India</p>
                                 <p className="mt-2.5 text-[11px] leading-relaxed text-ivory/60">
@@ -642,7 +642,7 @@ const InvoicePageView: React.FC<{
                                         <span className="h-1.5 w-1.5 rotate-45 border border-gold" />
                                         <span className="h-px w-9 bg-gold/60" />
                                     </div>
-                                    <p className="mt-2 font-serif text-sm text-espresso">For Vastralaye</p>
+                                    <p className="mt-2 font-serif text-sm text-espresso">For Vastraliya</p>
                                     <p className="mt-0.5 text-[10px] uppercase tracking-[0.14em] text-muted-foreground">Authorised signatory</p>
                                 </div>
                             </div>

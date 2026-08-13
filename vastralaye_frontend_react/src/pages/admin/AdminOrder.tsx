@@ -702,7 +702,7 @@ export default function AdminOrders() {
     <head>
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>Invoice · Order #${order.id} · Vastralaye</title>
+      <title>Invoice · Order #${order.id} · Vastraliya</title>
       <link rel="preconnect" href="https://fonts.googleapis.com">
       <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
       <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;500;600&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
@@ -735,7 +735,7 @@ export default function AdminOrders() {
         <!-- Letterhead -->
         <div style="background:${C.esp};color:${C.ivory};padding:24px 32px;display:flex;justify-content:space-between;align-items:flex-start;">
           <div>
-            <div style="font-family:${SERIF};font-size:23px;font-weight:600;">Vastra<span style="color:${C.gold};">laye</span></div>
+            <div style="font-family:${SERIF};font-size:23px;font-weight:600;">Vastra<span style="color:${C.gold};">liya</span></div>
             <div style="font-size:8.5px;letter-spacing:.42em;text-transform:uppercase;color:${C.gold};margin-top:3px;">Handcrafted India</div>
             <div style="font-size:11px;color:rgba(250,246,240,.6);margin-top:9px;line-height:1.65;">
               14 Weaver's Lane, Faridabad, Haryana 121001<br>
@@ -829,7 +829,7 @@ export default function AdminOrders() {
           <!-- Footer -->
           <div style="display:flex;justify-content:space-between;align-items:flex-end;border-top:1px solid ${C.bd};margin-top:24px;padding-top:18px;gap:20px;">
             <div style="font-size:11.5px;color:${C.mut};line-height:1.7;">
-              <b style="color:${C.esp};font-weight:500;">Vastralaye</b>${gstin ? ` · GSTIN ${gstin}` : ""}<br>
+              <b style="color:${C.esp};font-weight:500;">Vastraliya</b>${gstin ? ` · GSTIN ${gstin}` : ""}<br>
               Queries: support@vastralaye.in · +91 85275 96413<br>
               Generated ${new Date().toLocaleString("en-IN")}
             </div>
@@ -839,7 +839,7 @@ export default function AdminOrders() {
                 <span style="width:6px;height:6px;border:1px solid ${C.gold};transform:rotate(45deg);display:block;"></span>
                 <span style="width:36px;height:1px;background:${C.gold};opacity:.6;display:block;"></span>
               </div>
-              <div style="font-family:${SERIF};font-size:14px;margin-top:8px;">For Vastralaye</div>
+              <div style="font-family:${SERIF};font-size:14px;margin-top:8px;">For Vastraliya</div>
               <div style="font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:${C.mut};margin-top:2px;">Authorised signatory</div>
             </div>
           </div>

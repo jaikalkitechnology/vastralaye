@@ -384,7 +384,7 @@ const AdminEnquiries = () => {
                 <Input
                   value={form.sender_name}
                   onChange={(e) => setForm((f) => ({ ...f, sender_name: e.target.value }))}
-                  placeholder="Vastralaye"
+                  placeholder="Vastraliya"
                   className="text-[13px]"
                 />
               </div>

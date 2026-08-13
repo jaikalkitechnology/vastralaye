@@ -47,7 +47,7 @@ const mediaUrl = (path?: string | null) => {
 
 /**
  * Admin › Reels — upload & manage the shoppable product videos shown on
- * the storefront homepage ("Vastralaye in Motion") and product pages
+ * the storefront homepage ("Vastraliya in Motion") and product pages
  * ("Watch It Styled"). See admin_design.md §5.9.
  */
 const AdminReels = () => {
@@ -342,7 +342,7 @@ const AdminReels = () => {
                 onChange={(e) => setShowOnHome(e.target.checked)}
                 className="accent-[#7A1F2B]"
               />
-              Homepage — “Vastralaye in Motion” row
+              Homepage — “Vastraliya in Motion” row
             </label>
             <label className="flex items-center gap-2.5 text-sm cursor-pointer">
               <input

@@ -188,7 +188,7 @@ const NavBar = () => {
         {/* LOGO */}
         <Link to="/" className="flex flex-col items-start shrink-0">
           <span className="font-serif text-2xl md:text-[26px] font-semibold leading-none text-espresso">
-            Vastra<span className="text-maroon">laye</span>
+            Vastra<span className="text-maroon">liya</span>
           </span>
           <span className="text-[9px] uppercase tracking-[0.42em] text-gold font-medium leading-none mt-1.5">
             Handcrafted India

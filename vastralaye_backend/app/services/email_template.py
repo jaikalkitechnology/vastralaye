@@ -1,5 +1,5 @@
 """
-The house style for Vastralaye's transactional email.
+The house style for Vastraliya's transactional email.
 
 Email is not the web. Every rule the storefront relies on — flexbox, custom
 properties, a stylesheet, web fonts — is unavailable or unreliable across
@@ -136,7 +136,7 @@ def render_email(
     preheader: str,
     blocks: List[str],
     footer_lines: Optional[List[str]] = None,
-    brand: str = "Vastralaye",
+    brand: str = "Vastraliya",
     tagline: str = "Handcrafted India",
 ) -> str:
     """Wrap composed blocks in the branded shell.
@@ -183,7 +183,7 @@ def render_email(
               style="background:{MAROON};padding:26px 24px;border-bottom:3px solid {GOLD}">
             <div style="font-family:{SERIF};font-size:27px;font-weight:600;
                         letter-spacing:.01em;color:{IVORY};line-height:1">
-              Vastra<span style="color:{GOLD}">laye</span>
+              Vastra<span style="color:{GOLD}">liya</span>
             </div>
             <div style="margin-top:8px;font-family:{SANS};font-size:9px;font-weight:600;
                         letter-spacing:.42em;text-transform:uppercase;color:{GOLD}">

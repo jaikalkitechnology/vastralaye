@@ -1,4 +1,4 @@
-"""Turn a Google People API payload into Vastralaye user fields.
+"""Turn a Google People API payload into Vastraliya user fields.
 
 Pure functions, no HTTP and no ORM, so the mapping can be exercised on its
 own — which matters because Google's shapes vary a lot between accounts.

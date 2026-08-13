@@ -1566,6 +1566,45 @@ reads like a person wrote it; "Hi Riya Sharma," reads like a mail merge.
 
 ---
 
+## 44. Renamed: Vastralaye → Vastraliya
+
+Every visible instance of the brand name now reads **Vastraliya**, across 36 files
+— storefront, dashboard, invoices, emails, the browser tab title and the API docs.
+The split wordmark (`Vastra<span>laye</span>`, which a plain search misses)
+was handled separately and now reads `Vastra`**`liya`** in all 16 places it
+appears.
+
+### What was deliberately *not* renamed
+
+The rename only touched the **capitalised** `Vastralaye`. Every lowercase
+occurrence is an identifier pointing at something real, and renaming those would
+break working things rather than rebrand them:
+
+| Left alone | Why |
+|---|---|
+| `support@vastralaye.in` (×9) | A mailbox. `support@vastraliya.in` may not exist; guessing bounces customer mail. |
+| `instagram.com/vastralaye`, `@vastralaye` | Real social accounts, renamed on those platforms or not at all. |
+| `vastralaye_backend/`, `vastralaye_frontend_react/` | Directory names. Renaming is a repo-wide churn with no user-visible gain. |
+| `'vastralaye:'` in `persistentCache.ts` | The localStorage key prefix. Changing it silently invalidates every visitor's cache once — one flash of default content, which is the exact thing that cache exists to prevent. |
+
+Splitting on capitalisation is what made this safe: not one of those four
+categories uses a capital V.
+
+### Stored values the rename can't reach
+
+`EmailSetting.sender_name` lives in the database, so a shop that has typed
+"Vastralaye" into **Admin › Enquiries** keeps it — the code default changing to
+"Vastraliya" only affects a row that was never saved. This surfaced during
+verification, when the reply email kept signing off with the old name until the
+fixture stopped pinning it. Same applies to any admin-authored content: banner
+copy, testimonials, the top-bar message.
+
+| File | Change |
+|---|---|
+| 36 files across both apps | `Vastralaye` → `Vastraliya`, wordmark included |
+
+---
+
 ## Verification
 
 - `tsc --noEmit` — no errors in any changed file.
@@ -1576,6 +1615,13 @@ reads like a person wrote it; "Hi Riya Sharma," reads like a mail merge.
   toggle the CTA between *Place Order · ₹total* and *Pay ₹total*, and Place Order posts
   `{items, payment_method:"cod", shipping_address}` and opens the success modal. No
   console or page errors.
+- Rename verified as rendered output across 11 storefront pages, the dashboard and
+  both emails: all 11 show the new name, none shows the old one (once the support
+  mailbox — which is an address, not the brand — is excluded), the tab title and
+  header wordmark both read Vastraliya, and the admin shell carries no trace of
+  the old spelling. Grep confirms zero capitalised occurrences remain in either
+  app while all 17 lowercase identifiers survive untouched. `tsc` unchanged at 89
+  pre-existing errors, production build passes, every backend module still parses.
 - Email design checked as rendered output, not as source. Both emails rendered from
   the real endpoints and screenshotted at 760px and 380px: no horizontal overflow
   at either width, the masthead, ornament, quoted block and footer all landing as

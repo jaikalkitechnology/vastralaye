@@ -7,7 +7,7 @@ from app.database import Base
 class Reel(Base):
     """Shoppable product video shown on the storefront.
 
-    Placements: homepage "Vastralaye in Motion" row and/or the product
+    Placements: homepage "Vastraliya in Motion" row and/or the product
     page "Watch It Styled" strip.
     """
 
