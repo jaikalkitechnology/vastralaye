@@ -27,6 +27,7 @@ from app.models.invoice import Invoice, InvoiceItem
 from app.database import get_db
 from app.schemas.order_system import OrderResponse
 from app.security import get_password_hash, verify_password, create_reset_token, verify_reset_token
+from app.services.password_policy import PasswordPolicyError, validate_password
 from app.authentication import (
     get_current_user, create_access_token,
     get_user_by_email
@@ -74,7 +75,6 @@ os.makedirs(AVATAR_DIR, exist_ok=True)
 
 ALLOWED_AVATAR_TYPES = {"image/jpeg", "image/png", "image/jpg"}
 MAX_AVATAR_BYTES = 2 * 1024 * 1024  # 2 MB
-MIN_PASSWORD_LEN = 8
 EMAIL_REGEX = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 PHONE_REGEX = re.compile(r"^\+?[0-9]{7,15}$")  # basic international phone
 
@@ -89,12 +89,11 @@ def validate_email(email: str) -> str:
 
 
 def validate_password_strength(password: str) -> None:
-    if not password or not isinstance(password, str):
-        raise HTTPException(status_code=400, detail="Password is required.")
-    if len(password) < MIN_PASSWORD_LEN:
-        raise HTTPException(status_code=400, detail=f"Password must be at least {MIN_PASSWORD_LEN} characters.")
-    if not re.search(r"[A-Za-z]", password) or not re.search(r"[0-9]", password):
-        raise HTTPException(status_code=400, detail="Password must include both letters and numbers.")
+    """Same rule the admin dashboard applies — see app/services/password_policy.py."""
+    try:
+        validate_password(password)
+    except PasswordPolicyError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
 
 
 def validate_phone(phone: Optional[str]) -> Optional[str]:

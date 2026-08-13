@@ -1242,6 +1242,69 @@ ornament, one line of copy.
 
 ---
 
+## 37. Admin › Users — set a customer's password
+
+A key icon on each row opens a dialog that sets a new password for that customer.
+For when someone can't get back in and the emailed reset link isn't reaching them.
+
+`PUT /api/v1/admin/user/{id}/password`, admin-only. It deliberately does not ask
+for the customer's old password — an admin doesn't have it — so it is a genuine
+override, and these are what keep it from being an account-takeover tool:
+
+- **Not your own account.** Your own password still goes through
+  `/users/change-password`, which asks for your current one. Without that rule,
+  anyone who borrowed a signed-in dashboard could lock the real admin out of their
+  own account permanently.
+- **Reset links are burned.** Any unused link already sitting in that customer's
+  inbox is marked used. Otherwise the old link still works and hands the account
+  to whoever holds it. Only that customer's links — everyone else's are untouched.
+- **The password is never echoed or logged.** The response carries the outcome and
+  nothing else; the log line records which admin acted on which account.
+
+A peer admin *can* be reset. They're already equals — either could demote the
+other through the role endpoint — so refusing here would be theatre.
+
+Google-only accounts have no password hash at all. Setting one is allowed and is
+genuinely useful: it gives them an email login alongside Google. The response
+flags it (`first_password`) so the dashboard can say so rather than implying
+something was replaced.
+
+The dialog enforces the rule live before sending anything, has a show/hide toggle
+and a "Suggest one" button that generates something readable over the phone.
+
+### The rule now lives in one place
+
+`validate_password_strength` was defined inside `app/routers/user.py`, so anything
+else that sets a password had to import a router or invent its own weaker rule.
+It moved to `app/services/password_policy.py`, free of FastAPI and SQLAlchemy
+imports, and both paths call it. Same rule, same message, one definition.
+
+### Found while testing: `bcrypt` was unpinned
+
+Hashing failed outright in the test environment. The cause wasn't the new code —
+`requirements.txt` pinned `passlib==1.7.4` but left **`bcrypt` unpinned**, and
+passlib 1.7.4 cannot use bcrypt 5.x: it probes its backend with a 73-byte string,
+bcrypt 5 rejects anything over 72, and the probe raises. Every hash and verify
+call fails with it — no logins, no signups, no password changes, site-wide.
+
+A running server keeps working because its bcrypt was resolved months ago. A
+`pip install -r requirements.txt` on a fresh box, a container rebuild, or any
+dependency refresh picks up 5.x and takes authentication down.
+
+Pinned `bcrypt==4.3.0`. Tested across the range rather than guessing: 4.0.1 works,
+4.1.0 is separately broken (a bad release — salt type error), 4.1.2 / 4.1.3 /
+4.2.0 / 4.2.1 / 4.3.0 all work, 5.0.0 breaks.
+
+| File | Change |
+|---|---|
+| `app/services/password_policy.py` | New — the one password rule |
+| `app/routers/admin.py` | `PUT /user/{id}/password`; module logger |
+| `app/routers/user.py` | `validate_password_strength` delegates to the shared rule |
+| `requirements.txt` | Pin `bcrypt==4.3.0` |
+| `src/pages/admin/AdminUsers.tsx` | Key action + set-password dialog |
+
+---
+
 ## Verification
 
 - `tsc --noEmit` — no errors in any changed file.
@@ -1252,6 +1315,24 @@ ornament, one line of copy.
   toggle the CTA between *Place Order · ₹total* and *Pay ₹total*, and Place Order posts
   `{items, payment_method:"cod", shipping_address}` and opens the success modal. No
   console or page errors.
+- Admin set-password tested at three levels. The password rule over ten inputs:
+  blank, `None`, a non-string, too short, letters-only, digits-only, whitespace,
+  and three that pass. The real endpoint against a live SQLAlchemy session — 21
+  checks: unknown user 404s, your own account is refused, every weak password is
+  refused *and leaves the stored hash untouched*, a real change replaces the hash
+  and burns exactly that customer's two live reset links while another customer's
+  link survives, a Google-only account is flagged `first_password` and gets a
+  working hash, a peer admin can be reset, and the plaintext appears neither in
+  the response nor in storage. Then the point of the whole feature, against the
+  same session: the customer signs in with the new password, their old one is
+  dead, a case-different near-miss is rejected, and a Google-only account goes
+  from "no password set" to signed in. In a real browser against the production
+  build, 24 more: the row action appears per row, submit stays disabled and
+  nothing is sent while the input is short / letters-only / mismatched with the
+  reason shown each time, the eye reveals, "Suggest one" fills both fields with
+  something satisfying the rule, a valid save PUTs the right URL with auth and
+  closes, and a 400 from the API shows the API's own message with the dialog left
+  open to retry. No console or page errors.
 - Admin shell driven in a real browser against the production build, with the
   session endpoint and every list endpoint stubbed slow so each transient state is
   observable. Refreshing on `/admin/users` stays on `/admin/users` and never

@@ -27,12 +27,18 @@ from app.models import User, Category, Coupon, Order, OrderItem, OrderTracking,W
 from app.models.product import Product
 from app.schemas import category as category_schema
 from app.authentication import get_current_admin_user, get_current_user, create_access_token
-from app.security import verify_password  # ✅ FIXED: Import from security instead of authentication
+from app.security import verify_password, get_password_hash  # ✅ FIXED: Import from security instead of authentication
+from app.services.password_policy import PasswordPolicyError, validate_password
+from app.models.user import PasswordResetToken
 from app.crud import user as crud, admin
 from app.schemas.user import UserOut
 from datetime import datetime
 from uuid import uuid4
 from fastapi.responses import JSONResponse
+
+import logging
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/v1/admin", tags=["Admin"])
 
@@ -2069,6 +2075,72 @@ def admin_update_user(
             "postal_code": user.postal_code,
             "country": user.country,
         },
+    }
+
+
+class AdminSetPassword(BaseModel):
+    new_password: str
+
+
+@router.put("/user/{user_id}/password", dependencies=[Depends(get_current_admin_user)])
+def admin_set_user_password(
+    user_id: int,
+    payload: AdminSetPassword,
+    db: Session = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+):
+    """Set a customer's password from the admin dashboard.
+
+    For the case where a customer can't get back in and the emailed reset link
+    isn't reaching them. It deliberately does NOT ask for their old password —
+    an admin doesn't have it — so it is a genuine override, and the guards below
+    are what stop it becoming an account-takeover tool.
+    """
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Your own password still needs your old one. Without that, anyone who
+    # borrowed a signed-in dashboard could lock the real admin out of their
+    # own account for good; /users/change-password is the door for that.
+    if user.id == admin_user.id:
+        raise HTTPException(
+            status_code=400,
+            detail="Change your own password from your profile — it asks for your current one.",
+        )
+
+    new_password = payload.new_password or ""
+    try:
+        validate_password(new_password)
+    except PasswordPolicyError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
+    had_password = bool(user.password)
+    user.password = get_password_hash(new_password)
+
+    # Any reset link already in their inbox would still work against the old
+    # flow and hand the account back to whoever holds it. Burn them.
+    tokens_killed = (
+        db.query(PasswordResetToken)
+        .filter(PasswordResetToken.email == user.email, PasswordResetToken.used.is_(False))
+        .update({PasswordResetToken.used: True}, synchronize_session=False)
+    )
+
+    db.commit()
+
+    # Never log the password itself — just enough to answer "who did this".
+    logger.info(
+        "Admin %s set the password for user %s (reset links invalidated: %s)",
+        admin_user.id, user.id, tokens_killed,
+    )
+
+    return {
+        "message": "Password updated",
+        "user_id": user.id,
+        "email": user.email,
+        # A Google-only account had no password until now; the dashboard says so.
+        "first_password": not had_password,
+        "reset_links_invalidated": tokens_killed,
     }
 
 
