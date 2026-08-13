@@ -5,7 +5,7 @@
 
 @layer base {
   :root {
-    /* Vastralaye design tokens — see design.md §3 */
+    /* Vastraliya design tokens — see design.md §3 */
     --background: 36 50% 96%;        /* ivory */
     --foreground: 22 41% 12%;        /* espresso */
 

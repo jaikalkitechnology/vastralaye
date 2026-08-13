@@ -28,7 +28,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
     encodeURIComponent(
       `<svg xmlns='http://www.w3.org/2000/svg' width='600' height='800' viewBox='0 0 600 800'>
         <rect width='600' height='800' fill='%23EFE7DB'/>
-        <text x='300' y='400' dominant-baseline='middle' text-anchor='middle' fill='%236E5F53' font-family='Georgia' font-style='italic' font-size='28'>Vastralaye</text>
+        <text x='300' y='400' dominant-baseline='middle' text-anchor='middle' fill='%236E5F53' font-family='Georgia' font-style='italic' font-size='28'>Vastraliya</text>
       </svg>`
     );
 

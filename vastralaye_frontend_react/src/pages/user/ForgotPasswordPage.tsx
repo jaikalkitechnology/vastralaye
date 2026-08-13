@@ -18,7 +18,7 @@ const BrandPanel = () => (
 
     <div>
       <Link to="/" className="font-serif text-[34px] font-semibold text-ivory">
-        Vastra<span className="text-gold">laye</span>
+        Vastra<span className="text-gold">liya</span>
       </Link>
       <span className="block text-[9px] uppercase tracking-[0.42em] text-gold mt-1">
         Handcrafted India
@@ -51,7 +51,7 @@ const BrandPanel = () => (
     </ul>
 
     <p className="absolute bottom-9 left-14 text-[11px] uppercase tracking-[0.18em] text-ivory/40">
-      &copy; Vastralaye &middot; Faridabad, India
+      &copy; Vastraliya &middot; Faridabad, India
     </p>
   </aside>
 );
@@ -188,7 +188,7 @@ const ForgotPasswordPage = () => {
           {/* Mobile brand */}
           <div className="md:hidden text-center mb-8">
             <Link to="/" className="inline-block font-serif text-3xl font-semibold text-espresso">
-              Vastra<span className="text-maroon">laye</span>
+              Vastra<span className="text-maroon">liya</span>
             </Link>
             <svg
               className="mx-auto mt-3"
@@ -302,7 +302,7 @@ const ForgotPasswordPage = () => {
                 <ul className="space-y-1.5 text-[13px] text-muted-foreground">
                   <li className="flex items-start gap-2">
                     <span className="mt-[7px] h-1 w-1 flex-shrink-0 rounded-full bg-gold" />
-                    Use the email address associated with your Vastralaye account
+                    Use the email address associated with your Vastraliya account
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="mt-[7px] h-1 w-1 flex-shrink-0 rounded-full bg-gold" />

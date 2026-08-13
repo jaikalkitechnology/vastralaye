@@ -67,7 +67,7 @@ def _record_event(db: Session, merchant_ref: str, status: str, payload: dict) ->
 @router.post("/webhook")
 async def payment_webhook(request: Request, db: Session = Depends(get_db)):
     """
-    Vastralaye payment webhook.
+    Vastraliya payment webhook.
 
     Called by the Mizorpay gateway when a payin settles; the gateway's own
     field names (`mizor_pay_txn_id`, `merchant_ref`) are kept verbatim.

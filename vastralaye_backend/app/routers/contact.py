@@ -35,7 +35,7 @@ EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 # hosted at Hostinger, which is why the SMTP default below is theirs and not
 # Gmail's — sending *from* it against smtp.gmail.com simply fails to log in.
 DEFAULT_NOTIFY_EMAIL = "noreply@vastraliya.com"
-DEFAULT_SENDER_NAME = "Vastralaye"
+DEFAULT_SENDER_NAME = "Vastraliya"
 DEFAULT_SMTP_HOST = "smtp.hostinger.com"
 
 MAX_NAME = 120
@@ -555,7 +555,7 @@ def send_test_email(
     try:
         ok = send_custom_email(
             to_email=target,
-            subject="Vastralaye — test email",
+            subject="Vastraliya — test email",
             plain_text=(
                 "This is a test from Admin › Enquiries.\n\n"
                 "If you're reading it, contact form notifications will arrive here."

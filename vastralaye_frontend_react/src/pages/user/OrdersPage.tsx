@@ -463,7 +463,7 @@ const OrdersPage: React.FC = () => {
             <span className="overline-label mb-1.5">Order history</span>
             <h1 className="font-serif text-3xl md:text-4xl font-medium text-espresso">My Orders</h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              {orders.length} order{orders.length !== 1 ? 's' : ''} placed with Vastralaye
+              {orders.length} order{orders.length !== 1 ? 's' : ''} placed with Vastraliya
             </p>
           </div>
           <Button

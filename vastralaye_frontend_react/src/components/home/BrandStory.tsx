@@ -34,7 +34,7 @@ const BrandStory = () => (
             <br className="hidden md:block" /> with Love
           </h2>
           <p className="text-muted-foreground max-w-xl mx-auto lg:mx-0 mb-3">
-            Every Vastralaye piece begins in the hands of an artisan — block printers of Jaipur,
+            Every Vastraliya piece begins in the hands of an artisan — block printers of Jaipur,
             weavers of Banaras, dyers of Kutch. We work directly with craft clusters so heritage
             stays alive and makers earn fairly.
           </p>

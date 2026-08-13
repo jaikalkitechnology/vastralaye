@@ -18,7 +18,7 @@ const BrandPanel = () => (
 
     <div>
       <Link to="/" className="font-serif text-[34px] font-semibold text-ivory">
-        Vastra<span className="text-gold">laye</span>
+        Vastra<span className="text-gold">liya</span>
       </Link>
       <span className="block text-[9px] uppercase tracking-[0.42em] text-gold mt-1">
         Handcrafted India
@@ -51,7 +51,7 @@ const BrandPanel = () => (
     </ul>
 
     <p className="absolute bottom-9 left-14 text-[11px] uppercase tracking-[0.18em] text-ivory/40">
-      &copy; Vastralaye &middot; Faridabad, India
+      &copy; Vastraliya &middot; Faridabad, India
     </p>
   </aside>
 );
@@ -160,7 +160,7 @@ const ResetPasswordPage = () => {
           {/* Mobile brand */}
           <div className="md:hidden text-center mb-8">
             <span className="font-serif text-3xl font-semibold text-espresso">
-              Vastra<span className="text-maroon">laye</span>
+              Vastra<span className="text-maroon">liya</span>
             </span>
             <svg
               className="mx-auto mt-3"

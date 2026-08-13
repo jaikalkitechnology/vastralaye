@@ -338,7 +338,7 @@ const InvoiceTemplate = React.forwardRef<HTMLDivElement, { invoice: Invoice }>(
           {/* Brand */}
           <div style={{ position: "relative" }}>
             <div style={{ fontFamily: SERIF, fontSize: "23px", fontWeight: 600 }}>
-              Vastra<span style={{ color: "#C99A45" }}>laye</span>
+              Vastra<span style={{ color: "#C99A45" }}>liya</span>
             </div>
             <div style={{
               fontSize: "8.5px", letterSpacing: "0.42em",
@@ -760,7 +760,7 @@ const InvoiceTemplate = React.forwardRef<HTMLDivElement, { invoice: Invoice }>(
                 }} />
                 <span style={{ width: "36px", height: "1px", background: "#C99A45", opacity: 0.6 }} />
               </div>
-              <div style={{ fontFamily: SERIF, fontSize: "14px", marginTop: "8px" }}>For Vastralaye</div>
+              <div style={{ fontFamily: SERIF, fontSize: "14px", marginTop: "8px" }}>For Vastraliya</div>
               <div style={{
                 fontSize: "9.5px", letterSpacing: "0.14em",
                 textTransform: "uppercase", color: "#6E5F53", marginTop: "2px",
@@ -988,7 +988,7 @@ const InvoicesPage: React.FC = () => {
         <span className="h-10 w-10 animate-spin rounded-full border-2 border-[#7A1F2B]/20 border-t-[#7A1F2B]" />
         <p className="font-serif text-lg text-espresso">Preparing your invoice…</p>
         <p className="text-[11px] uppercase tracking-[0.16em] text-[#6E5F53]">
-          Vastralaye · Handcrafted India
+          Vastraliya · Handcrafted India
         </p>
       </div>
       </main>

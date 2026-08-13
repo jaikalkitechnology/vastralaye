@@ -678,7 +678,7 @@ return (
           {/* Category overline + stock status */}
           <div className="flex items-center justify-between gap-3">
             <span className="text-[10.5px] font-semibold uppercase tracking-[0.22em] text-[#8A6414]">
-              {product.category || "Vastralaye"}
+              {product.category || "Vastraliya"}
             </span>
             <span
               className={`whitespace-nowrap text-[11px] uppercase tracking-[0.1em] ${

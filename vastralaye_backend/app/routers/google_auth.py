@@ -256,7 +256,7 @@ async def google_login(payload: GoogleLoginIn, db: Session = Depends(get_db)):
 def google_callback_info():
     """Visiting the callback in a browser should explain itself, not 405."""
     return (
-        "Vastralaye — Google sign-in callback.\n\n"
+        "Vastraliya — Google sign-in callback.\n\n"
         "This is the Authorised redirect URI for Google Cloud Console. Google "
         "POSTs the signed credential here; there is nothing to see on GET.\n"
     )

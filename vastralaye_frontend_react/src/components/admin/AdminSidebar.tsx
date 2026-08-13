@@ -158,7 +158,7 @@ const AdminSidebar = ({ isOpen = false, onClose }: AdminSidebarProps) => {
       <div className="relative border-b border-ivory/10 px-5 pb-5 pt-6">
         <Link to="/admin" onClick={onClose} className="block">
           <span className="font-serif text-[22px] font-semibold leading-none text-ivory">
-            Vastra<span className="text-gold">laye</span>
+            Vastra<span className="text-gold">liya</span>
           </span>
           <span className="mt-1.5 block text-[8.5px] uppercase tracking-[0.4em] text-gold">
             Handcrafted India

@@ -50,9 +50,9 @@ async def lifespan(app: FastAPI):
 
 # ---------------------- App Initialization ----------------------
 app = FastAPI(
-    title="Vastralaye API",
+    title="Vastraliya API",
     description=(
-        "Vastralaye — storefront and admin API.\n\n"
+        "Vastraliya — storefront and admin API.\n\n"
         "Handcrafted ethnic wear: catalogue, cart, orders, invoices, coupons, "
         "reels and site content.\n\n"
         "Payments are processed by the Mizorpay gateway, so gateway-owned field "
@@ -69,7 +69,7 @@ app = FastAPI(
 def root():
     """Plain liveness check — also what a bare visit to the API host lands on."""
     return {
-        "message": "Vastralaye api is running",
+        "message": "Vastraliya api is running",
         "status": "ok",
         "version": app.version,
         "docs": "/docs",

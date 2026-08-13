@@ -10,7 +10,7 @@ const GlobalLoader = () => {
         </div>
         <div className="text-center">
           <span className="font-serif text-xl text-espresso">
-            Vastra<span className="text-maroon">laye</span>
+            Vastra<span className="text-maroon">liya</span>
           </span>
           <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground mt-1">Loading…</p>
         </div>
