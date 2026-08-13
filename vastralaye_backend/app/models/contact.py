@@ -44,10 +44,18 @@ class EmailSetting(Base):
     __tablename__ = "email_settings"
 
     id = Column(Integer, primary_key=True, index=True)
-    # The Gmail account used for SMTP.
+    # The mailbox used for SMTP — Hostinger, Gmail, anything that speaks SMTP.
     sender_email = Column(String(160), nullable=True)
-    # Gmail app password — a secret; masked everywhere it is returned.
+    # The mailbox password (Gmail calls it an "app password"). A secret; masked
+    # everywhere it is returned.
     app_password = Column(String(255), nullable=True)
+    # SMTP server. NULL means "use the default", resolved in code rather than
+    # by the column, so rows added by schema_sync (which lands columns as NULL)
+    # behave the same as rows created fresh.
+    smtp_host = Column(String(160), nullable=True)
+    smtp_port = Column(Integer, nullable=True)
+    # True = implicit TLS on connect (port 465). False = STARTTLS (port 587).
+    smtp_ssl = Column(Boolean, nullable=True)
     # Display name on outgoing mail.
     sender_name = Column(String(120), nullable=True)
     # Where contact-form submissions are announced.
