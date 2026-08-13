@@ -1514,6 +1514,58 @@ composer while the dialog is open.
 
 ---
 
+## 43. The reply email, designed
+
+The reply went out as bare `<p>` tags — technically an email, visibly not from the
+same shop as the storefront. It now arrives in the site's own clothes: maroon
+masthead under the gold rule, the `Vastra`**`laye`** wordmark with its
+letter-spaced tagline, ivory canvas, the gold rule-and-diamond ornament, and the
+customer's original message quoted in a gold-edged block.
+
+### Email is not the web
+
+Everything the storefront leans on is unavailable or unreliable across Outlook,
+Gmail's proxy and Apple Mail, so `app/services/email_template.py` is deliberately
+old-fashioned — nested tables for layout, every style inline, not one external
+asset. Specifically:
+
+- **No `<style>` block.** Gmail strips it on some clients; anything it carried
+  would silently vanish.
+- **No web fonts.** Georgia stands in for Fraunces because it's actually
+  installed on the machines reading this, and the stack falls back to any serif.
+- **`color-scheme: light only`.** Without it some clients auto-invert the whole
+  message and the maroon masthead comes out an unrelated pastel.
+- **A preheader.** The hidden line inboxes show beside the subject. Left out,
+  clients scrape the first text they find — "Hi Riya," — which tells the reader
+  nothing about whether to open it.
+- **Layout tables carry `role="presentation"`** so screen readers read prose
+  rather than announcing a grid.
+- **No remote images at all**, so nothing is blocked by default and there's no
+  tracking-pixel shape to it either.
+
+### Escaping is the whole safety story
+
+Both halves of a reply are typed by humans — the admin's text and the customer's
+quoted original — and both go into HTML. Every block helper escapes its own
+input, and the strongest proof is in a real browser: a message containing
+`<script>`, `<img onerror>` and `<svg onload>` renders as visible text with zero
+elements injected and zero handlers fired.
+
+The internal notification uses the same shell, so the mail the shop receives and
+the mail the customer receives are recognisably one product. Its layout differs —
+a label/value block for email, phone and time above the quoted message — because
+it's a work item, not a letter.
+
+Small thing that matters: the greeting uses the **first name only**. "Hi Riya,"
+reads like a person wrote it; "Hi Riya Sharma," reads like a mail merge.
+
+| File | Change |
+|---|---|
+| `app/services/email_template.py` | New — the branded shell and block helpers |
+| `app/routers/contact.py` | Reply and notification composed from it; first-name greeting |
+
+---
+
 ## Verification
 
 - `tsc --noEmit` — no errors in any changed file.
@@ -1524,6 +1576,22 @@ composer while the dialog is open.
   toggle the CTA between *Place Order · ₹total* and *Pay ₹total*, and Place Order posts
   `{items, payment_method:"cod", shipping_address}` and opens the success modal. No
   console or page errors.
+- Email design checked as rendered output, not as source. Both emails rendered from
+  the real endpoints and screenshotted at 760px and 380px: no horizontal overflow
+  at either width, the masthead, ornament, quoted block and footer all landing as
+  intended. 31 template checks: every block helper escapes its input, newlines
+  survive as `<br>` (CRLF included), the shell carries a doctype, charset,
+  `max-width:600px`, a pinned colour scheme, a hidden preheader and a
+  `role="presentation"` on every layout table — and contains no flexbox, grid,
+  `<link>`, `<style>`, remote image, background-image or custom property, with a
+  long message rendering at 10KB against Gmail's ~102KB clipping threshold. The
+  escaping proof is a browser one: an enquiry containing `<script>`,
+  `<img onerror>` and `<svg onload>`, replied to with more `<script>`, renders in
+  both emails with **zero** script/img/svg elements present, **zero** handlers
+  fired, and the markup visible as text. (The first run of the template suite
+  reported 8 escaping failures that were the test's fault — it asserted the string
+  `onerror=y` never appears, but that text is inert prose inside escaped content;
+  the assertion now checks that no tag ever opens.)
 - Replies tested at both levels. The endpoint against a live session, 35 checks:
   with no sending account it refuses and records nothing; an unknown enquiry 404s;
   blank and one-character replies are refused with nothing sent; a real reply
