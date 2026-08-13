@@ -15,6 +15,7 @@ import {
   X,
 } from 'lucide-react';
 import { getYouTubeId, youTubeThumb } from '@/lib/media';
+import AdminLoading from '@/components/admin/AdminLoading';
 
 interface ReelProduct {
   id: number;
@@ -386,7 +387,7 @@ const AdminReels = () => {
         {/* Library */}
         <div>
           {loading ? (
-            <div className="text-sm text-muted-foreground py-10 text-center">Loading reels…</div>
+            <AdminLoading label="reels" compact />
           ) : reels.length === 0 ? (
             <div className="border border-dashed border-border rounded-md bg-white text-center py-16 px-6">
               <Clapperboard className="h-10 w-10 mx-auto text-muted-foreground mb-3" strokeWidth={1.2} />

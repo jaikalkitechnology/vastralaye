@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import AdminLayout from '@/components/admin/AdminLayout';
+import AdminLoading from '@/components/admin/AdminLoading';
 import StatsCard from '@/components/admin/cards/StatsCard';
 import MonthlyChart from '@/components/admin/charts/MonthlyChart';
 import CategoryChart from '@/components/admin/charts/CategoryChart';
@@ -406,27 +407,10 @@ const AdminDashboard = () => {
     if (prev > 0) ordersDelta = ((curr - prev) / prev) * 100;
   }
 
-  /* ============================================================
-   * Loading skeleton (matches final geometry)
-   * ============================================================ */
   if (loading) {
     return (
       <AdminLayout>
-        <div className="animate-pulse space-y-5">
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
-            {[0, 1, 2, 3].map((i) => (
-              <div key={i} className="h-36 rounded-md border border-border bg-white" />
-            ))}
-          </div>
-          <div className="grid grid-cols-1 gap-5 xl:grid-cols-12">
-            <div className="h-80 rounded-md border border-border bg-white xl:col-span-8" />
-            <div className="h-80 rounded-md border border-border bg-white xl:col-span-4" />
-          </div>
-          <div className="grid grid-cols-1 gap-5 xl:grid-cols-12">
-            <div className="h-96 rounded-md border border-border bg-white xl:col-span-7" />
-            <div className="h-96 rounded-md border border-border bg-white xl:col-span-5" />
-          </div>
-        </div>
+        <AdminLoading label="dashboard" />
       </AdminLayout>
     );
   }

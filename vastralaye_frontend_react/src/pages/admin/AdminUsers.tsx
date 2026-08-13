@@ -38,7 +38,7 @@ import {
 } from "@/components/ui/select";
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Skeleton } from "@/components/ui/skeleton";
+import AdminLoading from '@/components/admin/AdminLoading';
 import {
   Dialog,
   DialogContent,
@@ -242,21 +242,27 @@ const AdminUsers = () => {
         setStats(response.data);
       }
     } catch {
-      // If stats endpoint doesn't exist, calculate from users
-      const allUsersResponse = await axios.get(`${BASE_URL}/admin/users`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      
-      const allUsers = Array.isArray(allUsersResponse.data) 
-        ? allUsersResponse.data 
-        : allUsersResponse.data.data || [];
-      
-      setStats({
-        total: allUsers.length,
-        active: allUsers.filter((u: any) => u.deleted_at === null).length,
-        inactive: allUsers.filter((u: any) => u.deleted_at !== null).length,
-        admins: allUsers.filter((u: any) => u.role === 'admin').length,
-      });
+      // If stats endpoint doesn't exist, calculate from users. This fallback
+      // can fail too — an expired token 401s both calls — and it used to throw
+      // straight out of the component, so guard it and settle for zeroes.
+      try {
+        const allUsersResponse = await axios.get(`${BASE_URL}/admin/users`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const allUsers = Array.isArray(allUsersResponse.data)
+          ? allUsersResponse.data
+          : allUsersResponse.data.data || [];
+
+        setStats({
+          total: allUsers.length,
+          active: allUsers.filter((u: any) => u.deleted_at === null).length,
+          inactive: allUsers.filter((u: any) => u.deleted_at !== null).length,
+          admins: allUsers.filter((u: any) => u.role === 'admin').length,
+        });
+      } catch {
+        setStats({ total: 0, active: 0, inactive: 0, admins: 0 });
+      }
     }
   };
 
@@ -356,22 +362,6 @@ const AdminUsers = () => {
                           sortBy !== 'created_at' || sortOrder !== 'desc';
 
   const totalPages = Math.ceil(totalCount / usersPerPage);
-
-  const SkeletonLoader = () => (
-    <div className="bg-white border border-border rounded-md overflow-hidden">
-      {[...Array(6)].map((_, i) => (
-        <div key={i} className="flex items-center gap-4 px-3 py-3 border-b border-border last:border-b-0">
-          <Skeleton className="h-8 w-8 rounded-full" />
-          <div className="flex-1">
-            <Skeleton className="h-4 w-40 mb-2" />
-            <Skeleton className="h-3 w-28" />
-          </div>
-          <Skeleton className="h-5 w-16 rounded-full" />
-          <Skeleton className="h-5 w-20 rounded-full" />
-        </div>
-      ))}
-    </div>
-  );
 
   return (
     <AdminLayout>
@@ -671,7 +661,9 @@ const AdminUsers = () => {
 
         {/* Users List */}
         {loading ? (
-          <SkeletonLoader />
+          <div className="bg-white border border-border rounded-md">
+            <AdminLoading label="users" />
+          </div>
         ) : users.length === 0 ? (
           <div className="bg-white border border-border rounded-md p-16 text-center">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-espresso/5 mb-6">
