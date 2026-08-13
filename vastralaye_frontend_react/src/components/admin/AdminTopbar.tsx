@@ -23,9 +23,12 @@ const PAGE_META: PageMeta[] = [
   { prefix: '/admin/banners', title: 'Banners', context: 'Homepage hero slides' },
   { prefix: '/admin/testimonials', title: 'Testimonials', context: 'Customer quotes on the homepage' },
   { prefix: '/admin/settings', title: 'Store Settings', context: 'Social links & WhatsApp chat' },
+  { prefix: '/admin/login-methods', title: 'Login Methods', context: 'How customers sign in' },
   { prefix: '/admin/orders', title: 'Orders', context: 'Track & fulfil customer orders' },
   { prefix: '/admin/reviews', title: 'Reviews', context: 'Moderate customer feedback' },
+  { prefix: '/admin/payments', title: 'Payments', context: 'Gateway credentials & online payment activity' },
   { prefix: '/admin/users', title: 'Users', context: 'Customer accounts & access' },
+  { prefix: '/admin/enquiries', title: 'Enquiries', context: 'Messages from the Contact Us form' },
   { prefix: '/admin', title: 'Dashboard' },
 ];
 

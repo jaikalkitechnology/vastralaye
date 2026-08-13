@@ -145,28 +145,52 @@ EMAIL_TEMPLATE = """
 # -------------------------------
 # Generic Email Sender
 # -------------------------------
-def send_email(to_email: str, subject: str, plain_text: str, html_content: str = None):
-    """Send an email via Gmail SMTP with enhanced error handling"""
-    # Get current year for footer
+def send_custom_email(
+    to_email: str,
+    subject: str,
+    plain_text: str,
+    html_content: str = None,
+    sender_email: str = None,
+    app_password: str = None,
+    sender_name: str = None,
+    reply_to: str = None,
+):
+    """Send via Gmail SMTP, with the account passed in rather than read from .env.
+
+    The module-level SENDER_EMAIL / APP_PASSWORD are resolved once at import,
+    so they can't follow a setting an admin changes at runtime. Anything that
+    needs the configured-in-the-dashboard account calls this and supplies it;
+    `send_email` below stays as it was and delegates here.
+
+    `reply_to` matters for forwarded mail: an enquiry announced to the shop's
+    inbox should reply to the customer, not to the shop's own sender address.
+    """
+    sender = (sender_email or SENDER_EMAIL or "").strip()
+    password = (app_password or APP_PASSWORD or "").strip()
+    display = (sender_name or COMPANY_NAME or "").strip()
+
+    if not sender or not password:
+        logger.error("❌ No sender credentials — cannot email %s", to_email)
+        return False
+
     current_year = datetime.now().year
 
     if not html_content:
         # Create a basic HTML template if none provided
         html_content = EMAIL_TEMPLATE.format(
             subject=subject,
-            company_name=COMPANY_NAME,
+            company_name=display,
             support_email=SUPPORT_EMAIL,
             current_year=current_year,
             content=f"<p>{plain_text.replace(chr(10), '<br>')}</p>"
         )
-    else:
-        # html_content is already formatted, just use it as is
-        pass
 
     msg = EmailMessage()
-    msg["From"] = f"{COMPANY_NAME} <{SENDER_EMAIL}>"
+    msg["From"] = f"{display} <{sender}>" if display else sender
     msg["To"] = to_email
     msg["Subject"] = subject
+    if reply_to:
+        msg["Reply-To"] = reply_to
 
     # Set plain text version
     msg.set_content(plain_text)
@@ -176,13 +200,18 @@ def send_email(to_email: str, subject: str, plain_text: str, html_content: str =
 
     try:
         with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
-            smtp.login(SENDER_EMAIL, APP_PASSWORD)
+            smtp.login(sender, password)
             smtp.send_message(msg)
         logger.info(f"✅ Email sent successfully to {to_email} | Subject: {subject}")
         return True
     except Exception as e:
         logger.error(f"❌ Email failed to send to {to_email}: {e}", exc_info=True)
         return False
+
+
+def send_email(to_email: str, subject: str, plain_text: str, html_content: str = None):
+    """Send an email via Gmail SMTP using the .env account."""
+    return send_custom_email(to_email, subject, plain_text, html_content)
 
 
 # ==========================

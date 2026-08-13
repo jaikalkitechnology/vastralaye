@@ -178,6 +178,8 @@ from app.routers import payment_gateway
 from app.routers import google_auth
 app.include_router(payment_gateway.router)   # ✅ admin payment integration
 app.include_router(google_auth.router)   # ✅ Sign in with Google
+from app.routers import contact
+app.include_router(contact.router)   # ✅ contact form + email config
 app.include_router(site_content.router)
 
 

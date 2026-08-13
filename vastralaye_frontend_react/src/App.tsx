@@ -49,6 +49,7 @@ const AdminBanners = lazy(() => import("@/pages/admin/AdminBanners"));
 const AdminPayments = lazy(() => import("@/pages/admin/AdminPayments"));
 const AdminLoginMethods = lazy(() => import("@/pages/admin/AdminLoginMethods"));
 const AdminTestimonials = lazy(() => import("@/pages/admin/AdminTestimonials"));
+const AdminEnquiries = lazy(() => import("@/pages/admin/AdminEnquiries"));
 const AdminSettings = lazy(() => import("@/pages/admin/AdminSettings"));
 const Reviews = lazy(() => import("@/pages/admin/CustomerReviews"));
 import PrivacyPolicy from "@/pages/policy/PrivacyPolicy";
@@ -113,6 +114,7 @@ const AppContent = () => {
         <Route path="/admin/payments" element={<AdminLayout><AdminPayments /></AdminLayout>} />
         <Route path="/admin/login-methods" element={<AdminLayout><AdminLoginMethods /></AdminLayout>} />
         <Route path="/admin/testimonials" element={<AdminLayout><AdminTestimonials /></AdminLayout>} />
+        <Route path="/admin/enquiries" element={<AdminLayout><AdminEnquiries /></AdminLayout>} />
         <Route path="/admin/settings" element={<AdminLayout><AdminSettings /></AdminLayout>} />
 
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />

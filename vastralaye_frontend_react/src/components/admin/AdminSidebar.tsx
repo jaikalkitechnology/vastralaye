@@ -14,6 +14,7 @@ import {
   ExternalLink,
   GalleryHorizontal,
   CreditCard,
+  Inbox,
   KeyRound,
   Quote,
   Settings,
@@ -98,6 +99,7 @@ const AdminSidebar = ({ isOpen = false, onClose }: AdminSidebarProps) => {
       label: 'Customers',
       items: [
         { name: 'Users', path: '/admin/users', icon: <Users className={ICON_CLASS} /> },
+        { name: 'Enquiries', path: '/admin/enquiries', icon: <Inbox className={ICON_CLASS} /> },
       ],
     },
     {

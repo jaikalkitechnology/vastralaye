@@ -10,6 +10,7 @@ from app.models.invoice import Invoice, InvoiceItem  # ✅ NEW
 from .reel import Reel
 from .newsletter import NewsletterSubscriber
 from .site_content import HeroBanner, Testimonial, SiteSetting
+from .contact import ContactMessage, EmailSetting
 
 from .order import Order, OrderItem, OrderTracking
 

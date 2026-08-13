@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import emailjs from "@emailjs/browser";
+import { api } from "@/api/api";
 import {
   Mail,
   Phone,
@@ -12,22 +12,20 @@ import {
   Loader2, Store
 } from "lucide-react";
 
-type MessageType =
-  | "Select Type"
-  | "Complaint"
-  | "Refund Complaint"
-  | "Product Complaint"
-  | "Feedback"
-  | "General Inquiry"
-  | "Payment"
-  | "Returns"
-  | "Delivery";
+/**
+ * Submissions post to our own API, which stores the enquiry and then emails
+ * it on. The store is the record: if the mail server is misconfigured the
+ * enquiry is still in Admin › Enquiries, which is not true of sending
+ * straight from the browser to a third-party mailer.
+ *
+ * The destination inbox is set in Admin › Enquiries, so it lives on the
+ * server and isn't baked into the bundle any more.
+ */
 
 interface FormErrors {
   name?: string;
   phone?: string;
   email?: string;
-  type?: string;
   message?: string;
 }
 
@@ -37,7 +35,6 @@ const Contact = () => {
     name: "",
     phone: "",
     email: "",
-    type: "Select Type" as MessageType,
     message: "",
   });
 
@@ -46,11 +43,6 @@ const Contact = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState<string>("");
   const [touched, setTouched] = useState<Record<string, boolean>>({});
-
-  // EmailJS Configuration
-  const EMAILJS_SERVICE_ID = "service_j02nkfo"; // Replace with your EmailJS service ID
-  const EMAILJS_TEMPLATE_ID = "template_44y0te3"; // Replace with your EmailJS template ID
-  const EMAILJS_PUBLIC_KEY = "DCImCt-wq6AGDvlKr"; // Replace with your EmailJS public key
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
@@ -101,11 +93,6 @@ const Contact = () => {
       newErrors.email = "Email cannot exceed 100 characters";
     }
 
-    // Message type validation
-    if (formData.type === "Select Type") {
-      newErrors.type = "Please select a message type";
-    }
-
     // Message validation
     if (!formData.message.trim()) {
       newErrors.message = "Message is required";
@@ -148,13 +135,6 @@ const Contact = () => {
     }
   };
 
-  const handleTypeSelect = (type: MessageType) => {
-    setFormData(prev => ({ ...prev, type }));
-    if (errors.type) {
-      setErrors(prev => ({ ...prev, type: undefined }));
-    }
-  };
-
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = e.target.value;
 
@@ -193,7 +173,6 @@ const Contact = () => {
       name: true,
       phone: true,
       email: true,
-      type: true,
       message: true
     });
 
@@ -204,42 +183,18 @@ const Contact = () => {
     setIsSubmitting(true);
 
     try {
-      // Check if EmailJS is initialized properly
-      if (!EMAILJS_SERVICE_ID || !EMAILJS_TEMPLATE_ID || !EMAILJS_PUBLIC_KEY) {
-        throw new Error("EmailJS configuration is missing. Please add your EmailJS credentials.");
-      }
-
-      // Prepare template parameters
-      const templateParams = {
-        from_name: formData.name,
-        from_email: formData.email,
-        phone_number: formData.phone,
-        message_type: formData.type,
+      await api.post("/fronted/contact", {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
         message: formData.message,
-        to_email: getRelevantEmail(formData.type),
-        to_name: "Mizorpay Mart Support",
-        reply_to: formData.email,
-        date: new Date().toLocaleString(),
-      };
-
-      console.log("Sending email with params:", templateParams);
-
-      // Send email using EmailJS
-      const result = await emailjs.send(
-        EMAILJS_SERVICE_ID,
-        EMAILJS_TEMPLATE_ID,
-        templateParams,
-        EMAILJS_PUBLIC_KEY
-      );
-
-      console.log("Email sent successfully:", result.text);
+      });
 
       // Reset form on successful submission
       setFormData({
         name: "",
         phone: "",
         email: "",
-        type: "Select Type",
         message: "",
       });
       setTouched({});
@@ -251,12 +206,12 @@ const Contact = () => {
         setIsSubmitted(false);
       }, 5000);
 
-    } catch (error) {
-      console.error("Failed to send email:", error);
+    } catch (error: any) {
+      console.error("Failed to send message:", error);
       setSubmitError(
-        error instanceof Error
-          ? error.message
-          : "Failed to send message. Please try again later."
+        // The API explains what's wrong with the input; anything else is ours.
+        error?.response?.data?.detail ||
+          "Failed to send message. Please try again later."
       );
 
       // Auto-hide error after 5 seconds
@@ -267,40 +222,6 @@ const Contact = () => {
       setIsSubmitting(false);
     }
   };
-
-  // Helper function to get relevant email based on message type
-  const getRelevantEmail = (type: MessageType): string => {
-    switch (type) {
-      case "Complaint":
-      case "Product Complaint":
-        return "complaints@mizorpaymart.in";
-      case "Refund Complaint":
-        return "refund@mizorpaymart.in";
-      case "Payment":
-        return "sales@mizorpaymart.in";
-      case "Delivery":
-        return "support@mizorpaymart.in";
-      case "Returns":
-        return "refund@mizorpaymart.in";
-      case "Feedback":
-        return "contact@mizorpaymart.in";
-      case "General Inquiry":
-        return "info@mizorpaymart.in";
-      default:
-        return "contact@mizorpaymart.in";
-    }
-  };
-
-  const messageTypes: MessageType[] = [
-    "General Inquiry",
-    "Complaint",
-    "Refund Complaint",
-    "Product Complaint",
-    "Payment",
-    "Delivery",
-    "Returns",
-    "Feedback"
-  ];
 
   const getFieldClassName = (fieldName: keyof FormErrors, isTextarea = false) => {
     const hasError = errors[fieldName] && touched[fieldName];
@@ -438,7 +359,7 @@ const Contact = () => {
                   Thank you for contacting us. We'll get back to you shortly.
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  Your message has been sent to: {getRelevantEmail(formData.type)}
+                  We usually reply within one business day.
                 </p>
               </div>
             ) : (
@@ -537,40 +458,6 @@ const Contact = () => {
                           <AlertCircle className="w-4 h-4 mr-1" />
                           {errors.email}
                         </p>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Message Type */}
-                  <div>
-                    <label className="text-sm font-medium text-espresso mb-2 block">
-                      Message Type *
-                    </label>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                      {messageTypes.map((type) => (
-                        <button
-                          key={type}
-                          type="button"
-                          onClick={() => handleTypeSelect(type)}
-                          className={`px-4 py-3 rounded-lg border transition-all text-sm ${formData.type === type
-                            ? "bg-blush border-maroon text-maroon"
-                            : "border-border text-muted-foreground hover:border-gold hover:bg-ivory"
-                            }`}
-                        >
-                          {type}
-                        </button>
-                      ))}
-                    </div>
-                    <div className="flex justify-between items-center mt-2">
-                      {errors.type && touched.type ? (
-                        <p className="text-sm text-red-600 flex items-center">
-                          <AlertCircle className="w-4 h-4 mr-1" />
-                          {errors.type}
-                        </p>
-                      ) : (
-                        <span className="text-sm text-muted-foreground">
-                          Will be sent to: {getRelevantEmail(formData.type)}
-                        </span>
                       )}
                     </div>
                   </div>
