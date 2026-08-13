@@ -1432,6 +1432,48 @@ and **Login Methods** from earlier sections. All admin routes are now covered.
 
 ---
 
+## 41. The mail server is not Gmail
+
+`noreply@vastraliya.com` is a **Hostinger** mailbox, and §40 shipped with
+`smtplib.SMTP_SSL("smtp.gmail.com", 465)` hard-coded. Receiving there was always
+fine, but *sending from* it would have failed at login every time — Gmail will
+not authenticate a Hostinger mailbox.
+
+The server is now configuration, not a constant:
+
+- `smtp_host`, `smtp_port` and `smtp_ssl` on `email_settings`, editable in
+  Admin › Enquiries with **Hostinger** and **Gmail** presets.
+- `smtp_ssl` picks the connection style — `True` is implicit TLS on connect
+  (465), `False` is plain connect then `STARTTLS` (587). Both are encrypted;
+  providers just publish different ports. Changing one in the UI moves the other,
+  because mismatching them is the usual reason a mail setup won't connect.
+- Unset resolves to Hostinger, except for a `@gmail.com` sender which resolves to
+  Gmail. Only ever a starting point for the form — a typed host always wins.
+- `.env` gets `SMTP_HOST` / `SMTP_PORT` / `SMTP_SSL` so a deployment can point at
+  its own provider without touching the database.
+
+Two things worth knowing about the defaults. They're resolved **in code, not by
+column defaults**, because `schema_sync` lands new columns as NULL — a row that
+predates these columns has to behave like a fresh one, and there's a test for
+exactly that. And `SMTP_TIMEOUT` (20s) is new: without it an unreachable mail
+host hangs the request thread indefinitely.
+
+The copy follows the provider too — "App password" only when Gmail is selected,
+since Hostinger has no such thing; it's the mailbox password from hPanel.
+
+**From must match the authenticated account.** Most providers, Hostinger
+included, reject mail whose From address isn't the mailbox that logged in, so the
+sender field is the mailbox and the page says so.
+
+| File | Change |
+|---|---|
+| `app/mail.py` | `send_custom_email` takes host/port/ssl; STARTTLS path; connect timeout |
+| `app/models/contact.py` | `smtp_host`, `smtp_port`, `smtp_ssl` |
+| `app/routers/contact.py` | Resolve and validate the server; pass it on both send paths |
+| `src/pages/admin/AdminEnquiries.tsx` | Server fields, provider presets, provider-aware copy |
+
+---
+
 ## Verification
 
 - `tsc --noEmit` — no errors in any changed file.
@@ -1442,6 +1484,18 @@ and **Login Methods** from earlier sections. All admin routes are now covered.
   toggle the CTA between *Place Order · ₹total* and *Pay ₹total*, and Place Order posts
   `{items, payment_method:"cod", shipping_address}` and opens the success modal. No
   console or page errors.
+- SMTP resolution tested against a live session, 24 checks: a
+  `@vastraliya.com` sender resolves to `smtp.hostinger.com:465` with implicit TLS
+  and a real submission is sent through it, logging in as that mailbox with a
+  matching From; a `@gmail.com` sender still resolves to Gmail; an explicitly
+  typed host/port/STARTTLS overrides the guess and the test email uses it too;
+  ports 0, 70000 and -1 are refused without changing what's stored; and a row
+  whose columns are all NULL — what `schema_sync` leaves on an existing database —
+  resolves to a usable host, port and encryption mode rather than to nothing. In
+  the browser, the server fields prefill from what sending actually uses, the
+  Hostinger preset shows as active with its own password hint, picking Gmail
+  switches both host and hint, choosing STARTTLS moves the port to 587, and
+  saving PUTs all three values.
 - Enquiries tested at both levels. The real endpoints against a live SQLAlchemy
   session, 55 checks: a brand-new install with no credentials still keeps the
   enquiry and records *which* thing is missing; blank name, bad email and a short

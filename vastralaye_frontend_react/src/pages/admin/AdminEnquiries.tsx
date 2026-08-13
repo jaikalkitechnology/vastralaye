@@ -52,16 +52,33 @@ interface EmailConfig {
   sender_name: string;
   notify_email: string;
   notify_enabled: boolean;
+  smtp_host: string;
+  smtp_port: number | null;
+  smtp_ssl: boolean | null;
   app_password_masked: string;
   effective: {
     sender_email: string;
     sender_name: string;
     notify_email: string;
+    smtp_host: string;
+    smtp_port: number;
+    smtp_ssl: boolean;
     has_password: boolean;
     from_env: boolean;
   };
   updated_at: string | null;
 }
+
+/**
+ * One-click server settings. Getting host/port/encryption right by hand is
+ * where mail setups usually die, and the two that matter here are known.
+ */
+const PRESETS = [
+  { id: 'hostinger', label: 'Hostinger', host: 'smtp.hostinger.com', port: 465, ssl: true,
+    hint: 'Use the mailbox password you set in hPanel — Hostinger has no separate app password.' },
+  { id: 'gmail', label: 'Gmail', host: 'smtp.gmail.com', port: 465, ssl: true,
+    hint: 'Needs a Google app password (2-step verification on), not the account password.' },
+] as const;
 
 const formatDate = (value: string | null) => {
   if (!value) return '—';
@@ -97,6 +114,9 @@ const AdminEnquiries = () => {
     notify_email: '',
     app_password: '',
     notify_enabled: true,
+    smtp_host: '',
+    smtp_port: '' as string | number,
+    smtp_ssl: true,
   });
 
   const fetchRows = async (opts?: { search?: string; unreadOnly?: boolean }) => {
@@ -132,6 +152,11 @@ const AdminEnquiries = () => {
         notify_email: res.data.notify_email || '',
         app_password: '',
         notify_enabled: res.data.notify_enabled,
+        // Show what sending actually uses, so the fields never sit empty while
+        // mail works fine off a default the admin can't see.
+        smtp_host: res.data.smtp_host || res.data.effective?.smtp_host || '',
+        smtp_port: res.data.smtp_port ?? res.data.effective?.smtp_port ?? '',
+        smtp_ssl: res.data.smtp_ssl ?? res.data.effective?.smtp_ssl ?? true,
       });
     } catch {
       /* the list is the important half — don't shout about this one */
@@ -190,6 +215,9 @@ const AdminEnquiries = () => {
         sender_name: form.sender_name,
         notify_email: form.notify_email,
         notify_enabled: form.notify_enabled,
+        smtp_host: form.smtp_host,
+        smtp_port: form.smtp_port === '' ? null : Number(form.smtp_port),
+        smtp_ssl: form.smtp_ssl,
         // Blank means "keep the stored password" — the server treats it that way.
         ...(form.app_password ? { app_password: form.app_password } : {}),
       });
@@ -217,6 +245,7 @@ const AdminEnquiries = () => {
     }
   };
 
+  const activePreset = PRESETS.find((p) => p.host === form.smtp_host);
   const effectiveInbox = config?.effective?.notify_email || '';
   const canSend = Boolean(config?.effective?.sender_email && config?.effective?.has_password);
 
@@ -295,7 +324,7 @@ const AdminEnquiries = () => {
                 Email configuration
               </h2>
               <p className="mt-0.5 text-[12.5px] text-muted-foreground">
-                The Gmail account the shop sends from, and where enquiries are announced.
+                The mailbox the shop sends from, and where enquiries are announced.
               </p>
             </header>
 
@@ -329,32 +358,102 @@ const AdminEnquiries = () => {
 
               <div>
                 <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">
-                  Gmail account
+                  Email account
                 </label>
                 <Input
                   value={form.sender_email}
                   onChange={(e) => setForm((f) => ({ ...f, sender_email: e.target.value }))}
-                  placeholder="shop@gmail.com"
+                  placeholder="noreply@vastraliya.com"
                   className="text-[13px]"
                 />
+                <p className="mt-1.5 text-[12px] text-muted-foreground">
+                  The mailbox that sends. Most providers refuse mail whose From address
+                  isn't the account it logged in as.
+                </p>
               </div>
 
               <div>
                 <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">
-                  App password
+                  {activePreset?.id === 'gmail' ? 'App password' : 'Mailbox password'}
                 </label>
                 <Input
                   type="password"
                   value={form.app_password}
                   onChange={(e) => setForm((f) => ({ ...f, app_password: e.target.value }))}
-                  placeholder={config?.app_password_masked || 'Gmail app password'}
+                  placeholder={config?.app_password_masked || 'Mailbox password'}
                   autoComplete="new-password"
                   className="text-[13px]"
                 />
                 <p className="mt-1.5 text-[12px] text-muted-foreground">
-                  A Google <em>app password</em>, not the account password. Leave blank to keep the
-                  stored one.
+                  {activePreset?.hint || 'The mailbox password.'} Leave blank to keep the stored one.
                 </p>
+              </div>
+
+              {/* Mail server */}
+              <div className="md:col-span-2">
+                <div className="mb-2 flex flex-wrap items-center gap-2">
+                  <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">
+                    Mail server
+                  </span>
+                  {PRESETS.map((preset) => (
+                    <button
+                      key={preset.id}
+                      type="button"
+                      onClick={() =>
+                        setForm((f) => ({
+                          ...f,
+                          smtp_host: preset.host,
+                          smtp_port: preset.port,
+                          smtp_ssl: preset.ssl,
+                        }))
+                      }
+                      className={`rounded-full border px-3 py-1 text-[11.5px] transition-colors ${
+                        form.smtp_host === preset.host
+                          ? 'border-maroon bg-blush text-maroon'
+                          : 'border-border text-muted-foreground hover:border-gold hover:bg-ivory'
+                      }`}
+                    >
+                      {preset.label}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-[1fr_120px_150px]">
+                  <Input
+                    value={form.smtp_host}
+                    onChange={(e) => setForm((f) => ({ ...f, smtp_host: e.target.value }))}
+                    placeholder="smtp.hostinger.com"
+                    aria-label="SMTP host"
+                    className="text-[13px]"
+                  />
+                  <Input
+                    value={String(form.smtp_port)}
+                    inputMode="numeric"
+                    onChange={(e) =>
+                      setForm((f) => ({ ...f, smtp_port: e.target.value.replace(/\D/g, '') }))
+                    }
+                    placeholder="465"
+                    aria-label="SMTP port"
+                    className="text-[13px]"
+                  />
+                  <select
+                    value={form.smtp_ssl ? 'ssl' : 'starttls'}
+                    onChange={(e) =>
+                      setForm((f) => ({
+                        ...f,
+                        smtp_ssl: e.target.value === 'ssl',
+                        // The two go together; changing one without the other is
+                        // the single most common way this ends up not connecting.
+                        smtp_port: e.target.value === 'ssl' ? 465 : 587,
+                      }))
+                    }
+                    aria-label="Encryption"
+                    className="h-10 rounded-md border border-border bg-white px-3 text-[13px] text-espresso"
+                  >
+                    <option value="ssl">SSL · 465</option>
+                    <option value="starttls">STARTTLS · 587</option>
+                  </select>
+                </div>
               </div>
 
               <label className="flex cursor-pointer items-start gap-3 md:col-span-2">

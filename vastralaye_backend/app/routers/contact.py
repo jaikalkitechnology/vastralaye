@@ -18,7 +18,7 @@ from sqlalchemy.orm import Session
 
 from app.authentication import get_current_admin_user
 from app.database import get_db
-from app.mail import send_custom_email
+from app.mail import DEFAULT_SMTP_SSL, send_custom_email
 from app.models import User
 from app.models.contact import ContactMessage, EmailSetting
 
@@ -30,9 +30,12 @@ router = APIRouter(tags=["Contact"])
 
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
-# Where enquiries go until an admin sets something else.
+# Where enquiries go until an admin sets something else. This mailbox is
+# hosted at Hostinger, which is why the SMTP default below is theirs and not
+# Gmail's — sending *from* it against smtp.gmail.com simply fails to log in.
 DEFAULT_NOTIFY_EMAIL = "noreply@vastraliya.com"
 DEFAULT_SENDER_NAME = "Vastralaye"
+DEFAULT_SMTP_HOST = "smtp.hostinger.com"
 
 MAX_NAME = 120
 MAX_EMAIL = 160
@@ -47,6 +50,19 @@ def _settings_row(db: Session) -> Optional[EmailSetting]:
     return db.query(EmailSetting).order_by(EmailSetting.id).first()
 
 
+def _guess_host(sender: str) -> str:
+    """A sensible SMTP host for an address nobody has configured a server for.
+
+    Only a starting point for the form — the admin can always type their own.
+    Gmail addresses go to Gmail; everything else defaults to Hostinger, which
+    is where this store's own mailboxes live.
+    """
+    domain = (sender or "").rsplit("@", 1)[-1].lower()
+    if domain in {"gmail.com", "googlemail.com"}:
+        return "smtp.gmail.com"
+    return DEFAULT_SMTP_HOST
+
+
 def resolve_email_config(db: Session) -> dict:
     """The configuration actually used to send, DB first and `.env` behind it.
 
@@ -56,8 +72,18 @@ def resolve_email_config(db: Session) -> dict:
     row = _settings_row(db)
     env_sender = os.getenv("GMAIL_SENDER_EMAIL") or ""
     env_password = os.getenv("GMAIL_APP_PASSWORD") or ""
+    sender = (row.sender_email if row and row.sender_email else env_sender).strip()
+
+    host = (row.smtp_host if row and row.smtp_host else "").strip() or _guess_host(sender)
+    port = int(row.smtp_port) if row and row.smtp_port else None
+    ssl = row.smtp_ssl if row and row.smtp_ssl is not None else None
+    if ssl is None:
+        ssl = DEFAULT_SMTP_SSL if port is None else (port == 465)
+    if port is None:
+        port = 465 if ssl else 587
+
     return {
-        "sender_email": (row.sender_email if row and row.sender_email else env_sender).strip(),
+        "sender_email": sender,
         "app_password": (row.app_password if row and row.app_password else env_password).strip(),
         "sender_name": (row.sender_name if row and row.sender_name else DEFAULT_SENDER_NAME).strip(),
         "notify_email": (
@@ -65,6 +91,9 @@ def resolve_email_config(db: Session) -> dict:
             else os.getenv("CONTACT_NOTIFY_EMAIL") or DEFAULT_NOTIFY_EMAIL
         ).strip(),
         "notify_enabled": bool(row.notify_enabled) if row else True,
+        "smtp_host": host,
+        "smtp_port": port,
+        "smtp_ssl": bool(ssl),
     }
 
 
@@ -172,6 +201,9 @@ def _notify(config: dict, row: ContactMessage) -> tuple:
             sender_email=config["sender_email"],
             app_password=config["app_password"],
             sender_name=config["sender_name"],
+            smtp_host=config["smtp_host"],
+            smtp_port=config["smtp_port"],
+            smtp_ssl=config["smtp_ssl"],
             # So hitting Reply in the inbox answers the customer, not the shop.
             reply_to=row.email,
         )
@@ -283,6 +315,9 @@ class EmailConfigIn(BaseModel):
     sender_name: Optional[str] = None
     notify_email: Optional[str] = None
     notify_enabled: Optional[bool] = None
+    smtp_host: Optional[str] = None
+    smtp_port: Optional[int] = None
+    smtp_ssl: Optional[bool] = None
 
 
 def _config_out(db: Session) -> dict:
@@ -296,6 +331,9 @@ def _config_out(db: Session) -> dict:
         "sender_name": (row.sender_name if row else "") or "",
         "notify_email": (row.notify_email if row else "") or "",
         "notify_enabled": bool(row.notify_enabled) if row else True,
+        "smtp_host": (row.smtp_host if row else "") or "",
+        "smtp_port": row.smtp_port if row and row.smtp_port else None,
+        "smtp_ssl": row.smtp_ssl if row and row.smtp_ssl is not None else None,
         "app_password_masked": _mask(row.app_password) if row and row.app_password else "",
         # What sending actually uses right now, after the .env fallback. Without
         # this the page can look empty while mail is working fine from .env.
@@ -303,6 +341,9 @@ def _config_out(db: Session) -> dict:
             "sender_email": resolved["sender_email"],
             "sender_name": resolved["sender_name"],
             "notify_email": resolved["notify_email"],
+            "smtp_host": resolved["smtp_host"],
+            "smtp_port": resolved["smtp_port"],
+            "smtp_ssl": resolved["smtp_ssl"],
             "has_password": bool(resolved["app_password"]),
             "from_env": not bool(row and row.sender_email),
         },
@@ -331,6 +372,9 @@ def update_email_config(
         if len(value) > limit:
             raise HTTPException(status_code=400, detail=f"{field.replace('_', ' ')} is too long.")
 
+    if payload.smtp_port is not None and not (1 <= payload.smtp_port <= 65535):
+        raise HTTPException(status_code=400, detail="SMTP port must be between 1 and 65535.")
+
     row = _settings_row(db)
     if not row:
         row = EmailSetting()
@@ -344,6 +388,12 @@ def update_email_config(
         row.notify_email = payload.notify_email.strip() or None
     if payload.notify_enabled is not None:
         row.notify_enabled = bool(payload.notify_enabled)
+    if payload.smtp_host is not None:
+        row.smtp_host = payload.smtp_host.strip()[:160] or None
+    if payload.smtp_port is not None:
+        row.smtp_port = payload.smtp_port
+    if payload.smtp_ssl is not None:
+        row.smtp_ssl = bool(payload.smtp_ssl)
     # Blank keeps what's stored, so re-saving the form doesn't wipe the password
     # the admin can only ever see masked.
     if payload.app_password:
@@ -393,6 +443,9 @@ def send_test_email(
             sender_email=config["sender_email"],
             app_password=config["app_password"],
             sender_name=config["sender_name"],
+            smtp_host=config["smtp_host"],
+            smtp_port=config["smtp_port"],
+            smtp_ssl=config["smtp_ssl"],
         )
     except Exception as exc:  # noqa: BLE001 - the message is the whole point here
         raise HTTPException(status_code=400, detail=f"Could not send: {exc}")

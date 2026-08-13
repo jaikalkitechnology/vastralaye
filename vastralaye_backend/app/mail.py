@@ -22,6 +22,15 @@ load_dotenv()
 
 SENDER_EMAIL = os.getenv("GMAIL_SENDER_EMAIL")
 APP_PASSWORD = os.getenv("GMAIL_APP_PASSWORD")
+
+# The mail server, when nothing overrides it. Kept as env vars so a deployment
+# can point at its own provider without touching the database — and defaulting
+# to Gmail because that is what every existing caller was hard-coded to use.
+DEFAULT_SMTP_HOST = os.getenv("SMTP_HOST", "smtp.gmail.com")
+DEFAULT_SMTP_PORT = int(os.getenv("SMTP_PORT", "465"))
+DEFAULT_SMTP_SSL = os.getenv("SMTP_SSL", "true").strip().lower() != "false"
+# Without this a dead mail host hangs the request thread indefinitely.
+SMTP_TIMEOUT = int(os.getenv("SMTP_TIMEOUT", "20"))
 COMPANY_NAME = os.getenv("COMPANY_NAME", "Jokroup")
 SUPPORT_EMAIL = os.getenv("SUPPORT_EMAIL", "support@jokroup.com")
 
@@ -154,13 +163,24 @@ def send_custom_email(
     app_password: str = None,
     sender_name: str = None,
     reply_to: str = None,
+    smtp_host: str = None,
+    smtp_port: int = None,
+    smtp_ssl: bool = None,
 ):
-    """Send via Gmail SMTP, with the account passed in rather than read from .env.
+    """Send via SMTP, with the account and server passed in rather than read from .env.
 
     The module-level SENDER_EMAIL / APP_PASSWORD are resolved once at import,
     so they can't follow a setting an admin changes at runtime. Anything that
     needs the configured-in-the-dashboard account calls this and supplies it;
     `send_email` below stays as it was and delegates here.
+
+    The server is a parameter because the shop's mailbox is not necessarily
+    Gmail — a Hostinger address needs smtp.hostinger.com, and hard-coding
+    Gmail meant authentication simply failed for it.
+
+    `smtp_ssl` picks the connection style: True is implicit TLS on connect
+    (port 465), False is plain connect then STARTTLS (port 587). Both are
+    encrypted; providers differ on which port they publish.
 
     `reply_to` matters for forwarded mail: an enquiry announced to the shop's
     inbox should reply to the customer, not to the shop's own sender address.
@@ -168,6 +188,9 @@ def send_custom_email(
     sender = (sender_email or SENDER_EMAIL or "").strip()
     password = (app_password or APP_PASSWORD or "").strip()
     display = (sender_name or COMPANY_NAME or "").strip()
+    host = (smtp_host or DEFAULT_SMTP_HOST).strip()
+    port = int(smtp_port or DEFAULT_SMTP_PORT)
+    use_ssl = DEFAULT_SMTP_SSL if smtp_ssl is None else bool(smtp_ssl)
 
     if not sender or not password:
         logger.error("❌ No sender credentials — cannot email %s", to_email)
@@ -199,13 +222,19 @@ def send_custom_email(
     msg.add_alternative(html_content, subtype="html")
 
     try:
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
-            smtp.login(sender, password)
-            smtp.send_message(msg)
+        if use_ssl:
+            with smtplib.SMTP_SSL(host, port, timeout=SMTP_TIMEOUT) as smtp:
+                smtp.login(sender, password)
+                smtp.send_message(msg)
+        else:
+            with smtplib.SMTP(host, port, timeout=SMTP_TIMEOUT) as smtp:
+                smtp.starttls()
+                smtp.login(sender, password)
+                smtp.send_message(msg)
         logger.info(f"✅ Email sent successfully to {to_email} | Subject: {subject}")
         return True
     except Exception as e:
-        logger.error(f"❌ Email failed to send to {to_email}: {e}", exc_info=True)
+        logger.error(f"❌ Email failed to send to {to_email} via {host}:{port}: {e}", exc_info=True)
         return False
 
 
