@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import AdminLoading from '@/components/admin/AdminLoading';
+import AdminTopBarControl from '@/components/admin/AdminTopBarControl';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -547,6 +548,9 @@ const AdminCategories: React.FC = () => {
             <IoAdd className="mr-2 h-4 w-4" /> Add Category
           </Button>
         </div>
+
+        {/* Storefront top bar — text + on/off for the strip above the header */}
+        <AdminTopBarControl />
 
         {/* Search */}
         <div className="relative max-w-md">

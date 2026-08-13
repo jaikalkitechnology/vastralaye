@@ -43,7 +43,15 @@ SETTING_KEYS = [
     "whatsapp_number",
     "call_number",
     "float_enabled",
+    # Announcement strip above the header, edited from Admin › Categories.
+    "topbar_enabled",   # "true" / "false"
+    "topbar_text",
 ]
+
+# site_settings.value is VARCHAR(500); a longer strip would be silently
+# truncated by MySQL (or rejected in strict mode), so cut it here with a
+# message instead.
+MAX_SETTING_LEN = 500
 
 
 def _save_image(upload: UploadFile, directory: str, prefix: str) -> str:
@@ -468,6 +476,8 @@ class SettingsIn(BaseModel):
     whatsapp_number: Optional[str] = None
     call_number: Optional[str] = None
     float_enabled: Optional[str] = None  # "true" / "false"
+    topbar_enabled: Optional[str] = None  # "true" / "false"
+    topbar_text: Optional[str] = None
 
 
 def _settings_dict(db: Session) -> Dict[str, str]:
@@ -490,10 +500,16 @@ def update_settings(
         value = getattr(payload, key)
         if value is None:
             continue
+        value = value.strip()
+        if len(value) > MAX_SETTING_LEN:
+            raise HTTPException(
+                status_code=400,
+                detail=f"{key.replace('_', ' ')} is too long — {MAX_SETTING_LEN} characters maximum.",
+            )
         row = db.query(SiteSetting).filter(SiteSetting.key == key).first()
         if row:
-            row.value = value.strip()
+            row.value = value
         else:
-            db.add(SiteSetting(key=key, value=value.strip()))
+            db.add(SiteSetting(key=key, value=value))
     db.commit()
     return _settings_dict(db)
