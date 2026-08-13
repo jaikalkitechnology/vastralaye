@@ -1102,6 +1102,36 @@ new photo, and prefixing that would have broken it.
 
 ---
 
+## 34. Wishlist crashed on `normalize_images`
+
+`GET /users/wishlist` raised `NameError: name 'normalize_images' is not defined` —
+`app/crud/wishlist.py` called it but nothing in the codebase ever defined it. The whole
+wishlist endpoint was dead.
+
+Added `app/services/product_media.py::normalize_images` and imported it. It has to be
+tolerant, because the `images` column holds more than one shape:
+
+- `Product.images` is a hybrid property returning a **list**, but the same column is read
+  as a raw **comma-separated string** elsewhere (the Excel import, some admin queries);
+- rows written before that property existed still hold the raw string;
+- and a stray `None` or empty segment in either shape shouldn't matter.
+
+So it accepts list, tuple, string or `None`, strips blanks, and returns `[]` for anything
+unexpected rather than raising — a product with odd image data should render without its
+pictures, not 500 the whole wishlist.
+
+**Worth knowing:** `admin.py` carries **three** copies of a local `to_list` closure doing
+the same job. They're identical in behaviour to this helper and could collapse into it,
+but that's three edits in a 2,000-line router for no behavioural change, so it's flagged
+rather than done.
+
+| File | Change |
+|---|---|
+| `app/services/product_media.py` | New — `normalize_images` |
+| `app/crud/wishlist.py` | Import it |
+
+---
+
 ## Verification
 
 - `tsc --noEmit` — no errors in any changed file.
@@ -1112,6 +1142,13 @@ new photo, and prefixing that would have broken it.
   toggle the CTA between *Place Order · ₹total* and *Pay ₹total*, and Place Order posts
   `{items, payment_method:"cod", shipping_address}` and opens the success modal. No
   console or page errors.
+- Wishlist fix tested at both levels. `normalize_images` over ten shapes: hybrid list,
+  raw string, padded string, empty, NULL, empty list, list with blanks and `None`, only
+  separators, tuple, and an unexpected int — none raise. Then the real
+  `get_user_wishlist` against a live session: a normal product returns both images, a
+  NULL-images product returns `[]`, a legacy row holding `" x.jpg , , y.jpg "` returns
+  `["x.jpg", "y.jpg"]`, and a wishlist row whose product was deleted returns
+  `product: None` instead of crashing.
 - Avatar resolution tested on both sides. Server branch over seven stored shapes: a
   Google URL passes through, a local path gains the API origin with or without a leading
   slash, and empty/None/whitespace all fall back to the default. `mediaUrl` over seven
