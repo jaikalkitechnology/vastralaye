@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { api } from '@/api/api';
 import { mediaUrl } from '@/lib/media';
 import { PAISLEY_TILE } from '@/components/decor/patterns';
+import { readCache, writeCache } from '@/lib/persistentCache';
 
 /**
  * Full-width page banner for catalogue pages (All Products, All
@@ -110,11 +111,16 @@ export const overlayGradient = (color: string, strength: number): string => {
   )} 50%, ${hexToRgba(color, peak * 0.37)} 100%)`;
 };
 
-let cachedPageBanners: Record<string, PageBannerData> | null = null;
+const PAGE_BANNERS_CACHE = 'page-banners';
+
+/* Seeded from localStorage so a refresh paints the admin's banner straight
+   away instead of the fallback, then revalidates in the background. */
+let cachedPageBanners: Record<string, PageBannerData> | null =
+  readCache<Record<string, PageBannerData>>(PAGE_BANNERS_CACHE);
 let pageBannersInflight: Promise<Record<string, PageBannerData>> | null = null;
 
 export const fetchPageBanners = (): Promise<Record<string, PageBannerData>> => {
-  if (cachedPageBanners) return Promise.resolve(cachedPageBanners);
+  // A cached copy is a head start, not the answer — always revalidate once.
   if (!pageBannersInflight) {
     pageBannersInflight = (async () => {
       let map: Record<string, PageBannerData> = {};
@@ -129,6 +135,7 @@ export const fetchPageBanners = (): Promise<Record<string, PageBannerData>> => {
         /* banners are optional */
       }
       cachedPageBanners = map;
+      writeCache(PAGE_BANNERS_CACHE, map);
       return map;
     })();
   }

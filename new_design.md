@@ -1132,6 +1132,51 @@ rather than done.
 
 ---
 
+## 35. Refreshing the homepage flashed the built-in banner
+
+Every refresh painted the stock "Woven for the Festive Season" hero for a moment
+before the admin's banner replaced it. The banner state started at the hard-coded
+`fallbackSlides` and only became correct once `GET /fronted/banners` came back —
+so the built-in set was always on screen first, for as long as that request took.
+
+The obvious fix — start blank — swaps one problem for another: a white gap that
+collapses the page and jumps when the real hero arrives. What's wanted is neither
+default nor blank, but *the banner the admin set*, immediately.
+
+So the last resolved banners are kept in `localStorage` and used to seed state on
+mount. A refresh renders the admin's hero on the first paint; the fetch still runs
+and quietly corrects it if anything changed. Stale-while-revalidate, deliberately
+with **no TTL** — a cached copy is only ever on screen for the length of one
+request, and a briefly-outdated banner beats a visible swap.
+
+Three details that matter:
+
+- **Only a genuine first-ever visit has nothing to show.** That case renders a
+  hero-shaped skeleton in the brand gradient (`aria-busy="true"`) holding the exact
+  same footprint — not the stock slides, which would flash, and not nothing, which
+  would jump.
+- **The fallback is cached too**, so a store with no banners configured also skips
+  the placeholder on later visits.
+- **A failed request is not.** If the API is down the stock set is shown but never
+  written to the cache — a network error isn't evidence the store has no banners,
+  and persisting it would reintroduce the exact flash on the next refresh.
+
+The same seeding was applied to `fetchPageBanners`, so `/products`, `/categories`,
+`/new-arrivals` and `/best-sellers` stop flashing their hard-coded titles as well.
+
+The cache is versioned (`vastralaye:` prefix, `v: 1`); a shape change bumps the
+version so old entries are ignored rather than misread, and every read/write is
+wrapped — private mode, a full quota or hand-edited junk all degrade to a cold
+cache, never an error.
+
+| File | Change |
+|---|---|
+| `src/lib/persistentCache.ts` | New — versioned `readCache` / `writeCache` |
+| `src/components/HeroSection.tsx` | Seed slides from cache; skeleton on cold start; don't cache error fallbacks |
+| `src/components/PageBanner.tsx` | Seed `cachedPageBanners` from cache, revalidate once, write back |
+
+---
+
 ## Verification
 
 - `tsc --noEmit` — no errors in any changed file.
@@ -1142,6 +1187,14 @@ rather than done.
   toggle the CTA between *Place Order · ₹total* and *Pay ₹total*, and Place Order posts
   `{items, payment_method:"cod", shipping_address}` and opens the success modal. No
   console or page errors.
+- Banner refresh driven in a real browser against the production build, with
+  `/fronted/banners` deliberately delayed 900ms so any flash is unmissable. Cold
+  cache: skeleton → admin banner. Refresh: the admin banner and nothing else — no
+  stock slides, no white gap, no swap. Degraded paths checked too: cold start with
+  the API down still shows a hero and does *not* cache it, the admin banner returns
+  once the API recovers, and a second outage keeps the cached admin banner rather
+  than falling back to stock. `/categories` behaves the same — the hard-coded
+  "All Categories" title never appears on a refresh. No console or page errors.
 - Wishlist fix tested at both levels. `normalize_images` over ten shapes: hybrid list,
   raw string, padded string, empty, NULL, empty list, list with blanks and `None`, only
   separators, tuple, and an unexpected int — none raise. Then the real
