@@ -1346,6 +1346,36 @@ the copy doesn't make every refresh flash the old line before the new one.
 
 ---
 
+## 39. Contact form — "Message Type" removed
+
+The eight-button *Message Type* grid (General Inquiry, Complaint, Refund Complaint,
+Product Complaint, Payment, Delivery, Returns, Feedback) is gone, along with its
+"Please select a message type" validation. The form is now Name, Phone, Email,
+Message.
+
+**It wasn't only a field.** The choice also decided which inbox the message went
+to — `getRelevantEmail` fanned it out to `complaints@`, `refund@`, `sales@`,
+`support@`, `info@` or `contact@`. With no picker there's nothing to route on, so
+everything goes to `contact@mizorpaymart.in`, which is what the picker's own
+`default` branch already used. That's now a single `SUPPORT_EMAIL` constant
+instead of a switch over a type that no longer exists.
+
+The `message_type` parameter is no longer sent to EmailJS. **If the EmailJS
+template prints `{{message_type}}`, that line will now render empty** and should be
+removed from the template.
+
+Left alone deliberately: the page's *Contact Information* panel still lists the
+per-department addresses, so a customer who wants `refund@` directly can still see
+it. And the addresses themselves are still `@mizorpaymart.in` with a
+`to_name` of "Mizorpay Mart Support" — real inboxes that have to exist before
+anything is renamed, so that's a decision to make rather than a rename to apply.
+
+| File | Change |
+|---|---|
+| `src/pages/Contact.tsx` | Field, validation, `MessageType`, `messageTypes` and `getRelevantEmail` removed; one `SUPPORT_EMAIL` |
+
+---
+
 ## Verification
 
 - `tsc --noEmit` — no errors in any changed file.
@@ -1356,6 +1386,16 @@ the copy doesn't make every refresh flash the old line before the new one.
   toggle the CTA between *Place Order · ₹total* and *Pay ₹total*, and Place Order posts
   `{items, payment_method:"cod", shipping_address}` and opens the success modal. No
   console or page errors.
+- Contact form driven against the production build, 21 checks with the EmailJS
+  call intercepted to read the exact payload: no "Message Type" label, no type
+  buttons, no "Will be sent to" hint; Name / Phone / Email / Message all remain and
+  the form has exactly one button; an empty submit is still refused for the
+  remaining fields, never asks for a type, and sends nothing; and a complete
+  submission carries name, email, formatted phone and message, with **no**
+  `message_type` key, routed to `contact@mizorpaymart.in`, ending on the success
+  screen. No console errors. (First run of this test passed its early assertions
+  against a 404 — the route is `/contact-us`, not `/contact` — so the URL was
+  corrected and the suite re-run against the real page.)
 - Top bar tested on both sides. The settings endpoints against a live SQLAlchemy
   session, 15 checks: a fresh store has no keys and reads as on, text and switch
   round-trip through the public endpoint, switching off keeps the text for later,
