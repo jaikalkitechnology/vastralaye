@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session, joinedload
 from app import models, schemas
+from app.services.product_media import normalize_images
 
 
 
