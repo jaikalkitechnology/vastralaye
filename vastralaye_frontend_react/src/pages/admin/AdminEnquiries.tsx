@@ -42,6 +42,7 @@ interface Enquiry {
   message: string;
   is_read: boolean;
   emailed: boolean;
+  ack_sent: boolean;
   email_error: string | null;
   created_at: string | null;
   reply: string | null;
@@ -54,6 +55,7 @@ interface EmailConfig {
   sender_name: string;
   notify_email: string;
   notify_enabled: boolean;
+  ack_enabled: boolean;
   smtp_host: string;
   smtp_port: number | null;
   smtp_ssl: boolean | null;
@@ -65,6 +67,7 @@ interface EmailConfig {
     smtp_host: string;
     smtp_port: number;
     smtp_ssl: boolean;
+    ack_enabled: boolean;
     has_password: boolean;
     from_env: boolean;
   };
@@ -119,6 +122,7 @@ const AdminEnquiries = () => {
     notify_email: '',
     app_password: '',
     notify_enabled: true,
+    ack_enabled: true,
     smtp_host: '',
     smtp_port: '' as string | number,
     smtp_ssl: true,
@@ -157,6 +161,7 @@ const AdminEnquiries = () => {
         notify_email: res.data.notify_email || '',
         app_password: '',
         notify_enabled: res.data.notify_enabled,
+        ack_enabled: res.data.ack_enabled ?? true,
         // Show what sending actually uses, so the fields never sit empty while
         // mail works fine off a default the admin can't see.
         smtp_host: res.data.smtp_host || res.data.effective?.smtp_host || '',
@@ -221,6 +226,7 @@ const AdminEnquiries = () => {
         sender_name: form.sender_name,
         notify_email: form.notify_email,
         notify_enabled: form.notify_enabled,
+        ack_enabled: form.ack_enabled,
         smtp_host: form.smtp_host,
         smtp_port: form.smtp_port === '' ? null : Number(form.smtp_port),
         smtp_ssl: form.smtp_ssl,
@@ -506,6 +512,24 @@ const AdminEnquiries = () => {
                 </span>
               </label>
 
+              <label className="flex cursor-pointer items-start gap-3 md:col-span-2">
+                <input
+                  type="checkbox"
+                  checked={form.ack_enabled}
+                  onChange={(e) => setForm((f) => ({ ...f, ack_enabled: e.target.checked }))}
+                  className="mt-0.5 h-4 w-4 accent-[#7A1F2B]"
+                />
+                <span>
+                  <span className="block text-[13px] font-medium text-espresso">
+                    Send the customer a thank-you
+                  </span>
+                  <span className="block text-[12.5px] text-muted-foreground">
+                    A confirmation to whoever filled the form, saying we've got their message
+                    and will reply shortly, with a copy of what they wrote.
+                  </span>
+                </span>
+              </label>
+
               <div className="flex flex-wrap justify-end gap-2 border-t border-border pt-4 md:col-span-2">
                 <Button
                   variant="outline"
@@ -596,6 +620,14 @@ const AdminEnquiries = () => {
                         <MailCheck className="h-3 w-3" /> replied
                       </span>
                     )}
+                    {!row.ack_sent && (
+                      <span
+                        title="The sender did not get a thank-you confirmation"
+                        className="inline-flex items-center gap-1 rounded-full border border-border bg-ivory px-2 py-0.5 text-[11px] font-medium text-muted-foreground"
+                      >
+                        <MailWarning className="h-3 w-3" /> no thank-you
+                      </span>
+                    )}
                     {!row.emailed && (
                       <span
                         title={row.email_error || 'Not emailed'}
@@ -672,6 +704,13 @@ const AdminEnquiries = () => {
               <p className="whitespace-pre-wrap rounded-sm border border-border bg-ivory p-4 text-[13.5px] leading-relaxed text-espresso">
                 {open?.message}
               </p>
+
+              {open && open.ack_sent && (
+                <p className="flex items-start gap-2 text-[12.5px] text-muted-foreground">
+                  <MailCheck className="mt-0.5 h-3.5 w-3.5 shrink-0 text-maroon" />
+                  <span>{open.name.split(' ')[0]} was sent a thank-you confirmation.</span>
+                </p>
+              )}
 
               {open && !open.emailed && (
                 <p className="flex items-start gap-2 rounded-sm border border-[#B07C1F]/30 bg-[#B07C1F]/10 p-3 text-[12.5px] text-[#8A6414]">

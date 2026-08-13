@@ -1605,6 +1605,44 @@ copy, testimonials, the top-bar message.
 
 ---
 
+## 45. The thank-you email
+
+Filling in the Contact Us form now sends **two** emails: the shop's notification,
+and a confirmation to the person who filled it in — *"Thanks, Riya. We've got your
+message and someone will get back to you shortly."*
+
+It carries a copy of what they wrote. That's not decoration: it proves the form
+worked, and it means a follow-up from them lands in the same thread instead of
+arriving as a fresh enquiry nobody can match up.
+
+### The two emails are independent
+
+Different people, different failure modes, so they're tracked and switched
+separately:
+
+- `emailed` / `ack_sent` are separate columns. Either can fail alone, and the
+  admin list badges both — **not emailed** and **no thank-you**.
+- Two switches. An admin who works from the dashboard rather than their inbox can
+  turn off their own notification and still have customers acknowledged. Turning
+  one off never affects the other; there's a test for each direction.
+- Both are best-effort. A mail failure must never turn a successfully-received
+  enquiry into an error on the customer's screen — the row is already committed.
+
+`ack_enabled` is nullable and reads as **on** when NULL, because `schema_sync`
+lands new columns as NULL on an existing database; treating that as "off" would
+silently disable the feature on exactly the deployments that just upgraded.
+
+Reply-To is the notification inbox again, so a customer who answers the thank-you
+reaches a person rather than `noreply@`.
+
+| File | Change |
+|---|---|
+| `app/models/contact.py` | `ContactMessage.ack_sent`, `EmailSetting.ack_enabled` |
+| `app/routers/contact.py` | `_acknowledge`; second send in `submit_contact`; setting wired through |
+| `src/pages/admin/AdminEnquiries.tsx` | Thank-you switch, "no thank-you" badge, per-enquiry confirmation |
+
+---
+
 ## Verification
 
 - `tsc --noEmit` — no errors in any changed file.
@@ -1615,6 +1653,22 @@ copy, testimonials, the top-bar message.
   toggle the CTA between *Place Order · ₹total* and *Pay ₹total*, and Place Order posts
   `{items, payment_method:"cod", shipping_address}` and opens the success modal. No
   console or page errors.
+- Thank-you email tested with 35 checks against a live session: with no mail
+  account the enquiry still stores and nothing is attempted; a normal submission
+  sends exactly two emails, one to the shop and one to the sender, both flagged on
+  the row; the confirmation greets by first name only, promises a reply, quotes
+  their message, sets Reply-To to a monitored inbox and goes through the
+  configured server in the branded shell. Independence proved in both directions —
+  the shop's notification failing still thanks the customer, the thank-you failing
+  still notifies the shop, and both blowing up loses neither the enquiry nor the
+  flags. The switch stops only the thank-you, a NULL `ack_enabled` column reads as
+  on, and `<script>` in the message is escaped in the confirmation too. Rendered
+  and screenshotted at 760px and 380px with no overflow. 54 browser checks cover
+  the new switch, the "no thank-you" badge and the per-enquiry confirmation line.
+  (Adding this legitimately broke three older assertions — one submission now
+  sends two emails, and turning off the shop's notification no longer means
+  "nothing is sent". Those tests were rewritten to assert on recipients rather
+  than counts; a fourth failure was the rename leaving `"laye"` in a brand check.)
 - Rename verified as rendered output across 11 storefront pages, the dashboard and
   both emails: all 11 show the new name, none shows the old one (once the support
   mailbox — which is an address, not the brand — is excluded), the tab title and
