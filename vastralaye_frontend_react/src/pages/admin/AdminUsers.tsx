@@ -19,6 +19,8 @@ import {
   XCircle,
   RefreshCw,
   Eye,
+  EyeOff,
+  KeyRound,
   Power,
   Download,
   Users,
@@ -132,6 +134,12 @@ const AdminUsers = () => {
   const [savingEdit, setSavingEdit] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<User | null>(null);
   const [deleting, setDeleting] = useState(false);
+  /* Set-a-new-password dialog */
+  const [pwTarget, setPwTarget] = useState<User | null>(null);
+  const [pwValue, setPwValue] = useState('');
+  const [pwConfirm, setPwConfirm] = useState('');
+  const [pwVisible, setPwVisible] = useState(false);
+  const [savingPw, setSavingPw] = useState(false);
 
   // Stats (calculated from all users, not paginated)
   const [stats, setStats] = useState({
@@ -321,6 +329,85 @@ const AdminUsers = () => {
       toast.error(err?.response?.data?.detail || 'Could not update this user');
     } finally {
       setSavingEdit(false);
+    }
+  };
+
+  /* ---------------- Set a new password ---------------- */
+
+  /** Mirrors the server rule exactly (app/services/password_policy.py). */
+  const passwordProblem = (value: string): string | null => {
+    if (!value) return 'Enter a new password.';
+    if (value.length < 8) return 'Password must be at least 8 characters.';
+    if (!/[A-Za-z]/.test(value) || !/[0-9]/.test(value))
+      return 'Password must include both letters and numbers.';
+    return null;
+  };
+
+  const openPassword = (user: User) => {
+    setPwTarget(user);
+    setPwValue('');
+    setPwConfirm('');
+    setPwVisible(false);
+  };
+
+  const closePassword = () => {
+    setPwTarget(null);
+    // Don't leave the typed password sitting in state behind a closed dialog.
+    setPwValue('');
+    setPwConfirm('');
+    setPwVisible(false);
+  };
+
+  /** A password that passes the rule and is easy to read out over the phone. */
+  const suggestPassword = () => {
+    const words = ['Cotton', 'Indigo', 'Saree', 'Jasmine', 'Marigold', 'Banaras', 'Mulberry', 'Peacock'];
+    const pick = () => words[Math.floor(Math.random() * words.length)];
+    const generated = `${pick()}${pick()}${Math.floor(1000 + Math.random() * 9000)}`;
+    setPwValue(generated);
+    setPwConfirm(generated);
+    setPwVisible(true);
+  };
+
+  const savePassword = async () => {
+    if (!pwTarget) return;
+    const problem = passwordProblem(pwValue);
+    if (problem) {
+      toast.error(problem);
+      return;
+    }
+    if (pwValue !== pwConfirm) {
+      toast.error("The two passwords don't match.");
+      return;
+    }
+    setSavingPw(true);
+    try {
+      const res = await axios.put<{
+        first_password?: boolean;
+        reset_links_invalidated?: number;
+      }>(
+        `${BASE_URL}/admin/user/${pwTarget.id}/password`,
+        { new_password: pwValue },
+        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+      );
+      const { first_password, reset_links_invalidated = 0 } = res.data || {};
+      toast.success(
+        first_password
+          ? `${pwTarget.email} can now sign in with a password as well as Google`
+          : `New password set for ${pwTarget.email}`
+      );
+      if (reset_links_invalidated > 0) {
+        toast.success(
+          `${reset_links_invalidated} unused reset link${
+            reset_links_invalidated === 1 ? '' : 's'
+          } cancelled`
+        );
+      }
+      closePassword();
+    } catch (err: any) {
+      // The API explains refusals (own account, weak password…) — show it.
+      toast.error(err?.response?.data?.detail || 'Could not set the password');
+    } finally {
+      setSavingPw(false);
     }
   };
 
@@ -777,6 +864,14 @@ const AdminUsers = () => {
                             </button>
                             <button
                               type="button"
+                              title="Set a new password"
+                              className="w-7 h-7 border border-border rounded-[5px] inline-flex items-center justify-center text-muted-foreground bg-white hover:text-espresso hover:border-espresso transition-colors"
+                              onClick={() => openPassword(user)}
+                            >
+                              <KeyRound className="h-3.5 w-3.5" />
+                            </button>
+                            <button
+                              type="button"
                               title="Delete user"
                               className="w-7 h-7 border border-sale/40 rounded-[5px] inline-flex items-center justify-center text-sale bg-white hover:bg-sale hover:text-ivory transition-colors"
                               onClick={() => setDeleteTarget(user)}
@@ -1003,6 +1098,116 @@ const AdminUsers = () => {
                 </div>
               </div>
             )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Set a new password */}
+        <Dialog
+          open={Boolean(pwTarget)}
+          onOpenChange={(open) => {
+            if (!open && !savingPw) closePassword();
+          }}
+        >
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2.5 font-serif text-xl font-medium text-espresso">
+                <KeyRound className="h-4 w-4 text-maroon" />
+                Set a new password
+              </DialogTitle>
+            </DialogHeader>
+
+            <div className="space-y-4 pt-1">
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                For{' '}
+                <span className="font-medium text-espresso">
+                  {pwTarget?.first_name} {pwTarget?.last_name}
+                </span>{' '}
+                ({pwTarget?.email}). They'll sign in with this immediately — tell them what
+                it is, and ask them to change it from their profile.
+              </p>
+
+              <div>
+                <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">
+                  New password
+                </label>
+                <div className="relative">
+                  <Input
+                    type={pwVisible ? 'text' : 'password'}
+                    value={pwValue}
+                    onChange={(e) => setPwValue(e.target.value)}
+                    placeholder="At least 8 characters"
+                    autoComplete="new-password"
+                    className="pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setPwVisible((v) => !v)}
+                    title={pwVisible ? 'Hide password' : 'Show password'}
+                    aria-label={pwVisible ? 'Hide password' : 'Show password'}
+                    className="absolute inset-y-0 right-0 flex w-10 items-center justify-center text-muted-foreground transition-colors hover:text-espresso"
+                  >
+                    {pwVisible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">
+                  Confirm password
+                </label>
+                <Input
+                  type={pwVisible ? 'text' : 'password'}
+                  value={pwConfirm}
+                  onChange={(e) => setPwConfirm(e.target.value)}
+                  placeholder="Type it again"
+                  autoComplete="new-password"
+                />
+              </div>
+
+              {/* Live rule feedback — same rule the server applies. */}
+              <div className="flex items-start justify-between gap-3">
+                <p
+                  className={`text-[12.5px] leading-relaxed ${
+                    pwValue && passwordProblem(pwValue) ? 'text-sale' : 'text-muted-foreground'
+                  }`}
+                >
+                  {pwValue && passwordProblem(pwValue)
+                    ? passwordProblem(pwValue)
+                    : pwValue && pwConfirm && pwValue !== pwConfirm
+                      ? "The two passwords don't match."
+                      : 'At least 8 characters, with letters and numbers.'}
+                </p>
+                <button
+                  type="button"
+                  onClick={suggestPassword}
+                  className="shrink-0 text-[12.5px] font-medium text-maroon underline underline-offset-2 hover:text-terracotta"
+                >
+                  Suggest one
+                </button>
+              </div>
+
+              <p className="rounded-sm border border-border bg-ivory p-3 text-[12.5px] leading-relaxed text-muted-foreground">
+                Any password-reset link already sitting in their inbox stops working.
+                To change <span className="font-medium text-espresso">your own</span>{' '}
+                password, use your profile — it asks for your current one first.
+              </p>
+
+              <div className="flex justify-end gap-2 border-t border-border pt-4">
+                <Button variant="outline" disabled={savingPw} onClick={closePassword}>
+                  Cancel
+                </Button>
+                <Button
+                  className="bg-maroon text-ivory hover:bg-terracotta"
+                  disabled={
+                    savingPw || Boolean(passwordProblem(pwValue)) || pwValue !== pwConfirm
+                  }
+                  onClick={savePassword}
+                >
+                  {savingPw && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {savingPw ? 'Setting…' : 'Set password'}
+                </Button>
+              </div>
+            </div>
           </DialogContent>
         </Dialog>
 
