@@ -26,6 +26,10 @@ class ContactMessage(Base):
 
     is_read = Column(Boolean, default=False, nullable=False, index=True)
     emailed = Column(Boolean, default=False, nullable=False)
+    # Did the sender get their "thanks, we'll be in touch" acknowledgement?
+    # Separate from `emailed`, which is the shop's own notification — the two
+    # go to different people and either can fail on its own.
+    ack_sent = Column(Boolean, default=False, nullable=False)
 
     # The most recent reply sent from the dashboard. Only ever written after
     # the email actually left — an unsent reply is not a reply, and showing
@@ -71,6 +75,10 @@ class EmailSetting(Base):
     # credentials are still being sorted out, and it stops every submit
     # waiting on an SMTP timeout.
     notify_enabled = Column(Boolean, default=True, nullable=False)
+    # Send the customer a "thanks, we'll be in touch" confirmation. Nullable so
+    # a row added by schema_sync (which lands columns as NULL) can be read as
+    # "not decided" and fall back to the default rather than to off.
+    ack_enabled = Column(Boolean, nullable=True)
 
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
     updated_by = Column(Integer, nullable=True)

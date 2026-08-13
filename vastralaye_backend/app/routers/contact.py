@@ -92,6 +92,9 @@ def resolve_email_config(db: Session) -> dict:
             else os.getenv("CONTACT_NOTIFY_EMAIL") or DEFAULT_NOTIFY_EMAIL
         ).strip(),
         "notify_enabled": bool(row.notify_enabled) if row else True,
+        # NULL means "never decided" — a column schema_sync just added — so it
+        # falls back to on rather than silently switching acknowledgements off.
+        "ack_enabled": bool(row.ack_enabled) if row and row.ack_enabled is not None else True,
         "smtp_host": host,
         "smtp_port": port,
         "smtp_ssl": bool(ssl),
@@ -154,6 +157,14 @@ def submit_contact(payload: ContactIn, db: Session = Depends(get_db)):
         ok, error = _notify(config, row)
         row.emailed = ok
         row.email_error = None if ok else (error or "")[:255]
+
+    # Thank the sender. Independent of the shop's own notification: they go to
+    # different people, and the customer's confirmation is the one they'll
+    # notice missing. Also best-effort — a failure here must not turn a
+    # successfully-received enquiry into an error on their screen.
+    if config["ack_enabled"] and config["sender_email"] and config["app_password"]:
+        row.ack_sent = _acknowledge(config, row)
+
     db.commit()
 
     # Never leak whether the notification worked; that's the shop's problem.
@@ -220,6 +231,72 @@ def _notify(config: dict, row: ContactMessage) -> tuple:
         return (False, str(exc))
 
 
+def _acknowledge(config: dict, row: ContactMessage) -> bool:
+    """Send the sender a "thanks, we'll be in touch" confirmation.
+
+    Two things it is quietly doing beyond good manners: it proves to the
+    customer that the form worked, and it gives them a copy of what they wrote
+    — so a follow-up from them lands in the same thread rather than as a fresh
+    enquiry nobody can match up.
+    """
+    shop = config["sender_name"] or DEFAULT_SENDER_NAME
+    first_name = (row.name or "").split()[0] if (row.name or "").strip() else "there"
+
+    plain = (
+        f"Hi {first_name},\n\n"
+        f"Thanks for getting in touch with {shop}. We've got your message and "
+        "someone will get back to you shortly — usually within one business day.\n\n"
+        f"— {shop}\n\n"
+        "-------- what you sent us --------\n"
+        f"{row.message}"
+    )
+    html = T.render_email(
+        preheader=f"We've got your message — {shop} will reply shortly.",
+        blocks=[
+            T.heading(f"Thanks, {first_name}"),
+            T.paragraph(
+                f"We've got your message and someone from {shop} will get back to you "
+                "shortly — usually within one business day."
+            ),
+            T.paragraph(
+                "There's nothing you need to do. A copy of what you sent is below, "
+                "for your records.",
+                muted=True,
+                size=14,
+            ),
+            T.ornament(),
+            T.signoff(shop),
+            T.quote("What you sent us", row.message, meta=_pretty_date(row.created_at) or None),
+        ],
+        footer_lines=[
+            "Need to add something? Just reply to this email.",
+            f"{T.esc(shop)} &middot; Handcrafted ethnic wear, made in India",
+        ],
+    )
+
+    try:
+        return bool(
+            send_custom_email(
+                to_email=row.email,
+                subject=f"Thanks for getting in touch — {shop}",
+                plain_text=plain,
+                html_content=html,
+                sender_email=config["sender_email"],
+                app_password=config["app_password"],
+                sender_name=shop,
+                smtp_host=config["smtp_host"],
+                smtp_port=config["smtp_port"],
+                smtp_ssl=config["smtp_ssl"],
+                # The shop may send from noreply@; if they hit Reply, it has to
+                # reach the inbox a person actually reads.
+                reply_to=config["notify_email"] or config["sender_email"],
+            )
+        )
+    except Exception as exc:  # noqa: BLE001 - never break a received enquiry
+        logger.error("Acknowledgement to %s failed: %s", row.email, exc)
+        return False
+
+
 def _esc(value: str) -> str:
     """The enquiry is untrusted text going into an HTML email."""
     return T.esc(value)
@@ -244,6 +321,7 @@ def _message_out(row: ContactMessage) -> dict:
         "message": row.message,
         "is_read": bool(row.is_read),
         "emailed": bool(row.emailed),
+        "ack_sent": bool(row.ack_sent),
         "email_error": row.email_error,
         "created_at": row.created_at.isoformat() if row.created_at else None,
         "reply": row.reply,
@@ -441,6 +519,7 @@ class EmailConfigIn(BaseModel):
     sender_name: Optional[str] = None
     notify_email: Optional[str] = None
     notify_enabled: Optional[bool] = None
+    ack_enabled: Optional[bool] = None
     smtp_host: Optional[str] = None
     smtp_port: Optional[int] = None
     smtp_ssl: Optional[bool] = None
@@ -457,6 +536,7 @@ def _config_out(db: Session) -> dict:
         "sender_name": (row.sender_name if row else "") or "",
         "notify_email": (row.notify_email if row else "") or "",
         "notify_enabled": bool(row.notify_enabled) if row else True,
+        "ack_enabled": bool(row.ack_enabled) if row and row.ack_enabled is not None else True,
         "smtp_host": (row.smtp_host if row else "") or "",
         "smtp_port": row.smtp_port if row and row.smtp_port else None,
         "smtp_ssl": row.smtp_ssl if row and row.smtp_ssl is not None else None,
@@ -470,6 +550,7 @@ def _config_out(db: Session) -> dict:
             "smtp_host": resolved["smtp_host"],
             "smtp_port": resolved["smtp_port"],
             "smtp_ssl": resolved["smtp_ssl"],
+            "ack_enabled": resolved["ack_enabled"],
             "has_password": bool(resolved["app_password"]),
             "from_env": not bool(row and row.sender_email),
         },
@@ -514,6 +595,8 @@ def update_email_config(
         row.notify_email = payload.notify_email.strip() or None
     if payload.notify_enabled is not None:
         row.notify_enabled = bool(payload.notify_enabled)
+    if payload.ack_enabled is not None:
+        row.ack_enabled = bool(payload.ack_enabled)
     if payload.smtp_host is not None:
         row.smtp_host = payload.smtp_host.strip()[:160] or None
     if payload.smtp_port is not None:
