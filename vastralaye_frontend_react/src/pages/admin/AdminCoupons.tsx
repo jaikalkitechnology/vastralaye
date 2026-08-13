@@ -39,7 +39,7 @@ import {
 } from '@/components/ui/form';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
+import AdminLoading from '@/components/admin/AdminLoading';
 import {
   Pagination,
   PaginationContent,
@@ -922,13 +922,7 @@ const AdminCoupons = () => {
         <div className="bg-white border border-border rounded-md overflow-hidden">
           <div>
             {isLoading ? (
-              <div className="p-8 space-y-4">
-                {[...Array(5)].map((_, i) => (
-                  <div key={i} className="flex items-center space-x-4">
-                    <Skeleton className="h-12 flex-1 rounded-md" />
-                  </div>
-                ))}
-              </div>
+              <AdminLoading label="coupons" />
             ) : (
               <>
                 <div className="overflow-x-auto">

@@ -1,6 +1,7 @@
 // AdminProductsPage.tsx - Enhanced Design Version (Fixed Subcategory Issues)
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
+import AdminLoading from '@/components/admin/AdminLoading';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -961,11 +962,8 @@ export default function AdminProductsPage(): JSX.Element {
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center py-12">
-                      <div className="flex flex-col items-center gap-3">
-                        <RefreshCw className="h-8 w-8 animate-spin text-maroon" />
-                        <p className="text-[13px] text-muted-foreground font-medium">Loading products...</p>
-                      </div>
+                    <TableCell colSpan={7} className="p-0">
+                      <AdminLoading label="products" />
                     </TableCell>
                   </TableRow>
                 ) : products.length > 0 ? (

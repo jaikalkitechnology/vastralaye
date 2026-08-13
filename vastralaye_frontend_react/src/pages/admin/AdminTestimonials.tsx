@@ -4,6 +4,7 @@ import { mediaUrl } from '@/lib/media';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/use-toast';
 import { Quote, Star, Trash2, Pencil, RefreshCw, X, ImagePlus } from 'lucide-react';
+import AdminLoading from '@/components/admin/AdminLoading';
 
 interface TestimonialRow {
   id: number;
@@ -222,7 +223,7 @@ const AdminTestimonials = () => {
         {/* List */}
         <div>
           {loading ? (
-            <div className="text-sm text-muted-foreground py-10 text-center">Loading testimonials…</div>
+            <AdminLoading label="testimonials" compact />
           ) : items.length === 0 ? (
             <div className="border border-dashed border-border rounded-md bg-white text-center py-16 px-6">
               <Quote className="h-10 w-10 mx-auto text-muted-foreground mb-3" strokeWidth={1.2} />

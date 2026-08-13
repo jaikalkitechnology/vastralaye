@@ -34,6 +34,7 @@ import AccountSettingsPage from "@/pages/user/AccountSettingsPage";
 import Newarrival from "@/components/user/Newarrival";
 import BestSellers from "@/components/user/BestSeller";
 import AdminLayout from "@/components/admin/AdminLayout";
+import AdminLoading from "@/components/admin/AdminLoading";
 
 /* Admin pages are code-split — they load only when an admin visits /admin/* */
 const AdminDashboard = lazy(() => import("@/pages/admin/AdminDashboard"));
@@ -78,9 +79,25 @@ const AppContent = () => {
 
   return (
     <>
-      {state.loading && <GlobalLoader />}
+      {/* The storefront's boot veil. The dashboard is deliberately exempt: it
+          renders its shell straight away and shows AdminLoading inside the one
+          panel that's waiting, instead of covering the screen. */}
+      {state.loading && !isAdminRoute && <GlobalLoader />}
 
-      <Suspense fallback={<GlobalLoader />}>
+      {/* App-wide fallback for the storefront's code-split pages. Admin pages
+          have their own boundary inside <AdminLayout>, which catches them
+          first and leaves the sidebar and topbar on screen. */}
+      <Suspense
+        fallback={
+          isAdminRoute ? (
+            <div className="flex min-h-screen items-center justify-center bg-[#F7F4EF]">
+              <AdminLoading />
+            </div>
+          ) : (
+            <GlobalLoader />
+          )
+        }
+      >
       <Routes>
         {/* 🔥 YOUR EXISTING ROUTES — UNCHANGED */}
         <Route path="/admin" element={<AdminLayout><AdminDashboard /></AdminLayout>} />

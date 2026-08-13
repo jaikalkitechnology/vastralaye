@@ -51,6 +51,15 @@ interface StoreState {
   currentUser: User | null;
   isLoggedIn: boolean;
   isAdmin: boolean;
+  /**
+   * Has the stored token actually been checked against the API yet?
+   *
+   * Until this is true, `isLoggedIn: false` only means "not known yet" — it is
+   * NOT evidence of a logged-out visitor. Guards that redirect on it will bounce
+   * a legitimate refresh straight to /login, which is exactly what used to
+   * happen on every admin page reload.
+   */
+  authChecked: boolean;
   searchQuery: string;
   users: User[];
   coupons: Coupon[];
@@ -82,16 +91,43 @@ type StoreAction =
   | { type: 'RESET_FILTERS' }
   | { type: 'SET_COUPONS'; payload: Coupon[] }
   | { type: 'SET_WISHLIST'; payload: WishlistItem[] }
+  | { type: 'SET_AUTH_CHECKED' }
   | { type: 'SET_ADMIN_STATUS'; payload: boolean };
+
+/**
+ * Last known session, read straight out of localStorage.
+ *
+ * Restoring it synchronously is what lets a refresh land back on the page you
+ * were on: the admin shell can render on the very first paint instead of
+ * waiting a round-trip with nothing but `isLoggedIn: false` to go on. The
+ * token is still validated against the API a moment later, and a bad one is
+ * cleared — this only decides what's on screen while that's in flight.
+ */
+const restoreSession = (): { user: User | null; isAdmin: boolean } => {
+  try {
+    if (!localStorage.getItem('token')) return { user: null, isAdmin: false };
+    const raw = localStorage.getItem('currentUser');
+    return {
+      user: raw ? (JSON.parse(raw) as User) : null,
+      isAdmin: localStorage.getItem('isAdmin') === 'true',
+    };
+  } catch {
+    // Private mode or hand-edited junk — fall back to a cold start.
+    return { user: null, isAdmin: false };
+  }
+};
+
+const restored = restoreSession();
 
 const initialState: StoreState = {
   products: [],
   filteredProducts: [],
   cart: [],
   wishlist: [],
-  currentUser: null,
-  isLoggedIn: false,
-  isAdmin: false,
+  currentUser: restored.user,
+  isLoggedIn: restored.user !== null,
+  isAdmin: restored.isAdmin,
+  authChecked: false,
   searchQuery: '',
   users: [],
   coupons: [],
@@ -141,6 +177,9 @@ const storeReducer = (state: StoreState, action: StoreAction): StoreState => {
 
     case 'SET_ADMIN_STATUS':
       return { ...state, isAdmin: action.payload };
+
+    case 'SET_AUTH_CHECKED':
+      return { ...state, authChecked: true };
 
     case 'SET_COUPONS':
       return { ...state, coupons: action.payload };
@@ -331,48 +370,30 @@ useEffect(() => {
     try {
       dispatch({ type: 'SET_LOADING_STATE', payload: true });
 
-      // Fetch public data
-      const [productsData, couponsData] = await Promise.all([
-        productsPublic().catch(e => {
-          console.error('Failed to fetch products:', e);
-          return [];
-        }),
-        couponsPublic().catch(e => {
-          // console.error('Failed to fetch coupons:', e);
-          return [];
-        })
-      ]);
-
-      dispatch({ type: 'SET_PRODUCTS', payload: productsData });
-      dispatch({ type: 'SET_FILTERED_PRODUCTS', payload: productsData });
-      dispatch({ type: 'SET_COUPONS', payload: couponsData });
-
-      // Check for existing token and validate user
+      /* Validate the stored token first and in its own task. Route guards are
+         blocked on this answer, so it must not queue behind the catalogue —
+         and it must be marked checked the moment it settles, either way. */
       const token = localStorage.getItem('token');
       const isAdmin = localStorage.getItem('isAdmin') === 'true';
       let isLoggedInNow = false;
 
-      if (token) {
+      const session = (async () => {
+        if (!token) {
+          // No token is a definite answer: this visitor is logged out.
+          dispatch({ type: 'SET_CURRENT_USER', payload: null });
+          dispatch({ type: 'SET_ADMIN_STATUS', payload: false });
+          dispatch({ type: 'SET_AUTH_CHECKED' });
+          return;
+        }
         try {
           axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
-          let userData;
-          if (isAdmin) {
-            userData = await adminMe();
-            dispatch({ type: 'SET_ADMIN_STATUS', payload: true });
-          } else {
-            userData = await getUserMe();
-            dispatch({ type: 'SET_ADMIN_STATUS', payload: false });
-          }
-
+          const userData = isAdmin ? await adminMe() : await getUserMe();
+          dispatch({ type: 'SET_ADMIN_STATUS', payload: isAdmin });
           dispatch({ type: 'SET_CURRENT_USER', payload: userData });
           saveToStorage('currentUser', userData);
 
           isLoggedInNow = true;
-
-          // Sync wishlist for logged-in users
-          await syncWishlistFromServer();
-
         } catch (err) {
           console.error('Token validation failed:', err);
 
@@ -384,7 +405,30 @@ useEffect(() => {
           delete axios.defaults.headers.common['Authorization'];
 
           isLoggedInNow = false;
+        } finally {
+          dispatch({ type: 'SET_AUTH_CHECKED' });
         }
+      })();
+
+      // Fetch public data alongside it
+      const [productsData, couponsData] = await Promise.all([
+        productsPublic().catch(e => {
+          console.error('Failed to fetch products:', e);
+          return [];
+        }),
+        couponsPublic().catch(e => {
+          // console.error('Failed to fetch coupons:', e);
+          return [];
+        }),
+        session,
+      ]);
+
+      dispatch({ type: 'SET_PRODUCTS', payload: productsData });
+      dispatch({ type: 'SET_FILTERED_PRODUCTS', payload: productsData });
+      dispatch({ type: 'SET_COUPONS', payload: couponsData });
+
+      if (isLoggedInNow) {
+        await syncWishlistFromServer();
       }
 
       // Load local cart & wishlist
@@ -406,6 +450,10 @@ useEffect(() => {
       toast.error('Failed to initialize application data');
 
     } finally {
+      // Belt and braces: a guard waiting on this must never hang, whatever
+      // else went wrong above. Setting it twice is a no-op.
+      dispatch({ type: 'SET_AUTH_CHECKED' });
+
       const elapsed = Date.now() - start;
       const MIN_LOADING_TIME = 800; // ✅ recommended
 

@@ -1177,6 +1177,71 @@ cache, never an error.
 
 ---
 
+## 36. Admin dashboard — refresh, page loads, and one loading state
+
+Three complaints, one shell. All three came from the dashboard treating every
+page load as if it were a cold start.
+
+### Refreshing bounced you out to the login page
+
+The store begins every page load at `isLoggedIn: false`, and `AdminLayout`'s guard
+redirected on it. Nothing was wrong with the session — the guard just ran before
+anyone had checked. On a refresh it fired on the very first render and you were on
+`/login` before `GET /admin/me` had even been sent.
+
+Two changes make the difference between *logged out* and *not yet known* explicit:
+
+- `authChecked` in the store, set the moment the token check settles either way.
+  The guard now waits for it. `isLoggedIn: false` on its own no longer redirects
+  anybody.
+- The last session is restored synchronously from `localStorage` on startup, so
+  the shell renders on the first paint instead of after a round-trip.
+
+The token check also used to queue behind the catalogue fetch — the thing route
+guards were waiting on ran *after* two unrelated requests. It now runs in its own
+task alongside them.
+
+**The seeded session decides the first paint, not access.** A hand-edited
+`localStorage` gets the shell for one round-trip and nothing else: the server's
+answer overwrites the seed, the guard evicts them, and every admin endpoint 403s
+on its own authorisation the whole time. Verified below, both ways of forging it.
+
+### Clicking a page reloaded the whole dashboard
+
+`App.tsx` wrapped all routes in one `<Suspense fallback={<GlobalLoader />}>`. Admin
+pages are code-split, so opening any of them suspended that boundary and replaced
+the **entire screen** — sidebar, topbar and all — with a full-screen veil, for what
+was really just one panel changing.
+
+The boundary now lives inside `AdminLayout`'s `<main>`, where it catches the lazy
+page first and leaves the frame alone. The storefront keeps the app-wide one.
+`GlobalLoader`'s boot veil is skipped on `/admin/*` for the same reason.
+
+### Every page had its own loading state
+
+Users and Orders drew grey skeleton rows, Coupons drew different grey bars,
+Categories a bordered spinner, Products a spinning refresh icon, Reviews the
+Categories spinner at a different size, Dashboard and Analytics pulsing empty
+cards, and Banners, Reels, Testimonials and Payments a bare line of text. Twelve
+pages, seven treatments — the dashboard looked like several different products
+depending on which tab you opened.
+
+`AdminLoading` is now the only one, and it is also the Suspense fallback, so the
+mark that appears while a page's code downloads is the same one that appears while
+its data loads. Two sizes (`compact` for table cells and small panels), one
+ornament, one line of copy.
+
+| File | Change |
+|---|---|
+| `src/components/admin/AdminLoading.tsx` | New — the dashboard's one loading state |
+| `src/components/admin/AdminLayout.tsx` | Guard waits for `authChecked`; `<Suspense>` scoped to `<main>` |
+| `src/contexts/StoreContext.tsx` | `authChecked` flag; restore session from `localStorage`; token check no longer queues behind the catalogue |
+| `src/App.tsx` | Boot veil and app-wide fallback skip `/admin/*` |
+| 12 × `src/pages/admin/*.tsx` | Bespoke loaders replaced with `AdminLoading` |
+| `src/pages/admin/AdminUsers.tsx` | `fetchStats` fallback no longer throws uncaught when it also fails |
+
+---
+
 ## Verification
 
 - `tsc --noEmit` — no errors in any changed file.
@@ -1187,6 +1252,23 @@ cache, never an error.
   toggle the CTA between *Place Order · ₹total* and *Pay ₹total*, and Place Order posts
   `{items, payment_method:"cod", shipping_address}` and opens the success modal. No
   console or page errors.
+- Admin shell driven in a real browser against the production build, with the
+  session endpoint and every list endpoint stubbed slow so each transient state is
+  observable. Refreshing on `/admin/users` stays on `/admin/users` and never
+  touches `/login`; the sidebar's 15 links are present in every sampled frame of a
+  page-to-page navigation, with no full-screen veil and the panel loader in its
+  place; and all 12 admin pages resolve to the same `AdminLoading` ornament
+  (identical class string) with the same copy. No console or page errors.
+- Admin guard re-checked against five sessions after the change, since the shell
+  now paints before the server answers: a valid admin gets in and stays; no token
+  goes to `/login`; a shopper and an expired admin token are both evicted with the
+  stale token cleared. Forging `role: "admin"` into `localStorage` — with the
+  `isAdmin` flag both off and on — gets the shell for one round-trip (~450ms) and
+  is then overwritten by the server's answer and evicted to `/login`, with every
+  admin endpoint returning 403 throughout. That last case surfaced a real
+  pre-existing bug: `fetchStats`'s fallback retried with no error handling of its
+  own, so a 401 on both calls threw out of the component uncaught. Fixed, and the
+  uncaught error is gone from the re-run.
 - Banner refresh driven in a real browser against the production build, with
   `/fronted/banners` deliberately delayed 900ms so any flash is unmissable. Cold
   cache: skeleton → admin banner. Refresh: the admin banner and nothing else — no

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
+import AdminLoading from '@/components/admin/AdminLoading';
 import { BASE_URL } from "@/config";
 import axios from "axios";
 import { toast } from "react-hot-toast";
@@ -964,17 +965,7 @@ export default function Reviews() {
   if (loading) {
     return (
       <AdminLayout>
-        <div className="p-6">
-          <div className="flex justify-center items-center py-32">
-            <div className="text-center">
-              <div className="w-12 h-12 border-2 border-sand border-t-maroon rounded-full animate-spin mx-auto"></div>
-              <p className="text-espresso mt-6 text-[13px] font-medium">
-                Loading reviews...
-              </p>
-              <p className="text-muted-foreground text-xs mt-2">Please wait a moment</p>
-            </div>
-          </div>
-        </div>
+        <AdminLoading label="reviews" />
       </AdminLayout>
     );
   }

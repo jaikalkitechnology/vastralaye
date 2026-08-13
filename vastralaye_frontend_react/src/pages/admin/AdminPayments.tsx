@@ -11,6 +11,7 @@ import {
   RefreshCw,
   ShieldCheck,
 } from 'lucide-react';
+import AdminLoading from '@/components/admin/AdminLoading';
 
 /**
  * Admin › Payment Integration — gateway credentials, the webhook URL the
@@ -408,7 +409,7 @@ const AdminPayments = () => {
           </div>
 
           {loading ? (
-            <div className="py-14 text-center text-sm text-muted-foreground">Loading…</div>
+            <AdminLoading compact />
           ) : rows.length === 0 ? (
             <div className="py-14 text-center text-sm text-muted-foreground">
               No online payments yet.

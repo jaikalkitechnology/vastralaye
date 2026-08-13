@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
+import AdminLoading from '@/components/admin/AdminLoading';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -560,10 +561,8 @@ const AdminCategories: React.FC = () => {
 
         {/* Categories Grid */}
         {loading ? (
-          <div className="bg-white border border-border rounded-md p-16 text-center">
-            <div className="w-10 h-10 border-2 border-sand border-t-maroon rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-[13px] font-medium text-espresso">Loading categories...</p>
-            <p className="text-xs text-muted-foreground mt-1">Please wait a moment</p>
+          <div className="bg-white border border-border rounded-md">
+            <AdminLoading label="categories" />
           </div>
         ) : filteredCategories.length === 0 ? (
           <div className="bg-white border border-border rounded-md p-16 text-center">

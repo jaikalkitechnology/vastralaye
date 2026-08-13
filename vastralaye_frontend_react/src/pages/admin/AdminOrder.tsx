@@ -47,7 +47,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Skeleton } from "@/components/ui/skeleton";
+import AdminLoading from '@/components/admin/AdminLoading';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Dialog,
@@ -862,24 +862,6 @@ export default function AdminOrders() {
     }
   };
 
-  /* ================= SKELETON ================= */
-
-  const SkeletonLoader = () => (
-    <div className="bg-white border border-border rounded-md overflow-hidden">
-      {[...Array(6)].map((_, i) => (
-        <div key={i} className="flex items-center gap-4 px-3 py-3 border-b border-border last:border-b-0">
-          <Skeleton className="h-8 w-8 rounded-full" />
-          <div className="flex-1">
-            <Skeleton className="h-4 w-40 mb-2" />
-            <Skeleton className="h-3 w-28" />
-          </div>
-          <Skeleton className="h-5 w-20 rounded-full" />
-          <Skeleton className="h-5 w-16 rounded-full" />
-        </div>
-      ))}
-    </div>
-  );
-
   /* ================= RENDER ================= */
 
   return (
@@ -988,7 +970,9 @@ export default function AdminOrders() {
 
         {/* ===================== ORDERS LIST ===================== */}
         {loading ? (
-          <SkeletonLoader />
+          <div className="bg-white border border-border rounded-md">
+            <AdminLoading label="orders" />
+          </div>
         ) : error ? (
           <div className="bg-white border border-border rounded-md p-16 text-center">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-sale/10 mb-6">

@@ -1,8 +1,9 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, Suspense, useContext, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useStore } from '@/contexts/StoreContext';
 import AdminSidebar from './AdminSidebar';
 import AdminTopbar from './AdminTopbar';
+import AdminLoading from './AdminLoading';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -20,7 +21,9 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { state } = useStore();
-  const { isLoggedIn, currentUser } = state;
+  const { isLoggedIn, currentUser, authChecked } = state;
+
+  const isAdmin = isLoggedIn && currentUser?.role === 'admin';
 
   /* Mobile/tablet sidebar drawer (static rail on lg+) */
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -32,19 +35,29 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
 
   useEffect(() => {
     if (insideShell) return;
-    if (isLoggedIn === false || (currentUser && currentUser.role !== 'admin')) {
-      navigate('/login');
+    /* Wait for the session check. Before it lands, "not logged in" only means
+       "not known yet" — the store starts every page load that way. Redirecting
+       on it is what bounced every admin refresh out to /login. */
+    if (!authChecked) return;
+    if (!isAdmin) {
+      navigate('/login', { replace: true });
     }
-  }, [insideShell, isLoggedIn, currentUser, navigate]);
+  }, [insideShell, authChecked, isAdmin, navigate]);
 
   // Nested usage: the outer shell already renders the frame.
   if (insideShell) {
     return <>{children}</>;
   }
 
-  // If not logged in or not admin, the useEffect above redirects.
-  if (!isLoggedIn || currentUser?.role !== 'admin') {
-    return null;
+  if (!isAdmin) {
+    /* Checked and genuinely not an admin — the effect above is redirecting.
+       Still checking, with no remembered session to go on — hold the ground
+       with the dashboard's own loader rather than a flash of nothing. */
+    return authChecked ? null : (
+      <div className="flex min-h-screen items-center justify-center bg-[#F7F4EF]">
+        <AdminLoading />
+      </div>
+    );
   }
 
   return (
@@ -55,7 +68,12 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
         <div className="flex min-h-screen flex-col lg:ml-60">
           <AdminTopbar onMenuClick={() => setSidebarOpen(true)} />
           <main className="mx-auto w-full max-w-[1400px] flex-1 p-4 sm:p-6 lg:p-8">
-            {children}
+            {/* Scoped to the canvas on purpose. Admin pages are code-split, and
+                the app-wide boundary in App.tsx would blank the sidebar and
+                topbar too while the next page's chunk downloads — the whole
+                dashboard flashing for what is really just this panel changing.
+                Catching it here keeps the frame on screen and swaps the panel. */}
+            <Suspense fallback={<AdminLoading />}>{children}</Suspense>
           </main>
         </div>
       </div>
