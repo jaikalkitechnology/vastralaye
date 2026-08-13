@@ -21,6 +21,7 @@ from app.database import get_db
 from app.mail import DEFAULT_SMTP_SSL, send_custom_email
 from app.models import User
 from app.models.contact import ContactMessage, EmailSetting
+from app.services import email_template as T
 
 import logging
 
@@ -182,15 +183,21 @@ def _notify(config: dict, row: ContactMessage) -> tuple:
         row.message,
     ]
     plain = "\n".join(lines)
-    html = (
-        '<div style="font-family:Segoe UI,Arial,sans-serif;color:#2B1B12">'
-        f'<h2 style="color:#7A1F2B;margin:0 0 16px">New enquiry from {_esc(row.name)}</h2>'
-        '<table cellpadding="6" style="border-collapse:collapse;font-size:14px">'
-        f'<tr><td><b>Email</b></td><td><a href="mailto:{_esc(row.email)}">{_esc(row.email)}</a></td></tr>'
-        f'<tr><td><b>Phone</b></td><td>{_esc(row.phone or "—")}</td></tr>'
-        '</table>'
-        f'<p style="white-space:pre-wrap;margin-top:16px">{_esc(row.message)}</p>'
-        '</div>'
+    html = T.render_email(
+        preheader=f"{row.name} · {row.message[:90]}",
+        blocks=[
+            T.heading(f"New enquiry from {row.name}"),
+            T.details([
+                ("Email", T.mailto(row.email)),
+                ("Phone", T.esc(row.phone) if row.phone else "&mdash;"),
+                ("Sent", T.esc(_pretty_date(row.created_at)) or "just now"),
+            ]),
+            T.quote("Message", row.message),
+        ],
+        footer_lines=[
+            "Reply to this email to answer them directly, "
+            "or open Admin &rsaquo; Enquiries to reply from the dashboard.",
+        ],
     )
     try:
         ok = send_custom_email(
@@ -215,11 +222,15 @@ def _notify(config: dict, row: ContactMessage) -> tuple:
 
 def _esc(value: str) -> str:
     """The enquiry is untrusted text going into an HTML email."""
-    return (
-        (value or "")
-        .replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
-        .replace('"', "&quot;")
-    )
+    return T.esc(value)
+
+
+def _pretty_date(value) -> str:
+    """'13 Aug 2026, 11:59' — or empty, for a row that predates timestamps."""
+    try:
+        return value.strftime("%d %b %Y, %H:%M") if value else ""
+    except Exception:  # noqa: BLE001 - a date is decoration, never a failure
+        return ""
 
 
 # ------------------------------------------------------------------- admin --
@@ -339,22 +350,37 @@ def reply_to_enquiry(
     shop = config["sender_name"] or DEFAULT_SENDER_NAME
     subject = f"Re: your message to {shop}"
 
+    # "Hi Riya," reads like a person; "Hi Riya Sharma," reads like a mail merge.
+    first_name = (row.name or "").split()[0] if (row.name or "").strip() else "there"
+
     plain = (
-        f"Hi {row.name},\n\n"
+        f"Hi {first_name},\n\n"
         f"{body}\n\n"
         f"— {shop}\n\n"
         "-------- your original message --------\n"
         f"{row.message}"
     )
-    html = (
-        '<div style="font-family:Segoe UI,Arial,sans-serif;color:#2B1B12;line-height:1.6">'
-        f"<p>Hi {_esc(row.name)},</p>"
-        f'<p style="white-space:pre-wrap">{_esc(body)}</p>'
-        f'<p style="color:#7A1F2B;margin-top:24px">— {_esc(shop)}</p>'
-        '<hr style="border:none;border-top:1px solid #EFE7DB;margin:24px 0">'
-        '<p style="font-size:12px;color:#8a7a6d;margin-bottom:6px">Your original message:</p>'
-        f'<p style="font-size:13px;color:#8a7a6d;white-space:pre-wrap">{_esc(row.message)}</p>'
-        "</div>"
+
+    sent_on = _pretty_date(row.created_at)
+    html = T.render_email(
+        # The inbox preview line. Left to the client it would read "Hi Riya,",
+        # which says nothing about why they should open it.
+        preheader=f"{shop} has replied to your message",
+        blocks=[
+            T.heading(f"Hi {first_name},"),
+            T.paragraph(body),
+            T.ornament(),
+            T.signoff(shop),
+            T.quote(
+                "Your message",
+                row.message,
+                meta=f"sent {sent_on}" if sent_on else None,
+            ),
+        ],
+        footer_lines=[
+            "Just reply to this email if you need anything else.",
+            f"{T.esc(shop)} &middot; Handcrafted ethnic wear, made in India",
+        ],
     )
 
     try:
