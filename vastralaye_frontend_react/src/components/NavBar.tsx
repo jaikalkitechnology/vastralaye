@@ -32,9 +32,34 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { listCategories } from "@/api/apihelper";
+import { useSiteSettings } from "@/hooks/use-site-settings";
+
+/** What the strip says until an admin changes it. */
+export const DEFAULT_TOP_BAR_TEXT =
+  "Free shipping on orders above ₹999 · *Easy 7-day returns* · Handcrafted in India";
+
+/**
+ * Render the strip, picking out *starred* phrases in gold.
+ *
+ * The line it replaced had one phrase highlighted, and losing that flattened
+ * the whole bar — but the admin types into a plain text box, and rendering
+ * their HTML would be an injection hole for the sake of one colour. Stars are
+ * the whole vocabulary, and they become spans, never markup.
+ */
+export const renderTopBar = (text: string): React.ReactNode[] =>
+  text.split(/(\*[^*]+\*)/g).filter(Boolean).map((part, i) =>
+    part.startsWith("*") && part.endsWith("*") && part.length > 2 ? (
+      <span key={i} className="text-gold font-semibold">
+        {part.slice(1, -1)}
+      </span>
+    ) : (
+      <React.Fragment key={i}>{part}</React.Fragment>
+    )
+  );
 
 const NavBar = () => {
   const { state, dispatch, logout } = useStore();
+  const settings = useSiteSettings();
   const { cart = [], isLoggedIn, currentUser } = state;
   const wishlistState = state.wishlist || [];
 
@@ -143,12 +168,21 @@ const NavBar = () => {
   const popularCategories = categories.slice(0, 10);
   const featuredCategories = categories.slice(0, 6);
 
+  /* Announcement strip. Admin › Categories owns both the copy and the switch;
+     an untouched store keeps the line the site shipped with, and clearing the
+     text hides the strip just as the switch does — an empty maroon band is
+     never what anyone wanted. */
+  const topBarText = (settings.topbar_text ?? '').trim() || DEFAULT_TOP_BAR_TEXT;
+  const showTopBar = settings.topbar_enabled !== 'false' && Boolean(topBarText);
+
   return (
     <header className={`sticky top-0 z-50 bg-white border-b border-border transition-all ${isScrolled ? "shadow-sm" : "shadow-none"}`}>
-      {/* ANNOUNCEMENT BAR */}
-      <div className="bg-maroon text-ivory text-center text-[11px] md:text-xs uppercase tracking-[0.18em] py-2 px-4">
-        Free shipping on orders above ₹999 · <span className="text-gold font-semibold">Easy 7-day returns</span> · Handcrafted in India
-      </div>
+      {/* ANNOUNCEMENT BAR — text and on/off from Admin › Categories */}
+      {showTopBar && (
+        <div className="bg-maroon text-ivory text-center text-[11px] md:text-xs uppercase tracking-[0.18em] py-2 px-4">
+          {renderTopBar(topBarText)}
+        </div>
+      )}
       {/* HEADER */}
       <div className="container flex items-center h-16 px-4">
         {/* LOGO */}

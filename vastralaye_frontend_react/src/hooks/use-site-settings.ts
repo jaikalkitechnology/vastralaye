@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { api } from '@/api/api';
+import { readCache, writeCache } from '@/lib/persistentCache';
 
 /** Store WhatsApp number used until the admin sets one (digits only, with country code). */
 export const FALLBACK_WHATSAPP = '918527596413';
@@ -13,23 +14,36 @@ export interface SiteSettings {
   call_number?: string;
   /** "true" / "false" — controls the floating contact hub. */
   float_enabled?: string;
+  /** "true" / "false" — the announcement strip above the header. */
+  topbar_enabled?: string;
+  /** What that strip says. */
+  topbar_text?: string;
 }
 
-/* Module-level cache so Footer / WhatsAppFloat / InstagramGrid share one request. */
-let cached: SiteSettings | null = null;
+const SETTINGS_CACHE = 'site-settings';
+
+/* Module-level cache so Footer / WhatsAppFloat / NavBar share one request,
+   seeded from localStorage so a refresh paints the admin's copy immediately
+   instead of the built-in default. See src/lib/persistentCache.ts. */
+let cached: SiteSettings | null = readCache<SiteSettings>(SETTINGS_CACHE);
 let inflight: Promise<SiteSettings> | null = null;
 
 const fetchSettings = (): Promise<SiteSettings> => {
-  if (cached) return Promise.resolve(cached);
+  // A cached copy is a head start, not the answer — always revalidate once.
   if (!inflight) {
     inflight = (async () => {
+      let next: SiteSettings = {};
       try {
         const res = await api.get('/fronted/settings');
-        cached = res.data && typeof res.data === 'object' ? (res.data as SiteSettings) : {};
+        next = res.data && typeof res.data === 'object' ? (res.data as SiteSettings) : {};
       } catch {
-        cached = {};
+        // Offline: keep showing the last known settings rather than snapping
+        // back to defaults, and don't cache the failure.
+        return cached ?? {};
       }
-      return cached;
+      cached = next;
+      writeCache(SETTINGS_CACHE, next);
+      return next;
     })();
   }
   return inflight;

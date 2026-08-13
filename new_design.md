@@ -1305,6 +1305,47 @@ Pinned `bcrypt==4.3.0`. Tested across the range rather than guessing: 4.0.1 work
 
 ---
 
+## 38. Storefront top bar — admin text + on/off
+
+The maroon strip above the header ("Free shipping on orders above ₹999 · Easy
+7-day returns · Handcrafted in India") was hard-coded in `NavBar.tsx`. It's now
+editable and switchable from **Admin › Categories**, per the request.
+
+Stored in the existing `site_settings` key/value table as `topbar_enabled` and
+`topbar_text` — no schema change, and `useSiteSettings` already fetches that
+endpoint for the footer and the WhatsApp float, so the strip costs no extra
+request.
+
+Three defaults chosen so it can't fail into something ugly:
+
+- **Unset means on.** A store that has never opened this page keeps the strip it
+  shipped with, rather than losing it the moment the feature deploys.
+- **Blank text falls back to the built-in line**, and the admin preview shows that
+  same fallback. An empty maroon band is never what anyone wanted.
+- **Switched off removes the element entirely** — not an empty bar, not a gap.
+
+### `*stars*` instead of HTML
+
+The line it replaced had one phrase in gold. Losing that flattened the whole bar,
+but the admin types into a plain text box, and rendering their HTML would be an
+injection hole for the sake of one colour. So `*starred*` phrases become gold
+spans — never markup — and that's the entire vocabulary. Typing
+`<img src=x onerror=…>` prints the characters and runs nothing; there's a test
+for exactly that.
+
+The strip also reads through the `persistentCache` seeding from §35, so changing
+the copy doesn't make every refresh flash the old line before the new one.
+
+| File | Change |
+|---|---|
+| `app/routers/site_content.py` | `topbar_enabled` / `topbar_text` keys; length check instead of silent truncation |
+| `src/components/admin/AdminTopBarControl.tsx` | New — switch, message box, live preview |
+| `src/pages/admin/AdminCategories.tsx` | Renders the control above the category list |
+| `src/components/NavBar.tsx` | Strip reads the settings; `renderTopBar` handles `*stars*` |
+| `src/hooks/use-site-settings.ts` | Seeded from the persistent cache; an outage keeps the last known settings |
+
+---
+
 ## Verification
 
 - `tsc --noEmit` — no errors in any changed file.
@@ -1315,6 +1356,23 @@ Pinned `bcrypt==4.3.0`. Tested across the range rather than guessing: 4.0.1 work
   toggle the CTA between *Place Order · ₹total* and *Pay ₹total*, and Place Order posts
   `{items, payment_method:"cod", shipping_address}` and opens the success modal. No
   console or page errors.
+- Top bar tested on both sides. The settings endpoints against a live SQLAlchemy
+  session, 15 checks: a fresh store has no keys and reads as on, text and switch
+  round-trip through the public endpoint, switching off keeps the text for later,
+  a top-bar save leaves the WhatsApp number alone and vice versa, over-length is
+  refused with a 400 and leaves the stored value untouched while exactly-at-limit
+  is accepted, and whitespace is trimmed. Then 27 browser checks against the
+  production build: an untouched store keeps the shipped line *with* its gold
+  phrase, admin copy replaces it on every page, `*starred*` text renders gold with
+  the stars themselves never printed, switching off removes the element while the
+  header still renders, blank text falls back rather than showing an empty band,
+  and `<img src=x onerror=…>` is printed as characters with nothing executed and
+  no injected element. Refresh behaviour re-checked with the settings call delayed
+  900ms: one state, the admin's, with no flash of the built-in line. On the admin
+  side the control sits on Categories without displacing the category list, the
+  preview tracks typing including the gold phrase and the character count,
+  unchecking previews the hidden state, Save PUTs both fields, and the storefront
+  then shows the saved strip. No console errors.
 - Admin set-password tested at three levels. The password rule over ten inputs:
   blank, `None`, a non-string, too short, letters-only, digits-only, whitespace,
   and three that pass. The real endpoint against a live SQLAlchemy session — 21
