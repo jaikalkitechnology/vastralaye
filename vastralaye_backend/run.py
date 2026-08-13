@@ -136,9 +136,11 @@ app.include_router(newsletter.router)   # ✅ newsletter signups
 from app.routers import site_content
 from app.routers import payment_gateway
 from app.routers import google_auth
+from app.routers import contact
 app.include_router(payment_gateway.router)   # ✅ admin payment integration
 app.include_router(google_auth.router)   # ✅ Sign in with Google
 app.include_router(site_content.router)   # ✅ banners, testimonials, settings
+app.include_router(contact.router)   # ✅ contact form + email config
 
 
 # ---------------------- Run the Server ----------------------

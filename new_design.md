@@ -1376,6 +1376,62 @@ anything is renamed, so that's a decision to make rather than a rename to apply.
 
 ---
 
+## 40. Enquiries — contact form to inbox, and to the dashboard
+
+The Contact Us form used to send straight from the browser to EmailJS. It now
+posts to our own API, which **stores the enquiry and then emails it on** to
+`noreply@vastraliya.com`, and every submission is readable in the new
+**Admin › Enquiries** page.
+
+### The row is the record
+
+Storing first is the whole design. Sending from the browser meant a wrong
+template ID or an expired EmailJS key lost the enquiry silently — the customer
+saw a tick and nobody ever received anything. Now the enquiry is committed
+before any mail is attempted, and delivery is a notification on top:
+
+- `emailed` says whether it went out; `email_error` says why not.
+- The admin list badges anything unsent as **not emailed**, with the reason.
+- The customer never sees the difference. An SMTP problem is the shop's to fix,
+  not something they can act on.
+
+### Email configuration
+
+Sender account (Gmail + app password), sender name, destination inbox, and a
+switch. Stored in a new `email_settings` row and falling back to the `.env`
+values, so a deployment that already sends order confirmations keeps working
+untouched — the page shows which is in effect and flags `(from the server's .env)`.
+
+The password is only ever returned masked, and saving with the field blank keeps
+the stored one, matching the payment-gateway page. **Send test email** proves the
+credentials before an enquiry depends on them.
+
+`send_email` resolved `GMAIL_SENDER_EMAIL` once at import, so it could never
+follow a setting changed at runtime. `send_custom_email` takes the account as
+arguments; `send_email` stays as it was and delegates to it. It also sets
+`Reply-To` to the customer, so hitting Reply in the shop's inbox answers them
+rather than the shop.
+
+The enquiry is untrusted text going into an HTML email, so it's escaped —
+a `<script>` or `onerror` in the message body arrives as characters.
+
+### Also fixed
+
+Three admin routes had no entry in the topbar's title map and rendered as
+"Dashboard" with yesterday's greeting: the new Enquiries page, and **Payments**
+and **Login Methods** from earlier sections. All admin routes are now covered.
+
+| File | Change |
+|---|---|
+| `app/models/contact.py` | New — `ContactMessage`, `EmailSetting` |
+| `app/routers/contact.py` | New — public submit, admin inbox, email config, test send |
+| `app/mail.py` | `send_custom_email` takes the account; `send_email` delegates |
+| `src/pages/admin/AdminEnquiries.tsx` | New — the inbox and the configuration panel |
+| `src/pages/Contact.tsx` | Posts to `/fronted/contact`; EmailJS removed |
+| `src/components/admin/AdminSidebar.tsx`, `AdminTopbar.tsx`, `src/App.tsx` | Route, nav link, titles |
+
+---
+
 ## Verification
 
 - `tsc --noEmit` — no errors in any changed file.
@@ -1386,6 +1442,28 @@ anything is renamed, so that's a decision to make rather than a rename to apply.
   toggle the CTA between *Place Order · ₹total* and *Pay ₹total*, and Place Order posts
   `{items, payment_method:"cod", shipping_address}` and opens the success modal. No
   console or page errors.
+- Enquiries tested at both levels. The real endpoints against a live SQLAlchemy
+  session, 55 checks: a brand-new install with no credentials still keeps the
+  enquiry and records *which* thing is missing; blank name, bad email and a short
+  message are refused with nothing stored and nothing sent; a real submission
+  stores the row, lower-cases the email, starts unread, and emails the default
+  `noreply@vastraliya.com` inbox with `Reply-To` set to the customer; an SMTP
+  exception still returns success to the customer while the row survives flagged
+  with the reason; `<script>` and `<img onerror=…>` in the message are escaped in
+  the outgoing HTML; the admin list orders newest-first, the unread badge counts
+  everything and ignores the search box, marking read and the unread filter agree,
+  and deleting a missing id 404s; the config validates addresses, masks the
+  password, keeps the stored one when the field is blank, and the switch stops
+  sending without stopping collection; the test send targets the notify inbox by
+  default and surfaces a rejected login as an error. Then 27 browser checks
+  against the production build: the storefront form reaches our API with the right
+  fields and **never calls EmailJS**, an API refusal shows the API's own message,
+  the sidebar link works, both enquiries list with the unread count and the
+  destination inbox stated, an unsent one is badged, opening one shows the full
+  message with a mailto reply and marks it read, the unread filter works, the
+  config panel shows only a masked password and saves without sending a blank one,
+  the test email posts the right target, and delete removes the row. No console
+  errors.
 - Contact form driven against the production build, 21 checks with the EmailJS
   call intercepted to read the exact payload: no "Message Type" label, no type
   buttons, no "Will be sent to" hint; Name / Phone / Email / Message all remain and

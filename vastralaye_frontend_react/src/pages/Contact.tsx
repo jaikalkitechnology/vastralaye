@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import emailjs from "@emailjs/browser";
+import { api } from "@/api/api";
 import {
   Mail,
   Phone,
@@ -13,14 +13,14 @@ import {
 } from "lucide-react";
 
 /**
- * Where contact messages land.
+ * Submissions post to our own API, which stores the enquiry and then emails
+ * it on. The store is the record: if the mail server is misconfigured the
+ * enquiry is still in Admin › Enquiries, which is not true of sending
+ * straight from the browser to a third-party mailer.
  *
- * There used to be a "Message Type" picker that fanned messages out to eight
- * different inboxes (complaints@, refund@, sales@…). With the picker gone the
- * sender can't choose, so everything goes to the general inbox — the same one
- * the picker's own default used.
+ * The destination inbox is set in Admin › Enquiries, so it lives on the
+ * server and isn't baked into the bundle any more.
  */
-const SUPPORT_EMAIL = "contact@mizorpaymart.in";
 
 interface FormErrors {
   name?: string;
@@ -43,11 +43,6 @@ const Contact = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState<string>("");
   const [touched, setTouched] = useState<Record<string, boolean>>({});
-
-  // EmailJS Configuration
-  const EMAILJS_SERVICE_ID = "service_j02nkfo"; // Replace with your EmailJS service ID
-  const EMAILJS_TEMPLATE_ID = "template_44y0te3"; // Replace with your EmailJS template ID
-  const EMAILJS_PUBLIC_KEY = "DCImCt-wq6AGDvlKr"; // Replace with your EmailJS public key
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
@@ -188,34 +183,12 @@ const Contact = () => {
     setIsSubmitting(true);
 
     try {
-      // Check if EmailJS is initialized properly
-      if (!EMAILJS_SERVICE_ID || !EMAILJS_TEMPLATE_ID || !EMAILJS_PUBLIC_KEY) {
-        throw new Error("EmailJS configuration is missing. Please add your EmailJS credentials.");
-      }
-
-      // Prepare template parameters
-      const templateParams = {
-        from_name: formData.name,
-        from_email: formData.email,
-        phone_number: formData.phone,
+      await api.post("/fronted/contact", {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
         message: formData.message,
-        to_email: SUPPORT_EMAIL,
-        to_name: "Mizorpay Mart Support",
-        reply_to: formData.email,
-        date: new Date().toLocaleString(),
-      };
-
-      console.log("Sending email with params:", templateParams);
-
-      // Send email using EmailJS
-      const result = await emailjs.send(
-        EMAILJS_SERVICE_ID,
-        EMAILJS_TEMPLATE_ID,
-        templateParams,
-        EMAILJS_PUBLIC_KEY
-      );
-
-      console.log("Email sent successfully:", result.text);
+      });
 
       // Reset form on successful submission
       setFormData({
@@ -233,12 +206,12 @@ const Contact = () => {
         setIsSubmitted(false);
       }, 5000);
 
-    } catch (error) {
-      console.error("Failed to send email:", error);
+    } catch (error: any) {
+      console.error("Failed to send message:", error);
       setSubmitError(
-        error instanceof Error
-          ? error.message
-          : "Failed to send message. Please try again later."
+        // The API explains what's wrong with the input; anything else is ours.
+        error?.response?.data?.detail ||
+          "Failed to send message. Please try again later."
       );
 
       // Auto-hide error after 5 seconds
@@ -386,7 +359,7 @@ const Contact = () => {
                   Thank you for contacting us. We'll get back to you shortly.
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  Your message has been sent to: {SUPPORT_EMAIL}
+                  We usually reply within one business day.
                 </p>
               </div>
             ) : (
