@@ -54,6 +54,7 @@ interface EmailConfig {
   sender_email: string;
   sender_name: string;
   notify_email: string;
+  notify_cc: string;
   notify_enabled: boolean;
   ack_enabled: boolean;
   smtp_host: string;
@@ -64,6 +65,7 @@ interface EmailConfig {
     sender_email: string;
     sender_name: string;
     notify_email: string;
+    notify_cc: string[];
     smtp_host: string;
     smtp_port: number;
     smtp_ssl: boolean;
@@ -84,6 +86,9 @@ const PRESETS = [
   { id: 'gmail', label: 'Gmail', host: 'smtp.gmail.com', port: 465, ssl: true,
     hint: 'Needs a Google app password (2-step verification on), not the account password.' },
 ] as const;
+
+/** Matches the server's cap; the API refuses more. */
+const MAX_CC = 5;
 
 const formatDate = (value: string | null) => {
   if (!value) return '—';
@@ -120,6 +125,7 @@ const AdminEnquiries = () => {
     sender_email: '',
     sender_name: '',
     notify_email: '',
+    notify_cc: '',
     app_password: '',
     notify_enabled: true,
     ack_enabled: true,
@@ -159,6 +165,7 @@ const AdminEnquiries = () => {
         sender_email: res.data.sender_email || '',
         sender_name: res.data.sender_name || '',
         notify_email: res.data.notify_email || '',
+        notify_cc: res.data.notify_cc || '',
         app_password: '',
         notify_enabled: res.data.notify_enabled,
         ack_enabled: res.data.ack_enabled ?? true,
@@ -225,6 +232,7 @@ const AdminEnquiries = () => {
         sender_email: form.sender_email,
         sender_name: form.sender_name,
         notify_email: form.notify_email,
+        notify_cc: form.notify_cc,
         notify_enabled: form.notify_enabled,
         ack_enabled: form.ack_enabled,
         smtp_host: form.smtp_host,
@@ -285,6 +293,8 @@ const AdminEnquiries = () => {
   };
 
   const activePreset = PRESETS.find((p) => p.host === form.smtp_host);
+  /* What the server says it will really copy — not whatever is in the box. */
+  const ccList = config?.effective?.notify_cc || [];
   const effectiveInbox = config?.effective?.notify_email || '';
   const canSend = Boolean(config?.effective?.sender_email && config?.effective?.has_password);
 
@@ -339,6 +349,11 @@ const AdminEnquiries = () => {
               <span>
                 New enquiries are emailed to{' '}
                 <span className="font-semibold text-espresso">{effectiveInbox}</span>
+                {ccList.length > 0 && (
+                  <>
+                    , copying <span className="font-semibold text-espresso">{ccList.join(', ')}</span>
+                  </>
+                )}
                 {config?.effective?.from_env && ' (from the server\'s .env)'}
               </span>
             </>
@@ -381,6 +396,32 @@ const AdminEnquiries = () => {
                 <p className="mt-1.5 text-[12px] text-muted-foreground">
                   Leave blank to use {config?.effective?.notify_email || 'the default'}.
                 </p>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="notify-cc"
+                  className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso"
+                >
+                  CC
+                </label>
+                <Input
+                  id="notify-cc"
+                  value={form.notify_cc}
+                  onChange={(e) => setForm((f) => ({ ...f, notify_cc: e.target.value }))}
+                  placeholder="owner@shop.com, team@shop.com"
+                  className="text-[13px]"
+                />
+                <p className="mt-1.5 text-[12px] text-muted-foreground">
+                  Copied on every new enquiry, up to {MAX_CC}. Separate with commas.
+                  {' '}Never added to anything the customer receives.
+                </p>
+                {ccList.length > 0 && (
+                  <p className="mt-1 text-[12px] text-muted-foreground">
+                    Currently copying{' '}
+                    <span className="text-espresso">{ccList.join(', ')}</span>.
+                  </p>
+                )}
               </div>
 
               <div>

@@ -1643,6 +1643,44 @@ reaches a person rather than `noreply@`.
 
 ---
 
+## 46. CC on the enquiry notification
+
+A **CC** field beside "Send enquiries to" in Admin › Enquiries. Up to five extra
+addresses copied on every new enquiry.
+
+**The shop's notification only.** Not the customer's thank-you, not a reply. A CC
+header is visible to everyone who receives the message, so copying an internal
+address onto customer mail hands them the team's addresses. There are tests
+asserting the thank-you and the reply carry no CC at all.
+
+### Bad input is dropped, not sent
+
+One malformed recipient fails the *entire* message at the SMTP server, so a stray
+comma would silently cost the shop a notification. Two layers:
+
+- **On save**, an invalid address is a 400 naming the offender, and the stored
+  list is left as it was.
+- **At send**, the list is re-parsed and anything invalid is dropped rather than
+  passed to the server.
+
+Parsing accepts commas, semicolons and newlines because people paste from all
+three; it lowercases, de-duplicates, caps at five, and drops any address equal to
+the primary inbox so nothing is delivered twice.
+
+The page shows the **parsed** list — what will really be copied — rather than
+echoing whatever is in the box, both under the field and on the status line at the
+top of the page. The **Send test email** button copies the CC list too, so the
+test proves those addresses work rather than only the primary one.
+
+| File | Change |
+|---|---|
+| `app/mail.py` | `send_custom_email` takes `cc` |
+| `app/models/contact.py` | `EmailSetting.notify_cc` |
+| `app/routers/contact.py` | `parse_cc`; CC on the notification and the test email; validation on save |
+| `src/pages/admin/AdminEnquiries.tsx` | CC field, parsed-list echo, status line |
+
+---
+
 ## Verification
 
 - `tsc --noEmit` — no errors in any changed file.
@@ -1653,6 +1691,20 @@ reaches a person rather than `noreply@`.
   toggle the CTA between *Place Order · ₹total* and *Pay ₹total*, and Place Order posts
   `{items, payment_method:"cod", shipping_address}` and opens the success modal. No
   console or page errors.
+- CC tested with 30 checks against a live session. Parsing over eleven inputs:
+  commas, semicolons, newlines, padding, mixed case, duplicates, an invalid entry
+  among valid ones, empty, `None`, whitespace, and nine addresses capped to five —
+  plus the primary inbox being excluded from its own copy list. Saving normalises
+  the stored string and surfaces the parsed list; an invalid address is a 400
+  naming it with the stored list untouched; more than five is refused. The
+  notification then really carries the CC while staying addressed to the primary
+  inbox — and, the point of the exercise, **the thank-you and the reply carry no
+  CC at all**, with the team's addresses appearing nowhere in either. The test
+  email copies the list too, clearing the field stops the copies, a CC equal to the
+  primary is dropped rather than delivered twice, and a NULL column resolves to no
+  CC rather than crashing. 59 browser checks cover the field, its cap and
+  customers-never-see-it notes, the saved value in the PUT, and the status line
+  naming who is copied.
 - Thank-you email tested with 35 checks against a live session: with no mail
   account the enquiry still stores and nothing is attempted; a normal submission
   sends exactly two emails, one to the shop and one to the sender, both flagged on

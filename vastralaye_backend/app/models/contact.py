@@ -71,6 +71,10 @@ class EmailSetting(Base):
     sender_name = Column(String(120), nullable=True)
     # Where contact-form submissions are announced.
     notify_email = Column(String(160), nullable=True)
+    # Extra addresses copied on that announcement, comma-separated. Applies to
+    # the shop's own notification only — never to anything a customer receives,
+    # which would hand them the team's internal addresses.
+    notify_cc = Column(String(500), nullable=True)
     # Off means "store submissions but don't try to send" — useful while
     # credentials are still being sorted out, and it stops every submit
     # waiting on an SMTP timeout.
