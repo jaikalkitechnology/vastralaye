@@ -63,6 +63,19 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+
+# ---------------------- Health ----------------------
+@app.get("/", tags=["Health"])
+def root():
+    """Plain liveness check — also what a bare visit to the API host lands on."""
+    return {
+        "message": "Vastralaye api is running",
+        "status": "ok",
+        "version": app.version,
+        "docs": "/docs",
+    }
+
+
 @app.get("/payment/{order_id}")
 def payment_page(order_id: str):
     return FileResponse("static/payment.html")
