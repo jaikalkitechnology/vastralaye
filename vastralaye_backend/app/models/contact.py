@@ -69,6 +69,10 @@ class EmailSetting(Base):
     smtp_ssl = Column(Boolean, nullable=True)
     # Display name on outgoing mail.
     sender_name = Column(String(120), nullable=True)
+    # Public address of the storefront. Emailed links (verify, reset) are built
+    # from this. Configuration on purpose — deriving it from the request would
+    # let anyone who can set an Origin header aim a reset link at their own site.
+    site_url = Column(String(255), nullable=True)
     # Where contact-form submissions are announced.
     notify_email = Column(String(160), nullable=True)
     # Extra addresses copied on that announcement, comma-separated. Applies to

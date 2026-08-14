@@ -28,6 +28,7 @@ import NotFound from "@/pages/NotFound";
 import About from "@/pages/About";
 import ForgotPasswordPage from "@/pages/user/ForgotPasswordPage";
 import ResetPasswordPage from "@/pages/user/ResetPasswordPage";
+import VerifyEmailPage from "@/pages/user/VerifyEmailPage";
 import ProfilePage from "@/pages/user/ProfilePage";
 import OrdersPage from "@/pages/user/OrdersPage";
 import AccountSettingsPage from "@/pages/user/AccountSettingsPage";
@@ -119,6 +120,7 @@ const AppContent = () => {
 
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/verify-email" element={<VerifyEmailPage />} />
 
         <Route path="/" element={<><NavBar /><main><Index /></main><Footer /></>} />
         <Route path="/products" element={<><NavBar /><main><ProductsPage /></main><Footer /></>} />

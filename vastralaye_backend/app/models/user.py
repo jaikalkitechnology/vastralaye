@@ -29,6 +29,12 @@ class User(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     deleted_at = Column(DateTime, nullable=True)   # 👈 Soft Delete Flag
     active = Column(Boolean, default=True, nullable=False)
+    # Has this address been proved? Deliberately NULLABLE, and NULL means
+    # "predates verification" — schema_sync adds columns as NULL, so every
+    # existing customer is grandfathered in rather than locked out of their
+    # own account the moment this deploys. Only an explicit False blocks login.
+    is_verified = Column(Boolean, nullable=True)
+    verified_at = Column(DateTime, nullable=True)
     active_at = Column(DateTime, nullable=True)
 
     @property
@@ -77,6 +83,23 @@ class SupportMessage(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     user = relationship("User", back_populates="support_messages")
 
+
+
+class EmailVerificationToken(Base):
+    """A single-use link proving someone can read the address they signed up with.
+
+    Mirrors PasswordResetToken: stored rather than a bare JWT, so a link can be
+    spent once and superseded when a new one is requested.
+    """
+
+    __tablename__ = "email_verification_tokens"
+
+    id = Column(Integer, primary_key=True)
+    email = Column(String(255), index=True, nullable=False)
+    token = Column(String(255), unique=True, index=True, nullable=False)
+    expires_at = Column(DateTime, nullable=False)
+    used = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
 
 
 class PasswordResetToken(Base):

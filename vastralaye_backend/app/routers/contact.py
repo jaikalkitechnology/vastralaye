@@ -22,6 +22,7 @@ from app.mail import DEFAULT_SMTP_SSL, send_custom_email
 from app.models import User
 from app.models.contact import ContactMessage, EmailSetting
 from app.services import email_template as T
+from app.services.account_email import resolve_site_url
 
 import logging
 
@@ -92,6 +93,7 @@ def resolve_email_config(db: Session) -> dict:
             else os.getenv("CONTACT_NOTIFY_EMAIL") or DEFAULT_NOTIFY_EMAIL
         ).strip(),
         "notify_cc": (row.notify_cc if row and row.notify_cc else "").strip(),
+        "site_url": (row.site_url if row and row.site_url else "").strip(),
         "notify_enabled": bool(row.notify_enabled) if row else True,
         # NULL means "never decided" — a column schema_sync just added — so it
         # falls back to on rather than silently switching acknowledgements off.
@@ -553,6 +555,7 @@ class EmailConfigIn(BaseModel):
     sender_name: Optional[str] = None
     notify_email: Optional[str] = None
     notify_cc: Optional[str] = None
+    site_url: Optional[str] = None
     notify_enabled: Optional[bool] = None
     ack_enabled: Optional[bool] = None
     smtp_host: Optional[str] = None
@@ -571,6 +574,7 @@ def _config_out(db: Session) -> dict:
         "sender_name": (row.sender_name if row else "") or "",
         "notify_email": (row.notify_email if row else "") or "",
         "notify_cc": (row.notify_cc if row else "") or "",
+        "site_url": (row.site_url if row else "") or "",
         "notify_enabled": bool(row.notify_enabled) if row else True,
         "ack_enabled": bool(row.ack_enabled) if row and row.ack_enabled is not None else True,
         "smtp_host": (row.smtp_host if row else "") or "",
@@ -586,6 +590,7 @@ def _config_out(db: Session) -> dict:
             # The parsed list, so the page can show what will really be copied
             # rather than whatever was typed into the box.
             "notify_cc": parse_cc(resolved["notify_cc"], exclude=resolved["notify_email"]),
+            "site_url": resolve_site_url(resolved),
             "smtp_host": resolved["smtp_host"],
             "smtp_port": resolved["smtp_port"],
             "smtp_ssl": resolved["smtp_ssl"],
@@ -632,6 +637,14 @@ def update_email_config(
         row.sender_name = payload.sender_name.strip()[:120] or None
     if payload.notify_email is not None:
         row.notify_email = payload.notify_email.strip() or None
+    if payload.site_url is not None:
+        url = payload.site_url.strip().rstrip("/")
+        if url and not re.match(r"^https?://[^\s/]+", url):
+            raise HTTPException(
+                status_code=400,
+                detail="Site address must start with http:// or https://",
+            )
+        row.site_url = url or None
     if payload.notify_cc is not None:
         raw = payload.notify_cc.strip()
         typed = [x.strip() for x in re.split(r"[,;\n\r]+", raw) if x.strip()]

@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Progress } from '@/components/ui/progress';
+import { toast } from 'sonner';
 
 // Constants
 const MAX_AVATAR_SIZE = 2 * 1024 * 1024;
@@ -239,7 +240,15 @@ const RegisterPage = () => {
     if (avatarFile) submitFormData.append('avatar', avatarFile);
 
     const success = await register(submitFormData);
-    if (success) navigate('/login');
+    if (success) {
+      // They can't sign in until they click the link, so say so here rather
+      // than dropping them on a login form that will refuse them.
+      toast.success(
+        'Account created — check your email for the activation link.',
+        { duration: 8000 }
+      );
+      navigate('/login');
+    }
   };
 
   if (isLoggedIn) return null;

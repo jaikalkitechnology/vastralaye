@@ -123,6 +123,39 @@ def details(rows: Iterable[tuple]) -> str:
     )
 
 
+def button(label: str, url: str) -> str:
+    """A call-to-action button.
+
+    A padded `<a>` inside a table cell rather than a styled `<div>`: Outlook
+    ignores padding on inline elements, so without the cell the button collapses
+    to plain text. It degrades to a readable coloured link everywhere else.
+    """
+    return (
+        '<table role="presentation" cellpadding="0" cellspacing="0" border="0" '
+        'style="margin:8px 0 24px"><tr>'
+        f'<td align="center" style="background:{MAROON};border-radius:2px">'
+        f'<a href="{esc(url)}" style="display:inline-block;padding:14px 30px;'
+        f'font-family:{SANS};font-size:12px;font-weight:600;letter-spacing:.14em;'
+        f'text-transform:uppercase;color:{IVORY};text-decoration:none">{esc(label)}</a>'
+        "</td></tr></table>"
+    )
+
+
+def fallback_link(url: str) -> str:
+    """The same URL as selectable text.
+
+    Buttons don't survive every client, and some corporate filters strip the
+    href entirely — without this, a broken button is a dead end.
+    """
+    safe = esc(url)
+    return (
+        f'<p style="margin:0 0 16px;font-family:{SANS};font-size:12px;'
+        f'line-height:1.6;color:{MUTED};word-break:break-all">'
+        "If the button doesn't work, paste this into your browser:<br>"
+        f'<a href="{safe}" style="color:{MAROON}">{safe}</a></p>'
+    )
+
+
 def mailto(address: str) -> str:
     """A value for `details` — clickable, and escaped both as text and as href."""
     safe = esc(address)

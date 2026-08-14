@@ -28,6 +28,14 @@ from app.database import get_db
 from app.schemas.order_system import OrderResponse
 from app.security import get_password_hash, verify_password, create_reset_token, verify_reset_token
 from app.services.password_policy import PasswordPolicyError, validate_password
+from app.routers.contact import resolve_email_config
+from app.services.account_email import (
+    consume_reset_token,
+    consume_verification_token,
+    peek_reset_token,
+    send_password_reset_email,
+    send_verification_email,
+)
 from app.authentication import (
     get_current_user, create_access_token,
     get_user_by_email
@@ -64,6 +72,10 @@ from dotenv import load_dotenv
 from typing import List, Dict, Any
 
 load_dotenv()
+
+import logging
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/v1/users", tags=["Users"])
 
@@ -201,6 +213,9 @@ def create_user(
         postal_code=(postal_code or "").strip(),
         country=(country or "").strip(),
         created_at=datetime.utcnow(),
+        # Explicitly False, not NULL: NULL means "predates verification" and is
+        # grandfathered through login, which must never apply to a new signup.
+        is_verified=False,
     )
     db.add(new_user)
     db.flush()  # get id
@@ -228,7 +243,22 @@ def create_user(
         # Don't fail registration if email fails
         pass
 
-    return {"message": "Registration successful"}
+    # Activation link. Best-effort: the account exists either way, and they can
+    # always ask for another link from the login page.
+    try:
+        config = resolve_email_config(db)
+        if config["sender_email"] and config["app_password"]:
+            send_verification_email(db, config, new_user)
+        else:
+            logger.warning("No mail account configured — %s cannot be sent a "
+                           "verification link", new_user.email)
+    except Exception as exc:  # noqa: BLE001
+        logger.error("Verification email for %s failed: %s", new_user.email, exc)
+
+    return {
+        "message": "Registration successful. Check your email for the activation link.",
+        "verification_required": True,
+    }
 
 
 @router.post("/login", response_model=Token)
@@ -257,6 +287,15 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
             detail="Your account is deactivated. Contact support to reactivate."
         )
 
+    # `is False` on purpose, not `not user.is_verified`: NULL means the account
+    # predates verification and must still be able to log in.
+    if user.is_verified is False:
+        raise HTTPException(
+            status_code=403,
+            detail="Please confirm your email address first — check your inbox "
+                   "for the activation link, or ask for a new one.",
+        )
+
     # Add role in token
     token = create_access_token({"sub": user.email, "role": user.role})
 
@@ -283,11 +322,18 @@ def forgot_password(request: ForgotPasswordRequest, db: Session = Depends(get_db
     if not user:
         return response
 
-    # Just pass the email, not db
-    reset_token = create_reset_token(user.email)
+    # Google-only accounts have no password to reset.
+    if not user.password:
+        return response
 
-    reset_link = f"http://localhost:8080/reset-password?token={reset_token}"
-    send_reset_email(user.email, reset_link, user.first_name or "User")
+    try:
+        config = resolve_email_config(db)
+        if config["sender_email"] and config["app_password"]:
+            send_password_reset_email(db, config, user)
+        else:
+            logger.warning("No mail account configured — cannot send a reset link")
+    except Exception as exc:  # noqa: BLE001 - never confirm an address by erroring
+        logger.error("Reset email for %s failed: %s", user.email, exc)
 
     return response
 
@@ -309,38 +355,105 @@ def reset_password(
             detail="Passwords do not match"
         )
 
-    # Verify token (checks: exists, not expired, not used)
-    email = verify_reset_token(db, request.token)
+    validate_password_strength(request.new_password)
+
+    # Single-use: spending the token here is what stops the same emailed link
+    # being replayed. The old code called verify_reset_token(db, token) against
+    # a one-argument function, so this endpoint raised TypeError every time.
+    email = consume_reset_token(db, request.token)
+    if not email:
+        raise HTTPException(
+            status_code=400,
+            detail="This reset link has expired or has already been used. "
+                   "Request a new one.",
+        )
 
     user = crud_user.get_user_by_email(db, email)
     if not user:
-        raise HTTPException(
-            status_code=404,
-            detail="User not found"
-        )
+        raise HTTPException(status_code=404, detail="User not found")
 
-    # Update password
     user.password = get_password_hash(request.new_password)
+    # Choosing a password from a link sent to that address proves they can read
+    # it, which is exactly what verification asks for.
+    if user.is_verified is not True:
+        user.is_verified = True
+        user.verified_at = datetime.utcnow()
     db.commit()
 
-    return {
-        "message": "Password reset successful"
-    }
+    return {"message": "Password reset successful"}
+
+
+class VerifyEmailRequest(BaseModel):
+    token: str
+
+
+@router.post("/verify-email", response_model=SuccessMessage)
+def verify_email(request: VerifyEmailRequest, db: Session = Depends(get_db)):
+    """Activate an account from the link in the welcome email."""
+    email = consume_verification_token(db, request.token)
+    if not email:
+        raise HTTPException(
+            status_code=400,
+            detail="This activation link has expired or has already been used. "
+                   "Ask for a new one from the sign-in page.",
+        )
+
+    user = db.query(User).filter(func.lower(User.email) == email.lower()).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Account not found")
+
+    # Clicking twice should read as success, not as an error — the second click
+    # is usually the same person wondering whether the first one worked.
+    if user.is_verified is not True:
+        user.is_verified = True
+        user.verified_at = datetime.utcnow()
+        db.commit()
+
+    return {"message": "Your email is confirmed — you can sign in now."}
+
+
+class ResendVerificationRequest(BaseModel):
+    email: str
+
+
+@router.post("/resend-verification", response_model=SuccessMessage)
+def resend_verification(request: ResendVerificationRequest, db: Session = Depends(get_db)):
+    """Send another activation link.
+
+    Answers the same way whichever address is given: telling a stranger that an
+    address does or doesn't have an account is exactly the leak the
+    forgot-password endpoint already avoids.
+    """
+    response = {"message": "If that account needs confirming, a new link is on its way."}
+
+    email = (request.email or "").strip().lower()
+    if not EMAIL_REGEX.match(email):
+        return response
+
+    user = db.query(User).filter(func.lower(User.email) == email).first()
+    if not user or user.is_verified is not False or user.deleted_at is not None:
+        return response
+
+    try:
+        config = resolve_email_config(db)
+        if config["sender_email"] and config["app_password"]:
+            send_verification_email(db, config, user)
+    except Exception as exc:  # noqa: BLE001
+        logger.error("Resend verification for %s failed: %s", email, exc)
+
+    return response
 
 
 @router.get("/verify-reset-token/{token}")
 def verify_reset_token_endpoint(token: str, db: Session = Depends(get_db)):
-    """Verify if reset token is valid (for frontend use)"""
-    try:
-        email = verify_reset_token(token)
-        user = db.query(User).filter(User.email == email).first()
-
-        if not user:
-            return {"valid": False, "error": "User not found"}
-
-        return {"valid": True, "email": email}
-    except HTTPException as e:
-        return {"valid": False, "error": e.detail}
+    """Is this reset link still good? Read-only — it does NOT spend the token."""
+    row = peek_reset_token(db, token)
+    if not row:
+        return {"valid": False, "error": "This link has expired or has already been used."}
+    user = db.query(User).filter(func.lower(User.email) == row.lower()).first()
+    if not user:
+        return {"valid": False, "error": "User not found"}
+    return {"valid": True, "email": row}
 
 
 @router.post("/change-password", response_model=SuccessMessage)
