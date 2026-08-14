@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useStore } from '@/contexts/StoreContext';
+import { api } from '@/api/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -25,6 +26,24 @@ const LoginPage = () => {
   const [rememberMe, setRememberMe] = useState(false);
 
   const [errors, setErrors] = useState({ email: '', password: '' });
+  const [resending, setResending] = useState(false);
+  const [resent, setResent] = useState(false);
+
+  /* The API says so in words; matching on them keeps the check in one place
+     rather than inventing a parallel error code for a single message. */
+  const needsVerification = /confirm your email/i.test(authError || '');
+
+  const resendVerification = async () => {
+    setResending(true);
+    try {
+      await api.post('/users/resend-verification', { email });
+    } catch {
+      /* the endpoint answers identically either way, by design */
+    } finally {
+      setResending(false);
+      setResent(true);
+    }
+  };
   const [touched, setTouched] = useState({ email: false, password: false });
 
   // Redirect based on role returned from backend
@@ -131,9 +150,38 @@ const LoginPage = () => {
           </p>
 
           {authError && (
-            <div className="mb-6 flex items-start gap-3 rounded-sm border border-sale/30 bg-sale/5 p-3.5 text-sale">
+            /* "Confirm your email" is a to-do, not a failure — it gets the
+               amber treatment and a way out, rather than the red one that
+               says you typed something wrong. */
+            <div
+              className={`mb-6 flex items-start gap-3 rounded-sm border p-3.5 ${
+                needsVerification
+                  ? 'border-[#B07C1F]/30 bg-[#B07C1F]/10 text-[#8A6414]'
+                  : 'border-sale/30 bg-sale/5 text-sale'
+              }`}
+            >
               <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
-              <div className="text-sm">{authError}</div>
+              <div className="text-sm">
+                {authError}
+                {needsVerification && (
+                  <div className="mt-2">
+                    {resent ? (
+                      <span className="font-medium">
+                        A new link is on its way to {email}.
+                      </span>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={resendVerification}
+                        disabled={resending}
+                        className="font-semibold underline underline-offset-2 disabled:opacity-60"
+                      >
+                        {resending ? 'Sending…' : 'Send me a new activation link'}
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           )}
 

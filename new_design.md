@@ -1681,6 +1681,71 @@ test proves those addresses work rather than only the primary one.
 
 ---
 
+## 47. Email verification, and password reset that actually works
+
+### Password reset was broken
+
+Not "could be better" — **broken**. `reset_password` called
+`verify_reset_token(db, request.token)` against a one-argument function, so every
+attempt raised `TypeError`. Nobody had ever been able to reset a password. And
+even if that call had worked, the emailed link was hard-coded to
+`http://localhost:8080/reset-password?token=…`, which is nobody's browser. A
+`FRONTEND_URL` constant sat two lines above it, unused, pointing at a LAN IP.
+
+Fixed, and the tokens changed shape while fixing it. `create_reset_token` minted a
+bare JWT, so a link stayed valid for its whole hour no matter what happened in
+between — the wrong property for something that changes a password. Reset links
+are now rows in `password_reset_tokens`, which means single-use, revocable, and
+superseded when a newer one is requested. It also makes §37's "burn outstanding
+reset links when an admin sets a password" real: that code was updating a table
+nothing ever wrote to.
+
+### New accounts confirm their address
+
+Manual signup creates the account with `is_verified=False`, emails an activation
+link, and login refuses until it's clicked — with the reason, and a resend button
+right there in the error.
+
+**`is_verified` is nullable, and NULL means "predates verification".** Only an
+explicit `False` blocks login. `schema_sync` adds columns as NULL, so every
+existing customer is grandfathered through instead of being locked out of their
+own account the moment this deploys. There's a test for exactly that.
+
+**Google sign-ups are verified immediately** and get a welcome email instead of an
+activation link. `_verify_id_token` already refuses a claim set without
+`email_verified`, so Google has proved the address — a confirmation link would be
+theatre. Signing in with Google also clears a *pending* manual verification,
+otherwise someone who registered with a password and then used Google would stay
+locked out of password login forever.
+
+### Links come from configuration, never from the request
+
+`site_url` is an admin setting (env `FRONTEND_URL` behind it). Deriving it from
+the `Origin` header would be convenient and would also mean anyone who can set
+that header could have us email a victim a password-reset link pointing at their
+own site.
+
+Other details worth keeping: the token-check endpoint peeks without spending, so
+opening the reset page doesn't burn the link before the form is filled in;
+verifying twice reads as success rather than an error, because the second click
+is usually the same person checking; resend answers identically for every address,
+like forgot-password already did; a Google-only account gets no reset email but
+the same reply; and choosing a password from an emailed link marks the address
+verified, since it proves the same thing.
+
+| File | Change |
+|---|---|
+| `app/services/account_email.py` | New — token issue/consume/peek, the three emails |
+| `app/services/email_template.py` | `button` and `fallback_link` blocks |
+| `app/models/user.py` | `is_verified`, `verified_at`, `EmailVerificationToken` |
+| `app/models/contact.py`, `app/routers/contact.py` | `site_url` setting |
+| `app/routers/user.py` | Signup sends the link; login gate; reset fixed; verify + resend endpoints |
+| `app/routers/google_auth.py` | Verified on creation, welcome email, clears a pending verification |
+| `src/pages/user/VerifyEmailPage.tsx` | New — consumes the link, offers a new one |
+| `src/pages/LoginPage.tsx`, `RegisterPage.tsx` | Resend button; "check your email" after signup |
+
+---
+
 ## Verification
 
 - `tsc --noEmit` — no errors in any changed file.
@@ -1691,6 +1756,30 @@ test proves those addresses work rather than only the primary one.
   toggle the CTA between *Place Order · ₹total* and *Pay ₹total*, and Place Order posts
   `{items, payment_method:"cod", shipping_address}` and opens the success modal. No
   console or page errors.
+- Verification and reset tested with 65 checks against a live session. Signup: the
+  account is created unverified, one email goes out, its link points at the
+  storefront's verify page (**not** localhost) with a real token. Login is refused
+  until the link is clicked, then works. The link is single-use, a made-up one is
+  refused, an expired one is refused, and asking for another retires the old one.
+  Legacy accounts whose flag is NULL still sign in — the grandfathering case.
+  Forgot-password now returns a working link (it used to raise `TypeError`), the
+  token can be checked without being spent, the reset applies the password policy,
+  the link is single-use, requesting twice retires the first, and a Google-only
+  account gets no email but the same reply. Google sign-up: verified immediately,
+  **no** verification token minted, a welcome email sent once and not again on the
+  next sign-in; signing in with Google clears a pending manual verification so
+  password login starts working; and an SMTP failure still creates the account and
+  the session. Site URL comes from configuration, falls back to the default when
+  blank, and a `javascript:` address is refused. In a real browser, 17 checks: the
+  verify page posts its token exactly once (StrictMode double-mount guarded), shows
+  success with a sign-in button, shows the API's reason on a dead link with a
+  resend form, handles a missing token without calling the API, and the login page
+  renders the confirm-your-email message in amber with a working resend. The three
+  emails were rendered and looked at — no overflow, live buttons, and a
+  paste-it-yourself fallback link under each. (Two browser-suite failures during
+  this work were the tests' fault: one selector matched the navbar's Sign In as
+  well as the form's, and one stub 403'd only `/users/login` while the store tries
+  `/admin/token` first, so the error path never ran.)
 - CC tested with 30 checks against a live session. Parsing over eleven inputs:
   commas, semicolons, newlines, padding, mixed case, duplicates, an invalid entry
   among valid ones, empty, `None`, whitespace, and nine addresses capped to five —

@@ -11,6 +11,7 @@ not expose, so they can be read and written independently of the social links.
 
 import hmac
 import logging
+from datetime import datetime
 from typing import Optional
 from urllib.parse import quote
 
@@ -23,8 +24,12 @@ from sqlalchemy.orm import Session
 from app.authentication import create_access_token, get_current_admin_user, get_current_user
 from app.database import get_db
 from app.models import User
+from app.routers.contact import resolve_email_config
+from app.services.account_email import send_welcome_email
 from app.models.site_content import SiteSetting
 from app.services.google_profile import PROFILE_SCOPES, fill_blanks
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["Google Login"])
 log = logging.getLogger("google_auth")
@@ -214,10 +219,22 @@ def _session_for(db: Session, claims: dict, allow_signup: bool):
             auth_provider="google",
             google_id=claims.get("sub"),
             avatar=claims.get("picture"),
+            # Google has already proved this address — _verify_id_token refuses
+            # a claim set without email_verified — so sending an activation link
+            # would be theatre. They get a welcome email instead.
+            is_verified=True,
+            verified_at=datetime.utcnow(),
         )
         db.add(user)
         db.commit()
         db.refresh(user)
+
+        try:
+            config = resolve_email_config(db)
+            if config["sender_email"] and config["app_password"]:
+                send_welcome_email(config, user)
+        except Exception as exc:  # noqa: BLE001 - never break a sign-in over mail
+            logger.error("Welcome email for %s failed: %s", email, exc)
     else:
         if user.deleted_at is not None:
             raise HTTPException(
@@ -231,6 +248,12 @@ def _session_for(db: Session, claims: dict, allow_signup: bool):
             user.auth_provider = "password"
         if not user.avatar and claims.get("picture"):
             user.avatar = claims.get("picture")
+        # Signing in through Google proves the address, which clears a pending
+        # verification — otherwise someone who registered manually and then used
+        # Google would stay locked out of password login forever.
+        if user.is_verified is not True:
+            user.is_verified = True
+            user.verified_at = datetime.utcnow()
         db.commit()
 
     return create_access_token({"sub": user.email, "role": user.role}), user
