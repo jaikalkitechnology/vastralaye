@@ -243,21 +243,34 @@ def create_user(
         # Don't fail registration if email fails
         pass
 
-    # Activation link. Best-effort: the account exists either way, and they can
-    # always ask for another link from the login page.
+    # Activation link.
+    sent = False
     try:
         config = resolve_email_config(db)
         if config["sender_email"] and config["app_password"]:
-            send_verification_email(db, config, new_user)
+            sent = bool(send_verification_email(db, config, new_user))
         else:
             logger.warning("No mail account configured — %s cannot be sent a "
                            "verification link", new_user.email)
     except Exception as exc:  # noqa: BLE001
         logger.error("Verification email for %s failed: %s", new_user.email, exc)
 
+    if not sent:
+        # A gate we can't open is just a locked door. If the link didn't go out
+        # — no SMTP configured, or the server refused — leave the account in the
+        # grandfathered state (NULL) so they can sign in, rather than stranding
+        # them behind a confirmation they will never receive and can't resend.
+        new_user.is_verified = None
+        db.commit()
+        logger.warning("Account %s created WITHOUT verification — no link could "
+                       "be delivered", new_user.email)
+
     return {
-        "message": "Registration successful. Check your email for the activation link.",
-        "verification_required": True,
+        "message": (
+            "Registration successful. Check your email for the activation link."
+            if sent else "Registration successful. You can sign in now."
+        ),
+        "verification_required": sent,
     }
 
 
