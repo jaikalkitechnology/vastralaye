@@ -1816,6 +1816,85 @@ piling up as unreachable accounts.
 
 ---
 
+## 49. Loading a database dump — `scripts/import_sql.py`
+
+```bash
+python scripts/import_sql.py backup.sql                       # → Vastralaye_db
+python scripts/import_sql.py backup.sql --host db.example.com --backup-first
+python scripts/import_sql.py backup.sql --dry-run             # parse, connect to nothing
+```
+
+Connection details come from the command line, then `DATABASE_URL` — *the same
+variable the app reads*, so on a configured machine there is nothing to type —
+then `DB_HOST`/`DB_PORT`/`DB_USER`/`DB_PASSWORD`. With none of them it prompts.
+A password passed as `--password` is visible in `ps` and in shell history, so
+`DB_PASSWORD` or the prompt is the better habit.
+
+`mysql < backup.sql` does the same job if you have the client and shell access.
+This exists for the machines where you don't, and it adds the four things a bare
+pipe won't: create the database with the right charset, refuse to overwrite data
+you didn't mean to overwrite, take a safety copy first, and count what landed.
+
+### Why not `sql.split(";")`
+
+Because it silently corrupts this exact dump. One product description reads:
+
+> Semi cut away collar**;** Cuff style - Single cuff
+
+Split on that semicolon and a 226 KB `INSERT` is cut in half — the first
+fragment is invalid SQL and the rest of the row becomes garbage. The importer
+scans instead, tracking `'…'`, `"…"` and `` `…` ``, backslash escapes, doubled
+quotes, `--` / `#` line comments and `/*…*/` blocks, so a delimiter inside a
+literal is just text.
+
+`/*!40101 SET NAMES utf8mb4 */;` is deliberately **not** treated as a comment.
+MySQL executes version-gated comments, so they are kept and sent like any other
+statement — dropping them would change the charset the data lands in.
+
+### The comment header that hid every DROP
+
+mysqldump captions each table, so the statement text really starts like this and
+the keyword is on line 5:
+
+```
+--
+-- Table structure for table `addresses`
+--
+
+DROP TABLE IF EXISTS `addresses`
+```
+
+Matching that raw text with `^\s*DROP\s+TABLE` finds **nothing**. The first
+version of this script did exactly that, so its overwrite warning read *"this
+dump starts with 0 DROP TABLE"* while holding 21 of them — the one number in the
+output that exists to stop you, understating the damage to zero. Classification
+now runs through `strip_leading_comments()` first, and a test asserts the count
+matches a plain `"DROP TABLE" in statement` scan of the same file.
+
+### Refusing to overwrite by accident
+
+If the target already has tables, it lists them, says how many `DROP TABLE`
+statements are coming, and asks you to **type the database name** — not `y`. The
+guard exists for the case where the host argument is wrong, and typing the name
+of the database you meant is the thing a wrong host can't survive. `--yes` skips
+it for automation; `--backup-first` mysqldumps the current contents first (the
+password goes via `MYSQL_PWD`, not the process list).
+
+`quote_ident()` refuses any database name that isn't `[A-Za-z0-9_$]+`, so a name
+carrying a backtick or a semicolon stops the run rather than reaching the server.
+
+| Exit | Meaning |
+|---|---|
+| 0 | imported, or `--dry-run` |
+| 1 | connection refused, guard declined, or a statement failed |
+| 2 | no such file, or the file holds no SQL |
+
+A failed statement stops the run, prints its number, the server's error and the
+first 140 characters of the statement, and says the database is part-imported —
+`SET autocommit=1` and DDL make a rollback impossible to promise, so it doesn't.
+
+---
+
 ## Verification
 
 - `tsc --noEmit` — no errors in any changed file.
@@ -2090,3 +2169,25 @@ piling up as unreachable accounts.
   (pixel-identical to the previous hard-coded wash), maroon 70 and black 40 — plus the
   admin card showing the picker, swatches, slider and live preview. No console or page
   errors.
+- `scripts/import_sql.py` run **against a real MariaDB 10.11 server**, importing the
+  722 KB / 224-statement dump into `Vastralaye_db`: 21 tables, 2,874 rows. The same
+  dump was then imported by the official `mysql` client into a second database, and
+  `CHECKSUM TABLE … EXTENDED` **matched on all 21 tables** — the script's output is
+  byte-identical to the client's. `mysqldump --no-data` of both schemas diffs clean
+  (indexes, charsets, foreign keys, AUTO_INCREMENT), the semicolon-bearing description
+  arrives whole at 277 characters, and the database is `utf8mb4`/`utf8mb4_unicode_ci`.
+- The safety paths driven for real: the guard aborts on a wrong typed name leaving all
+  486 products in place and accepts the right one; `--backup-first` produced a 723 KB
+  copy that **restored into a fresh database with matching checksums**; `--no-create-db`
+  refuses a missing database; a deliberately broken dump stops at statement 4, names the
+  server's error, and leaves the three statements before it applied. Exit codes 1/1/2/1/
+  0/0 as documented.
+- The closing advice was checked rather than assumed: pointing the backend at the
+  imported database took it from 21 tables to 30 — `contact_messages`, `email_settings`,
+  `email_verification_tokens`, `hero_banners`, `site_settings` and four more created,
+  `users.is_verified` and 12 other columns added, with all 486 products, 120 users and
+  194 orders untouched.
+- 48 splitter assertions pass, including the ones that matter most: a semicolon inside
+  single quotes, double quotes, backticks and each comment style; `\'`, `''` and `\\`
+  escapes; `/*!40101 …*/` kept as executable; an unterminated string that neither hangs
+  nor loses the tail; and `quote_ident` rejecting `` db`; DROP DATABASE x; -- ``.
