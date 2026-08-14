@@ -1783,9 +1783,36 @@ document — all run against `vite preview` — exercised the working branch.
 
 | File | Change |
 |---|---|
-| `src/config.tsx` | `API_ORIGIN` with `VITE_API_ORIGIN` override; `BASE_URL`/`BASE_IMG` derived |
+| `src/config.tsx` | `API_ORIGIN`: localhost in dev, deployed in build, `VITE_API_ORIGIN` overrides |
 | `src/api/apihelper.tsx` | `API_BASE = BASE_URL` — no relative dev path |
 | `vite.config.ts` | Proxy targets the same origin, from the same env var |
+
+### Running the whole thing locally
+
+`npm run dev` now talks to `http://127.0.0.1:8000` — the backend's own default —
+and `npm run build` talks to the deployed API. That's the setup for anyone
+running both halves on their own machine, with no file to create: an
+`.env.development` would have been the conventional home for this, but `.env.*`
+is gitignored here, so it would never have reached the repository.
+
+```
+VITE_API_ORIGIN=https://api.mizorpaymart.com npm run dev   # dev UI, live API
+VITE_API_ORIGIN=http://192.168.1.20:8000 npm run dev       # phone on the LAN
+```
+
+### A gate nobody could open
+
+Verified locally against a real backend: with no mail account configured — the
+normal state on a dev machine — signup was creating the account with
+`is_verified=False` and *no token*, because the send was skipped. Login then
+refused it, and "resend" needed the same mail account. The customer was stranded
+behind a confirmation that could never arrive.
+
+So verification is only enforced when the link actually went out. If it wasn't
+sent, the account stays in the grandfathered NULL state and the response says
+"You can sign in now" rather than promising an email that isn't coming. This
+matters in production too: if SMTP breaks, new customers get in instead of
+piling up as unreachable accounts.
 
 ---
 
@@ -1799,6 +1826,14 @@ document — all run against `vite preview` — exercised the working branch.
   toggle the CTA between *Place Order · ₹total* and *Pay ₹total*, and Place Order posts
   `{items, payment_method:"cod", shipping_address}` and opens the success modal. No
   console or page errors.
+- The local setup was verified by **running both halves**: the real FastAPI
+  backend on `127.0.0.1:8000` (SQLite via `DATABASE_URL`) and `npm run dev` on
+  `:8080`, then calling the app's own `signUp()` helper from the page with nothing
+  stubbed. Result: `200 POST http://127.0.0.1:8000/api/v1/users/signUp`, the
+  account in the database, and a following `login()` returning a session token —
+  the whole loop against a local backend. `forgot-password` likewise. That run is
+  also what exposed the stranded-account case: the account was created with
+  `is_verified=0` and no token, since no mail account exists on a dev machine.
 - The sign-up 502 was diagnosed and confirmed against a real **dev server**, not a
   preview build — the bug only exists when `import.meta.env.DEV` is true, which is
   why every previous browser test in this document missed it. With the fix, all
