@@ -17,7 +17,10 @@ import { Invoice, InvoicesResponse, InvoiceFilters } from "@/types/index";
 // Base URLs
 
 
-const API_BASE = import.meta.env.DEV ? '/api' : `${BASE_URL}`;
+// Always the real API — never a relative path. In dev this used to be '/api',
+// which routed through the Vite proxy to a different host than the rest of the
+// app used, so sign-up and forgot-password 502'd while everything else worked.
+const API_BASE = BASE_URL;
 
 export const ADMIN_BASE = `${API_BASE}/admin`;
 

@@ -1746,6 +1746,49 @@ verified, since it proves the same thing.
 
 ---
 
+## 48. Sign-up 502'd in dev — two backends at once
+
+`POST http://localhost:8080/api/users/signUp` → **502 Bad Gateway**. Two tells in
+that URL: it's missing the `/v1` the API actually serves, and it's pointing at the
+dev server rather than the API.
+
+The cause was a split nobody had noticed:
+
+```
+src/api/api.ts        →  BASE_URL             →  https://api.mizorpaymart.com/api/v1
+src/api/apihelper.tsx →  DEV ? '/api' : BASE  →  /api  →  Vite proxy  →  fastapi.jokroup.in
+```
+
+So **in development the app talked to two different servers at the same time**.
+Banners, settings and enquiries went straight to `api.mizorpaymart.com` and
+worked. Sign-up, login, forgot-password and every admin call went through the
+proxy to `fastapi.jokroup.in` — a host from the *jokroup* era — and 502'd when it
+didn't answer. Same page, same click, different backend.
+
+`API_BASE` is now simply `BASE_URL`: one origin, dev and production alike. The
+proxy is left in place for anyone who wants same-origin requests, but it now
+targets the same host the app does instead of a stale one.
+
+`VITE_API_ORIGIN` overrides the origin in both places at once, which is the thing
+someone actually wants when they reach for this — pointing a dev build at a local
+backend:
+
+```
+VITE_API_ORIGIN=http://127.0.0.1:8000 npm run dev
+```
+
+**Not reproducible from a production build**, which is why it survived this long:
+`import.meta.env.DEV` is false there, so every earlier browser test in this
+document — all run against `vite preview` — exercised the working branch.
+
+| File | Change |
+|---|---|
+| `src/config.tsx` | `API_ORIGIN` with `VITE_API_ORIGIN` override; `BASE_URL`/`BASE_IMG` derived |
+| `src/api/apihelper.tsx` | `API_BASE = BASE_URL` — no relative dev path |
+| `vite.config.ts` | Proxy targets the same origin, from the same env var |
+
+---
+
 ## Verification
 
 - `tsc --noEmit` — no errors in any changed file.
@@ -1756,6 +1799,14 @@ verified, since it proves the same thing.
   toggle the CTA between *Place Order · ₹total* and *Pay ₹total*, and Place Order posts
   `{items, payment_method:"cod", shipping_address}` and opens the success modal. No
   console or page errors.
+- The sign-up 502 was diagnosed and confirmed against a real **dev server**, not a
+  preview build — the bug only exists when `import.meta.env.DEV` is true, which is
+  why every previous browser test in this document missed it. With the fix, all
+  ten API calls a dev page load makes go to `api.mizorpaymart.com/api/v1`, none
+  through the relative `/api` path. Then the old line was temporarily restored and
+  the dev server restarted: `ADMIN_BASE` came back as `"/api/admin"`, meaning
+  `signUp` builds `/api/users/signUp` — character-for-character the URL in the
+  reported network tab. Fix restored and re-verified.
 - Verification and reset tested with 65 checks against a live session. Signup: the
   account is created unverified, one email goes out, its link points at the
   storefront's verify page (**not** localhost) with a real token. Login is refused
