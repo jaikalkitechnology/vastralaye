@@ -160,9 +160,6 @@ const AdminSidebar = ({ isOpen = false, onClose }: AdminSidebarProps) => {
           <span className="font-serif text-[22px] font-semibold leading-none text-ivory">
             Vastra<span className="text-gold">liya</span>
           </span>
-          <span className="mt-1.5 block text-[8.5px] uppercase tracking-[0.4em] text-gold">
-            Handcrafted India
-          </span>
         </Link>
         <span className="mt-3 inline-block rounded-full border border-ivory/20 px-2.5 py-0.5 text-[10px] uppercase tracking-[0.18em] text-ivory/55">
           Admin Panel

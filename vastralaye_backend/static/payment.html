@@ -21,9 +21,8 @@ async function startPayment() {
         return;
     }
 
-    const response = await fetch(
-        "https://api.mizorpaymart.com/get-token/" + orderId
-    );
+    // Same origin that served this page — works on any domain the API runs on.
+    const response = await fetch("/get-token/" + orderId);
 
     const data = await response.json();
 

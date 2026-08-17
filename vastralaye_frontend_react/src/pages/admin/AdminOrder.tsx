@@ -736,7 +736,6 @@ export default function AdminOrders() {
         <div style="background:${C.esp};color:${C.ivory};padding:24px 32px;display:flex;justify-content:space-between;align-items:flex-start;">
           <div>
             <div style="font-family:${SERIF};font-size:23px;font-weight:600;">Vastra<span style="color:${C.gold};">liya</span></div>
-            <div style="font-size:8.5px;letter-spacing:.42em;text-transform:uppercase;color:${C.gold};margin-top:3px;">Handcrafted India</div>
             <div style="font-size:11px;color:rgba(250,246,240,.6);margin-top:9px;line-height:1.65;">
               14 Weaver's Lane, Faridabad, Haryana 121001<br>
               support@vastralaye.in · +91 85275 96413${gstin ? `<br>GSTIN ${gstin}` : ""}

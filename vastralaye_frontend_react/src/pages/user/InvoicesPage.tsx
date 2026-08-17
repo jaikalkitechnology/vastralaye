@@ -787,9 +787,6 @@ const InvoicesPage: React.FC = () => {
               <p className="font-serif text-2xl font-semibold text-espresso">
                 Vastra<span className="text-maroon">liya</span>
               </p>
-              <span className="block text-[9px] uppercase tracking-[0.42em] text-[#8A6414] mt-0.5">
-                Handcrafted India
-              </span>
               <p className="text-xs text-muted-foreground mt-2.5 leading-relaxed">
                 {COMPANY_DETAILS.address}<br />
                 {COMPANY_DETAILS.email} · {COMPANY_DETAILS.phone}<br />

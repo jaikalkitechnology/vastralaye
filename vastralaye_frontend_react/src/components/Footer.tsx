@@ -64,9 +64,6 @@ const Footer = () => {
               <span className="font-serif text-2xl font-semibold text-ivory">
                 Vastra<span className="text-gold">liya</span>
               </span>
-              <span className="block text-[9px] font-sans uppercase tracking-[0.42em] text-gold mt-0.5">
-                Handcrafted India
-              </span>
             </Link>
             <p className="text-sm leading-relaxed mt-4 mb-6 max-w-xs">
               Woven with love by artisans across India. Timeless ethnic wear for every

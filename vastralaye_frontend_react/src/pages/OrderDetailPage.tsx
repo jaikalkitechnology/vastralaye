@@ -449,7 +449,6 @@ const InvoicePageView: React.FC<{
                                 <p className="font-serif text-2xl font-semibold leading-none text-ivory">
                                     Vastra<span className="text-gold">liya</span>
                                 </p>
-                                <p className="mt-1.5 text-[8.5px] uppercase tracking-[0.42em] text-gold">Handcrafted India</p>
                                 <p className="mt-2.5 text-[11px] leading-relaxed text-ivory/60">
                                     1PLOT NO 69-71, OM SHUBHAM TOWER, Faridabad, Haryana – 121001<br />
                                     support@vastralaye.in · +91 85275 96413 · GSTIN 06AAQCM6479G1ZV

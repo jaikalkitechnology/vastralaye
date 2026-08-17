@@ -20,9 +20,6 @@ const BrandPanel = () => (
       <Link to="/" className="font-serif text-[34px] font-semibold text-ivory">
         Vastra<span className="text-gold">liya</span>
       </Link>
-      <span className="block text-[9px] uppercase tracking-[0.42em] text-gold mt-1">
-        Handcrafted India
-      </span>
     </div>
 
     <p className="font-serif text-[21px] leading-relaxed text-ivory/90 mt-6 max-w-[340px]">
