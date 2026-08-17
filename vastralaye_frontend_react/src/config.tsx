@@ -10,15 +10,15 @@
  *
  * Override either default with VITE_API_ORIGIN:
  *
- *     VITE_API_ORIGIN=https://api.mizorpaymart.com npm run dev   # dev vs live API
- *     VITE_API_ORIGIN=http://192.168.1.20:8000 npm run dev       # phone on the LAN
+ *     VITE_API_ORIGIN=https://api.vastraliya.com npm run dev   # dev vs live API
+ *     VITE_API_ORIGIN=http://192.168.1.20:8000 npm run dev     # phone on the LAN
  */
 
 /** The backend's own default — see vastralaye_backend/run.py. */
 const LOCAL_ORIGIN = 'http://127.0.0.1:8000';
 
 /** The deployed API, used by production builds. */
-const DEPLOYED_ORIGIN = 'https://api.mizorpaymart.com';
+const DEPLOYED_ORIGIN = 'https://api.vastraliya.com';
 
 /** Scheme + host, no trailing slash and no path. */
 export const API_ORIGIN = (
