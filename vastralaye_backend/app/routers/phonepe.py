@@ -70,8 +70,10 @@ def generate_payment(amount: int):
     # Store redirect URL temporarily
     payment_store[order_id] = redirect_url
 
+    # The payment page is served by this API itself (GET /payment/{order_id}).
+    api_public = os.getenv("API_PUBLIC_URL", "https://api.vastraliya.com")
     return {
-        "paymentUrl": f"https://mizorpaymart.com/payment/{order_id}",
+        "paymentUrl": f"{api_public}/payment/{order_id}",
         "order_id": order_id,
         "expire": 1200,
     }
