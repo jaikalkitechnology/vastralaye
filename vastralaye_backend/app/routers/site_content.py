@@ -10,16 +10,18 @@ from sqlalchemy.orm import Session
 from app.authentication import get_current_admin_user
 from app.database import get_db
 from app.models import User
-from app.models.site_content import HeroBanner, PageBanner, SiteSetting, Testimonial
+from app.models.site_content import HeroBanner, HomeSection, PageBanner, SiteSetting, Testimonial
 
 router = APIRouter(tags=["Site Content"])
 
 BANNERS_DIR = os.path.join("static", "uploads", "banners")
 PAGE_BANNERS_DIR = os.path.join("static", "uploads", "page_banners")
 TESTIMONIALS_DIR = os.path.join("static", "uploads", "testimonials")
+HOME_SECTIONS_DIR = os.path.join("static", "uploads", "home_sections")
 os.makedirs(BANNERS_DIR, exist_ok=True)
 os.makedirs(PAGE_BANNERS_DIR, exist_ok=True)
 os.makedirs(TESTIMONIALS_DIR, exist_ok=True)
+os.makedirs(HOME_SECTIONS_DIR, exist_ok=True)
 
 # Storefront slots that can carry an admin-managed banner. "home_hero" is the
 # background behind the homepage hero slides; the rest are catalogue bands.
@@ -513,3 +515,106 @@ def update_settings(
             db.add(SiteSetting(key=key, value=value))
     db.commit()
     return _settings_dict(db)
+
+
+# ---------------------------------------------------------------
+# Home sections — the two collection cards + the craft-story band
+# ---------------------------------------------------------------
+# One row per slot, upserted like page banners. No row → the storefront
+# renders its built-in content; a row with is_active=False hides the
+# section; any blank field falls back to the built-in text or artwork.
+
+HOME_SLOTS = ["card_1", "card_2", "story"]
+
+
+def _home_out(row: HomeSection) -> dict:
+    return {
+        "slot": row.slot,
+        "overline": row.overline,
+        "title_line_1": row.title_line_1,
+        "title_line_2": row.title_line_2,
+        "description": row.description,
+        "cta_label": row.cta_label,
+        "cta_link": row.cta_link,
+        "stat1_value": row.stat1_value,
+        "stat1_label": row.stat1_label,
+        "stat2_value": row.stat2_value,
+        "stat2_label": row.stat2_label,
+        "stat3_value": row.stat3_value,
+        "stat3_label": row.stat3_label,
+        "image_url": row.image_url,
+        "is_active": bool(row.is_active),
+    }
+
+
+@router.get("/api/v1/fronted/home-sections")
+def list_public_home_sections(db: Session = Depends(get_db)):
+    """Keyed by slot. Inactive rows are included — is_active=False means
+    "hide this section", which the storefront must be able to see; a slot
+    that's absent means "use the built-in version"."""
+    rows = db.query(HomeSection).all()
+    return {row.slot: _home_out(row) for row in rows}
+
+
+@router.get("/api/v1/admin/home-sections")
+def list_admin_home_sections(
+    db: Session = Depends(get_db),
+    admin: User = Depends(get_current_admin_user),
+):
+    rows = db.query(HomeSection).all()
+    return {row.slot: _home_out(row) for row in rows}
+
+
+@router.put("/api/v1/admin/home-sections/{slot}")
+def upsert_home_section(
+    slot: str,
+    overline: str = Form(""),
+    title_line_1: str = Form(""),
+    title_line_2: str = Form(""),
+    description: str = Form(""),
+    cta_label: str = Form(""),
+    cta_link: str = Form(""),
+    stat1_value: str = Form(""),
+    stat1_label: str = Form(""),
+    stat2_value: str = Form(""),
+    stat2_label: str = Form(""),
+    stat3_value: str = Form(""),
+    stat3_label: str = Form(""),
+    is_active: str = Form("true"),
+    remove_image: str = Form("false"),
+    image_file: Optional[UploadFile] = File(None),
+    db: Session = Depends(get_db),
+    admin: User = Depends(get_current_admin_user),
+):
+    if slot not in HOME_SLOTS:
+        raise HTTPException(status_code=404, detail=f"Unknown home section '{slot}'")
+
+    row = db.query(HomeSection).filter(HomeSection.slot == slot).first()
+    if not row:
+        row = HomeSection(slot=slot)
+        db.add(row)
+
+    row.overline = overline.strip() or None
+    row.title_line_1 = title_line_1.strip() or None
+    row.title_line_2 = title_line_2.strip() or None
+    row.description = description.strip() or None
+    row.cta_label = cta_label.strip() or None
+    row.cta_link = cta_link.strip() or None
+    row.stat1_value = stat1_value.strip() or None
+    row.stat1_label = stat1_label.strip() or None
+    row.stat2_value = stat2_value.strip() or None
+    row.stat2_label = stat2_label.strip() or None
+    row.stat3_value = stat3_value.strip() or None
+    row.stat3_label = stat3_label.strip() or None
+    row.is_active = is_active.strip().lower() != "false"
+
+    if remove_image.strip().lower() == "true" and not image_file:
+        _remove_file(row.image_url)
+        row.image_url = None
+    if image_file:
+        _remove_file(row.image_url)
+        row.image_url = _save_image(image_file, HOME_SECTIONS_DIR, slot)
+
+    db.commit()
+    db.refresh(row)
+    return _home_out(row)

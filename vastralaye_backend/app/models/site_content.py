@@ -71,3 +71,32 @@ class SiteSetting(Base):
     id = Column(Integer, primary_key=True, index=True)
     key = Column(String(80), unique=True, nullable=False, index=True)
     value = Column(String(500), nullable=True)
+
+
+class HomeSection(Base):
+    """Admin-managed home sections that used to be hard-coded: the two
+    collection cards under the hero and the craft-story band. One row per
+    slot ("card_1", "card_2", "story"), upserted from Admin › Banners. A
+    missing row means the storefront shows its built-in version; a row with
+    is_active=False hides that section entirely."""
+
+    __tablename__ = "home_sections"
+
+    id = Column(Integer, primary_key=True, index=True)
+    slot = Column(String(20), unique=True, nullable=False, index=True)
+    overline = Column(String(120), nullable=True)
+    title_line_1 = Column(String(160), nullable=True)
+    title_line_2 = Column(String(160), nullable=True)    # story heading, line 2
+    description = Column(Text, nullable=True)            # story paragraph
+    cta_label = Column(String(60), nullable=True)
+    cta_link = Column(String(255), nullable=True)
+    # The three "40+ / Craft forms" counters on the story band.
+    stat1_value = Column(String(40), nullable=True)
+    stat1_label = Column(String(80), nullable=True)
+    stat2_value = Column(String(40), nullable=True)
+    stat2_label = Column(String(80), nullable=True)
+    stat3_value = Column(String(40), nullable=True)
+    stat3_label = Column(String(80), nullable=True)
+    image_url = Column(String(255), nullable=True)       # empty → built-in artwork
+    is_active = Column(Boolean, default=True)
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())

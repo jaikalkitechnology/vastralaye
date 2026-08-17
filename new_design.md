@@ -1940,6 +1940,41 @@ use, which is why it's the suggested target.
 
 ---
 
+## 50. The home sections join the admin panel
+
+The two collection cards under the hero and the "From Loom to Wardrobe" story
+band were hard-coded. Both are now editable from **Admin › Banners → Home
+sections**, with the same temperament as everything else on that page:
+
+- **One editor per slot** — left card, right card, story band. Cards take an
+  overline, title, button label/link and an image; the story adds a second
+  heading line, the paragraph, and the three counters.
+- **Blank means built-in.** Every field falls back to the shipped text, and an
+  empty image slot falls back to the drawn artwork (paisley, plaid, loom). The
+  admin page shows those defaults as placeholders, so the form documents what
+  leaving a field empty does.
+- **Visible off hides the section** — not "shows the default". The public
+  endpoint therefore returns inactive rows too; an absent row means built-ins,
+  `is_active=false` means gone. Three states, all distinguishable.
+- Cached like the hero slides (`vastralaye:home-sections`), so a refresh paints
+  the admin's version immediately instead of flashing stock content, and both
+  consuming components share one request via an in-flight promise.
+
+Backend: `home_sections` table (slot-keyed upserts, same shape as page
+banners), `GET /fronted/home-sections`, `GET/PUT /admin/home-sections[/{slot}]`,
+uploads under `static/uploads/home_sections/`. `create_all` on startup makes
+the table; no migration to run.
+
+| Piece | File |
+|---|---|
+| Model | `app/models/site_content.py` — `HomeSection` |
+| Endpoints | `app/routers/site_content.py` |
+| Hook + cache | `src/hooks/use-home-sections.ts` |
+| Storefront | `PromoSection.tsx`, `home/BrandStory.tsx` |
+| Admin editor | `src/pages/admin/AdminHomeSections.tsx` (on the Banners page) |
+
+---
+
 ## Verification
 
 - `tsc --noEmit` — no errors in any changed file.
@@ -2259,3 +2294,12 @@ use, which is why it's the suggested target.
   contains `COLLATE utf8mb4_0900_zz_ci` is stored verbatim while its table is remapped
   — the property that makes the rewrite safe to run on real customer data.
 - 61 assertions pass in total.
+- Home sections driven end to end. Backend: 18/18 against the real FastAPI app —
+  upsert with a real multipart image (file lands on disk, URL under
+  `/static/uploads/home_sections/`), stats round-trip, hide keeps the row public with
+  `is_active=false`, remove-image deletes the file, unknown slot 404s, no auth 401s, a
+  GIF is refused. Storefront in a real browser against the production build: an
+  admin-configured card renders its title/CTA with the default artwork kept, a card
+  switched off disappears, the story band shows admin heading/counters/button — 8/8
+  checks, no page errors. Admin: the Banners page renders all three editors with
+  Visible switches, default-documenting placeholders and image dropzones.
