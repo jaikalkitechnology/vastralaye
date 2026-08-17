@@ -19,8 +19,7 @@ const stats = [
 ];
 
 const wardrobe = [
-  'Sarees', 'Suit Sets', 'Lehengas', 'Kurtas', 'Jeans & Trousers',
-  'Dresses', 'Dupattas', 'Palazzos', 'Accessories',
+  'Jeans & Trousers', 'Dresses', 'Dupattas', 'Palazzos', 'Accessories',
 ];
 
 const pillars = [
