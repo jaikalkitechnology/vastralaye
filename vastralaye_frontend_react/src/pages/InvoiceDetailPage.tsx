@@ -341,12 +341,6 @@ const InvoiceTemplate = React.forwardRef<HTMLDivElement, { invoice: Invoice }>(
               Vastra<span style={{ color: "#C99A45" }}>liya</span>
             </div>
             <div style={{
-              fontSize: "8.5px", letterSpacing: "0.42em",
-              textTransform: "uppercase", color: "#C99A45", marginTop: "3px",
-            }}>
-              Handcrafted India
-            </div>
-            <div style={{
               fontSize: "11px", color: "rgba(250,246,240,0.6)",
               marginTop: "9px", lineHeight: 1.65,
             }}>
@@ -988,7 +982,7 @@ const InvoicesPage: React.FC = () => {
         <span className="h-10 w-10 animate-spin rounded-full border-2 border-[#7A1F2B]/20 border-t-[#7A1F2B]" />
         <p className="font-serif text-lg text-espresso">Preparing your invoice…</p>
         <p className="text-[11px] uppercase tracking-[0.16em] text-[#6E5F53]">
-          Vastraliya · Handcrafted India
+          Vastraliya
         </p>
       </div>
       </main>

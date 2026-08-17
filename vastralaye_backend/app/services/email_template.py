@@ -170,7 +170,7 @@ def render_email(
     blocks: List[str],
     footer_lines: Optional[List[str]] = None,
     brand: str = "Vastraliya",
-    tagline: str = "Handcrafted India",
+    tagline: str = "",
 ) -> str:
     """Wrap composed blocks in the branded shell.
 
@@ -183,6 +183,12 @@ def render_email(
         f'line-height:1.6;color:{MUTED}">{line}</p>'
         for line in (footer_lines or [])
     )
+
+    tagline_html = (
+        f'<div style="margin-top:8px;font-family:{SANS};font-size:9px;font-weight:600;'
+        f'letter-spacing:.42em;text-transform:uppercase;color:{GOLD}">'
+        f"{esc(tagline)}</div>"
+    ) if tagline else ""
 
     return f"""<!DOCTYPE html>
 <html lang="en" style="margin:0;padding:0">
@@ -217,11 +223,7 @@ def render_email(
             <div style="font-family:{SERIF};font-size:27px;font-weight:600;
                         letter-spacing:.01em;color:{IVORY};line-height:1">
               Vastra<span style="color:{GOLD}">liya</span>
-            </div>
-            <div style="margin-top:8px;font-family:{SANS};font-size:9px;font-weight:600;
-                        letter-spacing:.42em;text-transform:uppercase;color:{GOLD}">
-              {esc(tagline)}
-            </div>
+            </div>{tagline_html}
           </td>
         </tr>
 
