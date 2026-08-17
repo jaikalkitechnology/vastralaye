@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
 import { Shield, Zap, Heart, Users } from 'lucide-react';
 import Reveal from '@/components/motion/Reveal';
+import { mediaUrl } from '@/lib/media';
+import { useHomeSections } from '@/hooks/use-home-sections';
 
 /**
  * About — editorial brand page for Vastraliya Fashion Private Limited.
@@ -55,7 +57,15 @@ const Zari = ({ className = '' }: { className?: string }) => (
   </span>
 );
 
-const About = () => (
+const About = () => {
+  // The arch image is uploadable from Admin › Banners → Home sections
+  // ("About page — arch image"); empty falls back to the loom artwork.
+  const sections = useHomeSections();
+  const archImage = sections?.about_arch?.image_url
+    ? mediaUrl(sections.about_arch.image_url)
+    : '/collections/at-the-loom.svg';
+
+  return (
   <div className="min-h-screen bg-ivory font-sans">
 
     {/* ───────────── HERO — editorial split with the loom arch ───────────── */}
@@ -96,8 +106,8 @@ const About = () => (
             />
             <div className="relative aspect-[4/4.6] overflow-hidden rounded-t-[999px] bg-gradient-to-b from-sand via-sand to-blush">
               <img
-                src="/collections/at-the-loom.svg"
-                alt="A loom with warp threads and woven cloth"
+                src={archImage}
+                alt="The Vastraliya wardrobe"
                 loading="lazy"
                 onError={(e) => { e.currentTarget.style.display = 'none'; }}
                 className="absolute inset-0 w-full h-full object-cover"
@@ -264,6 +274,7 @@ const About = () => (
       </Reveal>
     </section>
   </div>
-);
+  );
+};
 
 export default About;

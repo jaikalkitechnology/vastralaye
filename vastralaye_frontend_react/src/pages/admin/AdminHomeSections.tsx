@@ -40,7 +40,13 @@ type FormState = Record<string, string> & { is_active: string };
 
 const emptyForm = (): FormState => ({ is_active: 'true' } as FormState);
 
-const SLOT_META: Record<string, { name: string; hint: string; placeholders: Record<string, string> }> = {
+const SLOT_META: Record<string, { name: string; hint: string; imageOnly?: boolean; placeholders: Record<string, string> }> = {
+  about_arch: {
+    name: 'About page — arch image',
+    hint: 'The arch photo in the About page hero. Portrait works best (roughly 4:5); it’s cropped into a rounded arch. Empty = the drawn loom artwork.',
+    imageOnly: true,
+    placeholders: {},
+  },
   card_1: {
     name: 'Collection card — left',
     hint: 'Defaults: "Occasion wear / The Festive Edit" with the maroon paisley artwork.',
@@ -90,7 +96,8 @@ const SlotEditor = ({ slot, row, onSaved }: {
 }) => {
   const meta = SLOT_META[slot];
   const isStory = slot === 'story';
-  const fields = isStory ? STORY_TEXT_FIELDS : CARD_TEXT_FIELDS;
+  const imageOnly = Boolean(meta.imageOnly);
+  const fields = imageOnly ? ([] as readonly string[]) : isStory ? STORY_TEXT_FIELDS : CARD_TEXT_FIELDS;
 
   const [form, setForm] = useState<FormState>(emptyForm());
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -145,6 +152,7 @@ const SlotEditor = ({ slot, row, onSaved }: {
     <div className="bg-white border border-border rounded-md p-5">
       <div className="flex items-start justify-between gap-3 mb-1.5">
         <h3 className="text-xs font-semibold uppercase tracking-[0.16em]">{meta.name}</h3>
+        {!imageOnly && (
         <label className="inline-flex items-center gap-2 cursor-pointer select-none shrink-0">
           <span className="text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
             {visible ? 'Visible' : 'Hidden'}
@@ -159,6 +167,7 @@ const SlotEditor = ({ slot, row, onSaved }: {
             <span className={`absolute top-0.5 h-4 w-4 rounded-full bg-white transition-all ${visible ? 'left-[18px]' : 'left-0.5'}`} />
           </button>
         </label>
+        )}
       </div>
       <p className="text-xs text-muted-foreground mb-4">{meta.hint}</p>
 
@@ -198,6 +207,7 @@ const SlotEditor = ({ slot, row, onSaved }: {
       )}
 
       {/* Text fields */}
+      {!imageOnly && (
       <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
           <label className={labelCls}>Overline (small gold text)</label>
@@ -222,6 +232,7 @@ const SlotEditor = ({ slot, row, onSaved }: {
           <input className={inputCls} value={form.cta_link || ''} onChange={(e) => set('cta_link', e.target.value)} placeholder={meta.placeholders.cta_link} />
         </div>
       </div>
+      )}
 
       {isStory && (
         <>
@@ -272,8 +283,8 @@ const AdminHomeSections = () => {
           <LayoutGrid className="h-5 w-5 text-maroon" /> Home sections
         </h2>
         <p className="text-sm text-muted-foreground mt-1">
-          The two collection cards under the hero, and the “From Loom to Wardrobe” story band.
-          Blank fields keep the built-in text and artwork.
+          The two collection cards under the hero, the “From Loom to Wardrobe” story band,
+          and the About page’s arch image. Blank fields keep the built-in text and artwork.
         </p>
       </div>
       {loaded && (
@@ -283,6 +294,7 @@ const AdminHomeSections = () => {
           <div className="xl:col-span-2">
             <SlotEditor slot="story" row={rows.story || null} onSaved={(r) => setRows((p) => ({ ...p, story: r }))} />
           </div>
+          <SlotEditor slot="about_arch" row={rows.about_arch || null} onSaved={(r) => setRows((p) => ({ ...p, about_arch: r }))} />
         </div>
       )}
     </div>
