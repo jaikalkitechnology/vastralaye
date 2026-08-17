@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/use-toast';
 import { GalleryHorizontal, UploadCloud, Trash2, Pencil, RefreshCw, X } from 'lucide-react';
 import AdminPageBanners from './AdminPageBanners';
+import AdminHomeSections from './AdminHomeSections';
 import AdminLoading from '@/components/admin/AdminLoading';
 
 interface Banner {
@@ -344,6 +345,9 @@ const AdminBanners = () => {
           )}
         </div>
       </div>
+
+      {/* The two collection cards + the craft-story band */}
+      <AdminHomeSections />
 
       {/* Per-page catalogue banners (4 pages: image + text each) */}
       <AdminPageBanners />
