@@ -1,408 +1,269 @@
-import {
-  Shield,
-  Users,
-  Truck,
-  Award,
-  Star,
-  ChevronRight,
-  Globe,
-  Heart,
-  Zap,
-  ShoppingBag,
-  Package,
-  Headphones,
-  ArrowRight,
-  Store,
-} from "lucide-react";
+import { Link } from 'react-router-dom';
+import { Shield, Zap, Heart, Users } from 'lucide-react';
+import Reveal from '@/components/motion/Reveal';
 
-const About = () => {
-  const stats = [
-    {
-      icon: Users,
-      value: "10,000+",
-      label: "Happy Customers",
-    },
-    {
-      icon: Award,
-      value: "5+",
-      label: "Years Experience",
-    },
-    {
-      icon: Truck,
-      value: "100%",
-      label: "Delivery Success",
-    },
-    {
-      icon: Star,
-      value: "4.9/5",
-      label: "Customer Rating",
-    },
-  ];
+/**
+ * About — editorial brand page for Vastraliya Fashion Private Limited.
+ * Same visual language as the storefront: ivory/blush/espresso bands,
+ * serif display headings, gold zari details, and the loom artwork from
+ * the home craft band.
+ */
 
-  const values = [
-    {
-      icon: Shield,
-      title: "Trust & Security",
-      description:
-        "Advanced encryption and secure payment gateways protect every transaction you make with us.",
-    },
-    {
-      icon: Zap,
-      title: "Fast Delivery",
-      description:
-        "A dependable delivery network ensures your order arrives right on time, every time.",
-    },
-    {
-      icon: Heart,
-      title: "Quality Assurance",
-      description:
-        "Every piece is checked by hand — stitching, fabric and finish — before it leaves for your doorstep.",
-    },
-    {
-      icon: Users,
-      title: "Customer First",
-      description:
-        "Your satisfaction drives everything we do. Our support team is always ready to help.",
-    },
-  ];
+const stats = [
+  { value: '10,000+', label: 'Happy customers' },
+  { value: '5+', label: 'Years of craft' },
+  { value: '100%', label: 'Delivery success' },
+  { value: '4.9/5', label: 'Customer rating' },
+];
 
-  const brandFeatures = [
-    {
-      icon: ShoppingBag,
-      title: "Curated Collections",
-      description:
-        "Sarees, suit sets, kurtas, dresses, denim and more — every style hand-picked to earn its place.",
-    },
-    {
-      icon: Package,
-      title: "Careful Packaging",
-      description:
-        "Garments are folded, wrapped and boxed with care, so they arrive crisp and ready to wear.",
-    },
-    {
-      icon: Headphones,
-      title: "Dedicated Support",
-      description:
-        "Real people who know the catalogue — sizing, fabric care or order help, answered fast.",
-    },
-    {
-      icon: Store,
-      title: "Artisan Partnerships",
-      description:
-        "We work directly with weavers, block printers and dyers, so craft heritage stays alive and makers earn fairly.",
-    },
-  ];
+const wardrobe = [
+  'Sarees', 'Suit Sets', 'Lehengas', 'Kurtas', 'Jeans & Trousers',
+  'Dresses', 'Dupattas', 'Palazzos', 'Accessories',
+];
 
-  return (
-    <div className="min-h-screen bg-ivory font-sans">
-      {/* ───────────── HERO ───────────── */}
-      <section className="px-4 sm:px-6 lg:px-8 pt-14 md:pt-20 pb-10">
-        <div className="max-w-3xl mx-auto text-center">
-          <span className="overline-label mb-3">Trusted across India</span>
+const pillars = [
+  {
+    icon: Heart,
+    title: 'Quality, checked by hand',
+    text: 'Stitching, fabric and finish inspected on every piece before it leaves for your doorstep.',
+  },
+  {
+    icon: Users,
+    title: 'Artisan partnerships',
+    text: 'We work directly with weavers, block printers and dyers, so craft heritage stays alive and makers earn fairly.',
+  },
+  {
+    icon: Zap,
+    title: 'Fast, careful delivery',
+    text: 'Orders folded, wrapped and boxed with care, then moved on a network that arrives on time.',
+  },
+  {
+    icon: Shield,
+    title: 'Secure by default',
+    text: '256-bit SSL encryption and trusted payment gateways protect every order you place.',
+  },
+];
 
-          {/* Company Name */}
-          <h1 className="font-serif text-3xl md:text-4xl font-medium text-espresso leading-tight mb-2">
-            <span className="text-maroon">VASTRALIYA</span> FASHION
+/** A small row of zari diamonds — the brand's running ornament. */
+const Zari = ({ className = '' }: { className?: string }) => (
+  <span className={`inline-flex items-center gap-3 ${className}`} aria-hidden="true">
+    <span className="h-px w-10 bg-gold/50" />
+    <span className="h-1.5 w-1.5 rotate-45 bg-gold" />
+    <span className="h-2 w-2 rotate-45 border border-gold" />
+    <span className="h-1.5 w-1.5 rotate-45 bg-gold" />
+    <span className="h-px w-10 bg-gold/50" />
+  </span>
+);
+
+const About = () => (
+  <div className="min-h-screen bg-ivory font-sans">
+
+    {/* ───────────── HERO — editorial split with the loom arch ───────────── */}
+    <section className="container mx-auto px-4 pt-12 md:pt-20 pb-14 md:pb-20">
+      <div className="grid grid-cols-1 lg:grid-cols-2 items-center gap-12 lg:gap-16">
+        <Reveal>
+          <span className="overline-label mb-4">Vastraliya Fashion Private Limited</span>
+          <h1 className="font-serif text-4xl md:text-5xl font-medium text-espresso leading-[1.12]">
+            A Home for
+            <span className="block italic text-maroon">Garments</span>
           </h1>
-          <p className="text-muted-foreground text-sm md:text-base mb-6">
-            PRIVATE LIMITED
+          <p className="mt-5 text-[15px] md:text-base leading-relaxed text-muted-foreground max-w-lg">
+            Ethnic and everyday fashion, made with care — festive silks beside
+            easy denim, each piece chosen like it's going to someone we know.
           </p>
-
-          {/* Brand pill */}
-          <div className="inline-flex items-center gap-2 bg-white border border-border px-5 py-2 rounded-full mb-6">
-            <ShoppingBag className="w-4 h-4 text-gold" />
-            <span className="text-sm text-espresso">
-              Home of{" "}
-              <span className="text-maroon font-semibold">Vastraliya</span>
-            </span>
-          </div>
-
-          <p className="text-[15px] leading-relaxed text-muted-foreground max-w-2xl mx-auto mb-8">
-            Ethnic and everyday fashion, made with care — built on quality,
-            reliability, and genuine respect for the hands that make every piece.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a
-              href="/products"
-              className="inline-flex items-center justify-center gap-2 bg-maroon text-ivory font-medium px-8 py-3 rounded-full hover:bg-terracotta transition-colors"
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link
+              to="/products"
+              className="inline-flex items-center justify-center bg-maroon text-ivory text-xs font-semibold uppercase tracking-[0.16em] px-8 py-3.5 rounded-sm hover:bg-terracotta transition-colors"
             >
-              Shop Vastraliya <ChevronRight className="w-4 h-4" />
-            </a>
+              Shop the Collection
+            </Link>
+            <Link
+              to="/categories"
+              className="inline-flex items-center justify-center border border-espresso text-espresso text-xs font-semibold uppercase tracking-[0.16em] px-8 py-3.5 rounded-sm hover:bg-espresso hover:text-ivory transition-colors"
+            >
+              Browse Categories
+            </Link>
           </div>
-        </div>
-      </section>
+        </Reveal>
 
-      {/* ───────────── STATS ───────────── */}
-      <section className="px-4 sm:px-6 lg:px-8 pb-14">
-        <div className="max-w-3xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-4">
-          {stats.map(({ icon: Icon, value, label }) => (
+        <Reveal delay={0.12} className="flex justify-center lg:justify-end">
+          <div className="relative w-[260px] sm:w-[320px] lg:w-[380px]">
+            {/* offset gold ring behind the arch */}
             <div
-              key={label}
-              className="bg-white border border-border rounded-lg p-5 text-center"
+              className="absolute -top-3 -right-3 w-full h-full rounded-t-[999px] border border-gold/45"
+              aria-hidden="true"
+            />
+            <div className="relative aspect-[4/4.6] overflow-hidden rounded-t-[999px] bg-gradient-to-b from-sand via-sand to-blush">
+              <img
+                src="/collections/at-the-loom.svg"
+                alt="A loom with warp threads and woven cloth"
+                loading="lazy"
+                onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            </div>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+
+    {/* ───────────── TRUST STRIP — espresso band ───────────── */}
+    <section className="bg-espresso">
+      <div className="container mx-auto px-4 py-10 md:py-12">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-y-8">
+          {stats.map((s, i) => (
+            <div
+              key={s.label}
+              className={`text-center ${i > 0 ? 'md:border-l md:border-ivory/10' : ''}`}
             >
-              <Icon className="w-6 h-6 mx-auto mb-2 text-gold" />
-              <p className="font-serif text-2xl font-medium text-espresso">{value}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">{label}</p>
+              <p className="font-serif text-3xl md:text-4xl font-medium text-gold">{s.value}</p>
+              <p className="mt-1.5 text-[10.5px] uppercase tracking-[0.22em] text-ivory/60">
+                {s.label}
+              </p>
             </div>
           ))}
         </div>
-      </section>
+      </div>
+    </section>
 
-      {/* ───────────── VASTRALIYA SPOTLIGHT ───────────── */}
-      <section className="px-4 sm:px-6 lg:px-8 pb-14">
-        <div className="max-w-3xl mx-auto">
-          {/* header */}
-          <div className="text-center mb-8">
-            <span className="overline-label mb-2">Our Storefront</span>
-            <h2 className="font-serif text-2xl md:text-3xl font-medium text-espresso mb-3">
-              Welcome to <span className="text-maroon">Vastraliya</span>
-            </h2>
-            <p className="text-[15px] leading-relaxed text-muted-foreground max-w-2xl mx-auto">
-              Vastraliya is the online store of Vastraliya Fashion Private
-              Limited — a wardrobe of ethnic and everyday styles for shoppers
-              across India.
-            </p>
-          </div>
-
-          {/* banner card */}
-          <div className="bg-blush rounded-lg p-8 md:p-10 mb-8">
-            <span className="overline-label mb-3">Vastraliya — Dress Beautifully</span>
-            <h3 className="font-serif text-2xl md:text-3xl font-medium text-espresso mb-4 leading-tight">
-              Everything You Love,{" "}
-              <span className="text-maroon">Woven with Care</span>
-            </h3>
-            <p className="text-[15px] leading-relaxed text-muted-foreground mb-6">
-              Browse curated styles across occasions — festive silks, everyday
-              suit sets, dresses, denim and the pieces in between. Vastraliya
-              makes dressing well effortless.
-            </p>
-            <a
-              href="/products"
-              className="inline-flex items-center gap-2 bg-maroon text-ivory font-medium px-8 py-3 rounded-full hover:bg-terracotta transition-colors mb-6"
-            >
-              Explore Vastraliya <ArrowRight className="w-4 h-4" />
-            </a>
-            {/* category pills */}
-            <div className="flex flex-wrap gap-2">
-              {[
-                "🥻 Sarees",
-                "👗 Suit Sets",
-                "✨ Lehengas",
-                "🧥 Kurtas",
-                "👖 Jeans & Trousers",
-                "💃 Dresses",
-                "🧣 Dupattas",
-                "🌸 Palazzos",
-                "💍 Accessories",
-              ].map((cat) => (
-                <span
-                  key={cat}
-                  className="bg-white border border-border text-espresso text-sm px-4 py-1.5 rounded-full"
-                >
-                  {cat}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {/* brand features grid */}
-          <div className="grid sm:grid-cols-2 gap-4">
-            {brandFeatures.map(({ icon: Icon, title, description }) => (
-              <div
-                key={title}
-                className="bg-white border border-border rounded-lg p-6"
-              >
-                <div className="w-11 h-11 bg-blush rounded-lg flex items-center justify-center mb-4">
-                  <Icon className="w-5 h-5 text-maroon" />
-                </div>
-                <h4 className="font-medium text-espresso mb-2">{title}</h4>
-                <p className="text-sm leading-relaxed text-muted-foreground">
-                  {description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ───────────── OUR STORY ───────────── */}
-      <section className="px-4 sm:px-6 lg:px-8 pb-14">
-        <div className="max-w-3xl mx-auto">
-          {/* text */}
-          <div className="text-center mb-8">
-            <span className="overline-label mb-2">Our Story</span>
-            <h2 className="font-serif text-2xl md:text-3xl font-medium text-espresso leading-tight">
-              A Name That Means{" "}
-              <span className="text-maroon">a Home for Garments</span>
-            </h2>
-          </div>
-          <div className="space-y-4 text-[15px] leading-relaxed text-muted-foreground">
-            <p>
-              Vastraliya Fashion Private Limited was established with a simple
-              belief: the clothes India celebrates in deserve the same care
-              online that they receive on the loom. Founded in Faridabad,
-              Haryana, we have grown from a small startup into a trusted
-              fashion destination serving customers across India through our
-              store,{" "}
-              <strong className="text-maroon font-semibold">Vastraliya</strong>.
-            </p>
-            <p>
-              "Vastraliya" joins{" "}
-              <strong className="text-espresso font-semibold">"Vastra"</strong> — the
-              Sanskrit word for garment — with{" "}
-              <strong className="text-espresso font-semibold">"ālaya"</strong>, meaning
-              home. A home for garments: festive silks beside everyday
-              cottons-to-denim, each chosen like it's going to someone we know.
-            </p>
-            <p>
-              Today,{" "}
-              <strong className="text-maroon font-semibold">Vastraliya</strong>{" "}
-              serves thousands of customers with the same passion that drove
-              our founding, and our commitment to the craft — and the people
-              behind it — has never wavered.
-            </p>
-          </div>
-
-          {/* cards */}
-          <div className="mt-8 bg-white border border-border rounded-lg p-6 space-y-3">
-            {[
-              {
-                icon: Globe,
-                title: "Pan-India Reach",
-                sub: "Delivering to 500+ cities across India",
-              },
-              {
-                icon: Shield,
-                title: "Secure Payments",
-                sub: "256-bit SSL encryption on every order",
-              },
-              {
-                icon: Award,
-                title: "MCA Registered",
-                sub: "Vastraliya Fashion Private Limited",
-              },
-              {
-                icon: ShoppingBag,
-                title: "Vastraliya",
-                sub: "900+ styles & growing",
-              },
-            ].map(({ icon: Icon, title, sub }) => (
-              <div
-                key={title}
-                className="flex items-center gap-4 p-4 bg-ivory rounded-lg"
-              >
-                <div className="w-11 h-11 bg-blush rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Icon className="w-5 h-5 text-maroon" />
-                </div>
-                <div>
-                  <p className="font-medium text-espresso">{title}</p>
-                  <p className="text-sm text-muted-foreground">{sub}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ───────────── MISSION & VISION ───────────── */}
-      <section className="px-4 sm:px-6 lg:px-8 pb-14">
-        <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-8">
-            <span className="overline-label mb-2">What Drives Us</span>
-            <h2 className="font-serif text-2xl md:text-3xl font-medium text-espresso">
-              Mission & Vision
-            </h2>
-          </div>
-          <div className="grid sm:grid-cols-2 gap-4">
-            {/* mission */}
-            <div className="bg-white border border-border rounded-lg p-8">
-              <div className="w-12 h-12 bg-blush rounded-lg flex items-center justify-center mb-5">
-                <Heart className="w-6 h-6 text-maroon" />
-              </div>
-              <h3 className="font-serif text-xl font-medium text-espresso mb-3">Our Mission</h3>
-              <p className="text-[15px] leading-relaxed text-muted-foreground">
-                To bring beautifully made ethnic and everyday fashion to every
-                wardrobe through{" "}
-                <strong className="text-maroon font-semibold">Vastraliya</strong> — at
-                honest prices, with service that makes shopping convenient,
-                secure, and genuinely enjoyable.
-              </p>
-            </div>
-            {/* vision */}
-            <div className="bg-white border border-border rounded-lg p-8">
-              <div className="w-12 h-12 bg-blush rounded-lg flex items-center justify-center mb-5">
-                <Globe className="w-6 h-6 text-maroon" />
-              </div>
-              <h3 className="font-serif text-xl font-medium text-espresso mb-3">Our Vision</h3>
-              <p className="text-[15px] leading-relaxed text-muted-foreground">
-                To make{" "}
-                <strong className="text-maroon font-semibold">Vastraliya</strong> India's
-                most loved fashion destination by 2030 — celebrated for
-                craft, a customer-first approach, and practices that empower
-                both shoppers and makers.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ───────────── CORE VALUES ───────────── */}
-      <section className="px-4 sm:px-6 lg:px-8 pb-14">
-        <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-8">
-            <span className="overline-label mb-2">What We Stand For</span>
-            <h2 className="font-serif text-2xl md:text-3xl font-medium text-espresso">
-              Our Core Values
-            </h2>
-          </div>
-          <div className="grid sm:grid-cols-2 gap-4">
-            {values.map(({ icon: Icon, title, description }) => (
-              <div
-                key={title}
-                className="bg-white border border-border rounded-lg p-6"
-              >
-                <div className="w-11 h-11 bg-blush rounded-lg flex items-center justify-center mb-4">
-                  <Icon className="w-5 h-5 text-maroon" />
-                </div>
-                <h3 className="font-medium text-espresso mb-2">
-                  {title}
-                </h3>
-                <p className="text-sm leading-relaxed text-muted-foreground">
-                  {description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ───────────── CTA ───────────── */}
-      <section className="px-4 sm:px-6 lg:px-8 pb-16">
-        <div className="max-w-3xl mx-auto bg-blush rounded-lg p-10 text-center">
-          <div className="inline-flex items-center gap-2 bg-white border border-border px-4 py-1.5 rounded-full text-sm mb-6">
-            <ShoppingBag className="w-4 h-4 text-gold" />
-            <span className="text-espresso">
-              Shop now on{" "}
-              <span className="text-maroon font-semibold">Vastraliya</span>
-            </span>
-          </div>
-          <h2 className="font-serif text-2xl md:text-3xl font-medium text-espresso mb-6">
-            Ready to Experience the{" "}
-            <span className="text-maroon">Vastraliya</span> Difference?
+    {/* ───────────── STORY — narrow editorial column ───────────── */}
+    <section className="container mx-auto px-4 py-14 md:py-20">
+      <div className="max-w-2xl mx-auto text-center">
+        <Reveal>
+          <span className="overline-label mb-3">Our Story</span>
+          <h2 className="font-serif text-3xl md:text-4xl font-medium text-espresso leading-tight">
+            From Faridabad,
+            <span className="italic text-maroon"> for every celebration</span>
           </h2>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a
-              href="/products"
-              className="inline-flex items-center justify-center gap-2 bg-maroon text-ivory font-medium px-10 py-3.5 rounded-full hover:bg-terracotta transition-colors"
-            >
-              Start Shopping <ChevronRight className="w-5 h-5" />
-            </a>
+          <p className="mt-6 text-[15px] leading-relaxed text-muted-foreground text-left md:text-center">
+            Vastraliya Fashion Private Limited was founded on a simple belief:
+            the clothes India celebrates in deserve the same care online that
+            they receive on the loom. From Faridabad, Haryana, we've grown into
+            a trusted fashion destination serving customers across the country —
+            with the same passion that drove our first order.
+          </p>
+        </Reveal>
+
+        {/* Pull-quote: the name */}
+        <Reveal delay={0.1}>
+          <figure className="mt-10 bg-blush rounded-sm px-8 py-9 md:px-12">
+            <Zari className="mb-5" />
+            <blockquote className="font-serif text-xl md:text-2xl text-espresso leading-relaxed">
+              <span className="text-maroon font-medium">"Vastra"</span> — the Sanskrit
+              word for garment. <span className="text-maroon font-medium">"Ālaya"</span> —
+              a home. <span className="italic">Vastraliya: a home for garments.</span>
+            </blockquote>
+            <figcaption className="mt-4 text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
+              The name, explained
+            </figcaption>
+          </figure>
+        </Reveal>
+      </div>
+    </section>
+
+    {/* ───────────── THE WARDROBE — blush band with pills + pillars ───────────── */}
+    <section className="bg-blush">
+      <div className="container mx-auto px-4 py-14 md:py-20">
+        <Reveal className="text-center">
+          <span className="overline-label mb-3">The Wardrobe</span>
+          <h2 className="font-serif text-3xl md:text-4xl font-medium text-espresso leading-tight">
+            Curated, <span className="italic text-maroon">not crowded</span>
+          </h2>
+          <p className="mt-4 text-[15px] leading-relaxed text-muted-foreground max-w-xl mx-auto">
+            900+ styles and growing — every one hand-picked to earn its place.
+          </p>
+        </Reveal>
+
+        <Reveal delay={0.08}>
+          <div className="mt-8 flex flex-wrap justify-center gap-2.5 max-w-3xl mx-auto">
+            {wardrobe.map((w) => (
+              <Link
+                key={w}
+                to="/categories"
+                className="inline-flex items-center gap-2 bg-ivory border border-sand text-espresso text-[13px] px-5 py-2 rounded-full hover:border-gold transition-colors"
+              >
+                <span className="h-1 w-1 rotate-45 bg-gold" aria-hidden="true" />
+                {w}
+              </Link>
+            ))}
           </div>
+        </Reveal>
+
+        <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-5xl mx-auto">
+          {pillars.map(({ icon: Icon, title, text }, i) => (
+            <Reveal key={title} delay={i * 0.06}>
+              <div className="h-full bg-ivory border border-sand rounded-sm p-6">
+                <Icon className="h-5 w-5 text-terracotta" strokeWidth={1.5} />
+                <h3 className="mt-4 font-medium text-espresso text-[15px]">{title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{text}</p>
+              </div>
+            </Reveal>
+          ))}
         </div>
-      </section>
-    </div>
-  );
-};
+      </div>
+    </section>
+
+    {/* ───────────── MISSION & VISION — espresso band ───────────── */}
+    <section className="bg-espresso">
+      <div className="container mx-auto px-4 py-14 md:py-20">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-0 max-w-5xl mx-auto">
+          <Reveal className="lg:pr-14">
+            <span className="block text-[11px] font-semibold uppercase tracking-[0.3em] text-gold mb-4">
+              Our Mission
+            </span>
+            <h3 className="font-serif text-2xl md:text-[28px] font-medium text-ivory leading-snug">
+              Beautifully made fashion, in every wardrobe
+            </h3>
+            <p className="mt-4 text-[14.5px] leading-relaxed text-ivory/65">
+              To bring ethnic and everyday styles to every wardrobe at honest
+              prices — with service that makes shopping convenient, secure and
+              genuinely enjoyable.
+            </p>
+          </Reveal>
+          <Reveal
+            delay={0.1}
+            className="lg:pl-14 lg:border-l lg:border-ivory/12"
+          >
+            <span className="block text-[11px] font-semibold uppercase tracking-[0.3em] text-gold mb-4">
+              Our Vision
+            </span>
+            <h3 className="font-serif text-2xl md:text-[28px] font-medium text-ivory leading-snug">
+              India's most loved fashion destination
+            </h3>
+            <p className="mt-4 text-[14.5px] leading-relaxed text-ivory/65">
+              By 2030 — celebrated for craft, a customer-first approach, and
+              practices that empower both shoppers and makers.
+            </p>
+          </Reveal>
+        </div>
+      </div>
+    </section>
+
+    {/* ───────────── CTA — blush, with the zari hem ───────────── */}
+    <section className="container mx-auto px-4 py-14 md:py-20">
+      <Reveal>
+        <div className="max-w-3xl mx-auto text-center bg-blush rounded-sm px-8 py-12 md:py-14">
+          <Zari className="mb-6" />
+          <h2 className="font-serif text-3xl md:text-4xl font-medium text-espresso leading-tight">
+            Dress <span className="italic text-maroon">beautifully</span>
+          </h2>
+          <p className="mt-3 text-[15px] text-muted-foreground">
+            The wardrobe is waiting — festive, everyday, and everything between.
+          </p>
+          <Link
+            to="/products"
+            className="mt-7 inline-flex items-center justify-center bg-maroon text-ivory text-xs font-semibold uppercase tracking-[0.16em] px-10 py-4 rounded-sm hover:bg-terracotta transition-colors"
+          >
+            Start Shopping
+          </Link>
+          <p className="mt-8 text-[10.5px] uppercase tracking-[0.2em] text-muted-foreground/80">
+            Vastraliya Fashion Private Limited · MCA Registered · Faridabad, Haryana
+          </p>
+        </div>
+      </Reveal>
+    </section>
+  </div>
+);
 
 export default About;
