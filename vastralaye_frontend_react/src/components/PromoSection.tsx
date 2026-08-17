@@ -18,10 +18,10 @@ const banners = [
   },
   {
     overline: 'Daily comfort',
-    title: 'Everyday Cottons',
-    cta: 'Shop Cottons',
+    title: 'Everyday Essentials',
+    cta: 'Shop Essentials',
     to: '/products',
-    image: '/collections/everyday-cottons.svg',
+    image: '/collections/everyday-essentials.svg',
     fallback: 'bg-gradient-to-br from-blush via-sand to-ivory',
   },
 ];
