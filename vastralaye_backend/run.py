@@ -40,18 +40,27 @@ sync_missing_columns()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     init_db()
+    # Bootstrap an admin only when the database has none AND credentials are
+    # provided via environment. Never hard-code them: the previous version
+    # created admin@jokroup.com/admin123 on every fresh start, which is a
+    # publicly-known login on any deployed copy of this code.
     db = SessionLocal()
-    existing_admin = db.query(User).filter(User.email == "admin@jokroup.com").first()
-    if not existing_admin:
-        admin = User(
+    has_admin = db.query(User).filter(User.role == "admin").first()
+    seed_email = os.getenv("ADMIN_SEED_EMAIL")
+    seed_password = os.getenv("ADMIN_SEED_PASSWORD")
+    if not has_admin and seed_email and seed_password:
+        db.add(User(
             first_name="Admin",
             last_name="User",
-            email="admin@jokroup.com",
-            password=get_password_hash("admin123"),
+            email=seed_email,
+            password=get_password_hash(seed_password),
             role="admin",
-        )
-        db.add(admin)
+        ))
         db.commit()
+        print(f"Seeded admin account {seed_email} (no admin existed).")
+    elif not has_admin:
+        print("No admin account exists. Set ADMIN_SEED_EMAIL and "
+              "ADMIN_SEED_PASSWORD to create one on next start.")
     db.close()
     yield
 

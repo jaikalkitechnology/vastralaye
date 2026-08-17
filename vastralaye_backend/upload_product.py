@@ -2,7 +2,7 @@ import requests
 from pathlib import Path
 
 # ================= CONFIG =================
-API_URL = "https://fastapi.jokroup.in/products/upload-excel"
+API_URL = "https://api.vastraliya.com/products/upload-excel"
 EXCEL_FILE = Path("product.xlsx")
 
 # ================= VALIDATION =================
