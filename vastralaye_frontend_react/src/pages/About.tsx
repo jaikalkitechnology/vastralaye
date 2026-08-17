@@ -8,7 +8,6 @@ import {
   Globe,
   Heart,
   Zap,
-  CheckCircle,
   ShoppingBag,
   Package,
   Headphones,
@@ -51,13 +50,13 @@ const About = () => {
       icon: Zap,
       title: "Fast Delivery",
       description:
-        "Lightning-fast delivery network ensures your products arrive right on time, every time.",
+        "A dependable delivery network ensures your order arrives right on time, every time.",
     },
     {
       icon: Heart,
       title: "Quality Assurance",
       description:
-        "Every product undergoes rigorous quality checks before it's delivered to your doorstep.",
+        "Every piece is checked by hand — stitching, fabric and finish — before it leaves for your doorstep.",
     },
     {
       icon: Users,
@@ -67,34 +66,30 @@ const About = () => {
     },
   ];
 
-  const features = [
-
-  ];
-
-  const martFeatures = [
+  const brandFeatures = [
     {
       icon: ShoppingBag,
-      title: "Huge Product Range",
+      title: "Curated Collections",
       description:
-        "From electronics to fashion, groceries to home décor  MizorpayMart has everything under one roof.",
+        "Sarees, suit sets, kurtas, dresses, denim and more — every style hand-picked to earn its place.",
     },
     {
       icon: Package,
-      title: "Smart Packaging",
+      title: "Careful Packaging",
       description:
-        "Products are packed securely and eco-consciously, ensuring they arrive in perfect condition.",
+        "Garments are folded, wrapped and boxed with care, so they arrive crisp and ready to wear.",
     },
     {
       icon: Headphones,
       title: "Dedicated Support",
       description:
-        "MizorpayMart's dedicated support team resolves queries faster than industry standards.",
+        "Real people who know the catalogue — sizing, fabric care or order help, answered fast.",
     },
     {
       icon: Store,
-      title: "Seller Marketplace",
+      title: "Artisan Partnerships",
       description:
-        "Empower local sellers to list and sell their products on MizorpayMart and reach millions.",
+        "We work directly with weavers, block printers and dyers, so craft heritage stays alive and makers earn fairly.",
     },
   ];
 
@@ -107,24 +102,24 @@ const About = () => {
 
           {/* Company Name */}
           <h1 className="font-serif text-3xl md:text-4xl font-medium text-espresso leading-tight mb-2">
-            <span className="text-maroon">MIZORPAY</span> SOLUTION
+            <span className="text-maroon">VASTRALIYA</span> FASHION
           </h1>
           <p className="text-muted-foreground text-sm md:text-base mb-6">
-            (OPC) PRIVATE LIMITED
+            PRIVATE LIMITED
           </p>
 
-          {/* MizorpayMart brand pill */}
+          {/* Brand pill */}
           <div className="inline-flex items-center gap-2 bg-white border border-border px-5 py-2 rounded-full mb-6">
             <ShoppingBag className="w-4 h-4 text-gold" />
             <span className="text-sm text-espresso">
-              Proudly presents{" "}
-              <span className="text-maroon font-semibold">MizorpayMart</span>
+              Home of{" "}
+              <span className="text-maroon font-semibold">Vastraliya</span>
             </span>
           </div>
 
           <p className="text-[15px] leading-relaxed text-muted-foreground max-w-2xl mx-auto mb-8">
-            Your all-in-one online shopping destination  built on quality,
-            reliability, and genuine care for every customer.
+            Ethnic and everyday fashion, made with care — built on quality,
+            reliability, and genuine respect for the hands that make every piece.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -132,7 +127,7 @@ const About = () => {
               href="/products"
               className="inline-flex items-center justify-center gap-2 bg-maroon text-ivory font-medium px-8 py-3 rounded-full hover:bg-terracotta transition-colors"
             >
-              Shop on MizorpayMart <ChevronRight className="w-4 h-4" />
+              Shop Vastraliya <ChevronRight className="w-4 h-4" />
             </a>
           </div>
         </div>
@@ -154,52 +149,52 @@ const About = () => {
         </div>
       </section>
 
-      {/* ───────────── MIZORPAYMART SPOTLIGHT ───────────── */}
+      {/* ───────────── VASTRALIYA SPOTLIGHT ───────────── */}
       <section className="px-4 sm:px-6 lg:px-8 pb-14">
         <div className="max-w-3xl mx-auto">
           {/* header */}
           <div className="text-center mb-8">
-            <span className="overline-label mb-2">Our Flagship Platform</span>
+            <span className="overline-label mb-2">Our Storefront</span>
             <h2 className="font-serif text-2xl md:text-3xl font-medium text-espresso mb-3">
-              Welcome to <span className="text-maroon">MizorpayMart</span>
+              Welcome to <span className="text-maroon">Vastraliya</span>
             </h2>
             <p className="text-[15px] leading-relaxed text-muted-foreground max-w-2xl mx-auto">
-              MizorpayMart is the e-commerce storefront of MIZORPAY SOLUTION
-              (OPC) PRIVATE LIMITED  a one-stop mart for millions of shoppers
+              Vastraliya is the online store of Vastraliya Fashion Private
+              Limited — a wardrobe of ethnic and everyday styles for shoppers
               across India.
             </p>
           </div>
 
           {/* banner card */}
           <div className="bg-blush rounded-lg p-8 md:p-10 mb-8">
-            <span className="overline-label mb-3">MizorpayMart  Shop Smart</span>
+            <span className="overline-label mb-3">Vastraliya — Dress Beautifully</span>
             <h3 className="font-serif text-2xl md:text-3xl font-medium text-espresso mb-4 leading-tight">
-              Everything You Need,{" "}
-              <span className="text-maroon">Delivered Fast</span>
+              Everything You Love,{" "}
+              <span className="text-maroon">Woven with Care</span>
             </h3>
             <p className="text-[15px] leading-relaxed text-muted-foreground mb-6">
-              Browse thousands of curated products across categories
-              Electronics, Fashion, Home & Kitchen, Beauty, Sports, and
-              much more. MizorpayMart makes online shopping effortless.
+              Browse curated styles across occasions — festive silks, everyday
+              suit sets, dresses, denim and the pieces in between. Vastraliya
+              makes dressing well effortless.
             </p>
             <a
               href="/products"
               className="inline-flex items-center gap-2 bg-maroon text-ivory font-medium px-8 py-3 rounded-full hover:bg-terracotta transition-colors mb-6"
             >
-              Explore MizorpayMart <ArrowRight className="w-4 h-4" />
+              Explore Vastraliya <ArrowRight className="w-4 h-4" />
             </a>
             {/* category pills */}
             <div className="flex flex-wrap gap-2">
               {[
-                "📱 Electronics",
-                "👗 Fashion",
-                "🏠 Home & Kitchen",
-                "💄 Beauty",
-                "⚽ Sports",
-                "📚 Books",
-                "🛒 Groceries",
-                "🧸 Toys",
-                "🔧 Tools",
+                "🥻 Sarees",
+                "👗 Suit Sets",
+                "✨ Lehengas",
+                "🧥 Kurtas",
+                "👖 Jeans & Trousers",
+                "💃 Dresses",
+                "🧣 Dupattas",
+                "🌸 Palazzos",
+                "💍 Accessories",
               ].map((cat) => (
                 <span
                   key={cat}
@@ -211,9 +206,9 @@ const About = () => {
             </div>
           </div>
 
-          {/* mart features grid */}
+          {/* brand features grid */}
           <div className="grid sm:grid-cols-2 gap-4">
-            {martFeatures.map(({ icon: Icon, title, description }) => (
+            {brandFeatures.map(({ icon: Icon, title, description }) => (
               <div
                 key={title}
                 className="bg-white border border-border rounded-lg p-6"
@@ -238,47 +233,36 @@ const About = () => {
           <div className="text-center mb-8">
             <span className="overline-label mb-2">Our Story</span>
             <h2 className="font-serif text-2xl md:text-3xl font-medium text-espresso leading-tight">
-              From a Small Startup to a{" "}
-              <span className="text-maroon">Trusted Platform</span>
+              A Name That Means{" "}
+              <span className="text-maroon">a Home for Garments</span>
             </h2>
           </div>
           <div className="space-y-4 text-[15px] leading-relaxed text-muted-foreground">
             <p>
-              MIZORPAY SOLUTION (OPC) PRIVATE LIMITED was established with a
-              vision to revolutionize the way people shop online. Founded in
-              Faridabad, Haryana, we have grown from a small startup to a
-              trusted e-commerce platform serving customers across India
-              through our flagship store {" "}
-              <strong className="text-maroon font-semibold">MizorpayMart</strong>.
+              Vastraliya Fashion Private Limited was established with a simple
+              belief: the clothes India celebrates in deserve the same care
+              online that they receive on the loom. Founded in Faridabad,
+              Haryana, we have grown from a small startup into a trusted
+              fashion destination serving customers across India through our
+              store,{" "}
+              <strong className="text-maroon font-semibold">Vastraliya</strong>.
             </p>
             <p>
-              "MIZORPAY" combines{" "}
-              <strong className="text-espresso font-semibold">"Mizo"</strong>  representing
-              our roots and spirit of innovation  with{" "}
-              <strong className="text-espresso font-semibold">"Pay"</strong>, signifying
-              seamless payment solutions. As an OPC Private Limited entity,
-              we blend startup agility with corporate stability.
+              "Vastraliya" joins{" "}
+              <strong className="text-espresso font-semibold">"Vastra"</strong> — the
+              Sanskrit word for garment — with{" "}
+              <strong className="text-espresso font-semibold">"ālaya"</strong>, meaning
+              home. A home for garments: festive silks beside everyday
+              cottons-to-denim, each chosen like it's going to someone we know.
             </p>
             <p>
-              Today, through{" "}
-              <strong className="text-maroon font-semibold">MizorpayMart</strong>, we
-              serve thousands of customers with the same passion that drove
-              our founding, and our commitment to excellence has never
-              wavered.
+              Today,{" "}
+              <strong className="text-maroon font-semibold">Vastraliya</strong>{" "}
+              serves thousands of customers with the same passion that drove
+              our founding, and our commitment to the craft — and the people
+              behind it — has never wavered.
             </p>
           </div>
-
-          <ul className="mt-8 grid sm:grid-cols-2 gap-x-6 gap-y-3">
-            {features.map((f) => (
-              <li
-                key={f}
-                className="flex items-center gap-2 text-muted-foreground text-sm"
-              >
-                <CheckCircle className="w-4 h-4 text-gold flex-shrink-0" />
-                {f}
-              </li>
-            ))}
-          </ul>
 
           {/* cards */}
           <div className="mt-8 bg-white border border-border rounded-lg p-6 space-y-3">
@@ -286,7 +270,7 @@ const About = () => {
               {
                 icon: Globe,
                 title: "Pan-India Reach",
-                sub: "Delivering to 500+ cities via MizorpayMart",
+                sub: "Delivering to 500+ cities across India",
               },
               {
                 icon: Shield,
@@ -296,12 +280,12 @@ const About = () => {
               {
                 icon: Award,
                 title: "MCA Registered",
-                sub: "OPC Private Limited entity",
+                sub: "Vastraliya Fashion Private Limited",
               },
               {
                 icon: ShoppingBag,
-                title: "MizorpayMart",
-                sub: "1,00,000+ products & growing",
+                title: "Vastraliya",
+                sub: "900+ styles & growing",
               },
             ].map(({ icon: Icon, title, sub }) => (
               <div
@@ -338,12 +322,11 @@ const About = () => {
               </div>
               <h3 className="font-serif text-xl font-medium text-espresso mb-3">Our Mission</h3>
               <p className="text-[15px] leading-relaxed text-muted-foreground">
-                To provide customers with high-quality products at competitive
-                prices through{" "}
-                <strong className="text-maroon font-semibold">MizorpayMart</strong>, while
-                delivering exceptional service that exceeds expectations
-                making online purchasing convenient, secure, and genuinely
-                enjoyable.
+                To bring beautifully made ethnic and everyday fashion to every
+                wardrobe through{" "}
+                <strong className="text-maroon font-semibold">Vastraliya</strong> — at
+                honest prices, with service that makes shopping convenient,
+                secure, and genuinely enjoyable.
               </p>
             </div>
             {/* vision */}
@@ -354,10 +337,10 @@ const About = () => {
               <h3 className="font-serif text-xl font-medium text-espresso mb-3">Our Vision</h3>
               <p className="text-[15px] leading-relaxed text-muted-foreground">
                 To make{" "}
-                <strong className="text-maroon font-semibold">MizorpayMart</strong> India's
-                most loved e-commerce platform by 2030  celebrated for
-                innovation, a customer-centric approach, and sustainable
-                practices that empower both buyers and sellers.
+                <strong className="text-maroon font-semibold">Vastraliya</strong> India's
+                most loved fashion destination by 2030 — celebrated for
+                craft, a customer-first approach, and practices that empower
+                both shoppers and makers.
               </p>
             </div>
           </div>
@@ -401,12 +384,12 @@ const About = () => {
             <ShoppingBag className="w-4 h-4 text-gold" />
             <span className="text-espresso">
               Shop now on{" "}
-              <span className="text-maroon font-semibold">MizorpayMart</span>
+              <span className="text-maroon font-semibold">Vastraliya</span>
             </span>
           </div>
           <h2 className="font-serif text-2xl md:text-3xl font-medium text-espresso mb-6">
             Ready to Experience the{" "}
-            <span className="text-maroon">MizorpayMart</span> Difference?
+            <span className="text-maroon">Vastraliya</span> Difference?
           </h2>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
