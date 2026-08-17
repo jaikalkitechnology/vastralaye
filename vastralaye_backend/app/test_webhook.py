@@ -5,7 +5,7 @@ import requests
 # =====================================================
 # ⚙️ CONFIG
 # =====================================================
-BASE_URL = "https://api.mizorpaymart.com"   # change if deployed
+BASE_URL = "https://api.vastraliya.com"   # change if deployed
 WEBHOOK_SECRET = "your_webhook_secret"
 
 CREATE_ORDER_URL = f"{BASE_URL}/api/v1/orders/create"

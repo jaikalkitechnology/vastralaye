@@ -1,10 +1,14 @@
+import os
+
 from fastapi_mail import FastMail, MessageSchema
 from app.utilis.email_config import conf
 from app.utilis.invoice_pdf import generate_invoice_pdf
 
-BASE_URL = "https://api.mizorpaymart.com"
-ORDER_DETAILS_URL = "https://mizorpaymart.com/orders/"
-PRODUCT_URL = "https://mizorpaymart.com/product/"
+# The API serves product images; the storefront serves the pages links open.
+BASE_URL = os.getenv("API_PUBLIC_URL", "https://api.vastraliya.com")
+STOREFRONT_URL = os.getenv("STOREFRONT_URL", "https://vastraliya.com")
+ORDER_DETAILS_URL = f"{STOREFRONT_URL}/orders/"
+PRODUCT_URL = f"{STOREFRONT_URL}/product/"
 
 
 async def send_order_email(

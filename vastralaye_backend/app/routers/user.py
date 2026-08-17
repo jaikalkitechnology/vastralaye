@@ -1232,7 +1232,8 @@ def get_order_detail(
     grand_total = subtotal + gst
 
     # Invoice URL
-    invoice_url = f"https://api.mizorpaymart.com/orders/{order.id}/invoice"
+    api_public = os.getenv("API_PUBLIC_URL", "https://api.vastraliya.com")
+    invoice_url = f"{api_public}/orders/{order.id}/invoice"
 
     return {
         "id": order.id,
