@@ -21,6 +21,7 @@ const PAGES = [
   { key: 'categories', label: 'All Categories', route: '/categories' },
   { key: 'new_arrivals', label: 'New Arrivals', route: '/new-arrivals' },
   { key: 'best_sellers', label: 'Bestsellers', route: '/best-sellers' },
+  { key: 'contact', label: 'Contact Us', route: '/contact-us' },
 ] as const;
 
 const ALL_SLOTS = [HOME_HERO, ...PAGES];

@@ -31,6 +31,7 @@ PAGE_BANNER_PAGES = [
     "new_arrivals",
     "best_sellers",
     "home_hero",
+    "contact",
 ]
 
 ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp"}
