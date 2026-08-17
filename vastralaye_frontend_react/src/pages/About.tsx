@@ -1,425 +1,269 @@
-import {
-  Shield,
-  Users,
-  Truck,
-  Award,
-  Star,
-  ChevronRight,
-  Globe,
-  Heart,
-  Zap,
-  CheckCircle,
-  ShoppingBag,
-  Package,
-  Headphones,
-  ArrowRight,
-  Store,
-} from "lucide-react";
+import { Link } from 'react-router-dom';
+import { Shield, Zap, Heart, Users } from 'lucide-react';
+import Reveal from '@/components/motion/Reveal';
 
-const About = () => {
-  const stats = [
-    {
-      icon: Users,
-      value: "10,000+",
-      label: "Happy Customers",
-    },
-    {
-      icon: Award,
-      value: "5+",
-      label: "Years Experience",
-    },
-    {
-      icon: Truck,
-      value: "100%",
-      label: "Delivery Success",
-    },
-    {
-      icon: Star,
-      value: "4.9/5",
-      label: "Customer Rating",
-    },
-  ];
+/**
+ * About — editorial brand page for Vastraliya Fashion Private Limited.
+ * Same visual language as the storefront: ivory/blush/espresso bands,
+ * serif display headings, gold zari details, and the loom artwork from
+ * the home craft band.
+ */
 
-  const values = [
-    {
-      icon: Shield,
-      title: "Trust & Security",
-      description:
-        "Advanced encryption and secure payment gateways protect every transaction you make with us.",
-    },
-    {
-      icon: Zap,
-      title: "Fast Delivery",
-      description:
-        "Lightning-fast delivery network ensures your products arrive right on time, every time.",
-    },
-    {
-      icon: Heart,
-      title: "Quality Assurance",
-      description:
-        "Every product undergoes rigorous quality checks before it's delivered to your doorstep.",
-    },
-    {
-      icon: Users,
-      title: "Customer First",
-      description:
-        "Your satisfaction drives everything we do. Our support team is always ready to help.",
-    },
-  ];
+const stats = [
+  { value: '10,000+', label: 'Happy customers' },
+  { value: '5+', label: 'Years of craft' },
+  { value: '100%', label: 'Delivery success' },
+  { value: '4.9/5', label: 'Customer rating' },
+];
 
-  const features = [
+const wardrobe = [
+  'Sarees', 'Suit Sets', 'Lehengas', 'Kurtas', 'Jeans & Trousers',
+  'Dresses', 'Dupattas', 'Palazzos', 'Accessories',
+];
 
-  ];
+const pillars = [
+  {
+    icon: Heart,
+    title: 'Quality, checked by hand',
+    text: 'Stitching, fabric and finish inspected on every piece before it leaves for your doorstep.',
+  },
+  {
+    icon: Users,
+    title: 'Artisan partnerships',
+    text: 'We work directly with weavers, block printers and dyers, so craft heritage stays alive and makers earn fairly.',
+  },
+  {
+    icon: Zap,
+    title: 'Fast, careful delivery',
+    text: 'Orders folded, wrapped and boxed with care, then moved on a network that arrives on time.',
+  },
+  {
+    icon: Shield,
+    title: 'Secure by default',
+    text: '256-bit SSL encryption and trusted payment gateways protect every order you place.',
+  },
+];
 
-  const martFeatures = [
-    {
-      icon: ShoppingBag,
-      title: "Huge Product Range",
-      description:
-        "From electronics to fashion, groceries to home décor  MizorpayMart has everything under one roof.",
-    },
-    {
-      icon: Package,
-      title: "Smart Packaging",
-      description:
-        "Products are packed securely and eco-consciously, ensuring they arrive in perfect condition.",
-    },
-    {
-      icon: Headphones,
-      title: "Dedicated Support",
-      description:
-        "MizorpayMart's dedicated support team resolves queries faster than industry standards.",
-    },
-    {
-      icon: Store,
-      title: "Seller Marketplace",
-      description:
-        "Empower local sellers to list and sell their products on MizorpayMart and reach millions.",
-    },
-  ];
+/** A small row of zari diamonds — the brand's running ornament. */
+const Zari = ({ className = '' }: { className?: string }) => (
+  <span className={`inline-flex items-center gap-3 ${className}`} aria-hidden="true">
+    <span className="h-px w-10 bg-gold/50" />
+    <span className="h-1.5 w-1.5 rotate-45 bg-gold" />
+    <span className="h-2 w-2 rotate-45 border border-gold" />
+    <span className="h-1.5 w-1.5 rotate-45 bg-gold" />
+    <span className="h-px w-10 bg-gold/50" />
+  </span>
+);
 
-  return (
-    <div className="min-h-screen bg-ivory font-sans">
-      {/* ───────────── HERO ───────────── */}
-      <section className="px-4 sm:px-6 lg:px-8 pt-14 md:pt-20 pb-10">
-        <div className="max-w-3xl mx-auto text-center">
-          <span className="overline-label mb-3">Trusted across India</span>
+const About = () => (
+  <div className="min-h-screen bg-ivory font-sans">
 
-          {/* Company Name */}
-          <h1 className="font-serif text-3xl md:text-4xl font-medium text-espresso leading-tight mb-2">
-            <span className="text-maroon">MIZORPAY</span> SOLUTION
+    {/* ───────────── HERO — editorial split with the loom arch ───────────── */}
+    <section className="container mx-auto px-4 pt-12 md:pt-20 pb-14 md:pb-20">
+      <div className="grid grid-cols-1 lg:grid-cols-2 items-center gap-12 lg:gap-16">
+        <Reveal>
+          <span className="overline-label mb-4">Vastraliya Fashion Private Limited</span>
+          <h1 className="font-serif text-4xl md:text-5xl font-medium text-espresso leading-[1.12]">
+            A Home for
+            <span className="block italic text-maroon">Garments</span>
           </h1>
-          <p className="text-muted-foreground text-sm md:text-base mb-6">
-            (OPC) PRIVATE LIMITED
+          <p className="mt-5 text-[15px] md:text-base leading-relaxed text-muted-foreground max-w-lg">
+            Ethnic and everyday fashion, made with care — festive silks beside
+            easy denim, each piece chosen like it's going to someone we know.
           </p>
-
-          {/* MizorpayMart brand pill */}
-          <div className="inline-flex items-center gap-2 bg-white border border-border px-5 py-2 rounded-full mb-6">
-            <ShoppingBag className="w-4 h-4 text-gold" />
-            <span className="text-sm text-espresso">
-              Proudly presents{" "}
-              <span className="text-maroon font-semibold">MizorpayMart</span>
-            </span>
-          </div>
-
-          <p className="text-[15px] leading-relaxed text-muted-foreground max-w-2xl mx-auto mb-8">
-            Your all-in-one online shopping destination  built on quality,
-            reliability, and genuine care for every customer.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a
-              href="/products"
-              className="inline-flex items-center justify-center gap-2 bg-maroon text-ivory font-medium px-8 py-3 rounded-full hover:bg-terracotta transition-colors"
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link
+              to="/products"
+              className="inline-flex items-center justify-center bg-maroon text-ivory text-xs font-semibold uppercase tracking-[0.16em] px-8 py-3.5 rounded-sm hover:bg-terracotta transition-colors"
             >
-              Shop on MizorpayMart <ChevronRight className="w-4 h-4" />
-            </a>
+              Shop the Collection
+            </Link>
+            <Link
+              to="/categories"
+              className="inline-flex items-center justify-center border border-espresso text-espresso text-xs font-semibold uppercase tracking-[0.16em] px-8 py-3.5 rounded-sm hover:bg-espresso hover:text-ivory transition-colors"
+            >
+              Browse Categories
+            </Link>
           </div>
-        </div>
-      </section>
+        </Reveal>
 
-      {/* ───────────── STATS ───────────── */}
-      <section className="px-4 sm:px-6 lg:px-8 pb-14">
-        <div className="max-w-3xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-4">
-          {stats.map(({ icon: Icon, value, label }) => (
+        <Reveal delay={0.12} className="flex justify-center lg:justify-end">
+          <div className="relative w-[260px] sm:w-[320px] lg:w-[380px]">
+            {/* offset gold ring behind the arch */}
             <div
-              key={label}
-              className="bg-white border border-border rounded-lg p-5 text-center"
+              className="absolute -top-3 -right-3 w-full h-full rounded-t-[999px] border border-gold/45"
+              aria-hidden="true"
+            />
+            <div className="relative aspect-[4/4.6] overflow-hidden rounded-t-[999px] bg-gradient-to-b from-sand via-sand to-blush">
+              <img
+                src="/collections/at-the-loom.svg"
+                alt="A loom with warp threads and woven cloth"
+                loading="lazy"
+                onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            </div>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+
+    {/* ───────────── TRUST STRIP — espresso band ───────────── */}
+    <section className="bg-espresso">
+      <div className="container mx-auto px-4 py-10 md:py-12">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-y-8">
+          {stats.map((s, i) => (
+            <div
+              key={s.label}
+              className={`text-center ${i > 0 ? 'md:border-l md:border-ivory/10' : ''}`}
             >
-              <Icon className="w-6 h-6 mx-auto mb-2 text-gold" />
-              <p className="font-serif text-2xl font-medium text-espresso">{value}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">{label}</p>
+              <p className="font-serif text-3xl md:text-4xl font-medium text-gold">{s.value}</p>
+              <p className="mt-1.5 text-[10.5px] uppercase tracking-[0.22em] text-ivory/60">
+                {s.label}
+              </p>
             </div>
           ))}
         </div>
-      </section>
+      </div>
+    </section>
 
-      {/* ───────────── MIZORPAYMART SPOTLIGHT ───────────── */}
-      <section className="px-4 sm:px-6 lg:px-8 pb-14">
-        <div className="max-w-3xl mx-auto">
-          {/* header */}
-          <div className="text-center mb-8">
-            <span className="overline-label mb-2">Our Flagship Platform</span>
-            <h2 className="font-serif text-2xl md:text-3xl font-medium text-espresso mb-3">
-              Welcome to <span className="text-maroon">MizorpayMart</span>
-            </h2>
-            <p className="text-[15px] leading-relaxed text-muted-foreground max-w-2xl mx-auto">
-              MizorpayMart is the e-commerce storefront of MIZORPAY SOLUTION
-              (OPC) PRIVATE LIMITED  a one-stop mart for millions of shoppers
-              across India.
-            </p>
-          </div>
-
-          {/* banner card */}
-          <div className="bg-blush rounded-lg p-8 md:p-10 mb-8">
-            <span className="overline-label mb-3">MizorpayMart  Shop Smart</span>
-            <h3 className="font-serif text-2xl md:text-3xl font-medium text-espresso mb-4 leading-tight">
-              Everything You Need,{" "}
-              <span className="text-maroon">Delivered Fast</span>
-            </h3>
-            <p className="text-[15px] leading-relaxed text-muted-foreground mb-6">
-              Browse thousands of curated products across categories
-              Electronics, Fashion, Home & Kitchen, Beauty, Sports, and
-              much more. MizorpayMart makes online shopping effortless.
-            </p>
-            <a
-              href="/products"
-              className="inline-flex items-center gap-2 bg-maroon text-ivory font-medium px-8 py-3 rounded-full hover:bg-terracotta transition-colors mb-6"
-            >
-              Explore MizorpayMart <ArrowRight className="w-4 h-4" />
-            </a>
-            {/* category pills */}
-            <div className="flex flex-wrap gap-2">
-              {[
-                "📱 Electronics",
-                "👗 Fashion",
-                "🏠 Home & Kitchen",
-                "💄 Beauty",
-                "⚽ Sports",
-                "📚 Books",
-                "🛒 Groceries",
-                "🧸 Toys",
-                "🔧 Tools",
-              ].map((cat) => (
-                <span
-                  key={cat}
-                  className="bg-white border border-border text-espresso text-sm px-4 py-1.5 rounded-full"
-                >
-                  {cat}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {/* mart features grid */}
-          <div className="grid sm:grid-cols-2 gap-4">
-            {martFeatures.map(({ icon: Icon, title, description }) => (
-              <div
-                key={title}
-                className="bg-white border border-border rounded-lg p-6"
-              >
-                <div className="w-11 h-11 bg-blush rounded-lg flex items-center justify-center mb-4">
-                  <Icon className="w-5 h-5 text-maroon" />
-                </div>
-                <h4 className="font-medium text-espresso mb-2">{title}</h4>
-                <p className="text-sm leading-relaxed text-muted-foreground">
-                  {description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ───────────── OUR STORY ───────────── */}
-      <section className="px-4 sm:px-6 lg:px-8 pb-14">
-        <div className="max-w-3xl mx-auto">
-          {/* text */}
-          <div className="text-center mb-8">
-            <span className="overline-label mb-2">Our Story</span>
-            <h2 className="font-serif text-2xl md:text-3xl font-medium text-espresso leading-tight">
-              From a Small Startup to a{" "}
-              <span className="text-maroon">Trusted Platform</span>
-            </h2>
-          </div>
-          <div className="space-y-4 text-[15px] leading-relaxed text-muted-foreground">
-            <p>
-              MIZORPAY SOLUTION (OPC) PRIVATE LIMITED was established with a
-              vision to revolutionize the way people shop online. Founded in
-              Faridabad, Haryana, we have grown from a small startup to a
-              trusted e-commerce platform serving customers across India
-              through our flagship store {" "}
-              <strong className="text-maroon font-semibold">MizorpayMart</strong>.
-            </p>
-            <p>
-              "MIZORPAY" combines{" "}
-              <strong className="text-espresso font-semibold">"Mizo"</strong>  representing
-              our roots and spirit of innovation  with{" "}
-              <strong className="text-espresso font-semibold">"Pay"</strong>, signifying
-              seamless payment solutions. As an OPC Private Limited entity,
-              we blend startup agility with corporate stability.
-            </p>
-            <p>
-              Today, through{" "}
-              <strong className="text-maroon font-semibold">MizorpayMart</strong>, we
-              serve thousands of customers with the same passion that drove
-              our founding, and our commitment to excellence has never
-              wavered.
-            </p>
-          </div>
-
-          <ul className="mt-8 grid sm:grid-cols-2 gap-x-6 gap-y-3">
-            {features.map((f) => (
-              <li
-                key={f}
-                className="flex items-center gap-2 text-muted-foreground text-sm"
-              >
-                <CheckCircle className="w-4 h-4 text-gold flex-shrink-0" />
-                {f}
-              </li>
-            ))}
-          </ul>
-
-          {/* cards */}
-          <div className="mt-8 bg-white border border-border rounded-lg p-6 space-y-3">
-            {[
-              {
-                icon: Globe,
-                title: "Pan-India Reach",
-                sub: "Delivering to 500+ cities via MizorpayMart",
-              },
-              {
-                icon: Shield,
-                title: "Secure Payments",
-                sub: "256-bit SSL encryption on every order",
-              },
-              {
-                icon: Award,
-                title: "MCA Registered",
-                sub: "OPC Private Limited entity",
-              },
-              {
-                icon: ShoppingBag,
-                title: "MizorpayMart",
-                sub: "1,00,000+ products & growing",
-              },
-            ].map(({ icon: Icon, title, sub }) => (
-              <div
-                key={title}
-                className="flex items-center gap-4 p-4 bg-ivory rounded-lg"
-              >
-                <div className="w-11 h-11 bg-blush rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Icon className="w-5 h-5 text-maroon" />
-                </div>
-                <div>
-                  <p className="font-medium text-espresso">{title}</p>
-                  <p className="text-sm text-muted-foreground">{sub}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ───────────── MISSION & VISION ───────────── */}
-      <section className="px-4 sm:px-6 lg:px-8 pb-14">
-        <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-8">
-            <span className="overline-label mb-2">What Drives Us</span>
-            <h2 className="font-serif text-2xl md:text-3xl font-medium text-espresso">
-              Mission & Vision
-            </h2>
-          </div>
-          <div className="grid sm:grid-cols-2 gap-4">
-            {/* mission */}
-            <div className="bg-white border border-border rounded-lg p-8">
-              <div className="w-12 h-12 bg-blush rounded-lg flex items-center justify-center mb-5">
-                <Heart className="w-6 h-6 text-maroon" />
-              </div>
-              <h3 className="font-serif text-xl font-medium text-espresso mb-3">Our Mission</h3>
-              <p className="text-[15px] leading-relaxed text-muted-foreground">
-                To provide customers with high-quality products at competitive
-                prices through{" "}
-                <strong className="text-maroon font-semibold">MizorpayMart</strong>, while
-                delivering exceptional service that exceeds expectations
-                making online purchasing convenient, secure, and genuinely
-                enjoyable.
-              </p>
-            </div>
-            {/* vision */}
-            <div className="bg-white border border-border rounded-lg p-8">
-              <div className="w-12 h-12 bg-blush rounded-lg flex items-center justify-center mb-5">
-                <Globe className="w-6 h-6 text-maroon" />
-              </div>
-              <h3 className="font-serif text-xl font-medium text-espresso mb-3">Our Vision</h3>
-              <p className="text-[15px] leading-relaxed text-muted-foreground">
-                To make{" "}
-                <strong className="text-maroon font-semibold">MizorpayMart</strong> India's
-                most loved e-commerce platform by 2030  celebrated for
-                innovation, a customer-centric approach, and sustainable
-                practices that empower both buyers and sellers.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ───────────── CORE VALUES ───────────── */}
-      <section className="px-4 sm:px-6 lg:px-8 pb-14">
-        <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-8">
-            <span className="overline-label mb-2">What We Stand For</span>
-            <h2 className="font-serif text-2xl md:text-3xl font-medium text-espresso">
-              Our Core Values
-            </h2>
-          </div>
-          <div className="grid sm:grid-cols-2 gap-4">
-            {values.map(({ icon: Icon, title, description }) => (
-              <div
-                key={title}
-                className="bg-white border border-border rounded-lg p-6"
-              >
-                <div className="w-11 h-11 bg-blush rounded-lg flex items-center justify-center mb-4">
-                  <Icon className="w-5 h-5 text-maroon" />
-                </div>
-                <h3 className="font-medium text-espresso mb-2">
-                  {title}
-                </h3>
-                <p className="text-sm leading-relaxed text-muted-foreground">
-                  {description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ───────────── CTA ───────────── */}
-      <section className="px-4 sm:px-6 lg:px-8 pb-16">
-        <div className="max-w-3xl mx-auto bg-blush rounded-lg p-10 text-center">
-          <div className="inline-flex items-center gap-2 bg-white border border-border px-4 py-1.5 rounded-full text-sm mb-6">
-            <ShoppingBag className="w-4 h-4 text-gold" />
-            <span className="text-espresso">
-              Shop now on{" "}
-              <span className="text-maroon font-semibold">MizorpayMart</span>
-            </span>
-          </div>
-          <h2 className="font-serif text-2xl md:text-3xl font-medium text-espresso mb-6">
-            Ready to Experience the{" "}
-            <span className="text-maroon">MizorpayMart</span> Difference?
+    {/* ───────────── STORY — narrow editorial column ───────────── */}
+    <section className="container mx-auto px-4 py-14 md:py-20">
+      <div className="max-w-2xl mx-auto text-center">
+        <Reveal>
+          <span className="overline-label mb-3">Our Story</span>
+          <h2 className="font-serif text-3xl md:text-4xl font-medium text-espresso leading-tight">
+            From Faridabad,
+            <span className="italic text-maroon"> for every celebration</span>
           </h2>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a
-              href="/products"
-              className="inline-flex items-center justify-center gap-2 bg-maroon text-ivory font-medium px-10 py-3.5 rounded-full hover:bg-terracotta transition-colors"
-            >
-              Start Shopping <ChevronRight className="w-5 h-5" />
-            </a>
+          <p className="mt-6 text-[15px] leading-relaxed text-muted-foreground text-left md:text-center">
+            Vastraliya Fashion Private Limited was founded on a simple belief:
+            the clothes India celebrates in deserve the same care online that
+            they receive on the loom. From Faridabad, Haryana, we've grown into
+            a trusted fashion destination serving customers across the country —
+            with the same passion that drove our first order.
+          </p>
+        </Reveal>
+
+        {/* Pull-quote: the name */}
+        <Reveal delay={0.1}>
+          <figure className="mt-10 bg-blush rounded-sm px-8 py-9 md:px-12">
+            <Zari className="mb-5" />
+            <blockquote className="font-serif text-xl md:text-2xl text-espresso leading-relaxed">
+              <span className="text-maroon font-medium">"Vastra"</span> — the Sanskrit
+              word for garment. <span className="text-maroon font-medium">"Ālaya"</span> —
+              a home. <span className="italic">Vastraliya: a home for garments.</span>
+            </blockquote>
+            <figcaption className="mt-4 text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
+              The name, explained
+            </figcaption>
+          </figure>
+        </Reveal>
+      </div>
+    </section>
+
+    {/* ───────────── THE WARDROBE — blush band with pills + pillars ───────────── */}
+    <section className="bg-blush">
+      <div className="container mx-auto px-4 py-14 md:py-20">
+        <Reveal className="text-center">
+          <span className="overline-label mb-3">The Wardrobe</span>
+          <h2 className="font-serif text-3xl md:text-4xl font-medium text-espresso leading-tight">
+            Curated, <span className="italic text-maroon">not crowded</span>
+          </h2>
+          <p className="mt-4 text-[15px] leading-relaxed text-muted-foreground max-w-xl mx-auto">
+            900+ styles and growing — every one hand-picked to earn its place.
+          </p>
+        </Reveal>
+
+        <Reveal delay={0.08}>
+          <div className="mt-8 flex flex-wrap justify-center gap-2.5 max-w-3xl mx-auto">
+            {wardrobe.map((w) => (
+              <Link
+                key={w}
+                to="/categories"
+                className="inline-flex items-center gap-2 bg-ivory border border-sand text-espresso text-[13px] px-5 py-2 rounded-full hover:border-gold transition-colors"
+              >
+                <span className="h-1 w-1 rotate-45 bg-gold" aria-hidden="true" />
+                {w}
+              </Link>
+            ))}
           </div>
+        </Reveal>
+
+        <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-5xl mx-auto">
+          {pillars.map(({ icon: Icon, title, text }, i) => (
+            <Reveal key={title} delay={i * 0.06}>
+              <div className="h-full bg-ivory border border-sand rounded-sm p-6">
+                <Icon className="h-5 w-5 text-terracotta" strokeWidth={1.5} />
+                <h3 className="mt-4 font-medium text-espresso text-[15px]">{title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{text}</p>
+              </div>
+            </Reveal>
+          ))}
         </div>
-      </section>
-    </div>
-  );
-};
+      </div>
+    </section>
+
+    {/* ───────────── MISSION & VISION — espresso band ───────────── */}
+    <section className="bg-espresso">
+      <div className="container mx-auto px-4 py-14 md:py-20">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-0 max-w-5xl mx-auto">
+          <Reveal className="lg:pr-14">
+            <span className="block text-[11px] font-semibold uppercase tracking-[0.3em] text-gold mb-4">
+              Our Mission
+            </span>
+            <h3 className="font-serif text-2xl md:text-[28px] font-medium text-ivory leading-snug">
+              Beautifully made fashion, in every wardrobe
+            </h3>
+            <p className="mt-4 text-[14.5px] leading-relaxed text-ivory/65">
+              To bring ethnic and everyday styles to every wardrobe at honest
+              prices — with service that makes shopping convenient, secure and
+              genuinely enjoyable.
+            </p>
+          </Reveal>
+          <Reveal
+            delay={0.1}
+            className="lg:pl-14 lg:border-l lg:border-ivory/12"
+          >
+            <span className="block text-[11px] font-semibold uppercase tracking-[0.3em] text-gold mb-4">
+              Our Vision
+            </span>
+            <h3 className="font-serif text-2xl md:text-[28px] font-medium text-ivory leading-snug">
+              India's most loved fashion destination
+            </h3>
+            <p className="mt-4 text-[14.5px] leading-relaxed text-ivory/65">
+              By 2030 — celebrated for craft, a customer-first approach, and
+              practices that empower both shoppers and makers.
+            </p>
+          </Reveal>
+        </div>
+      </div>
+    </section>
+
+    {/* ───────────── CTA — blush, with the zari hem ───────────── */}
+    <section className="container mx-auto px-4 py-14 md:py-20">
+      <Reveal>
+        <div className="max-w-3xl mx-auto text-center bg-blush rounded-sm px-8 py-12 md:py-14">
+          <Zari className="mb-6" />
+          <h2 className="font-serif text-3xl md:text-4xl font-medium text-espresso leading-tight">
+            Dress <span className="italic text-maroon">beautifully</span>
+          </h2>
+          <p className="mt-3 text-[15px] text-muted-foreground">
+            The wardrobe is waiting — festive, everyday, and everything between.
+          </p>
+          <Link
+            to="/products"
+            className="mt-7 inline-flex items-center justify-center bg-maroon text-ivory text-xs font-semibold uppercase tracking-[0.16em] px-10 py-4 rounded-sm hover:bg-terracotta transition-colors"
+          >
+            Start Shopping
+          </Link>
+          <p className="mt-8 text-[10.5px] uppercase tracking-[0.2em] text-muted-foreground/80">
+            Vastraliya Fashion Private Limited · MCA Registered · Faridabad, Haryana
+          </p>
+        </div>
+      </Reveal>
+    </section>
+  </div>
+);
 
 export default About;
