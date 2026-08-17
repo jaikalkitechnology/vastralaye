@@ -262,6 +262,52 @@ def quote_ident(name: str) -> str:
     return f"`{name}`"
 
 
+# ------------------------------------------------------------ collations --
+
+# `COLLATE=x` (table option) and `COLLATE x` (column) — both shapes mysqldump
+# emits. Capturing the keyword lets the same pattern do the rewrite.
+_COLLATE_RE = re.compile(r"(COLLATE\s*=?\s*)([A-Za-z0-9_]+)", re.I)
+
+
+def dump_collations(sql: str) -> set:
+    """Every collation the dump asks for."""
+    return {m.group(2).lower() for m in _COLLATE_RE.finditer(sql)}
+
+
+def server_collations(conn) -> set:
+    with conn.cursor() as cur:
+        cur.execute("SELECT collation_name FROM information_schema.collations")
+        return {r[0].lower() for r in cur.fetchall()}
+
+
+def apply_collation_map(statement: str, mapping: dict) -> str:
+    """Rewrite collation names in a CREATE — and only in a CREATE.
+
+    Restricted to DDL so a collation name that happens to appear inside a row
+    of text can never be rewritten. `INSERT` statements are left untouched.
+    """
+    if not mapping or not re.match(r"CREATE\s", strip_leading_comments(statement), re.I):
+        return statement
+
+    def swap(m):
+        return m.group(1) + mapping.get(m.group(2).lower(), m.group(2))
+
+    return _COLLATE_RE.sub(swap, statement)
+
+
+def parse_collation_map(pairs: list) -> dict:
+    """`--map-collation old=new` → {old: new}."""
+    mapping = {}
+    for pair in pairs or []:
+        if "=" not in pair:
+            raise SystemExit(f"--map-collation wants OLD=NEW, got {pair!r}")
+        old, new = pair.split("=", 1)
+        if not re.fullmatch(r"[A-Za-z0-9_]+", new.strip()):
+            raise SystemExit(f"Not a collation name: {new!r}")
+        mapping[old.strip().lower()] = new.strip()
+    return mapping
+
+
 def existing_tables(conn, database: str) -> list:
     with conn.cursor() as cur:
         cur.execute(
@@ -327,6 +373,9 @@ def main() -> int:
                     help="fail if the database doesn't already exist")
     ap.add_argument("--backup-first", metavar="PATH", nargs="?", const="auto",
                     help="mysqldump the target before importing")
+    ap.add_argument("--map-collation", metavar="OLD=NEW", action="append",
+                    help="rewrite a collation the server lacks, e.g. "
+                         "utf8mb4_0900_ai_ci=utf8mb4_unicode_ci (repeatable)")
     args = ap.parse_args()
 
     # ---------------------------------------------------------------- read --
@@ -350,7 +399,10 @@ def main() -> int:
     print(f"  statements  {len(statements)}  "
           f"({len(creates)} CREATE TABLE, {len(inserts)} INSERT, {len(drops)} DROP TABLE)")
     print(f"  tables      {', '.join(tables) if tables else '(none)'}")
+    print(f"  collations  {', '.join(sorted(dump_collations(sql))) or '(server default)'}")
     print(f"  target      {args.user}@{args.host}:{args.port} → {args.database}")
+
+    mapping = parse_collation_map(args.map_collation)
 
     if args.dry_run:
         print("\n  --dry-run: nothing was connected to and nothing was changed.\n")
@@ -376,6 +428,42 @@ def main() -> int:
         print(f"\n  Could not connect: {exc.args[-1]}")
         if hint:
             print(f"  → {hint}")
+        return 1
+
+    # ------------------------------------------------------------ preflight --
+    # Before anything is written. A dump from MySQL 8 can carry
+    # utf8mb4_0900_ai_ci, which MySQL 5.7 and MariaDB don't have; without this
+    # check the run dies on the first such CREATE TABLE and leaves the database
+    # half-loaded. Cheaper to find out now.
+    with server.cursor() as cur:
+        cur.execute("SELECT VERSION()")
+        server_version = cur.fetchone()[0]
+    supported = server_collations(server)
+    wanted = {mapping.get(c, c).lower() for c in dump_collations(sql)}
+    unsupported = sorted(wanted - supported)
+
+    print(f"  server      MySQL {server_version}")
+    if mapping:
+        for old, new in mapping.items():
+            print(f"  mapping     {old} → {new}")
+
+    if unsupported:
+        print(f"\n  This server does not support: {', '.join(unsupported)}")
+        print("  The dump asks for them, so the import would fail partway and\n"
+              "  leave the database half-loaded. Nothing has been changed.\n")
+        for name in unsupported:
+            suggestion = ("utf8mb4_unicode_ci" if name.startswith("utf8mb4")
+                          else "utf8_general_ci")
+            if suggestion in supported:
+                print(f"  Either upgrade the server, or re-run with:\n"
+                      f"      --map-collation {name}={suggestion}")
+                break
+        else:
+            print("  Upgrade the server, or import onto one that has them.")
+        print("\n  A mapped collation changes sorting and comparison rules for\n"
+              "  text, not the text itself. utf8mb4_unicode_ci is the collation\n"
+              "  the other 21 tables in this schema already use.\n")
+        server.close()
         return 1
 
     db_quoted = quote_ident(args.database)
@@ -423,6 +511,7 @@ def main() -> int:
     try:
         with conn.cursor() as cur:
             for index, statement in enumerate(statements, 1):
+                statement = apply_collation_map(statement, mapping)
                 try:
                     cur.execute(statement)
                 except Exception as exc:  # noqa: BLE001 - report and stop
