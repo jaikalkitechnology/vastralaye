@@ -70,7 +70,7 @@ app = FastAPI(
     title="Vastraliya API",
     description=(
         "Vastraliya — storefront and admin API.\n\n"
-        "Handcrafted ethnic wear: catalogue, cart, orders, invoices, coupons, "
+        "Premium ethnic wear: catalogue, cart, orders, invoices, coupons, "
         "reels and site content.\n\n"
         "Payments are processed by the Mizorpay gateway, so gateway-owned field "
         "names (`mizor_pay_txn_id`, `merchant_ref`) appear verbatim in the payment "

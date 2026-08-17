@@ -6,7 +6,7 @@ const items = [
   { icon: Truck, label: 'Free Shipping ₹999+' },
   { icon: Banknote, label: 'Cash on Delivery' },
   { icon: RefreshCcw, label: '7-Day Easy Returns' },
-  { icon: Sparkles, label: 'Handcrafted in India' },
+  { icon: Sparkles, label: 'Premium Quality Fabrics' },
 ];
 
 const UspStrip = () => (

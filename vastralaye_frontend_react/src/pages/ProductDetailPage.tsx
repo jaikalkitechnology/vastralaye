@@ -877,7 +877,7 @@ return (
             </div>
             <div className="px-2 py-3 text-[10.5px] uppercase tracking-[0.08em] text-muted-foreground">
               <span aria-hidden className="block mx-auto mb-1.5 h-[7px] w-[7px] rotate-45 border border-gold" />
-              Artisan handcrafted
+              Premium fabrics
             </div>
           </div>
 

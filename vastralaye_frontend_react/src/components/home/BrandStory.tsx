@@ -18,7 +18,7 @@ const BrandStory = () => (
             <div className="relative aspect-[4/4.6] overflow-hidden rounded-t-[999px] bg-sand">
               <img
                 src="/cloth-bg.jpg"
-                alt="Handcrafted fabrics at the loom"
+                alt="Fabrics at the loom"
                 loading="lazy"
                 className="absolute inset-0 w-full h-full object-cover"
               />
