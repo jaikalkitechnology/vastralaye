@@ -45,13 +45,13 @@ const fallbackSlides: HeroSlide[] = [
   },
   {
     id: 2,
-    overline: 'Everyday Comfort',
-    titleA: 'Cottons for',
+    overline: 'Everyday Ease',
+    titleA: 'Made for',
     titleB: 'Every Single Day',
     description:
       'Breathable weaves and easy silhouettes, crafted to be lived in from morning chai to last light.',
     image: '/jbanner.jpg',
-    ctaPrimary: { label: 'Shop Cottons', to: '/products' },
+    ctaPrimary: { label: 'Shop Everyday', to: '/products' },
     ctaSecondary: { label: 'Bestsellers', to: '/best-sellers' },
   },
   {

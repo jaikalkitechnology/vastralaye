@@ -360,7 +360,7 @@ const AdminUsers = () => {
 
   /** A password that passes the rule and is easy to read out over the phone. */
   const suggestPassword = () => {
-    const words = ['Cotton', 'Indigo', 'Saree', 'Jasmine', 'Marigold', 'Banaras', 'Mulberry', 'Peacock'];
+    const words = ['Silk', 'Indigo', 'Saree', 'Jasmine', 'Marigold', 'Banaras', 'Mulberry', 'Peacock'];
     const pick = () => words[Math.floor(Math.random() * words.length)];
     const generated = `${pick()}${pick()}${Math.floor(1000 + Math.random() * 9000)}`;
     setPwValue(generated);
