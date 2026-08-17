@@ -1906,6 +1906,38 @@ sentence, and a fixed string could only ever be right for one of them.
 the script has to run on machines where the app's dependencies aren't installed.
 Nothing is created from it — it exists purely to make that last line true.
 
+### The collation that only MySQL 8 has
+
+Nine tables in the current dump carry `utf8mb4_0900_ai_ci` — the tables
+SQLAlchemy created on a MySQL 8 server, taking its default. **MySQL 5.7 and
+MariaDB don't have that collation.** Sent to either, the import dies on the
+first such `CREATE TABLE`, roughly a third of the way in, leaving a database
+holding some tables and not others.
+
+So the server is asked what it supports *before* anything is written:
+
+```
+  server      MySQL 5.7.44
+
+  This server does not support: utf8mb4_0900_ai_ci
+  The dump asks for them, so the import would fail partway and
+  leave the database half-loaded. Nothing has been changed.
+
+  Either upgrade the server, or re-run with:
+      --map-collation utf8mb4_0900_ai_ci=utf8mb4_unicode_ci
+```
+
+`--map-collation` rewrites the name in `CREATE` statements **and nowhere else**.
+Restricting it to DDL is the whole safety argument: a plain string replace over
+the file would also rewrite any row of product text that happened to contain
+the collation name, silently editing customer data to fix a schema problem. A
+test pins this — an `INSERT` carrying `'COLLATE utf8mb4_0900_ai_ci'` in its
+text comes through byte-for-byte while the table around it is remapped.
+
+A collation governs how text sorts and compares, not what the text is;
+`utf8mb4_unicode_ci` is what the other 21 tables in this same schema already
+use, which is why it's the suggested target.
+
 ---
 
 ## Verification
@@ -2218,3 +2250,12 @@ Nothing is created from it — it exists purely to make that last line true.
   its client ID. `schema_sync` added nothing — that dump is current with the code.
 - Both branches of the closing note verified by importing each dump: the 21-table one
   reports nine missing tables by name, the 30-table one reports none missing.
+- The collation preflight tested against a server that genuinely lacks what the dump
+  asks for: it names the collation, suggests the exact `--map-collation` line, exits 1
+  and **the database is not created** — confirmed by querying
+  `information_schema.schemata` afterwards. Re-running with the mapping imports all 312
+  statements, lands all 30 tables as `utf8mb4_unicode_ci`, and **changes row data in 0
+  of 30 tables** (checksums identical to the unmapped import). A row whose text
+  contains `COLLATE utf8mb4_0900_zz_ci` is stored verbatim while its table is remapped
+  — the property that makes the rewrite safe to run on real customer data.
+- 61 assertions pass in total.

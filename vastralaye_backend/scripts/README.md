@@ -39,8 +39,27 @@ Prefer `DB_PASSWORD` or the prompt over `--password`: an argument is visible in
 | `--yes`, `-y` | skip the overwrite confirmation (for scripts) |
 | `--backup-first [PATH]` | `mysqldump` the target before importing |
 | `--no-create-db` | fail instead of creating a missing database |
+| `--map-collation OLD=NEW` | rewrite a collation the server doesn't have |
 
 Exit codes: `0` imported, `1` refused or failed, `2` bad file.
+
+### "This server does not support: utf8mb4_0900_ai_ci"
+
+A dump taken from MySQL 8 can ask for `utf8mb4_0900_ai_ci`, which **MySQL 5.7
+and MariaDB don't have**. The script checks the server's collation list before
+writing anything, so you get this message instead of a database that's half
+loaded when the first such `CREATE TABLE` fails.
+
+Either import onto MySQL 8, or map it to a collation the server does have:
+
+```bash
+python scripts/import_sql.py backup.sql \
+    --map-collation utf8mb4_0900_ai_ci=utf8mb4_unicode_ci
+```
+
+The rewrite only touches `CREATE` statements, never `INSERT`s, so row text that
+happens to mention a collation is left exactly as it was. A collation decides
+how text sorts and compares, not what the text is — no data changes.
 
 ### If the database already has tables
 
