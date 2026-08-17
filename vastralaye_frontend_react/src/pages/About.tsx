@@ -217,6 +217,14 @@ const About = () => {
     {/* ───────────── MISSION & VISION — espresso band ───────────── */}
     <section className="bg-espresso">
       <div className="container mx-auto px-4 py-14 md:py-20">
+        <Reveal className="text-center mb-12">
+          <span className="block text-[11px] font-semibold uppercase tracking-[0.3em] text-gold mb-3">
+            What Drives Us
+          </span>
+          <h2 className="font-serif text-3xl md:text-4xl font-medium text-ivory leading-tight">
+            Mission <span className="italic text-gold">&</span> Vision
+          </h2>
+        </Reveal>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-0 max-w-5xl mx-auto">
           <Reveal className="lg:pr-14">
             <span className="block text-[11px] font-semibold uppercase tracking-[0.3em] text-gold mb-4">
