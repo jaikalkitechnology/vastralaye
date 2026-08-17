@@ -233,7 +233,7 @@ const AdminBanners = () => {
           </div>
           <div className="mt-4">
             <label className={labelCls}>Description</label>
-            <textarea className={`${inputCls} min-h-[70px]`} value={form.description} onChange={(e) => set('description', e.target.value)} placeholder="Handcrafted sarees, suit sets and more…" />
+            <textarea className={`${inputCls} min-h-[70px]`} value={form.description} onChange={(e) => set('description', e.target.value)} placeholder="Premium sarees, suit sets and more…" />
           </div>
 
           <div className="grid grid-cols-2 gap-3 mt-4">

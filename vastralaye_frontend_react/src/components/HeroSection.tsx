@@ -38,7 +38,7 @@ const fallbackSlides: HeroSlide[] = [
     titleA: 'Woven for the',
     titleB: 'Festive Season',
     description:
-      'Handcrafted sarees, suit sets and more — made with love by artisans across India, for every celebration.',
+      'Premium sarees, suit sets and more — made with love by artisans across India, for every celebration.',
     image: '/banner-1.jpeg',
     ctaPrimary: { label: 'Shop Now', to: '/products' },
     ctaSecondary: { label: 'New Arrivals', to: '/new-arrivals' },

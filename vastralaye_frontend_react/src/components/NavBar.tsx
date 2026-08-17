@@ -36,7 +36,7 @@ import { useSiteSettings } from "@/hooks/use-site-settings";
 
 /** What the strip says until an admin changes it. */
 export const DEFAULT_TOP_BAR_TEXT =
-  "Free shipping on orders above ₹999 · *Easy 7-day returns* · Handcrafted in India";
+  "Free shipping on orders above ₹999 · *Easy 7-day returns* · Premium quality fabrics";
 
 /**
  * Render the strip, picking out *starred* phrases in gold.

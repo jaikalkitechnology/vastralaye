@@ -306,7 +306,7 @@ def _acknowledge(config: dict, row: ContactMessage) -> bool:
         ],
         footer_lines=[
             "Need to add something? Just reply to this email.",
-            f"{T.esc(shop)} &middot; Handcrafted ethnic wear, made in India",
+            f"{T.esc(shop)} &middot; Premium ethnic wear, made in India",
         ],
     )
 
@@ -493,7 +493,7 @@ def reply_to_enquiry(
         ],
         footer_lines=[
             "Just reply to this email if you need anything else.",
-            f"{T.esc(shop)} &middot; Handcrafted ethnic wear, made in India",
+            f"{T.esc(shop)} &middot; Premium ethnic wear, made in India",
         ],
     )
 

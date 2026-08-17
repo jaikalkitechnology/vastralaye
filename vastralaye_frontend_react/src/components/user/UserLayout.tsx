@@ -48,7 +48,7 @@ const UserLayout = ({ children }: UserLayoutProps) => {
               <span className="w-1.5 h-1.5 border border-gold rotate-45" />
               Vastraliya Member
             </span>
-            <p className="text-[12.5px] text-ivory/65 mt-1.5">Handcrafted wardrobe, managed here</p>
+            <p className="text-[12.5px] text-ivory/65 mt-1.5">Your wardrobe, managed here</p>
           </div>
         </div>
       </div>

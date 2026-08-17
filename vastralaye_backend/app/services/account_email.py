@@ -196,7 +196,7 @@ def send_verification_email(db: Session, config: dict, user: User) -> bool:
             T.ornament(),
             T.signoff(shop),
         ],
-        footer_lines=[f"{T.esc(shop)} &middot; Handcrafted ethnic wear, made in India"],
+        footer_lines=[f"{T.esc(shop)} &middot; Premium ethnic wear, made in India"],
     )
     return _send(config, user.email, f"Confirm your email — {shop}", plain, html)
 
@@ -230,7 +230,7 @@ def send_welcome_email(config: dict, user: User) -> bool:
             T.ornament(),
             T.signoff(shop),
         ],
-        footer_lines=[f"{T.esc(shop)} &middot; Handcrafted ethnic wear, made in India"],
+        footer_lines=[f"{T.esc(shop)} &middot; Premium ethnic wear, made in India"],
     )
     return _send(config, user.email, f"Welcome to {shop}", plain, html)
 
@@ -270,6 +270,6 @@ def send_password_reset_email(db: Session, config: dict, user: User) -> bool:
             T.ornament(),
             T.signoff(shop),
         ],
-        footer_lines=[f"{T.esc(shop)} &middot; Handcrafted ethnic wear, made in India"],
+        footer_lines=[f"{T.esc(shop)} &middot; Premium ethnic wear, made in India"],
     )
     return _send(config, user.email, f"Reset your password — {shop}", plain, html)
