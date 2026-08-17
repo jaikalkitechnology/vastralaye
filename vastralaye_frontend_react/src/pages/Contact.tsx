@@ -9,17 +9,24 @@ import {
   CheckCircle,
   Send,
   MapPin,
-  Loader2, Store
+  Loader2,
+  Store,
+  Clock,
+  MessageCircle,
 } from "lucide-react";
+import PageBanner from "@/components/PageBanner";
+import Reveal from "@/components/motion/Reveal";
+import { useSiteSettings } from "@/hooks/use-site-settings";
 
 /**
+ * Contact — editorial split: admin-controlled page banner on top (same
+ * system as the catalogue pages, Admin › Banners → Page banners), the
+ * enquiry form beside a contact card.
+ *
  * Submissions post to our own API, which stores the enquiry and then emails
  * it on. The store is the record: if the mail server is misconfigured the
  * enquiry is still in Admin › Enquiries, which is not true of sending
  * straight from the browser to a third-party mailer.
- *
- * The destination inbox is set in Admin › Enquiries, so it lives on the
- * server and isn't baked into the bundle any more.
  */
 
 interface FormErrors {
@@ -31,6 +38,7 @@ interface FormErrors {
 
 const Contact = () => {
   const formRef = useRef<HTMLFormElement>(null);
+  const settings = useSiteSettings();
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -43,6 +51,9 @@ const Contact = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState<string>("");
   const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+  const phoneNumber = settings.call_number?.trim() || "+91 85275 96413";
+  const whatsapp = settings.whatsapp_number?.trim() || "";
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
@@ -225,7 +236,7 @@ const Contact = () => {
 
   const getFieldClassName = (fieldName: keyof FormErrors, isTextarea = false) => {
     const hasError = errors[fieldName] && touched[fieldName];
-    const baseClass = `w-full rounded-lg border px-4 py-3 focus:outline-none focus:ring-2 ${isTextarea ? 'resize-none' : ''
+    const baseClass = `w-full rounded-sm border bg-white px-4 py-3 text-sm focus:outline-none focus:ring-2 ${isTextarea ? 'resize-none' : ''
       }`;
 
     if (hasError) {
@@ -234,129 +245,132 @@ const Contact = () => {
     return `${baseClass} border-border focus:ring-gold/40 focus:border-gold`;
   };
 
-  return (
-    <div className="min-h-screen bg-ivory py-12 md:py-16 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-3xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-10 md:mb-12">
-          <span className="overline-label mb-2">Contact</span>
-          <h1 className="font-serif text-3xl md:text-4xl font-medium text-espresso mb-4">
-            Get in Touch
-          </h1>
-          <p className="text-[15px] leading-relaxed text-muted-foreground max-w-2xl mx-auto">
-            All fields are required. Fill out the form below and our team will get back to you within 24 hours.
-          </p>
-        </div>
+  const infoRow = "flex items-start gap-4";
+  const infoIcon = "shrink-0 w-10 h-10 bg-blush rounded-sm flex items-center justify-center";
 
-        <div className="grid gap-8">
-          {/* Contact Information */}
-          <div className="bg-white rounded-lg border border-border p-8">
-            <h2 className="font-serif text-xl font-medium text-espresso mb-8">
-              Contact Information
+  return (
+    <div className="min-h-screen bg-ivory">
+      {/* Admin-controlled banner — Admin › Banners → Page banners → Contact Us */}
+      <PageBanner
+        title="Get in Touch"
+        subtitle="Questions, orders, sizing — we reply within one business day"
+        crumb="Contact"
+        page="contact"
+      />
+
+      <div className="container mx-auto px-4 py-10 md:py-14">
+        <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-6 lg:gap-8 items-start">
+
+          {/* ── Contact card ── */}
+          <Reveal>
+          <aside className="bg-white border border-border rounded-sm p-7">
+            <span className="overline-label mb-2">Reach us</span>
+            <h2 className="font-serif text-2xl font-medium text-espresso mb-7">
+              Talk to <span className="italic text-maroon">Vastraliya</span>
             </h2>
 
-            <div className="space-y-6 pb-5">
-              <div className="flex items-start space-x-4">
-                <div className="bg-blush p-3 rounded-lg">
-                  <Store className="w-6 h-6 text-maroon" />
+            <div className="space-y-6">
+              <div className={infoRow}>
+                <div className={infoIcon}>
+                  <Store className="w-4.5 h-4.5 text-maroon" strokeWidth={1.6} />
                 </div>
                 <div>
-                  <h3 className="font-medium text-espresso">Legal Company Name</h3>
-                  <p className="text-sm text-muted-foreground">
-                    MIZORPAY SOLUTION<br />(OPC) PRIVATE LIMITED
+                  <h3 className="text-sm font-medium text-espresso">Company</h3>
+                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                    Vastraliya Fashion Private Limited
+                  </p>
+                </div>
+              </div>
+
+              <div className={infoRow}>
+                <div className={infoIcon}>
+                  <Phone className="w-4.5 h-4.5 text-maroon" strokeWidth={1.6} />
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-espresso">Phone</h3>
+                  <a
+                    href={`tel:${phoneNumber.replace(/\s/g, "")}`}
+                    className="mt-1 block text-sm text-muted-foreground hover:text-maroon transition-colors"
+                  >
+                    {phoneNumber}
+                  </a>
+                  {whatsapp && (
+                    <a
+                      href={`https://wa.me/${whatsapp.replace(/\D/g, "")}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="mt-1 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-maroon transition-colors"
+                    >
+                      <MessageCircle className="w-3.5 h-3.5" /> WhatsApp us
+                    </a>
+                  )}
+                </div>
+              </div>
+
+              <div className={infoRow}>
+                <div className={infoIcon}>
+                  <Clock className="w-4.5 h-4.5 text-maroon" strokeWidth={1.6} />
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-espresso">Hours</h3>
+                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                    Monday – Friday, 9am – 6pm IST
+                  </p>
+                </div>
+              </div>
+
+              <div className={infoRow}>
+                <div className={infoIcon}>
+                  <MapPin className="w-4.5 h-4.5 text-maroon" strokeWidth={1.6} />
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-espresso">Address</h3>
+                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                    Plot No 69-71, Om Shubham Tower,<br />
+                    Faridabad, Haryana – 121001
+                  </p>
+                </div>
+              </div>
+
+              <div className={infoRow}>
+                <div className={infoIcon}>
+                  <Mail className="w-4.5 h-4.5 text-maroon" strokeWidth={1.6} />
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-espresso">Prefer writing?</h3>
+                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                    The form here lands straight in our inbox — we reply within
+                    one business day.
                   </p>
                 </div>
               </div>
             </div>
 
-
-            <div className="space-y-6">
-              <div className="flex items-start space-x-4">
-                <div className="bg-blush p-3 rounded-lg">
-                  <Phone className="w-6 h-6 text-maroon" />
-                </div>
-                <div>
-                  <h3 className="font-medium text-espresso">Phone Support</h3>
-                  <p className="text-muted-foreground">+91 85275 96413</p>
-                  <p className="text-sm text-muted-foreground">Mon-Fri 9am-6pm</p>
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-4">
-                <div className="bg-blush p-3 rounded-lg">
-                  <Mail className="w-6 h-6 text-maroon" />
-                </div>
-                <div>
-                  <h3 className="font-medium text-espresso">Department Emails</h3>
-                  <div className="space-y-2">
-                    <div>
-                      <p className="text-xs font-medium text-muted-foreground mb-1">General Inquiries</p>
-                      <a href="mailto:info@mizorpaymart.in" className="block text-sm text-muted-foreground hover:text-maroon transition-colors">
-                        info@mizorpaymart.com
-                      </a>
-                    </div>
-                    <div>
-                      <p className="text-xs font-medium text-muted-foreground mb-1">Support</p>
-                      <a href="mailto:support@mizorpaymart.in" className="block text-sm text-muted-foreground hover:text-maroon transition-colors">
-                        support@mizorpaymart.com
-                      </a>
-                    </div>
-                    <div>
-                      <p className="text-xs font-medium text-muted-foreground mb-1">Complaints</p>
-                      <a href="mailto:complaints@mizorpaymart.in" className="block text-sm text-muted-foreground hover:text-maroon transition-colors">
-                        complaints@mizorpaymart.com
-                      </a>
-                    </div>
-                    <div>
-                      <p className="text-xs font-medium text-muted-foreground mb-1">Refunds</p>
-                      <a href="mailto:refund@mizorpaymart.in" className="block text-sm text-muted-foreground hover:text-maroon transition-colors">
-                        refund@mizorpaymart.com
-                      </a>
-                    </div>
-                    <div>
-                      <p className="text-xs font-medium text-muted-foreground mb-1">Legal</p>
-                      <a href="mailto:legal@mizorpaymart.in" className="block text-sm text-muted-foreground hover:text-maroon transition-colors">
-                        legal@mizorpaymart.com
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-4">
-                <div className="bg-blush p-3 rounded-lg">
-                  <MapPin className="w-6 h-6 text-maroon" />
-                </div>
-                <div>
-                  <h3 className="font-medium text-espresso">Address</h3>
-                  <p className="text-muted-foreground"> PLOT NO 69-71, <br />OM SHUBHAM TOWER, BP, </p> <p className="text-muted-foreground"> Faridabad, Faridabad, </p> <p className="text-muted-foreground"> Haryana – 121001 </p>
-                </div>
-              </div>
-
-              <div className="mt-6 w-full h-[300px] rounded-lg overflow-hidden border border-border">
-                <iframe
-                  title="Mizorpay Mart Location"
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d112306.01439054766!2d77.31907425!3d28.40226565!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390cdc15f5a424b1%3A0xe4f50576c850e0f2!2sFaridabad%2C%20Haryana!5e0!3m2!1sen!2sin!4v1769501410330!5m2!1sen!2sin"
-                  className="w-full h-full border-0"
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                />
-              </div>
+            <div className="mt-7 h-[220px] rounded-sm overflow-hidden border border-sand">
+              <iframe
+                title="Vastraliya, Faridabad"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d112306.01439054766!2d77.31907425!3d28.40226565!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390cdc15f5a424b1%3A0xe4f50576c850e0f2!2sFaridabad%2C%20Haryana!5e0!3m2!1sen!2sin!4v1769501410330!5m2!1sen!2sin"
+                className="w-full h-full border-0"
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
             </div>
-          </div>
+          </aside>
+          </Reveal>
 
-          {/* Contact Form */}
-          <div className="bg-white rounded-lg border border-border p-8">
+          {/* ── Form ── */}
+          <Reveal delay={0.1}>
+          <div className="bg-white border border-border rounded-sm p-7 md:p-9">
             {isSubmitted ? (
-              <div className="text-center py-12">
+              <div className="text-center py-16">
                 <div className="inline-flex items-center justify-center w-16 h-16 bg-blush rounded-full mb-6">
                   <CheckCircle className="w-8 h-8 text-maroon" />
                 </div>
-                <h3 className="font-serif text-xl font-medium text-espresso mb-3">
-                  Message Sent Successfully!
+                <h3 className="font-serif text-2xl font-medium text-espresso mb-3">
+                  Message sent
                 </h3>
-                <p className="text-muted-foreground mb-4">
-                  Thank you for contacting us. We'll get back to you shortly.
+                <p className="text-muted-foreground mb-2">
+                  Thank you for writing to us — we'll get back to you shortly.
                 </p>
                 <p className="text-sm text-muted-foreground">
                   We usually reply within one business day.
@@ -364,15 +378,16 @@ const Contact = () => {
               </div>
             ) : (
               <>
-                <h2 className="font-serif text-xl font-medium text-espresso mb-2">
-                  Send us a Message
+                <span className="overline-label mb-2">Enquiry</span>
+                <h2 className="font-serif text-2xl font-medium text-espresso mb-1.5">
+                  Send us a message
                 </h2>
-                <p className="text-muted-foreground mb-8">
-                  All fields are required. Please fill in all details.
+                <p className="text-sm text-muted-foreground mb-7">
+                  All fields are required — we'll reply to the email you give here.
                 </p>
 
                 {submitError && (
-                  <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-sm">
                     <div className="flex items-center text-red-700">
                       <AlertCircle className="w-5 h-5 mr-2" />
                       <p className="font-medium">Error: {submitError}</p>
@@ -474,7 +489,7 @@ const Contact = () => {
                       onChange={handleChange}
                       onBlur={() => handleBlur('message')}
                       rows={5}
-                      placeholder="Please describe your issue in detail..."
+                      placeholder="Tell us about your order, sizing question, or anything else…"
                       className={getFieldClassName('message', true)}
                       maxLength={1000}
                     />
@@ -503,16 +518,16 @@ const Contact = () => {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full bg-maroon text-ivory py-4 rounded-lg font-medium hover:bg-terracotta transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                    className="w-full bg-maroon text-ivory py-4 rounded-sm text-xs font-semibold uppercase tracking-[0.16em] hover:bg-terracotta transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                   >
                     {isSubmitting ? (
                       <>
-                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                        Sending...
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Sending…
                       </>
                     ) : (
                       <>
-                        <Send className="w-5 h-5 mr-2" />
+                        <Send className="w-4 h-4 mr-2" />
                         Send Message
                       </>
                     )}
@@ -532,6 +547,7 @@ const Contact = () => {
               </>
             )}
           </div>
+          </Reveal>
         </div>
       </div>
     </div>

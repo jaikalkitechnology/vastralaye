@@ -46,6 +46,7 @@ export type PageBannerKey =
   | 'categories'
   | 'new_arrivals'
   | 'best_sellers'
+  | 'contact'
   /** Background behind the homepage hero slides. */
   | 'home_hero';
 
