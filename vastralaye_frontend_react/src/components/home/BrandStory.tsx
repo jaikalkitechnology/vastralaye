@@ -15,11 +15,12 @@ const BrandStory = () => (
         {/* Arch image */}
         <Reveal className="flex justify-center">
           <div className="relative w-[260px] sm:w-[320px] lg:w-[380px]">
-            <div className="relative aspect-[4/4.6] overflow-hidden rounded-t-[999px] bg-sand">
+            <div className="relative aspect-[4/4.6] overflow-hidden rounded-t-[999px] bg-gradient-to-b from-sand via-sand to-blush">
               <img
-                src="/cloth-bg.jpg"
-                alt="Fabrics at the loom"
+                src="/collections/at-the-loom.svg"
+                alt="A loom with warp threads and woven cloth"
                 loading="lazy"
+                onError={(e) => { e.currentTarget.style.display = 'none'; }}
                 className="absolute inset-0 w-full h-full object-cover"
               />
             </div>
