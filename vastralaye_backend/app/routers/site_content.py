@@ -524,7 +524,9 @@ def update_settings(
 # renders its built-in content; a row with is_active=False hides the
 # section; any blank field falls back to the built-in text or artwork.
 
-HOME_SLOTS = ["card_1", "card_2", "story"]
+# card_1/card_2/story live on the home page; about_arch is the arch image in
+# the About page's hero (image-only — the About text is designed copy).
+HOME_SLOTS = ["card_1", "card_2", "story", "about_arch"]
 
 
 def _home_out(row: HomeSection) -> dict:
