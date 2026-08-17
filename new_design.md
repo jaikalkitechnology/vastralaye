@@ -1893,6 +1893,19 @@ A failed statement stops the run, prints its number, the server's error and the
 first 140 characters of the statement, and says the database is part-imported —
 `SET autocommit=1` and DDL make a rollback impossible to promise, so it doesn't.
 
+### What it tells you afterwards
+
+The closing note is computed, not canned. It compares the tables that landed
+against `APP_TABLES` and says either *"this dump predates N table(s) the app
+expects (…)"* or *"every table the app expects is already here"*. The first dump
+tested was the older 21-table one, where the honest answer is nine missing
+tables; a dump taken after the current backend has run needs the opposite
+sentence, and a fixed string could only ever be right for one of them.
+
+`APP_TABLES` is a literal list rather than an import of `app.models`, because
+the script has to run on machines where the app's dependencies aren't installed.
+Nothing is created from it — it exists purely to make that last line true.
+
 ---
 
 ## Verification
@@ -2191,3 +2204,17 @@ first 140 characters of the statement, and says the database is part-imported �
   single quotes, double quotes, backticks and each comment style; `\'`, `''` and `\\`
   escapes; `/*!40101 …*/` kept as executable; an unterminated string that neither hangs
   nor loses the tail; and `quote_ident` rejecting `` db`; DROP DATABASE x; -- ``.
+- Repeated on a **second, newer dump** (`e_new`, 751 KB, 312 statements, 30 tables,
+  2,925 rows) against **MySQL 8.0.46 — the exact server version it was taken from**,
+  because 9 of its tables carry `utf8mb4_0900_ai_ci`, which MySQL 8 has and MariaDB
+  does not. Checksums match the official client on **all 30 tables**, the schemas diff
+  clean, and both collations land as written (21 `utf8mb4_unicode_ci`, 9
+  `utf8mb4_0900_ai_ci`). The ₹ survives: 182 of them in the dump, intact in the
+  database and still correct in the JSON the API serves.
+- The whole stack was then run against the imported database — backend on MySQL, real
+  HTTP requests: 484 products (paginated `total=484`), 12 categories, 42 subcategories,
+  3 hero banners, 5 page banners, 10 reels, and `topbar_text` served as
+  *"Free shipping on orders above ₹999"*. Google config reports `enabled: true` with
+  its client ID. `schema_sync` added nothing — that dump is current with the code.
+- Both branches of the closing note verified by importing each dump: the 21-table one
+  reports nine missing tables by name, the 30-table one reports none missing.

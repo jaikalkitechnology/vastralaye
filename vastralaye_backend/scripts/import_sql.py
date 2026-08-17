@@ -31,6 +31,7 @@ import os
 import re
 import subprocess
 import sys
+import textwrap
 import time
 from datetime import datetime
 from typing import Iterator, Optional
@@ -49,6 +50,20 @@ except ImportError:  # pragma: no cover - the message is the point
 DEFAULT_DATABASE = "Vastralaye_db"
 DEFAULT_CHARSET = "utf8mb4"
 DEFAULT_COLLATION = "utf8mb4_unicode_ci"
+
+# Tables the app declares (app/models). Listed here rather than imported so the
+# script stays standalone — it must run on a machine where the app's own
+# dependencies aren't installed. Used only to tell you afterwards what the
+# backend will add on its next start; nothing is created from it.
+APP_TABLES = {
+    "addresses", "cart_items", "categories", "contact_messages", "coupons",
+    "email_settings", "email_verification_tokens", "hero_banners",
+    "invoice_items", "invoices", "newsletter_subscribers", "order_items",
+    "order_tracking", "orders", "page_banners", "password_reset_tokens",
+    "product_review_replies", "product_reviews", "products", "reels",
+    "site_settings", "subcategories", "support_messages", "testimonials",
+    "user_settings", "users", "wishlist_items",
+}
 
 
 # --------------------------------------------------------------- splitting --
@@ -430,8 +445,9 @@ def main() -> int:
     conn = connect(args.host, args.port, args.user, password, args.database)
     print(f"\n  {args.database} now contains:")
     total = 0
+    landed = existing_tables(conn, args.database)
     with conn.cursor() as cur:
-        for table in existing_tables(conn, args.database):
+        for table in landed:
             cur.execute(f"SELECT COUNT(*) FROM {quote_ident(table)}")
             count = cur.fetchone()[0]
             total += count
@@ -439,18 +455,33 @@ def main() -> int:
     conn.close()
     print(f"    {'':<32} {total:>8,} rows total")
 
+    missing = sorted(APP_TABLES - set(landed))
+
     port_part = "" if args.port == 3306 else f":{args.port}"
     print(
         "\n  Done. Next:\n"
         "    1. Point the app at it — in vastralaye_backend/.env:\n"
-        f"       DATABASE_URL=mysql+pymysql://{args.user}:<password>@{args.host}{port_part}/{args.database}\n"
-        "    2. Restart the backend. This dump predates several features, so on\n"
-        "       startup it creates the tables they need (contact_messages,\n"
-        "       email_settings, email_verification_tokens, hero_banners,\n"
-        "       site_settings and a few more) and adds missing columns such as\n"
-        "       users.is_verified — see app/schema_sync.py. Existing rows are\n"
-        "       left alone; new columns arrive as NULL.\n"
+        f"       DATABASE_URL=mysql+pymysql://{args.user}:<password>@{args.host}{port_part}/{args.database}"
     )
+    if missing:
+        shown = ", ".join(missing[:4])
+        if len(missing) > 4:
+            shown += f" and {len(missing) - 4} more"
+        body = (
+            f"Restart the backend. This dump predates {len(missing)} table(s) the app "
+            f"expects ({shown}), so startup creates them and adds any missing columns "
+            "— see app/schema_sync.py. Existing rows are left alone; new columns "
+            "arrive as NULL."
+        )
+        print(textwrap.fill(body, width=74,
+                            initial_indent="    2. ", subsequent_indent="       "))
+    else:
+        print(
+            "    2. Restart the backend. Every table the app expects is already\n"
+            "       here, so startup only fills in columns this dump predates, if\n"
+            "       any — see app/schema_sync.py. Existing rows are left alone."
+        )
+    print()
     return 0
 
 
