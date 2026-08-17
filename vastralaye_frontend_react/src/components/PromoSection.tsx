@@ -11,14 +11,18 @@ const banners = [
     title: 'The Festive Edit',
     cta: 'Shop the Edit',
     to: '/products',
-    image: '/banner-1.jpeg',
+    image: '/collections/festive-edit.svg',
+    // Shown behind the image, and alone if the file ever fails to load —
+    // never the browser's broken-image icon.
+    fallback: 'bg-gradient-to-br from-espresso via-maroon to-maroon',
   },
   {
     overline: 'Daily comfort',
     title: 'Everyday Cottons',
     cta: 'Shop Cottons',
     to: '/products',
-    image: '/jbanner.jpg',
+    image: '/collections/everyday-cottons.svg',
+    fallback: 'bg-gradient-to-br from-blush via-sand to-ivory',
   },
 ];
 
@@ -30,12 +34,13 @@ const PromoSection = () => (
           <Reveal key={b.title} delay={i * 0.12}>
           <Link
             to={b.to}
-            className="group relative block overflow-hidden rounded-sm aspect-[16/11]"
+            className={`group relative block overflow-hidden rounded-sm aspect-[16/11] ${b.fallback}`}
           >
             <img
               src={b.image}
               alt={b.title}
               loading="lazy"
+              onError={(e) => { e.currentTarget.style.display = 'none'; }}
               className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
             />
             <span

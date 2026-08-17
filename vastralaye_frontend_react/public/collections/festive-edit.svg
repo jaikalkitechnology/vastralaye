@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 660" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Festive silk with gold paisley">
+  <defs>
+    <linearGradient id="silk" x1="0" y1="0" x2="0.25" y2="1">
+      <stop offset="0" stop-color="#241009"/>
+      <stop offset="0.45" stop-color="#5C1620"/>
+      <stop offset="0.8" stop-color="#7A1F2B"/>
+      <stop offset="1" stop-color="#6A1A25"/>
+    </linearGradient>
+    <radialGradient id="sheen" cx="0.72" cy="0.22" r="0.85">
+      <stop offset="0" stop-color="#C99A45" stop-opacity="0.32"/>
+      <stop offset="0.45" stop-color="#C99A45" stop-opacity="0.08"/>
+      <stop offset="1" stop-color="#C99A45" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="drape" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FAF6F0" stop-opacity="0.10"/>
+      <stop offset="1" stop-color="#FAF6F0" stop-opacity="0.02"/>
+    </linearGradient>
+    <!-- Classic teardrop paisley: full bulb below, leaning to a pointed tip,
+         with a curl tucked inside the tip. Drawn once, reused at many scales. -->
+    <g id="paisley">
+      <path d="M26,-92 C -8,-88 -50,-60 -60,-16 C -70,28 -44,78 4,88 C 52,78 74,36 62,-10 C 54,-42 40,-68 26,-92 Z"
+            fill="#C99A45" fill-opacity="0.07"
+            stroke="#C99A45" stroke-width="5" stroke-linejoin="round"/>
+      <path d="M26,-92 C 34,-74 26,-58 10,-56 C -2,-55 -8,-64 -4,-74"
+            fill="none" stroke="#C99A45" stroke-width="3" stroke-linecap="round"/>
+      <path d="M14,-58 C -14,-50 -36,-26 -38,6 C -40,38 -20,62 6,66 C 36,62 50,34 44,4"
+            fill="none" stroke="#C99A45" stroke-width="2.4" stroke-linecap="round" opacity="0.7"/>
+      <circle cx="4" cy="22" r="8" fill="#C99A45" opacity="0.9"/>
+      <circle cx="-16" cy="-8" r="4" fill="#C99A45" opacity="0.6"/>
+      <circle cx="24" cy="44" r="4" fill="#C99A45" opacity="0.6"/>
+    </g>
+    <g id="bud">
+      <path d="M0,-26 C16,-24 26,-12 24,4 C22,18 10,27 -4,26 C-15,25 -22,17 -21,8"
+            fill="none" stroke="#C99A45" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="4" cy="0" r="3.4" fill="#C99A45"/>
+    </g>
+  </defs>
+
+  <rect width="960" height="660" fill="url(#silk)"/>
+  <rect width="960" height="660" fill="url(#sheen)"/>
+
+  <!-- Falling silk drape lines -->
+  <g fill="none" stroke="url(#drape)" stroke-width="90">
+    <path d="M140,-60 C 60,180 220,340 120,700"/>
+    <path d="M560,-80 C 480,160 660,360 560,720"/>
+    <path d="M900,-60 C 830,200 980,380 880,700"/>
+  </g>
+  <g fill="none" stroke="#FAF6F0" stroke-opacity="0.07" stroke-width="2">
+    <path d="M200,-40 C 120,200 280,360 180,700"/>
+    <path d="M320,-60 C 250,180 400,380 300,700"/>
+    <path d="M700,-60 C 620,180 780,380 680,700"/>
+    <path d="M820,-40 C 750,220 900,400 800,700"/>
+  </g>
+
+  <!-- Paisley constellation: rich upper-right, sparse lower-left so the
+       card's caption sits on quiet ground. -->
+  <use href="#paisley" transform="translate(700,190) rotate(18)" opacity="0.9"/>
+  <use href="#paisley" transform="translate(838,388) rotate(-24) scale(0.72)" opacity="0.6"/>
+  <use href="#paisley" transform="translate(505,120) rotate(-12) scale(0.6)" opacity="0.55"/>
+  <use href="#paisley" transform="translate(300,235) rotate(30) scale(0.48)" opacity="0.4"/>
+  <use href="#paisley" transform="translate(875,95) rotate(45) scale(0.42)" opacity="0.45"/>
+  <use href="#paisley" transform="translate(565,395) rotate(60) scale(0.4)" opacity="0.35"/>
+  <use href="#bud" transform="translate(430,90) rotate(-20)" opacity="0.55"/>
+  <use href="#bud" transform="translate(645,300) rotate(35) scale(1.3)" opacity="0.5"/>
+  <use href="#bud" transform="translate(180,120) rotate(10)" opacity="0.4"/>
+  <use href="#bud" transform="translate(760,520) rotate(-40)" opacity="0.35"/>
+  <use href="#bud" transform="translate(90,330) rotate(25) scale(0.85)" opacity="0.3"/>
+
+  <!-- Zari hem near the bottom edge -->
+  <g stroke="#C99A45" fill="none">
+    <line x1="0" y1="596" x2="960" y2="596" stroke-width="1.6" opacity="0.55"/>
+    <line x1="0" y1="640" x2="960" y2="640" stroke-width="1.2" opacity="0.4"/>
+  </g>
+  <g fill="#C99A45" opacity="0.6">
+    <g id="hemrow">
+      <rect x="24" y="611" width="13" height="13" transform="rotate(45 30.5 617.5)"/>
+      <rect x="104" y="611" width="13" height="13" transform="rotate(45 110.5 617.5)"/>
+      <rect x="184" y="611" width="13" height="13" transform="rotate(45 190.5 617.5)"/>
+      <rect x="264" y="611" width="13" height="13" transform="rotate(45 270.5 617.5)"/>
+      <rect x="344" y="611" width="13" height="13" transform="rotate(45 350.5 617.5)"/>
+      <rect x="424" y="611" width="13" height="13" transform="rotate(45 430.5 617.5)"/>
+      <rect x="504" y="611" width="13" height="13" transform="rotate(45 510.5 617.5)"/>
+      <rect x="584" y="611" width="13" height="13" transform="rotate(45 590.5 617.5)"/>
+      <rect x="664" y="611" width="13" height="13" transform="rotate(45 670.5 617.5)"/>
+      <rect x="744" y="611" width="13" height="13" transform="rotate(45 750.5 617.5)"/>
+      <rect x="824" y="611" width="13" height="13" transform="rotate(45 830.5 617.5)"/>
+      <rect x="904" y="611" width="13" height="13" transform="rotate(45 910.5 617.5)"/>
+    </g>
+  </g>
+</svg>
