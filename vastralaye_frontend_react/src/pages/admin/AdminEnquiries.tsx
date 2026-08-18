@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '@/api/api';
 import AdminLayout from '@/components/admin/AdminLayout';
+import AdminSubscribers from './AdminSubscribers';
 import AdminLoading from '@/components/admin/AdminLoading';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -843,6 +844,9 @@ const AdminEnquiries = () => {
             </div>
           </DialogContent>
         </Dialog>
+
+        {/* Newsletter subscribers from the home page's "Letters from the Loom" band */}
+        <AdminSubscribers />
       </div>
     </AdminLayout>
   );
