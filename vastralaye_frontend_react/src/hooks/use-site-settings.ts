@@ -3,7 +3,7 @@ import { api } from '@/api/api';
 import { readCache, writeCache } from '@/lib/persistentCache';
 
 /** Store WhatsApp number used until the admin sets one (digits only, with country code). */
-export const FALLBACK_WHATSAPP = '918527596413';
+export const FALLBACK_WHATSAPP = '917066181207';
 
 export interface SiteSettings {
   instagram_url?: string;

@@ -48,7 +48,7 @@ const BrandPanel = () => (
     </ul>
 
     <p className="absolute bottom-9 left-14 text-[11px] uppercase tracking-[0.18em] text-ivory/40">
-      &copy; Vastraliya &middot; Faridabad, India
+      &copy; Vastraliya &middot; Vasai, India
     </p>
   </aside>
 );

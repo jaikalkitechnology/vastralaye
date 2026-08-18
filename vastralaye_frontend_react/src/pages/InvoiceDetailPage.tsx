@@ -288,7 +288,7 @@ const InvoiceTemplate = React.forwardRef<HTMLDivElement, { invoice: Invoice }>(
       ...(invoice.notes ? [invoice.notes] : []),
       "Goods once sold are eligible for return within 7 days in original condition.",
       "GST is included in the listed price.",
-      "For queries about this invoice, write to support@vastralaye.in quoting the invoice number.",
+      "For queries about this invoice, write to support@vastraliya.com quoting the invoice number.",
     ];
 
     return (
@@ -344,9 +344,9 @@ const InvoiceTemplate = React.forwardRef<HTMLDivElement, { invoice: Invoice }>(
               fontSize: "11px", color: "rgba(250,246,240,0.6)",
               marginTop: "9px", lineHeight: 1.65,
             }}>
-              <div>{"14 Weaver's Lane, Faridabad, Haryana 121001"}</div>
-              <div>support@vastralaye.in · +91 85275 96413</div>
-              <div>GSTIN 06AAAAA0000A1Z5</div>
+              <div>{"Pride Industrial Estate, Vasai East, Maharashtra 401208"}</div>
+              <div>support@vastraliya.com · +91 70661 81207</div>
+              <div>GSTIN 27AAMCV4451F</div>
             </div>
           </div>
 
@@ -778,7 +778,7 @@ const InvoiceTemplate = React.forwardRef<HTMLDivElement, { invoice: Invoice }>(
           padding: "0 34px 20px", fontSize: "10.5px",
           color: "#6E5F53", textAlign: "center",
         }}>
-          This is a computer-generated invoice and does not require a physical signature. · support@vastralaye.in
+          This is a computer-generated invoice and does not require a physical signature. · support@vastraliya.com
         </p>
 
         {/* ── EDGE BAR ── */}

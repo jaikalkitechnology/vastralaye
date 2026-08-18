@@ -63,10 +63,10 @@ const AdminSettings = () => {
       }
     }
     if (form.whatsapp_number && !/^[\d+\s-]{8,18}$/.test(form.whatsapp_number)) {
-      return toast({ title: 'WhatsApp number should be digits with country code, e.g. 918527596413' });
+      return toast({ title: 'WhatsApp number should be digits with country code, e.g. 917066181207' });
     }
     if (form.call_number && !/^[\d+\s-]{8,18}$/.test(form.call_number)) {
-      return toast({ title: 'Call number should be digits with country code, e.g. 918527596413' });
+      return toast({ title: 'Call number should be digits with country code, e.g. 917066181207' });
     }
     setSaving(true);
     try {
@@ -84,8 +84,8 @@ const AdminSettings = () => {
     { key: 'facebook_url', label: 'Facebook URL', placeholder: 'https://facebook.com/vastralaye', icon: Facebook },
     { key: 'twitter_url', label: 'Twitter / X URL', placeholder: 'https://x.com/vastralaye', icon: Twitter },
     { key: 'youtube_url', label: 'YouTube URL (optional)', placeholder: 'https://youtube.com/@vastralaye', icon: Youtube },
-    { key: 'whatsapp_number', label: 'WhatsApp number (with country code)', placeholder: '918527596413', icon: MessageCircle },
-    { key: 'call_number', label: 'Call number (optional, with country code)', placeholder: '918527596413', icon: Phone },
+    { key: 'whatsapp_number', label: 'WhatsApp number (with country code)', placeholder: '917066181207', icon: MessageCircle },
+    { key: 'call_number', label: 'Call number (optional, with country code)', placeholder: '917066181207', icon: Phone },
   ];
 
   return (

@@ -450,8 +450,8 @@ const InvoicePageView: React.FC<{
                                     Vastra<span className="text-gold">liya</span>
                                 </p>
                                 <p className="mt-2.5 text-[11px] leading-relaxed text-ivory/60">
-                                    1PLOT NO 69-71, OM SHUBHAM TOWER, Faridabad, Haryana – 121001<br />
-                                    support@vastralaye.in · +91 85275 96413 · GSTIN 06AAQCM6479G1ZV
+                                    Gala No 230, Pride Industrial Estate, Vasai East, Thane, Maharashtra – 401208<br />
+                                    support@vastraliya.com · +91 70661 81207 · GSTIN 27AAMCV4451F
                                 </p>
                             </div>
                             <div className="relative sm:text-right">
@@ -652,7 +652,7 @@ const InvoicePageView: React.FC<{
                         </p>
                         <p className="px-6 pb-6 text-center text-[10.5px] leading-relaxed text-muted-foreground sm:px-9">
                             This is a computer-generated invoice and does not require a physical signature.
-                            All prices are inclusive of applicable taxes. · support@vastralaye.in
+                            All prices are inclusive of applicable taxes. · support@vastraliya.com
                         </p>
 
                         {/* Faint heritage strip along the paper base */}
@@ -1136,7 +1136,7 @@ const OrderDetailPage = () => {
                             <section className="relative overflow-hidden rounded-sm bg-espresso p-5 text-ivory">
                                 <span aria-hidden className="pointer-events-none absolute inset-2 rounded-[2px] border border-gold/35" />
                                 <h4 className="font-serif text-[16.5px] font-medium">Need help with this order?</h4>
-                                <p className="mt-1 text-xs text-ivory/65">Chat with us on WhatsApp or write to support@vastralaye.in</p>
+                                <p className="mt-1 text-xs text-ivory/65">Chat with us on WhatsApp or write to support@vastraliya.com</p>
                                 <a
                                     href={`https://wa.me/${FALLBACK_WHATSAPP}`}
                                     target="_blank"
