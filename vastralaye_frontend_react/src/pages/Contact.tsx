@@ -52,7 +52,9 @@ const Contact = () => {
   const [submitError, setSubmitError] = useState<string>("");
   const [touched, setTouched] = useState<Record<string, boolean>>({});
 
-  const phoneNumber = settings.call_number?.trim() || "+91 85275 96413";
+  // Defaults come from the company's published policies; the admin's site
+  // settings override the phone/WhatsApp when set.
+  const phoneNumber = settings.call_number?.trim() || "+91 70661 81207";
   const whatsapp = settings.whatsapp_number?.trim() || "";
 
   const validateForm = (): boolean => {
@@ -314,7 +316,7 @@ const Contact = () => {
                 <div>
                   <h3 className="text-sm font-medium text-espresso">Hours</h3>
                   <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                    Monday – Friday, 9am – 6pm IST
+                    Monday – Saturday, 10am – 6pm IST
                   </p>
                 </div>
               </div>
@@ -324,10 +326,10 @@ const Contact = () => {
                   <MapPin className="w-4.5 h-4.5 text-maroon" strokeWidth={1.6} />
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-espresso">Address</h3>
+                  <h3 className="text-sm font-medium text-espresso">Registered Address</h3>
                   <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                    Plot No 69-71, Om Shubham Tower,<br />
-                    Faridabad, Haryana – 121001
+                    Gala No 230, Second Floor, Pride Industrial Estate,<br />
+                    Vasai East, Thane, Maharashtra – 401208
                   </p>
                 </div>
               </div>
@@ -337,10 +339,15 @@ const Contact = () => {
                   <Mail className="w-4.5 h-4.5 text-maroon" strokeWidth={1.6} />
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-espresso">Prefer writing?</h3>
+                  <h3 className="text-sm font-medium text-espresso">Email</h3>
+                  <a
+                    href="mailto:support@vastraliya.com"
+                    className="mt-1 block text-sm text-muted-foreground hover:text-maroon transition-colors"
+                  >
+                    support@vastraliya.com
+                  </a>
                   <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                    The form here lands straight in our inbox — we reply within
-                    one business day.
+                    Or use the form — it lands straight in our inbox.
                   </p>
                 </div>
               </div>
@@ -348,8 +355,8 @@ const Contact = () => {
 
             <div className="mt-7 h-[220px] rounded-sm overflow-hidden border border-sand">
               <iframe
-                title="Vastraliya, Faridabad"
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d112306.01439054766!2d77.31907425!3d28.40226565!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390cdc15f5a424b1%3A0xe4f50576c850e0f2!2sFaridabad%2C%20Haryana!5e0!3m2!1sen!2sin!4v1769501410330!5m2!1sen!2sin"
+                title="Vastraliya, Vasai East"
+                src="https://www.google.com/maps?q=Pride%20Industrial%20Estate%2C%20Vasai%20East%2C%20Maharashtra%20401208&output=embed"
                 className="w-full h-full border-0"
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
