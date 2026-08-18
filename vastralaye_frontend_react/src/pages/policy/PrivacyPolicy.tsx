@@ -1,216 +1,153 @@
-import React from 'react';
+import PolicyPage, { PolicyContent } from '@/components/policy/PolicyPage';
 
-const sectionHeading = "font-serif text-xl font-medium text-espresso mt-8 mb-3";
-const paragraph = "mb-4";
-const list = "list-disc pl-5 mb-4 space-y-1.5 marker:text-gold";
-
-const PrivacyPolicy: React.FC = () => {
-  return (
-    <div className="min-h-screen bg-ivory py-12 md:py-16 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-3xl mx-auto">
-        <header className="text-center mb-10 md:mb-12">
-          <span className="overline-label mb-2">Our Policies</span>
-          <h1 className="font-serif text-3xl md:text-4xl font-medium text-espresso">
-            Privacy Policy
-          </h1>
-        </header>
-
-        <div className="text-[15px] leading-relaxed text-muted-foreground">
-          <h2 className={sectionHeading}>
-            Introduction
-          </h2>
-          <p className={paragraph}>
-            This Privacy Policy applies to your use of Mizorpaymart website, Mizorpay Solution (OPC) Private limited – Online Ecommerce Fashion Style (Mizorpaymart.com) herein referred to "Mizorpaymart " or WEBSITE", but does not apply to any third party websites that may be linked to them, or any relationships you may have with the businesses listed on Mizorpaymart.
-          </p>
-          <p className={paragraph}>
-            This Privacy Policy covers treatment of personally identifiable information collected from Users (Merchants, Prospective Merchants etc.) who use the Mizorpaymart Online Ecommerce Fashion Style services, as well as consumer information that we acquire in the course of our business. This Policy also covers the treatment of personally identifiable information that Mizorpaymart back end technology providers / partners may share with it.
-          </p>
-
-          <h2 className={sectionHeading}>
-            To the Users
-          </h2>
-          <p className={paragraph}>
-            The terms " WE", " OUR" and " US" refer to Mizorpaymart and/or Mizorpaymart"WEBSITE" , Mizorpay Solution (OPC) Private limited – Online Ecommerce Fashion Style (Mizorpaymart.com) and the terms " YOU", " YOUR" and " USER" refer to you, as a User of Mizorpaymart Solution. The term " PERSONAL INFORMATION" means information that you provide to us which personally identifies you to be contacted or identified, such as your name, phone number, email address, and any other data that is tied to such information including the heads outlined below. Our practices and procedures in relation to the collection and use of Personal Information have been set-out below in order to ensure safe usage of the Website for you. An indicative list of the Personal Information being collected from you is set out below. Please note that the list above is only indicative, and as such, we may collect more information and data points from you, including as detailed in this Privacy Policy:
-          </p>
-
-          <ul className={list}>
-            <li>Your Full Name</li>
-            <li>Contact details including Mobile Number</li>
-            <li>Your Company Name and Email Addresses</li>
-            <li>Information from your Email Accounts (as permitted)</li>
-            <li>Information from your Device (as permitted)</li>
-          </ul>
-
-          <p className={paragraph}>
-            The Platform shall clearly display the Personal Information it is collecting from you, and you have the option to not provide such Personal Information. However, this may limit the services provided to you on the Platform. As such, the specifics of certain Information collected from you is detailed in this Privacy Policy.
-          </p>
-
-          <h2 className={sectionHeading}>
-            Reason for collecting and Processing the Data
-          </h2>
-          <p className={paragraph}>
-            We collect the personal information to render our services efficiently. To curb down the chance and risk of online/ offline frauds. In process to provide our service we, are required to have the personal information of the Customer to authorize and complete the transactions or requests of the Customers. We process and collect your information mainly for the following purposes:
-          </p>
-
-          <ul className={list}>
-            <li>To help you purchase/ acquire the Products/Services that you have requested and to process any payment connected with that Products/Services as requested.</li>
-            <li>To contact you if required in relation to the Product/Services that you have purchased/requested to any communications that you might have sent us.</li>
-            <li>To provide you with customer care</li>
-            <li>For security and fraud prevention purposes</li>
-            <li>To help improve our Applications and our Services</li>
-            <li>The use of this information is necessary for the purpose of our legitimate interests.</li>
-          </ul>
-
-          <h2 className={sectionHeading}>
-            Protection of your Information
-          </h2>
-          <p className={paragraph}>
-            We access, collect, receive and store your Personal Information. If you provide your third-party account credentials (" THIRD PARTY ACCOUNT INFORMATION") to us, you understand that some content and information in those accounts may be transmitted to your account with us if you authorize such transmissions and that Third Party Account Information transmitted to us shall be covered by this Privacy Policy. You may opt to not provide us with certain information, however that will restrict you from registering with us or availing some of our features.
-          </p>
-          <p className={paragraph}>
-            All Personal Information collected may be retained with us for such periods as may be necessary and to comply with our legal obligations, to resolve disputes, and enforce our agreements.
-          </p>
-
-          <h2 className={sectionHeading}>
-            Protection of Personal Information
-          </h2>
-          <p className={paragraph}>
-            We have implemented reasonable security practices and procedures that are commensurate with the information assets being protected and with the nature of our business. While we try our best to provide security that is better than the industry standards, because of the inherent vulnerabilities of the internet, we cannot ensure or warrant complete security of all information that is being transmitted to us by you. By visiting this Website, you agree and acknowledge to be bound by this Privacy Policy and you hereby consent that we will collect, use, process and share your Personal Information in the manner set out herein below. If you do not agree with these terms, you may choose to not use Mizorpaymart.
-          </p>
-          <p className={paragraph}>
-            It is clarified that the terms and conditions that are provided separately, form an integral part of your use of this Website and should be read in conjunction with this Privacy Policy.
-          </p>
-          <p className={paragraph}>
-            While we are committed to maintaining confidentiality of all Personal Information, we shall not be responsible for any breach of security or for any action of any third parties that receive Users' personal data or events that are beyond our reasonable control including, acts of government, computer hacking, unauthorized access to computer data and storage device, computer crashes, breach of security and encryption, etc. All Personal Information collected from the Users by us is maintained in electronic form on servers and/or cloud systems located in India. The Personal Information may also be converted to physical form from time to time. Regardless of the manner of storage, we will make commercially reasonable endeavours to ensure that the Personal Information is rendered confidential and will disclose Personal Information only in accordance with the terms of this Privacy Policy.
-          </p>
-
-          <h2 className={sectionHeading}>
-            Activity
-          </h2>
-          <p className={paragraph}>
-            We record infomation relating to your use of Mizorpaymart, such as the searches you undertake, the pages you view, your browser type, IP address, location, requested URL, referring URL, and timestamp information. We use this type of information to administer Mizorpaymart and provide the highest possible level of security and service to you. We also use this information in the aggregate to perform statistical analyses of User behaviour and characteristics in order to measure interest in and use of the various areas of Mizorpaymart. However, you cannot be identified from this aggregate information.
-          </p>
-          <p className={paragraph}>
-            We own all the intellectual property rights associated with the Website and its contents. No right, title or interest in any downloaded material is transferred to you as a result of any such downloading or copying. The Website is protected by copyright as a collective work and/ or compilation (meaning the collection, arrangement, and assembly) of all the content on this Website, pursuant to applicable law.
-          </p>
-          <p className={paragraph}>
-            Our logos, product and service marks and/ or names, trademarks, copyrights and other intellectual property, whether registered or not (" OUR IP") are exclusively owned by us. Without our prior written permission, you agree to not display and/ or use Our IP in any manner. Nothing contained in this Website or the content, should be construed as granting, in any way to the User, any license or right or interest whatsoever, in and/ or to Our IP, without our express written permission.
-          </p>
-
-          <h2 className={sectionHeading}>
-            Cookies
-          </h2>
-          <p className={paragraph}>
-            Mizorpaymart uses cookies to enable us to retrieve certain information for each visit. Cookies are used in some elements of our site to enable the functionality of that element and ease of use for the User. Third Party cookies, we may use in connection with our Website and the Services provided like Google analytics, Website analytics cookie for visitor information and source. No Personal Information is collected or used in this process. These third parties do not know or have access to the name, phone number, address, email address, or any Personal Information about Mizorpaymart Users. Mizorpaymart Users can opt-out of sharing this information with third parties by deactivating cookies, the process of which varies from browser to browser. Please refer to the help file of your browser to understand the process of deactivating cookies on your browser.
-          </p>
-
-          <h2 className={sectionHeading}>
-            Camera Permissions
-          </h2>
-          <p className={paragraph}>
-            We require access to your camera and permissions thereof to ensure that the process of uploading pictures and graphics from your camera on your devices through which you access the Platform is a smooth process. For instance, you may need to click pictures of your government identity cards for the purposes of KYC obligations.
-          </p>
-
-          <h2 className={sectionHeading}>
-            Transfer of information
-          </h2>
-          <p className={paragraph}>
-            We do not share your Personal Information with any third party apart from financial institutions such as banks, RBI or other regulatory agencies (as may be required) and to provide you with services that we offer through Mizorpaymart, conduct quality assurance testing, facilitate creation of accounts, provide technical and customer support, or provide specific services, such as synchronization of your contacts with other software applications, in accordance with your instructions. These third parties are required not to use your Personal Information other than to provide the services requested by you.
-          </p>
-          <p className={paragraph}>
-            We may share your Personal Information with our parent company, subsidiaries, joint ventures, or other companies under a common control (collectively, " AFFILIATES") that we may have now or in the future, in which case we will require them to honour this Privacy Policy. If another company acquires our company or our assets, that company will possess your Personal Information, and will assume the rights and obligations with respect to that information as described in this Privacy Policy. We may disclose your Personal Information to third parties in a good faith belief that such disclosure is reasonably necessary to (a) take action regarding suspected illegal activities; (b) enforce or apply our terms and conditions and Privacy Policy; (c) comply with legal process, such as a search warrant, subpoena, statute, or court order; or (d) protect our rights, reputation, and property, or that of our Users, affiliates, or the public. Please note that we are not required to question or contest the validity of any search warrant, subpoena or other similar governmental request that we receive.
-          </p>
-          <p className={paragraph}>
-            We may disclose information in the aggregate to third parties relating to User behavior in connection with actual or prospective business relationship with those third parties, such as advertisers and content distributors. For example, we may disclose the number of Users that have been exposed to, or clicked on, advertising banners.
-          </p>
-          <p className={paragraph}>
-            We will disclose the data / Personal Information provided by a User with other technology partners to track how the User interacts with the Platform. Personal Information will also be disclosed to our credit partners to perform credit checks and credit analysis.
-          </p>
-          <p className={paragraph}>
-            We may also disclose Personal Information in our sole discretion, if we deem it necessary in order to protect our rights or the rights of others, to prevent harm to persons or property, to fight fraud and credit risk, or to enforce or apply the terms of use, without any notice to you. We shall not be responsible for the manner or method in which such institutions and authorities (to whom the disclosure is made) use or disclose such Personal Information.
-          </p>
-          <p className={paragraph}>
-            Please note that deleting or withdrawing Information may affect the services we provide to you. In case of modification of Personal Information, Users will be required to furnish supporting documents relating to change in Personal Information for the purpose of verification by the Platform. As such, Users have the option of restricting our access to their Information by means of implementing suitable device settings and/or deletion of their account. In order to remove any Personal Information from our servers, you may contact us, and seek deletion of such data. Notwithstanding the same, we are not under an obligation to delete this data if we are required to retain it under applicable law or require such Personal Information for the purposes of operating and/or improving the Platform.
-          </p>
-
-          <h2 className={sectionHeading}>
-            Feedback
-          </h2>
-          <p className={paragraph}>
-            If you contact us to provide feedback, register a complaint, or ask a question, we will record any Personal Information and other content that you provide in your communication so that we can effectively respond to your communication.
-          </p>
-
-          <h2 className={sectionHeading}>
-            Legal Disclosure
-          </h2>
-          <p className={paragraph}>
-            We reserve the right to disclose your personal data as required by applicable law and when we believe that disclosure is necessary to protect our rights and/or to comply with a judicial proceeding, court order, or other legal process served on us.
-          </p>
-          <p className={paragraph}>
-            Your personal data will also be shared between the Mizorpay Solution (OPC) Private limited for the activities permitted under this Policy.
-          </p>
-          <p className={paragraph}>
-            In the event Mizorpaymart goes through a business transition, such as a merger or acquisition by another company, or sale of all or a portion of its assets, including an acquisition which occurs as a result of our bankruptcy, the Merchant User account and data will likely be among the assets transferred. You will be notified via mizorpaymartsolution@gmail.com and via a prominent notice on our Website of any such change in ownership or control.
-          </p>
-
-          <h2 className={sectionHeading}>
-            No Unlawful or Prohibited Use
-          </h2>
-          <p className={paragraph}>
-            As a condition of your use of this Website, you agree that you will not use this Website or the information or software contained herein for any purpose that is unlawful or prohibited by these terms and conditions.
-          </p>
-
-          <h2 className={sectionHeading}>
-            Enforcement
-          </h2>
-          <p className={paragraph}>
-            We may use the information we collect in connection with your use of Mizorpaymart (including your Personal Information) in order to investigate, enforce, and apply our terms and conditions and Privacy Policy.
-          </p>
-
-          <h2 className={sectionHeading}>
-            Terms and Modifications to this Privacy Policy
-          </h2>
-          <p className={paragraph}>
-            Our Privacy Policy is subject to change at any time without notice. To make sure you are aware of any changes, please review this policy periodically. These changes will be effective immediately on the Users of Mizorpaymart. Please note that at all times you are responsible for updating your Personal Information, including to provide us with your most current e-mail address.
-          </p>
-
-          <h2 className={sectionHeading}>
-            Applicable law
-          </h2>
-          <p className={paragraph}>
-            Your use of this Website will be governed by and construed in accordance with the laws of India. Users agree that any legal action or proceedings arising out of your use may be brought exclusively in the competent courts/ tribunals having jurisdiction in FARIDABAD (Haryana) in India and irrevocably submit themselves to the jurisdiction of such courts/ tribunals.
-          </p>
-
-          <h2 className={sectionHeading}>
-            Consent and Binding Agreement
-          </h2>
-          <p className={paragraph}>
-            By using the Platform and by providing your Information, you:
-          </p>
-          <ul className={list}>
-            <li>consent to the collection, use, sharing and disclosure of your Personal Information on the terms and conditions, and in the manner contained in this Privacy Policy; and</li>
-            <li>agree that this Privacy Policy will form a binding legal agreement of between you and us. We will publish any changes to this Privacy Policy on the Platform.</li>
-          </ul>
-
-          <h2 className={sectionHeading}>
-            Complaints and Grievance Redressal
-          </h2>
-          <p className={paragraph}>
-            Any complaints or concerns in relation to your Personal Information or content of this Website or comment or breach of use of the Website or any intellectual property of any User shall be immediately informed to Mizorpaymart at mizorpaymartsolution@gmail.com or by mail using the details provided below:
-          </p>
-
-          <div className="mt-6 p-6 bg-sand rounded-lg border border-border">
-            <h3 className="font-serif text-lg font-medium text-espresso mb-2">
-              Mizorpay SOLUTION (OPC) PRIVATE LIMITED
-            </h3>
-            <p>
-              PLOT NO 69-71, BP, FARIDABAD,Factory Area Faridabad Faridabad,Faridabad-121001,Haryana
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+/**
+ * Privacy Policy — applied verbatim from VastraliyaPrivacyPolicy_1.docx.
+ * The source document's "[Legal Entity Name]" placeholder is filled with
+ * the entity named in its own Section 10 (Vastraliya Fashion Pvt. Ltd.).
+ */
+const content: PolicyContent = {
+  title: 'Privacy Policy',
+  effective: 'August 17, 2026',
+  intro: [
+    `This Privacy Policy (“Policy”) describes how Vastraliya Fashion Pvt. Ltd., operating the website www.vastraliya.com under the brand name “Vastraliya” (“Vastraliya”, “we”, “us” or “our”) collects, uses, stores, discloses and protects the personal information of visitors and customers (“you”, “your”, or “User”) who access or transact on our website, mobile site, or any related platform (collectively, the “Platform”), including for the purchase of sarees, suit sets, kurtas, dupattas and other ethnic wear and accessories offered by us.`,
+    `By accessing or using the Platform, or by providing your information to us, you agree to the collection, use, storage and disclosure of your information as described in this Policy. If you do not agree with this Policy, please do not use the Platform.`,
+  ],
+  sections: [
+    {
+      heading: '1. Information We Collect',
+      blocks: [
+        { t: 'h3', text: '1.1 Information You Provide to Us' },
+        { t: 'list', items: [
+          `Contact and identity details: name, email address, mobile number, and billing/shipping address(es), provided at account creation, checkout, or when you contact customer support.`,
+          `Order details: products purchased (e.g., sarees, suit sets, kurtas), size and fit preferences, gift-wrap/gift-message instructions, and order history.`,
+          `Payment information: billing name, card/UPI/net-banking details are collected and processed by our third-party payment gateway partners; we do not store your full card or UPI credentials on our servers.`,
+          `Communications: any information you share when you contact us via email, phone, WhatsApp, chat, or social media, including complaints, reviews, and feedback.`,
+          `Account credentials: username and password if you create an account on the Platform.`,
+          `Optional information: date of birth, gender, style preferences, or wishlist information you choose to provide for a personalised shopping experience.`,
+        ]},
+        { t: 'h3', text: '1.2 Information Collected Automatically' },
+        { t: 'list', items: [
+          `Device and usage information: IP address, browser type, device identifiers, operating system, pages viewed, time spent, referring URLs and clickstream data.`,
+          `Location information: approximate location derived from your IP address or, where permitted, precise location if you enable location services.`,
+          `Cookies and similar technologies: as described in Section 5 (Cookies) below.`,
+        ]},
+        { t: 'h3', text: '1.3 Information from Third Parties' },
+        { t: 'list', items: [
+          `Information from payment gateways regarding transaction status and payment verification, and delivery-status updates recorded by our in-house delivery team.`,
+          `Information from social media platforms if you choose to log in, follow, or interact with us via such platforms (subject to their own privacy policies).`,
+        ]},
+      ],
+    },
+    {
+      heading: '2. How We Use Your Information',
+      blocks: [
+        { t: 'p', text: `We use the information we collect for the following purposes:` },
+        { t: 'list', items: [
+          `To process, confirm, pack, ship and deliver your orders for sarees, suit sets, kurtas and other products purchased on the Platform;`,
+          `To create and manage your account, process payments, refunds, exchanges and cancellations;`,
+          `To communicate with you regarding order confirmations, shipping updates, delivery notifications, and customer support queries;`,
+          `To personalise your shopping experience, including product recommendations, size suggestions, and curated collections;`,
+          `To send promotional communications, offers, newsletters and updates about new collections (subject to your consent/opt-out preferences);`,
+          `To improve the Platform, troubleshoot issues, conduct analytics, and enhance security and fraud prevention;`,
+          `To comply with applicable law, respond to lawful requests from public authorities, and enforce our Terms & Conditions; and`,
+          `For any other purpose disclosed to you at the time the information was collected, with your consent where required.`,
+        ]},
+      ],
+    },
+    {
+      heading: '3. Sharing and Disclosure of Information',
+      blocks: [
+        { t: 'p', text: `We do not sell your personal information. We may share your information with:` },
+        { t: 'list', items: [
+          `Our in-house logistics and delivery team, who require access to your name, address, and contact number solely to fulfil and deliver your order (Vastraliya delivers orders through its own delivery team rather than third-party couriers);`,
+          `Payment gateways and financial institutions to process payments, refunds and prevent fraud;`,
+          `Technology and service providers who help us operate the Platform, such as website hosting, analytics, customer support tools, email/SMS/WhatsApp communication providers, and marketing platforms;`,
+          `Professional advisors such as auditors, legal counsel, and consultants, where necessary;`,
+          `Government authorities or regulators where required under applicable law, court order, or to protect our rights, property or safety, or that of our users or the public; and`,
+          `Business transfers – in connection with a merger, acquisition, restructuring, or sale of business assets, your information may be transferred as part of that transaction, subject to confidentiality obligations.`,
+        ]},
+      ],
+    },
+    {
+      heading: '4. Data Storage, Security and Retention',
+      blocks: [
+        { t: 'p', text: `We implement reasonable security practices and procedures, including administrative, technical and physical safeguards (such as SSL encryption, restricted access, and secure servers), commensurate with the sensitivity of the information, to protect your personal information from unauthorised access, disclosure, alteration or destruction. However, no method of transmission over the internet or electronic storage is 100% secure, and we cannot guarantee absolute security.` },
+        { t: 'p', text: `We retain your personal information for as long as necessary to fulfil the purposes described in this Policy, including to comply with legal, accounting, tax, or reporting requirements (e.g., under applicable consumer protection and tax laws in India), resolve disputes, and enforce our agreements. Where information is no longer required, we take reasonable steps to delete, destroy, or anonymise it.` },
+      ],
+    },
+    {
+      heading: '5. Cookies and Tracking Technologies',
+      blocks: [
+        { t: 'p', text: `We use cookies, web beacons, and similar technologies on the Platform to:` },
+        { t: 'list', items: [
+          `Remember your login details, cart items, and preferences;`,
+          `Understand how you use the Platform and improve navigation and product discovery;`,
+          `Measure the effectiveness of our marketing campaigns; and`,
+          `Serve relevant advertisements on our Platform and third-party websites (via advertising/analytics partners such as Google and Meta).`,
+        ]},
+        { t: 'p', text: `You can control or disable cookies through your browser settings; however, disabling cookies may affect the functionality of the Platform, including your ability to complete a purchase.` },
+      ],
+    },
+    {
+      heading: '6. Your Rights and Choices',
+      blocks: [
+        { t: 'p', text: `Subject to applicable law (including the Digital Personal Data Protection Act, 2023 and related rules), you may:` },
+        { t: 'list', items: [
+          `Access, review and update your personal information through your account settings or by contacting us;`,
+          `Request correction or deletion of your personal information, subject to our legal and legitimate business requirements;`,
+          `Withdraw consent for marketing communications at any time by using the “unsubscribe” link in our emails, replying “STOP” to SMS/WhatsApp messages, or contacting us directly;`,
+          `Request a copy of the personal information we hold about you; and`,
+          `Lodge a grievance with our Grievance Officer (Section 9) if you believe your information has been misused.`,
+        ]},
+        { t: 'p', text: `To exercise any of these rights, please write to us at the contact details in Section 10. We may need to verify your identity before actioning such requests.` },
+      ],
+    },
+    {
+      heading: `7. Children's Privacy`,
+      blocks: [
+        { t: 'p', text: `The Platform is intended for use by individuals who are 18 years of age or older, or who are otherwise competent to enter into a binding contract under applicable law. We do not knowingly collect personal information from children. If we become aware that we have inadvertently collected personal information from a minor without appropriate consent, we will take steps to delete such information.` },
+      ],
+    },
+    {
+      heading: '8. Third-Party Links',
+      blocks: [
+        { t: 'p', text: `The Platform may contain links to third-party websites, payment gateways, or social media pages that are not owned or controlled by Vastraliya. This Policy does not apply to such third-party websites, and we encourage you to review their respective privacy policies before providing any personal information.` },
+      ],
+    },
+    {
+      heading: '9. Grievance Officer',
+      blocks: [
+        { t: 'p', text: `In accordance with applicable Indian law, including the Information Technology Act, 2000 and rules made thereunder, the details of the Grievance Officer are provided below:` },
+        { t: 'lines', lines: [
+          `Name: Yash`,
+          `Designation: Grievance Officer`,
+          `Address: Gala No 230, Second Floor, Pride Industrial Estate, Vasai East Ie, Vasai, Thane, Maharashtra, India, 401208`,
+          `Email: yash@vastraliya.com`,
+          `Working Hours: Mon–Sat, 10:00 AM – 6:00 PM IST`,
+        ]},
+      ],
+    },
+    {
+      heading: '10. Contact Us',
+      blocks: [
+        { t: 'p', text: `If you have any questions, concerns, or requests regarding this Privacy Policy or our data practices, please contact us at:` },
+        { t: 'lines', lines: [
+          `Vastraliya – Vastraliya Fashion Pvt. Ltd.`,
+          `Registered Address: Gala No 230, Second Floor, Pride Industrial Estate, Vasai East Ie, Vasai, Thane, Maharashtra, India, 401208`,
+          `Email: support@vastraliya.com`,
+          `Phone: 7066181207`,
+        ]},
+      ],
+    },
+    {
+      heading: '11. Changes to This Privacy Policy',
+      blocks: [
+        { t: 'p', text: `We may update this Privacy Policy from time to time to reflect changes in our practices, technology, legal requirements, or other factors. The updated version will be indicated by a revised “Effective Date” at the top of this Policy and will be effective as soon as it is accessible. We encourage you to review this Policy periodically. Continued use of the Platform after any changes constitutes your acceptance of the revised Policy.` },
+      ],
+    },
+  ],
 };
+
+const PrivacyPolicy = () => <PolicyPage content={content} />;
 
 export default PrivacyPolicy;
