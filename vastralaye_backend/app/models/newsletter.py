@@ -11,6 +11,9 @@ class NewsletterSubscriber(Base):
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String(255), unique=True, nullable=False, index=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+    # Set when an admin writes to this subscriber from the Enquiries page.
+    # Nullable so schema_sync can add it to existing databases (lands NULL).
+    last_emailed_at = Column(DateTime(timezone=True), nullable=True)
 
     def __repr__(self):
         return f"<NewsletterSubscriber(email='{self.email}')>"
