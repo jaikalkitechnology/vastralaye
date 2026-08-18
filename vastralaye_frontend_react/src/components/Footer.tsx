@@ -162,7 +162,11 @@ const Footer = () => {
             <ul className="space-y-2.5 text-sm">
               <li className="flex items-start gap-2.5">
                 <MapPin className="h-4 w-4 mt-0.5 text-gold shrink-0" strokeWidth={1.5} />
-                Vasai East, Maharashtra, India
+                <span>
+                  Gala No 230, Second Floor, Pride Industrial Estate,
+                  <br />
+                  Vasai East, Thane, Maharashtra – 401208
+                </span>
               </li>
               <li className="flex items-center gap-2.5">
                 <Phone className="h-4 w-4 text-gold shrink-0" strokeWidth={1.5} />
@@ -176,9 +180,14 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Bottom bar */}
+        {/* Bottom bar — company legal identity */}
         <div className="border-t border-ivory/15 py-5 flex flex-col md:flex-row items-center justify-between gap-4 text-[13px]">
-          <span>© {new Date().getFullYear()} Vastraliya · All rights reserved</span>
+          <div className="text-center md:text-left">
+            <span>© {new Date().getFullYear()} Vastraliya Fashion Pvt. Ltd. · All rights reserved</span>
+            <p className="mt-1 text-[11px] tracking-[0.04em] text-ivory/45">
+              CIN: U47711MR2026PTC478420 · GSTIN: 27AAMCV4451F
+            </p>
+          </div>
           <PaymentBadges />
         </div>
       </div>
