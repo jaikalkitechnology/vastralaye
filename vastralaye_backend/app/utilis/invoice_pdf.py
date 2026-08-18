@@ -7,15 +7,20 @@ from reportlab.lib import colors
 from reportlab.platypus import Table, TableStyle
 
 
-# Configuration
-COMPANY_NAME = "MizorPayMart"
-GST_NUMBER = "06AAQCM6479G1ZV"
+# Configuration — the seller identity printed on every tax invoice.
+COMPANY_NAME = "Vastraliya Fashion Pvt. Ltd."
+GST_NUMBER = "27AAMCV4451F"
+CIN_NUMBER = "U47711MR2026PTC478420"
 COMPANY_ADDRESS = [
-    "PLOT NO 69-71,OM SHUBHAM TOWER,",
-    "Faridabad, Haryana, PIN - 121001, India"
+    "Gala No 230, Second Floor, Pride Industrial Estate,",
+    "Vasai East, Thane, Maharashtra, PIN - 401208, India",
 ]
-COMPANY_PHONE = "+91 85275 96413"
-LOGO_PATH = "https://mizorpaymart.com/assets/logo-BqwRdMpW.png"
+COMPANY_PHONE = "+91 70661 81207"
+COMPANY_EMAIL = "support@vastraliya.com"
+# No remote logo: the old URL pointed at a host we no longer control, and a
+# network fetch inside PDF generation is a failure point. The letterhead's
+# company name is the mark; drop a file at static/logo.png to add one back.
+LOGO_PATH = "static/logo.png"
 
 # Colors
 COLOR_PRIMARY = colors.HexColor("#232F3E")
@@ -98,8 +103,8 @@ def generate_invoice_pdf(order_id, customer_name, address, phone, total_amount, 
     seller_lines = COMPANY_ADDRESS + [
         f"Phone: {COMPANY_PHONE}",
         f"GSTIN: {GST_NUMBER}",
-        f"Email: support@mizorpaymart.com"
-
+        f"CIN: {CIN_NUMBER}",
+        f"Email: {COMPANY_EMAIL}",
     ]
 
     draw_text_block(c, margin, y_start, f"Sold By: {COMPANY_NAME}", seller_lines)

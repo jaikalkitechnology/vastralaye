@@ -2492,7 +2492,7 @@ def list_all_orders(
         })
 
     return {
-        "gstin": "06AAQCM6479G1ZV",
+        "gstin": "27AAMCV4451F",
         "gst_rate": "18%",
         "data": response_orders,
         "total": total

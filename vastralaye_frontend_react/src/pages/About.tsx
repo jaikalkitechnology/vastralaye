@@ -142,13 +142,13 @@ const About = () => {
         <Reveal>
           <span className="overline-label mb-3">Our Story</span>
           <h2 className="font-serif text-3xl md:text-4xl font-medium text-espresso leading-tight">
-            From Faridabad,
+            From Vasai,
             <span className="italic text-maroon"> for every celebration</span>
           </h2>
           <p className="mt-6 text-[15px] leading-relaxed text-muted-foreground text-left md:text-center">
             Vastraliya Fashion Private Limited was founded on a simple belief:
             the clothes India celebrates in deserve the same care online that
-            they receive on the loom. From Faridabad, Haryana, we've grown into
+            they receive on the loom. From Vasai, Maharashtra, we&rsquo;ve grown into
             a trusted fashion destination serving customers across the country —
             with the same passion that drove our first order.
           </p>
@@ -275,7 +275,7 @@ const About = () => {
             Start Shopping
           </Link>
           <p className="mt-8 text-[10.5px] uppercase tracking-[0.2em] text-muted-foreground/80">
-            Vastraliya Fashion Private Limited · MCA Registered · Faridabad, Haryana
+            Vastraliya Fashion Private Limited · CIN U47711MR2026PTC478420 · Vasai, Maharashtra
           </p>
         </div>
       </Reveal>

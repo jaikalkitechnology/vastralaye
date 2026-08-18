@@ -32,7 +32,7 @@ DEFAULT_SMTP_SSL = os.getenv("SMTP_SSL", "true").strip().lower() != "false"
 # Without this a dead mail host hangs the request thread indefinitely.
 SMTP_TIMEOUT = int(os.getenv("SMTP_TIMEOUT", "20"))
 COMPANY_NAME = os.getenv("COMPANY_NAME", "Jokroup")
-SUPPORT_EMAIL = os.getenv("SUPPORT_EMAIL", "support@jokroup.com")
+SUPPORT_EMAIL = os.getenv("SUPPORT_EMAIL", "support@vastraliya.com")
 
 if not SENDER_EMAIL or not APP_PASSWORD:
     logger.warning("Missing GMAIL_SENDER_EMAIL or GMAIL_APP_PASSWORD in .env file")

@@ -737,8 +737,8 @@ export default function AdminOrders() {
           <div>
             <div style="font-family:${SERIF};font-size:23px;font-weight:600;">Vastra<span style="color:${C.gold};">liya</span></div>
             <div style="font-size:11px;color:rgba(250,246,240,.6);margin-top:9px;line-height:1.65;">
-              14 Weaver's Lane, Faridabad, Haryana 121001<br>
-              support@vastralaye.in · +91 85275 96413${gstin ? `<br>GSTIN ${gstin}` : ""}
+              Pride Industrial Estate, Vasai East, Maharashtra 401208<br>
+              support@vastraliya.com · +91 70661 81207${gstin ? `<br>GSTIN ${gstin}` : ""}
             </div>
           </div>
           <div style="text-align:right;">
@@ -829,7 +829,7 @@ export default function AdminOrders() {
           <div style="display:flex;justify-content:space-between;align-items:flex-end;border-top:1px solid ${C.bd};margin-top:24px;padding-top:18px;gap:20px;">
             <div style="font-size:11.5px;color:${C.mut};line-height:1.7;">
               <b style="color:${C.esp};font-weight:500;">Vastraliya</b>${gstin ? ` · GSTIN ${gstin}` : ""}<br>
-              Queries: support@vastralaye.in · +91 85275 96413<br>
+              Queries: support@vastraliya.com · +91 70661 81207<br>
               Generated ${new Date().toLocaleString("en-IN")}
             </div>
             <div style="text-align:center;">
