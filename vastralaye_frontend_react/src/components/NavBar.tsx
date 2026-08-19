@@ -400,13 +400,13 @@ const NavBar = () => {
           {/* Hairline between the account menu and the icons */}
           <span aria-hidden className="mx-2 h-6 w-px bg-border" />
 
-          {/* WISHLIST — a dot says "something's saved" without a number */}
+          {/* WISHLIST — counts like the cart, visible even at zero */}
           <Link to="/wishlist">
             <Button variant="ghost" size="icon" className="relative text-espresso hover:text-terracotta">
               <Heart className="w-5 h-5" strokeWidth={1.5} />
-              {totalWishlist > 0 && (
-                <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-maroon" />
-              )}
+              <span className="absolute top-0.5 right-0.5 bg-maroon text-ivory text-[10px] font-semibold rounded-full h-4 min-w-4 px-1 flex items-center justify-center">
+                {totalWishlist}
+              </span>
             </Button>
           </Link>
 
@@ -432,11 +432,9 @@ const NavBar = () => {
           <Link to="/wishlist" className="hidden md:block">
             <Button variant="ghost" size="icon" className="relative text-espresso hover:text-terracotta">
               <Heart className="w-5 h-5" strokeWidth={1.5} />
-              {totalWishlist > 0 && (
-                <span className="absolute -top-1 -right-1 bg-maroon text-ivory text-[10px] font-semibold rounded-full h-4 w-4 flex items-center justify-center">
-                  {totalWishlist}
-                </span>
-              )}
+              <span className="absolute top-0.5 right-0.5 bg-maroon text-ivory text-[10px] font-semibold rounded-full h-4 min-w-4 px-1 flex items-center justify-center">
+                {totalWishlist}
+              </span>
             </Button>
           </Link>
 
@@ -444,11 +442,9 @@ const NavBar = () => {
           <Link to="/cart" className="hidden md:block">
             <Button variant="ghost" size="icon" className="relative text-espresso hover:text-terracotta">
               <ShoppingCart className="w-5 h-5" strokeWidth={1.5} />
-              {totalItems > 0 && (
-                <span className="absolute -top-1 -right-1 bg-maroon text-ivory text-[10px] font-semibold rounded-full h-4 w-4 flex items-center justify-center">
-                  {totalItems}
-                </span>
-              )}
+              <span className="absolute top-0.5 right-0.5 bg-maroon text-ivory text-[10px] font-semibold rounded-full h-4 min-w-4 px-1 flex items-center justify-center">
+                {totalItems}
+              </span>
             </Button>
           </Link>
 
