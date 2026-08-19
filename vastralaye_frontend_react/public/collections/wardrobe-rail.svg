@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 874" preserveAspectRatio="xMidYMid slice" role="img" aria-label="A wardrobe rail of Vastraliya styles">
+  <defs>
+    <linearGradient id="wall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F6EFE3"/>
+      <stop offset="0.62" stop-color="#EFE7DB"/>
+      <stop offset="1" stop-color="#E9DECB"/>
+    </linearGradient>
+    <radialGradient id="sun" cx="0.3" cy="0.22" r="0.8">
+      <stop offset="0" stop-color="#FFFDF8" stop-opacity="0.75"/>
+      <stop offset="0.55" stop-color="#FFFDF8" stop-opacity="0.12"/>
+      <stop offset="1" stop-color="#FFFDF8" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="wood" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5C3A24"/>
+      <stop offset="0.5" stop-color="#3F2716"/>
+      <stop offset="1" stop-color="#2B1B12"/>
+    </linearGradient>
+    <linearGradient id="dress" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7A1F2B"/>
+      <stop offset="1" stop-color="#5C1620"/>
+    </linearGradient>
+    <linearGradient id="shirt" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFDF8"/>
+      <stop offset="1" stop-color="#F0E8D9"/>
+    </linearGradient>
+    <linearGradient id="kurta" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#C0693F"/>
+      <stop offset="1" stop-color="#A55631"/>
+    </linearGradient>
+    <linearGradient id="denim" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3F5573"/>
+      <stop offset="1" stop-color="#2E405A"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="760" height="874" fill="url(#wall)"/>
+  <rect width="760" height="874" fill="url(#sun)"/>
+
+  <!-- Rail posts and bar -->
+  <rect x="70" y="120" width="18" height="700" rx="9" fill="url(#wood)"/>
+  <rect x="672" y="120" width="18" height="700" rx="9" fill="url(#wood)"/>
+  <rect x="52" y="182" width="656" height="20" rx="10" fill="url(#wood)"/>
+  <rect x="52" y="186" width="656" height="4" rx="2" fill="#C99A45" opacity="0.55"/>
+
+  <!-- Hanger + maroon dress -->
+  <g>
+    <path d="M180,202 L180,224" stroke="#8A6414" stroke-width="4"/>
+    <path d="M120,258 C132,238 168,226 180,226 C192,226 228,238 240,258" fill="none" stroke="#8A6414" stroke-width="6" stroke-linecap="round"/>
+    <path d="M126,262 C138,250 158,244 180,244 C202,244 222,250 234,262
+             L246,330 C250,352 246,368 238,382 C260,470 268,560 258,640
+             C232,656 128,656 102,640 C92,560 100,470 122,382
+             C114,368 110,352 114,330 Z" fill="url(#dress)"/>
+    <path d="M180,244 L180,640" stroke="#5C1620" stroke-width="2" opacity="0.5"/>
+    <path d="M102,640 C128,656 232,656 258,640" fill="none" stroke="#C99A45" stroke-width="4" opacity="0.7"/>
+    <circle cx="180" cy="300" r="3.5" fill="#C99A45" opacity="0.85"/>
+    <circle cx="180" cy="330" r="3.5" fill="#C99A45" opacity="0.85"/>
+    <circle cx="180" cy="360" r="3.5" fill="#C99A45" opacity="0.85"/>
+  </g>
+
+  <!-- Hanger + ivory shirt -->
+  <g>
+    <path d="M362,202 L362,224" stroke="#8A6414" stroke-width="4"/>
+    <path d="M308,256 C320,238 352,226 362,226 C372,226 404,238 416,256" fill="none" stroke="#8A6414" stroke-width="6" stroke-linecap="round"/>
+    <path d="M314,260 C328,250 344,246 362,246 C380,246 396,250 410,260
+             L426,320 L404,338 L398,308 L398,540 C376,552 348,552 326,540
+             L326,308 L320,338 L298,320 Z" fill="url(#shirt)" stroke="#D8CDB8" stroke-width="2"/>
+    <path d="M348,250 L362,268 L376,250" fill="none" stroke="#C9BCA1" stroke-width="2.5"/>
+    <path d="M362,268 L362,540" stroke="#D8CDB8" stroke-width="2"/>
+    <circle cx="362" cy="300" r="2.6" fill="#B85C38"/>
+    <circle cx="362" cy="332" r="2.6" fill="#B85C38"/>
+    <circle cx="362" cy="364" r="2.6" fill="#B85C38"/>
+  </g>
+
+  <!-- Hanger + terracotta top -->
+  <g>
+    <path d="M520,202 L520,224" stroke="#8A6414" stroke-width="4"/>
+    <path d="M468,256 C480,238 510,226 520,226 C530,226 560,238 572,256" fill="none" stroke="#8A6414" stroke-width="6" stroke-linecap="round"/>
+    <path d="M474,262 C488,250 504,246 520,246 C536,246 552,250 566,262
+             L580,322 L558,338 L552,310 L552,500 C532,512 508,512 488,500
+             L488,310 L482,338 L460,322 Z" fill="url(#kurta)"/>
+    <path d="M506,250 C510,262 530,262 534,250" fill="none" stroke="#8A4326" stroke-width="2.5"/>
+    <rect x="488" y="472" width="64" height="6" fill="#C99A45" opacity="0.6"/>
+  </g>
+
+  <!-- Hanger + folded denim over the bar -->
+  <g>
+    <rect x="612" y="196" width="64" height="270" rx="8" fill="url(#denim)"/>
+    <rect x="612" y="196" width="64" height="14" rx="7" fill="#2A3A52"/>
+    <path d="M644,210 L644,466" stroke="#25344B" stroke-width="3"/>
+    <path d="M620,220 C628,228 660,228 668,220" fill="none" stroke="#C99A45" stroke-width="2" opacity="0.65"/>
+    <path d="M620,452 C628,444 660,444 668,452" fill="none" stroke="#9FB2CC" stroke-width="2" opacity="0.5"/>
+  </g>
+
+  <!-- Floor line + zari hem -->
+  <rect x="0" y="820" width="760" height="54" fill="#E4D6BE"/>
+  <line x1="0" y1="820" x2="760" y2="820" stroke="#C99A45" stroke-width="2" opacity="0.5"/>
+  <g fill="#C99A45" opacity="0.7">
+    <rect x="76"  y="840" width="13" height="13" transform="rotate(45 82.5 846.5)"/>
+    <rect x="216" y="840" width="13" height="13" transform="rotate(45 222.5 846.5)"/>
+    <rect x="356" y="840" width="13" height="13" transform="rotate(45 362.5 846.5)"/>
+    <rect x="496" y="840" width="13" height="13" transform="rotate(45 502.5 846.5)"/>
+    <rect x="636" y="840" width="13" height="13" transform="rotate(45 642.5 846.5)"/>
+  </g>
+</svg>

@@ -845,7 +845,7 @@ const AdminEnquiries = () => {
           </DialogContent>
         </Dialog>
 
-        {/* Newsletter subscribers from the home page's "Letters from the Loom" band */}
+        {/* Newsletter subscribers from the home page's sign-up band */}
         <AdminSubscribers />
       </div>
     </AdminLayout>

@@ -22,7 +22,7 @@ const fallbackTestimonials: TestimonialItem[] = [
   },
   {
     quote:
-      'Ordered a Banarasi for my mother’s 60th. The weave, the fall, the packaging — everything felt thoughtful and premium.',
+      'Ordered a Banarasi for my mother’s 60th. The fall, the colours, the packaging — everything felt thoughtful and premium.',
     who: 'Ritika M. · Bengaluru',
     rating: 5,
   },

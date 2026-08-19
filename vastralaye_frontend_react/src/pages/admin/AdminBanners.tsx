@@ -346,7 +346,7 @@ const AdminBanners = () => {
         </div>
       </div>
 
-      {/* The two collection cards + the craft-story band */}
+      {/* The two collection cards + the home story band */}
       <AdminHomeSections />
 
       {/* Per-page catalogue banners (4 pages: image + text each) */}

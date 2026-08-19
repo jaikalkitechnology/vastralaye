@@ -116,7 +116,7 @@ const BestSellers = () => {
       {/* Admin-driven banner (Admin → Banner Control) */}
       <PageBanner
         title="Bestsellers"
-        subtitle={`Most-loved weaves, chosen by our shoppers · ${allProducts.length} products`}
+        subtitle={`Most-loved styles, chosen by our shoppers · ${allProducts.length} products`}
         crumb="Bestsellers"
         page="best_sellers"
       />

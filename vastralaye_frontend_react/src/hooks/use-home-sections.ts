@@ -4,7 +4,7 @@ import { readCache, writeCache } from '@/lib/persistentCache';
 
 /**
  * Admin-managed content for the home sections that used to be hard-coded:
- * the two collection cards and the craft-story band (Admin › Banners).
+ * the two collection cards and the home story band (Admin › Banners).
  *
  * Semantics, per slot ("card_1" | "card_2" | "story"):
  *   absent            → the section renders its built-in content

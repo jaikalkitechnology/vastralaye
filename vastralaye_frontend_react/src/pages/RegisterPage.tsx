@@ -276,7 +276,7 @@ const RegisterPage = () => {
             Join the Vastraliya family
           </h2>
           <p className="text-[15px] text-ivory/75">
-            Members get early access to new drops, artisan stories and members-only offers.
+            Members get early access to new drops, styling notes and members-only offers.
           </p>
         </div>
       </div>

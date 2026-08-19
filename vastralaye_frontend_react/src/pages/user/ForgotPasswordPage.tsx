@@ -23,7 +23,7 @@ const BrandPanel = () => (
     </div>
 
     <p className="font-serif text-[21px] leading-relaxed text-ivory/90 mt-6 max-w-[340px]">
-      Handwoven stories, waiting to be worn &mdash; your wardrobe remembers where it came from.
+      Good style, waiting to be worn &mdash; pieces you'll reach for on repeat.
     </p>
 
     <div className="flex items-center gap-2.5 mt-6" aria-hidden="true">
@@ -35,7 +35,7 @@ const BrandPanel = () => (
     <ul className="mt-7 space-y-3">
       <li className="flex items-center gap-3 text-[13px] text-ivory/70">
         <span className="w-1.5 h-1.5 border border-gold rotate-45 shrink-0" />
-        Artisan-direct sarees, suits &amp; lehengas
+        Curated festive &amp; everyday styles
       </li>
       <li className="flex items-center gap-3 text-[13px] text-ivory/70">
         <span className="w-1.5 h-1.5 border border-gold rotate-45 shrink-0" />

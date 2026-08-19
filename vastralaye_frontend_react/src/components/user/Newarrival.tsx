@@ -131,7 +131,7 @@ const NewArrivals = () => {
       {/* Admin-driven banner (Admin → Banner Control) */}
       <PageBanner
         title="New Arrivals"
-        subtitle={`Fresh off the loom, just for you · ${allProducts.length} products`}
+        subtitle={`Fresh in, just for you · ${allProducts.length} products`}
         crumb="New Arrivals"
         page="new_arrivals"
       />
@@ -273,7 +273,7 @@ const NewArrivals = () => {
             </span>
             <h3 className="font-serif text-xl font-medium text-espresso">No new arrivals yet</h3>
             <p className="mt-1 text-sm text-muted-foreground">
-              Fresh pieces are on the loom — check back soon.
+              Fresh pieces are on the way — check back soon.
             </p>
           </div>
         )}

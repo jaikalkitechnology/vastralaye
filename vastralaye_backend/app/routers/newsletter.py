@@ -111,7 +111,7 @@ def email_subscriber(
         "Hello,\n\n"
         f"{body}\n\n"
         f"— {shop}\n\n"
-        "You're receiving this because you subscribed to Letters from the Loom."
+        "You're receiving this because you signed up for The Style Letter on our website."
     )
     html = T.render_email(
         preheader=f"A note from {shop}",
@@ -122,7 +122,7 @@ def email_subscriber(
             T.signoff(shop),
         ],
         footer_lines=[
-            "You're receiving this because you subscribed to Letters from the Loom.",
+            "You're receiving this because you signed up for The Style Letter on our website.",
             f"{T.esc(shop)} &middot; Premium ethnic wear, made in India",
         ],
     )

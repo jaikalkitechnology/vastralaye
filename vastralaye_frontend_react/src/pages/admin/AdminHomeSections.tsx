@@ -43,7 +43,7 @@ const emptyForm = (): FormState => ({ is_active: 'true' } as FormState);
 const SLOT_META: Record<string, { name: string; hint: string; imageOnly?: boolean; placeholders: Record<string, string> }> = {
   about_arch: {
     name: 'About page — arch image',
-    hint: 'The arch photo in the About page hero. Portrait works best (roughly 4:5); it’s cropped into a rounded arch. Empty = the drawn loom artwork.',
+    hint: 'The arch photo in the About page hero. Portrait works best (roughly 4:5); it’s cropped into a rounded arch. Empty = the drawn wardrobe artwork.',
     imageOnly: true,
     placeholders: {},
   },
@@ -68,18 +68,18 @@ const SLOT_META: Record<string, { name: string; hint: string; imageOnly?: boolea
     },
   },
   story: {
-    name: 'Craft story band',
-    hint: 'The "From Loom to Wardrobe" section — heading, paragraph, three counters, button and arch image.',
+    name: 'Home story band',
+    hint: 'The story section on the home page — heading, paragraph, three counters, button and arch image.',
     placeholders: {
-      overline: 'Our craft',
-      title_line_1: 'From Loom to Wardrobe,',
-      title_line_2: 'with Love',
+      overline: 'Our promise',
+      title_line_1: 'Made to Be',
+      title_line_2: 'Lived In',
       description:
-        'Every Vastraliya piece begins in the hands of an artisan — block printers of Jaipur, weavers of Banaras, dyers of Kutch.',
+        'Every piece is picked for how it feels on a real day — quality fabrics, honest stitching and cuts that flatter.',
       cta_label: 'Read our story',
       cta_link: '/about',
-      stat1_value: '40+', stat1_label: 'Craft forms',
-      stat2_value: '900+', stat2_label: 'Styles',
+      stat1_value: '900+', stat1_label: 'Styles',
+      stat2_value: '7-Day', stat2_label: 'Easy returns',
       stat3_value: '50k+', stat3_label: 'Happy customers',
     },
   },
@@ -283,7 +283,7 @@ const AdminHomeSections = () => {
           <LayoutGrid className="h-5 w-5 text-maroon" /> Home sections
         </h2>
         <p className="text-sm text-muted-foreground mt-1">
-          The two collection cards under the hero, the “From Loom to Wardrobe” story band,
+          The two collection cards under the hero, the home story band,
           and the About page’s arch image. Blank fields keep the built-in text and artwork.
         </p>
       </div>

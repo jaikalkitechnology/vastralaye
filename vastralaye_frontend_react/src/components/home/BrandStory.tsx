@@ -4,15 +4,15 @@ import { mediaUrl } from '@/lib/media';
 import { useHomeSections } from '@/hooks/use-home-sections';
 
 /**
- * Craft storytelling band on blush (design.md §5.7).
+ * Brand story band on blush (design.md §5.7).
  *
  * Everything here — heading, paragraph, the three counters, button and the
  * arch image — is editable from Admin › Banners (Home sections). Blank
  * fields fall back to the built-ins; switching the section off hides it.
  */
 const defaultStats = [
-  { value: '40+', label: 'Craft forms' },
   { value: '900+', label: 'Styles' },
+  { value: '7-Day', label: 'Easy returns' },
   { value: '50k+', label: 'Happy customers' },
 ];
 
@@ -22,15 +22,15 @@ const BrandStory = () => {
 
   if (row?.is_active === false) return null;
 
-  const overline = row?.overline || 'Our craft';
-  const titleLine1 = row?.title_line_1 || 'From Loom to Wardrobe,';
-  const titleLine2 = row?.title_line_2 || 'with Love';
+  const overline = row?.overline || 'Our promise';
+  const titleLine1 = row?.title_line_1 || 'Made to Be';
+  const titleLine2 = row?.title_line_2 || 'Lived In';
   const paragraph =
     row?.description ||
-    'Every Vastraliya piece begins in the hands of an artisan — block printers of Jaipur, weavers of Banaras, dyers of Kutch. We work directly with craft clusters so heritage stays alive and makers earn fairly.';
+    'Every Vastraliya piece is picked for how it feels on a real day — quality fabrics, honest stitching and cuts that flatter. Each one is checked before it ships, so what reaches you is exactly what you chose.';
   const ctaLabel = row?.cta_label || 'Read our story';
   const ctaLink = row?.cta_link || '/about';
-  const image = row?.image_url ? mediaUrl(row.image_url) : '/collections/at-the-loom.svg';
+  const image = row?.image_url ? mediaUrl(row.image_url) : '/collections/wardrobe-rail.svg';
 
   const stats = defaultStats.map((s, i) => {
     const value = row?.[`stat${i + 1}_value` as keyof typeof row] as string | undefined;
@@ -48,7 +48,7 @@ const BrandStory = () => {
               <div className="relative aspect-[4/4.6] overflow-hidden rounded-t-[999px] bg-gradient-to-b from-sand via-sand to-blush">
                 <img
                   src={image}
-                  alt="A loom with warp threads and woven cloth"
+                  alt="A wardrobe rail of Vastraliya styles"
                   loading="lazy"
                   onError={(e) => { e.currentTarget.style.display = 'none'; }}
                   className="absolute inset-0 w-full h-full object-cover"

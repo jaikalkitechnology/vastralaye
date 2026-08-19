@@ -34,9 +34,9 @@ const NewsletterBand = () => {
         <span className="block text-[11px] md:text-xs font-semibold uppercase tracking-[0.3em] text-gold mb-2">
           Stay in the loop
         </span>
-        <h2 className="font-serif text-3xl md:text-4xl font-medium mb-2">Letters from the Loom</h2>
+        <h2 className="font-serif text-3xl md:text-4xl font-medium mb-2">The Style Letter</h2>
         <p className="text-ivory/75 mb-7 text-sm md:text-base">
-          New drops, artisan stories and members-only offers. No spam, only silk.
+          New drops, styling notes and members-only offers. No spam — only the good stuff.
         </p>
         <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row justify-center gap-2.5 sm:gap-0 max-w-lg mx-auto">
           <input

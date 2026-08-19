@@ -7,13 +7,13 @@ import { useHomeSections } from '@/hooks/use-home-sections';
 /**
  * About — editorial brand page for Vastraliya Fashion Private Limited.
  * Same visual language as the storefront: ivory/blush/espresso bands,
- * serif display headings, gold zari details, and the loom artwork from
- * the home craft band.
+ * serif display headings, gold zari details, and the wardrobe artwork from
+ * the home story band.
  */
 
 const stats = [
   { value: '10,000+', label: 'Happy customers' },
-  { value: '5+', label: 'Years of craft' },
+  { value: '5+', label: 'Years of style' },
   { value: '100%', label: 'Delivery success' },
   { value: '4.9/5', label: 'Customer rating' },
 ];
@@ -30,8 +30,8 @@ const pillars = [
   },
   {
     icon: Users,
-    title: 'Artisan partnerships',
-    text: 'We work directly with weavers, block printers and dyers, so craft heritage stays alive and makers earn fairly.',
+    title: 'Fabrics that last',
+    text: 'Materials picked for feel and wear — soft on day one, still right after many washes.',
   },
   {
     icon: Zap,
@@ -58,16 +58,16 @@ const Zari = ({ className = '' }: { className?: string }) => (
 
 const About = () => {
   // The arch image is uploadable from Admin › Banners → Home sections
-  // ("About page — arch image"); empty falls back to the loom artwork.
+  // ("About page — arch image"); empty falls back to the wardrobe artwork.
   const sections = useHomeSections();
   const archImage = sections?.about_arch?.image_url
     ? mediaUrl(sections.about_arch.image_url)
-    : '/collections/at-the-loom.svg';
+    : '/collections/wardrobe-rail.svg';
 
   return (
   <div className="min-h-screen bg-ivory font-sans">
 
-    {/* ───────────── HERO — editorial split with the loom arch ───────────── */}
+    {/* ───────────── HERO — editorial split with the wardrobe arch ───────────── */}
     <section className="container mx-auto px-4 pt-12 md:pt-20 pb-14 md:pb-20">
       <div className="grid grid-cols-1 lg:grid-cols-2 items-center gap-12 lg:gap-16">
         <Reveal>
@@ -147,8 +147,8 @@ const About = () => {
           </h2>
           <p className="mt-6 text-[15px] leading-relaxed text-muted-foreground text-left md:text-center">
             Vastraliya Fashion Private Limited was founded on a simple belief:
-            the clothes India celebrates in deserve the same care online that
-            they receive on the loom. From Vasai, Maharashtra, we&rsquo;ve grown into
+            dressing well should be effortless — quality fabrics, honest prices
+            and pieces that earn their place. From Vasai, Maharashtra, we&rsquo;ve grown into
             a trusted fashion destination serving customers across the country —
             with the same passion that drove our first order.
           </p>
@@ -249,7 +249,7 @@ const About = () => {
               India's most loved fashion destination
             </h3>
             <p className="mt-4 text-[14.5px] leading-relaxed text-ivory/65">
-              By 2030 — celebrated for craft, a customer-first approach, and
+              By 2030 — celebrated for quality, a customer-first approach, and
               practices that empower both shoppers and makers.
             </p>
           </Reveal>

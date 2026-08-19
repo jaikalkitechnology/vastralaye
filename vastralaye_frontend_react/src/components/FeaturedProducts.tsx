@@ -192,7 +192,7 @@ const FeaturedProducts = () => {
             Premium Collection
           </h2>
           <p className="text-muted-foreground mt-2 text-sm md:text-base max-w-xl mx-auto">
-            Handpicked weaves for every occasion — fresh arrivals, loved bestsellers and
+            Handpicked styles for every occasion — fresh arrivals, loved bestsellers and
             the pieces in between.
           </p>
         </Reveal>

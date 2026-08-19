@@ -133,7 +133,7 @@ const LoginPage = () => {
             <circle cx="65" cy="7" r="1.5" fill="#C99A45" />
           </svg>
           <h2 className="mt-5 mb-3 font-serif text-4xl font-medium leading-tight">
-            Welcome back to the loom
+            Welcome back to Vastraliya
           </h2>
           <p className="text-[15px] text-ivory/75">
             Your wishlist, orders and festive picks are right where you left them.
