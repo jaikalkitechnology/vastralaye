@@ -7,7 +7,7 @@ import PolicyPage, { PolicyContent } from '@/components/policy/PolicyPage';
  */
 const content: PolicyContent = {
   title: 'Refund & Cancellation Policy',
-  effective: 'August 17, 2026',
+  effective: 'July 17, 2026',
   intro: [
     `At Vastraliya, we take pride in the quality of every saree, suit set, kurta and accessory we offer. This Refund & Cancellation Policy explains the terms under which orders may be cancelled, returned, exchanged, or refunded. This Policy forms part of, and should be read together with, our Terms & Conditions.`,
   ],
