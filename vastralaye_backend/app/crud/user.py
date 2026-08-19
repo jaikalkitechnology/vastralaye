@@ -4,11 +4,10 @@ from app import models
 from app.models import User
 from app.schemas import user as user_schema
 from datetime import datetime
-from passlib.context import CryptContext
+from app.security import pwd_context
 
 from app.schemas.user import UserCreate, UserOut, UserSettingsUpdate
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 def get_user_by_email(db: Session, email: str):
     return db.query(models.User).filter(models.User.email == email).first()
 

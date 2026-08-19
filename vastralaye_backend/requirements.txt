@@ -24,14 +24,11 @@ Jinja2==3.1.6
 MarkupSafe==3.0.3
 numpy==2.5.1
 pandas==3.0.5
-passlib==1.7.4
-# Must stay on bcrypt 4.x. passlib 1.7.4 probes its backend with a 73-byte
-# string; bcrypt 5 rejects anything over 72 and the probe raises, so EVERY hash
-# and verify call fails — no logins, no signups, no password changes. bcrypt was
-# unpinned here, so a fresh `pip install -r` would have picked up 5.x and taken
-# authentication down site-wide. passlib has shipped nothing since 1.7.4, so the
-# pin has to be on this side. Verified: 4.1.2–4.3.0 fine, 5.0.0 broken (4.1.0
-# was separately a bad release — salt type error — hence 4.3.0 and not 4.1.x).
+# Password hashing calls bcrypt directly (app/security.py); passlib is gone —
+# it probed bcrypt internals that newer bcrypt removed, printing an
+# AttributeError traceback at startup and hard-failing under bcrypt 5. Any
+# bcrypt 4.1.2+ or 5.x works now; pinned only for reproducible installs
+# (4.1.0/4.1.1 were bad releases — salt type error).
 bcrypt==4.3.0
 pillow==12.3.0
 pyasn1==0.6.4
