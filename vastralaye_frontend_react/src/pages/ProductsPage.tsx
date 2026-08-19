@@ -14,7 +14,7 @@ import {
 import { Filter, Search, ChevronLeft, ChevronRight, Grid, List, X, RefreshCw } from "lucide-react";
 import PageBanner from "@/components/PageBanner";
 import axios from "axios";
-import { BASE_URL } from "@/config";
+import { BASE_URL, BOOT_TIMEOUT_MS } from "@/config";
 import { Product } from "@/types";
 
 interface Filters {
@@ -123,6 +123,9 @@ const ProductsPage = () => {
 
         const res = await axios.get(`${BASE_URL}/fronted/products/products`, {
           params,
+          // The visitor is staring at the grid spinner while this runs — if
+          // the server hangs, fail fast into the error state instead.
+          timeout: BOOT_TIMEOUT_MS,
         });
 
         const data: Product[] = (res.data as Product[]) || [];
