@@ -20,6 +20,7 @@ import {
   ArrowRight,
   Package,
   Sparkles,
+  Truck,
 } from "lucide-react";
 
 import {
@@ -34,9 +35,10 @@ import {
 import { listCategories } from "@/api/apihelper";
 import { useSiteSettings } from "@/hooks/use-site-settings";
 
-/** What the strip says until an admin changes it. */
-export const DEFAULT_TOP_BAR_TEXT =
-  "Free shipping on orders above ₹999 · *Easy 7-day returns* · Premium quality fabrics";
+/** What the strip says until an admin changes it. One short line — the USP
+ *  strip under the hero already carries returns and quality, so the top bar
+ *  leads with shipping alone, the way the reference design does. */
+export const DEFAULT_TOP_BAR_TEXT = "Free shipping on orders above ₹999";
 
 /**
  * Render the strip, picking out *starred* phrases in gold.
@@ -56,6 +58,24 @@ export const renderTopBar = (text: string): React.ReactNode[] =>
       <React.Fragment key={i}>{part}</React.Fragment>
     )
   );
+
+/**
+ * The maroon announcement strip: a delivery truck beside the message, the
+ * pair centred between two hairline separators. Shared with the admin
+ * panel's live preview so the two renders can never drift apart.
+ */
+export const TopBarStrip = ({ text }: { text: string }) => (
+  <div className="bg-maroon px-4 py-2 text-ivory">
+    <div className="flex items-center justify-center gap-4 md:gap-6">
+      <span aria-hidden className="hidden sm:block h-3.5 w-px bg-ivory/25" />
+      <span className="flex items-center gap-2.5 text-[11px] uppercase tracking-[0.18em] md:text-xs">
+        <Truck className="h-4 w-4 shrink-0" strokeWidth={1.5} />
+        <span className="text-center">{renderTopBar(text)}</span>
+      </span>
+      <span aria-hidden className="hidden sm:block h-3.5 w-px bg-ivory/25" />
+    </div>
+  </div>
+);
 
 /**
  * Categories kept out of the navbar menus (SHOP dropdown and the mobile
@@ -190,11 +210,7 @@ const NavBar = () => {
   return (
     <header className={`sticky top-0 z-50 bg-white border-b border-border transition-all ${isScrolled ? "shadow-sm" : "shadow-none"}`}>
       {/* ANNOUNCEMENT BAR — text and on/off from Admin › Categories */}
-      {showTopBar && (
-        <div className="bg-maroon text-ivory text-center text-[11px] md:text-xs uppercase tracking-[0.18em] py-2 px-4">
-          {renderTopBar(topBarText)}
-        </div>
-      )}
+      {showTopBar && <TopBarStrip text={topBarText} />}
       {/* HEADER */}
       <div className="container flex items-center h-16 px-4">
         {/* LOGO */}
@@ -304,12 +320,12 @@ const NavBar = () => {
                 placeholder="Search products..."
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
-                className="pl-10 pr-4 py-2 w-full bg-white border-border border-r-0 rounded-sm rounded-r-none focus-visible:ring-1 focus-visible:ring-maroon focus-visible:ring-offset-0 focus-visible:border-maroon"
+                className="pl-10 pr-4 h-11 w-full bg-white border-border border-r-0 rounded-lg rounded-r-none focus-visible:ring-1 focus-visible:ring-maroon focus-visible:ring-offset-0 focus-visible:border-maroon"
               />
             </div>
             <Button
               type="submit"
-              className="bg-maroon hover:bg-terracotta text-ivory text-[13px] uppercase tracking-[0.1em] rounded-sm rounded-l-none px-6"
+              className="h-11 bg-maroon hover:bg-terracotta text-ivory text-[13px] uppercase tracking-[0.1em] rounded-lg rounded-l-none px-6"
             >
               Search
             </Button>
@@ -327,6 +343,7 @@ const NavBar = () => {
                     {currentUser?.first_name?.charAt(0)}
                   </div>
                   <span className="text-[13px] font-medium text-espresso">{currentUser?.first_name}</span>
+                  <ChevronDown className="w-3.5 h-3.5 text-espresso/60" strokeWidth={1.5} />
                 </Button>
               </DropdownMenuTrigger>
 
@@ -376,27 +393,26 @@ const NavBar = () => {
             </Link>
           )}
 
-          {/* WISHLIST */}
+          {/* Hairline between the account menu and the icons */}
+          <span aria-hidden className="mx-2 h-6 w-px bg-border" />
+
+          {/* WISHLIST — a dot says "something's saved" without a number */}
           <Link to="/wishlist">
             <Button variant="ghost" size="icon" className="relative text-espresso hover:text-terracotta">
               <Heart className="w-5 h-5" strokeWidth={1.5} />
               {totalWishlist > 0 && (
-                <span className="absolute -top-1 -right-1 bg-maroon text-ivory text-[10px] font-semibold rounded-full h-4 w-4 flex items-center justify-center">
-                  {totalWishlist}
-                </span>
+                <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-maroon" />
               )}
             </Button>
           </Link>
 
-          {/* CART */}
+          {/* CART — the count stays visible even at zero */}
           <Link to="/cart">
             <Button variant="ghost" size="icon" className="relative text-espresso hover:text-terracotta">
               <ShoppingCart className="w-5 h-5" strokeWidth={1.5} />
-              {totalItems > 0 && (
-                <span className="absolute -top-1 -right-1 bg-maroon text-ivory text-[10px] font-semibold rounded-full h-4 w-4 flex items-center justify-center">
-                  {totalItems}
-                </span>
-              )}
+              <span className="absolute top-0.5 right-0.5 bg-maroon text-ivory text-[10px] font-semibold rounded-full h-4 min-w-4 px-1 flex items-center justify-center">
+                {totalItems}
+              </span>
             </Button>
           </Link>
         </div>
