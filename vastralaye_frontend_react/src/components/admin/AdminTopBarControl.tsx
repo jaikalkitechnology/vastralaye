@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { Megaphone, RefreshCw } from 'lucide-react';
-import { DEFAULT_TOP_BAR_TEXT, renderTopBar } from '@/components/NavBar';
+import { DEFAULT_TOP_BAR_TEXT, TopBarStrip } from '@/components/NavBar';
 
 /**
  * Admin control for the announcement strip above the storefront header —
@@ -146,9 +146,7 @@ const AdminTopBarControl = () => {
           </p>
           {enabled ? (
             <div className="overflow-hidden rounded-sm border border-border">
-              <div className="bg-maroon px-4 py-2 text-center text-[11px] uppercase tracking-[0.18em] text-ivory md:text-xs">
-                {renderTopBar(shown)}
-              </div>
+              <TopBarStrip text={shown} />
               <div className="flex items-center gap-2 bg-white px-4 py-3">
                 <span className="font-serif text-[15px] font-semibold text-espresso">
                   Vastra<span className="text-maroon">liya</span>
