@@ -7,7 +7,7 @@ import PolicyPage, { PolicyContent } from '@/components/policy/PolicyPage';
  */
 const content: PolicyContent = {
   title: 'Shipping & Delivery Policy',
-  effective: 'August 17, 2026',
+  effective: 'July 17, 2026',
   intro: [
     `This Shipping & Delivery Policy explains how Vastraliya processes, ships, and delivers orders for sarees, suit sets, kurtas, and other ethnic wear and accessories purchased on www.vastraliya.com. This Policy forms part of, and should be read together with, our Terms & Conditions.`,
   ],

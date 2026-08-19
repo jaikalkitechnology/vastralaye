@@ -7,7 +7,7 @@ import PolicyPage, { PolicyContent } from '@/components/policy/PolicyPage';
  */
 const content: PolicyContent = {
   title: 'Privacy Policy',
-  effective: 'August 17, 2026',
+  effective: 'July 17, 2026',
   intro: [
     `This Privacy Policy (“Policy”) describes how Vastraliya Fashion Pvt. Ltd., operating the website www.vastraliya.com under the brand name “Vastraliya” (“Vastraliya”, “we”, “us” or “our”) collects, uses, stores, discloses and protects the personal information of visitors and customers (“you”, “your”, or “User”) who access or transact on our website, mobile site, or any related platform (collectively, the “Platform”), including for the purchase of sarees, suit sets, kurtas, dupattas and other ethnic wear and accessories offered by us.`,
     `By accessing or using the Platform, or by providing your information to us, you agree to the collection, use, storage and disclosure of your information as described in this Policy. If you do not agree with this Policy, please do not use the Platform.`,
