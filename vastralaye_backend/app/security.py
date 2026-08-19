@@ -1,19 +1,52 @@
 import os
 from datetime import datetime, timedelta
 from fastapi import HTTPException, status
-from passlib.context import CryptContext
+import bcrypt
 from jose import JWTError, jwt  # ✅ FIXED: Use jose.jwt
 
-# Password hashing
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# Password hashing — bcrypt called directly. passlib (unmaintained since
+# 2020) probes bcrypt internals that newer bcrypt removed, printing an
+# AttributeError traceback on every startup and hard-failing under bcrypt 5.
+# Every stored hash is $2b$12$, which checkpw reads natively, so nothing
+# about the database changes.
+
+# bcrypt reads only the first 72 bytes of a password. passlib truncated
+# silently, so keep truncating — a long password hashed under the old code
+# must still verify — and bcrypt 5.x raises instead of truncating.
+_BCRYPT_MAX_BYTES = 72
+
+
+def _secret_bytes(password: str) -> bytes:
+    return password.encode("utf-8")[:_BCRYPT_MAX_BYTES]
 
 
 def get_password_hash(password: str) -> str:
-    return pwd_context.hash(password)
+    return bcrypt.hashpw(_secret_bytes(password), bcrypt.gensalt(rounds=12)).decode("ascii")
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
+    if not hashed_password:
+        return False
+    try:
+        return bcrypt.checkpw(_secret_bytes(plain_password), hashed_password.encode("utf-8"))
+    except ValueError:
+        # A malformed stored hash means "wrong password", not a 500.
+        return False
+
+
+class _PasswordContext:
+    """Stand-in for the old passlib CryptContext — only .hash/.verify were used."""
+
+    @staticmethod
+    def hash(password: str) -> str:
+        return get_password_hash(password)
+
+    @staticmethod
+    def verify(plain_password: str, hashed_password: str) -> bool:
+        return verify_password(plain_password, hashed_password)
+
+
+pwd_context = _PasswordContext()
 
 
 # JWT Configuration for password reset
