@@ -82,9 +82,35 @@ const AdminPageBanners = () => {
   const patchDraft = (key: string, patch: Partial<Draft>) =>
     setDrafts((prev) => ({ ...prev, [key]: { ...prev[key], ...patch } }));
 
+  /** One slot per catalogue category, discovered from the live category list. */
+  const [catSlots, setCatSlots] = useState<{ key: string; label: string; route: string }[]>([]);
+
   useEffect(() => {
     let cancelled = false;
     (async () => {
+      /* Categories first, so their draft slots exist before the stored
+         banners arrive — otherwise a saved category banner has nowhere to land. */
+      let slots: { key: string; label: string; route: string }[] = [];
+      try {
+        const cats = await api.get('/fronted/products/categories');
+        if (Array.isArray(cats.data)) {
+          slots = (cats.data as any[]).map((c) => ({
+            key: `category_${c.id}`,
+            label: c.name || `Category #${c.id}`,
+            route: `/category/${c.slug || c.id}`,
+          }));
+        }
+      } catch {
+        /* category list down — the fixed pages still work */
+      }
+      if (cancelled) return;
+      setCatSlots(slots);
+      setDrafts((prev) => {
+        const next = { ...prev };
+        for (const s of slots) if (!next[s.key]) next[s.key] = emptyDraft(s.key);
+        return next;
+      });
+
       try {
         const res = await api.get('/admin/page-banners');
         if (cancelled || !Array.isArray(res.data)) return;
@@ -467,6 +493,24 @@ const AdminPageBanners = () => {
       <div className="grid gap-5 md:grid-cols-2">
         {PAGES.map((p) => renderCard(p, false))}
       </div>
+
+      <div className="mb-4 mt-10">
+        <h2 className="font-serif text-xl font-medium text-espresso">Category banners</h2>
+        <p className="mt-0.5 text-[13px] text-muted-foreground">
+          One banner per category page — shown at the top of /category/&lt;name&gt;.
+          Categories added later appear here automatically.
+        </p>
+      </div>
+
+      {catSlots.length === 0 ? (
+        <p className="text-sm text-muted-foreground">
+          No categories yet — create them in Admin › Categories first.
+        </p>
+      ) : (
+        <div className="grid gap-5 md:grid-cols-2">
+          {catSlots.map((p) => (drafts[p.key] ? renderCard(p, false) : null))}
+        </div>
+      )}
     </div>
   );
 };

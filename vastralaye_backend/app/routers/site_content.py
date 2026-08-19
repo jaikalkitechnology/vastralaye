@@ -311,7 +311,18 @@ def upsert_page_banner(
     admin: User = Depends(get_current_admin_user),
 ):
     if page not in PAGE_BANNER_PAGES:
-        raise HTTPException(status_code=400, detail=f"Unknown page. Use one of: {', '.join(PAGE_BANNER_PAGES)}")
+        # Per-category banners use dynamic slots: category_<id>. Validated
+        # against the catalogue so a typo can't create an orphan slot.
+        match = re.fullmatch(r"category_(\d+)", page)
+        if not match:
+            raise HTTPException(
+                status_code=400,
+                detail=(f"Unknown page. Use one of: {', '.join(PAGE_BANNER_PAGES)}, "
+                        "or category_<id> for a category page."),
+            )
+        from app.models import Category
+        if not db.query(Category).filter(Category.id == int(match.group(1))).first():
+            raise HTTPException(status_code=404, detail="Category not found")
 
     banner = db.query(PageBanner).filter(PageBanner.page == page).first()
     if not banner:
