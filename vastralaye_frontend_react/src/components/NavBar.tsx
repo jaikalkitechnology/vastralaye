@@ -57,6 +57,18 @@ export const renderTopBar = (text: string): React.ReactNode[] =>
     )
   );
 
+/**
+ * Categories kept out of the navbar menus (SHOP dropdown and the mobile
+ * Categories list). They stay live everywhere else — the All Categories
+ * page, their own /category/<slug> URL, search and admin — this only trims
+ * the menu. Matched against slug and name, case-insensitively.
+ */
+const NAV_HIDDEN_CATEGORIES = ["bracelet"];
+
+const isNavHidden = (cat: { name?: string; slug?: string }) =>
+  NAV_HIDDEN_CATEGORIES.includes((cat?.slug ?? "").trim().toLowerCase()) ||
+  NAV_HIDDEN_CATEGORIES.includes((cat?.name ?? "").trim().toLowerCase());
+
 const NavBar = () => {
   const { state, dispatch, logout } = useStore();
   const settings = useSiteSettings();
@@ -87,7 +99,7 @@ const NavBar = () => {
     (async () => {
       try {
         const data = await listCategories();
-        if (Array.isArray(data)) setCategories(data);
+        if (Array.isArray(data)) setCategories(data.filter((cat) => !isNavHidden(cat)));
       } catch (err) {
         console.error("Category fetch failed:", err);
       }
