@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Filter, Search, Grid, List, Home, ChevronRight, X, ChevronLeft, RefreshCw } from 'lucide-react';
 import { listProducts, listCategories, listSubcategories } from '@/api/apihelper';
 import { Product, Category } from '@/types';
+import PageBanner, { type PageBannerKey } from '@/components/PageBanner';
 
 // Type Definitions
 type SortOption = 'featured' | 'newest' | 'price-low-high' | 'price-high-low' | 'rating';
@@ -365,17 +366,29 @@ const CategoryPage = () => {
     return <ErrorDisplay error={error} onRetry={handleRetry} />;
   }
 
+  const pageName = currentSubCategory?.name || currentCategory?.name || 'Products';
+  /* Admin-managed banner slot for this category (Admin › Banners → Category
+     banners); a subcategory page uses its parent category's banner. */
+  const bannerSlot = currentCategory
+    ? (`category_${currentCategory.id}` as PageBannerKey)
+    : undefined;
+
   return (
     <div className="min-h-screen bg-background">
+      {/* Admin-controlled banner, same system as the catalogue pages */}
+      <PageBanner
+        title={pageName}
+        subtitle={`${sortedAndFilteredProducts.length} products`}
+        crumb={pageName}
+        page={bannerSlot}
+      />
+
       <div className="container mx-auto px-4 pb-16 lg:pb-20">
-        {/* Breadcrumb */}
-        <Breadcrumb items={breadcrumbItems} />
+        {/* Breadcrumb — keeps the deeper category → subcategory chain */}
+        {currentSubCategory && <Breadcrumb items={breadcrumbItems} />}
 
         {/* Page head */}
         <div className="pt-4 pb-6">
-          <h1 className="font-serif text-3xl md:text-4xl font-medium text-espresso capitalize">
-            {currentSubCategory?.name || currentCategory?.name || 'Products'}
-          </h1>
           {currentCategory?.description && (
             <p className="text-sm text-muted-foreground mt-2 max-w-2xl">
               {currentCategory.description}

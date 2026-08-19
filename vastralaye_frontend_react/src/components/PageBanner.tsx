@@ -48,7 +48,9 @@ export type PageBannerKey =
   | 'best_sellers'
   | 'contact'
   /** Background behind the homepage hero slides. */
-  | 'home_hero';
+  | 'home_hero'
+  /** One slot per catalogue category, e.g. "category_12". */
+  | `category_${number}`;
 
 export interface PageBannerData {
   page: string;
