@@ -56,11 +56,11 @@ const fallbackSlides: HeroSlide[] = [
   },
   {
     id: 3,
-    overline: 'From the Loom',
-    titleA: 'Heritage Craft,',
-    titleB: 'Modern Drape',
+    overline: 'The Collections',
+    titleA: 'Chosen Well,',
+    titleB: 'Worn Often',
     description:
-      'Block prints of Jaipur, weaves of Banaras — heritage techniques reimagined for today.',
+      'Quality fabrics and flattering cuts, picked with intention — styles that work as hard as you do.',
     image: '/cloth-bg.jpg',
     ctaPrimary: { label: 'Explore Collections', to: '/categories' },
     ctaSecondary: { label: 'Our Story', to: '/about' },
