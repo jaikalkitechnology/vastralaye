@@ -263,6 +263,8 @@ export interface Category {
 export const listCategories = async () => {
   const res = await axios.get(`${BASE_URL}/fronted/products/categories`, {
     headers: getAuthHeaders(),
+    // Feeds the navbar menus and category sections — give up fast.
+    timeout: BOOT_TIMEOUT_MS,
   });
   return res.data as Category[];
 };

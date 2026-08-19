@@ -47,6 +47,10 @@ export const DEFAULT_TOP_BAR_TEXT = "Free shipping on orders above ₹999";
  * the whole bar — but the admin types into a plain text box, and rendering
  * their HTML would be an injection hole for the sake of one colour. Stars are
  * the whole vocabulary, and they become spans, never markup.
+ *
+ * Plain runs render as spans too, not Fragments — the lovable-tagger dev
+ * plugin stamps data-lov-id on every JSX element, and Fragments reject
+ * unknown props with a console warning on each render.
  */
 export const renderTopBar = (text: string): React.ReactNode[] =>
   text.split(/(\*[^*]+\*)/g).filter(Boolean).map((part, i) =>
@@ -55,7 +59,7 @@ export const renderTopBar = (text: string): React.ReactNode[] =>
         {part.slice(1, -1)}
       </span>
     ) : (
-      <React.Fragment key={i}>{part}</React.Fragment>
+      <span key={i}>{part}</span>
     )
   );
 
