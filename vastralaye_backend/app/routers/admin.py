@@ -1639,24 +1639,49 @@ def delete_product(
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
 
-    # 🔥 STEP 1: DELETE FROM wishlist_items
+    from app.models.cart import CartItem
+    from app.models.invoice import InvoiceItem
+
+    # Carts and wishlists only point at the catalogue — clear them either way.
+    # (These two tables were also what made the old version crash: their FKs
+    # have no ON DELETE action, so deleting the product first raised 1451.)
+    db.query(CartItem).filter(
+        CartItem.product_id == product_id
+    ).delete(synchronize_session=False)
     db.query(WishlistItem).filter(
         WishlistItem.product_id == product_id
     ).delete(synchronize_session=False)
 
-    # 🔥 STEP 2: DELETE FROM order_items
-    db.query(OrderItem).filter(
-        OrderItem.product_id == product_id
-    ).delete(synchronize_session=False)
+    # Order and invoice lines are records of money that changed hands. They
+    # are never deleted — the old version destroyed order history here. If
+    # any exist, the product is archived instead of removed: hidden from the
+    # storefront (which filters is_active) but kept so past orders stay whole.
+    ordered = db.query(OrderItem).filter(OrderItem.product_id == product_id).count()
+    invoiced = db.query(InvoiceItem).filter(InvoiceItem.product_id == product_id).count()
 
-    # 🔥 STEP 3: DELETE PRODUCT
+    if ordered or invoiced:
+        product.is_active = False
+        product.in_stock = False
+        db.commit()
+        return {
+            "status": True,
+            "archived": True,
+            "message": (
+                f"'{product.name}' appears in {ordered} past order line(s)"
+                + (f" and {invoiced} invoice line(s)" if invoiced else "")
+                + " — order history can't lose it, so it was archived instead: "
+                  "hidden from the store and removed from carts and wishlists."
+            ),
+        }
+
+    # Never sold: safe to remove outright. Reviews cascade with the product
+    # and reels keep playing with their product link cleared (SET NULL).
     db.delete(product)
-
-    # 🔥 STEP 4: COMMIT
     db.commit()
 
     return {
         "status": True,
+        "archived": False,
         "message": "Product deleted permanently"
     }
 

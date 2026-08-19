@@ -650,8 +650,16 @@ export default function AdminProductsPage(): JSX.Element {
     try {
       const id = Number(deleteTargetId);
       if (!Number.isFinite(id)) throw new Error("Invalid product id");
-      await axiosInstance.delete(ENDPOINTS.productDelete(id));
-      toast.success("Product deleted successfully");
+      const res = await axiosInstance.delete(ENDPOINTS.productDelete(id));
+      // A product with order history is archived (hidden from the store),
+      // not destroyed — surface the API's explanation instead of claiming
+      // a deletion that didn't happen.
+      const data = res.data as { archived?: boolean; message?: string } | undefined;
+      if (data?.archived) {
+        toast.success(data?.message || "Product archived — it appears in past orders.");
+      } else {
+        toast.success("Product deleted successfully");
+      }
       setDeleteDialogOpen(false);
       setDeleteTargetId(null);
       await fetchProducts();
