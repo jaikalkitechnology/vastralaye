@@ -31,3 +31,16 @@ export const BASE_URL = `${API_ORIGIN}/api/v1`;
 
 /** Uploads and other static files are served from the API host's root. */
 export const BASE_IMG = API_ORIGIN;
+
+/* A server that accepts the connection but never answers — gunicorn workers
+ * crash-looping behind a live socket, a wedged database — used to hold every
+ * request open forever, and the boot veil with it: the whole storefront froze
+ * on the spinner. Every api module imports from this file, so the default set
+ * here is inherited by the shared axios instance and all bare axios calls.
+ * Generous, because admin image uploads ride on it too; the handful of calls
+ * the boot veil actually waits on carry a tighter BOOT_TIMEOUT_MS each. */
+import axios from 'axios';
+axios.defaults.timeout = 60_000;
+
+/** For boot-path GETs (products, session, wishlist) — the veil must lift. */
+export const BOOT_TIMEOUT_MS = 15_000;

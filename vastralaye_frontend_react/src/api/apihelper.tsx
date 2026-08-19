@@ -10,7 +10,7 @@ import {
   // import other types you have (Order, Review, etc.)
 } from "../types";
 
-import { BASE_URL } from "@/config";
+import { BASE_URL, BOOT_TIMEOUT_MS } from "@/config";
 
 import { Invoice, InvoicesResponse, InvoiceFilters } from "@/types/index";
 
@@ -67,7 +67,7 @@ export const login = async (payload: { email: string; password: string }): Promi
 };
 
 export const getUserMe = async (): Promise<any> => {
-  const res = await axios.get(`${BASE_URL}/users/me`);
+  const res = await axios.get(`${BASE_URL}/users/me`, { timeout: BOOT_TIMEOUT_MS });
   return res.data;
 };
 
@@ -138,6 +138,7 @@ export const uploadAvatar = async (formData: FormData) => {
 export const getWishlist = async (): Promise<WishlistItem[]> => {
   const res = await axios.get<WishlistItem[]>(`${BASE_URL}/users/wishlist`, {
     headers: getAuthHeaders(),
+    timeout: BOOT_TIMEOUT_MS,
   });
   return res.data;
 };
@@ -227,6 +228,7 @@ export const adminLogin = async (payload: { email: string; password: string }): 
 export const adminMe = async () => {
   const res = await axios.get(`${BASE_URL}/admin/me`, {
     headers: getAuthHeaders(),
+    timeout: BOOT_TIMEOUT_MS,
   });
   return res.data;
 };
@@ -460,12 +462,16 @@ export const replySupportMessage = async (message_id: number | string, payload: 
 // Convenience: existing public product/coupon functions (kept for compatibility)
 // ------------------------------------------------------------------
 export const productsPublic = async (): Promise<Product[]> => {
-  const res = await axios.get<Product[]>(`${BASE_URL}/fronted/products/products`);
+  const res = await axios.get<Product[]>(`${BASE_URL}/fronted/products/products`, {
+    timeout: BOOT_TIMEOUT_MS,
+  });
   return res.data;
 };
 
 export const couponsPublic = async (): Promise<Coupon[]> => {
-  const res = await axios.get<Coupon[]>(`${BASE_URL}/users/list`);
+  const res = await axios.get<Coupon[]>(`${BASE_URL}/users/list`, {
+    timeout: BOOT_TIMEOUT_MS,
+  });
   return res.data;
 };
 
