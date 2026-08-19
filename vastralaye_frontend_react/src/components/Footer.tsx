@@ -66,7 +66,7 @@ const Footer = () => {
               </span>
             </Link>
             <p className="text-sm leading-relaxed mt-4 mb-6 max-w-xs">
-              Woven with love by artisans across India. Timeless ethnic wear for every
+              Quality fashion, chosen with care. Timeless style for every
               celebration — and every day in between.
             </p>
             <div className="flex flex-wrap gap-3">

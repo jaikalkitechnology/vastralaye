@@ -844,7 +844,7 @@ export default function AdminOrders() {
           </div>
         </div>
 
-        <p style="font-family:${SERIF};font-size:15px;text-align:center;padding:14px 32px 4px;">Thank you for weaving us into your story.</p>
+        <p style="font-family:${SERIF};font-size:15px;text-align:center;padding:14px 32px 4px;">Thank you for making us part of your story.</p>
         <p style="padding:0 32px 18px;font-size:10.5px;color:${C.mut};text-align:center;">Computer-generated invoice · no physical signature required. Goods once sold are subject to our 7-day return policy.</p>
         <div style="height:5px;background:linear-gradient(90deg,${C.mar},${C.gold},${C.terra});"></div>
       </div>

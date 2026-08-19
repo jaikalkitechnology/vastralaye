@@ -249,7 +249,7 @@ const CategoriesPage = () => {
       {/* Admin-driven banner (Admin → Banner Control) */}
       <PageBanner
         title="All Categories"
-        subtitle={`Every weave, every occasion · ${filteredCategories.length} categories · ${totalProducts} products`}
+        subtitle={`Every style, every occasion · ${filteredCategories.length} categories · ${totalProducts} products`}
         crumb="Categories"
         page="categories"
       />
@@ -404,7 +404,7 @@ const CategoriesPage = () => {
 
             {/* Section header with toran garland */}
             <div className="text-center mb-9">
-              <p className="overline-label mb-2">Browse the Loom</p>
+              <p className="overline-label mb-2">Browse the Wardrobe</p>
               <h2 className="font-serif text-3xl font-medium text-espresso">Shop by Category</h2>
               <ToranDivider />
             </div>
@@ -574,9 +574,9 @@ const CategoriesPage = () => {
               <span aria-hidden className="pointer-events-none absolute inset-2.5 rounded-[2px] border border-gold/35" />
               <div className="relative flex flex-col md:flex-row items-center justify-between gap-6 px-8 py-9 md:px-10 text-center md:text-left">
                 <div>
-                  <h2 className="font-serif text-[23px] font-medium">Can't find your weave?</h2>
+                  <h2 className="font-serif text-[23px] font-medium">Can't find your style?</h2>
                   <p className="mt-1 text-[13px] text-ivory/65">
-                    Browse the full catalogue — every piece, every craft, in one place.
+                    Browse the full catalogue — every piece, every style, in one place.
                   </p>
                 </div>
                 <Link

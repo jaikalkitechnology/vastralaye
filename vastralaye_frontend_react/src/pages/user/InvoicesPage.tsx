@@ -937,7 +937,7 @@ const InvoicesPage: React.FC = () => {
               <span className="h-1.5 w-1.5 rotate-45 border border-gold" />
               <span className="h-px w-11 bg-gold" />
             </div>
-            <p className="font-serif text-base text-espresso mt-3">Thank you for weaving us into your story.</p>
+            <p className="font-serif text-base text-espresso mt-3">Thank you for making us part of your story.</p>
             <p className="text-[11px] text-muted-foreground mt-1.5">
               This is a computer-generated invoice and does not require a signature. · For help, write to {COMPANY_DETAILS.email}
             </p>

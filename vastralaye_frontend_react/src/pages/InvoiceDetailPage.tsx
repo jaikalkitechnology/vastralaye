@@ -771,7 +771,7 @@ const InvoiceTemplate = React.forwardRef<HTMLDivElement, { invoice: Invoice }>(
           fontFamily: SERIF, fontSize: "15px",
           textAlign: "center", padding: "14px 34px 6px",
         }}>
-          Thank you for weaving us into your story.
+          Thank you for making us part of your story.
         </p>
         <p style={{
           position: "relative", zIndex: 2,

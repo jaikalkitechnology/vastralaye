@@ -35,10 +35,10 @@ const fallbackSlides: HeroSlide[] = [
   {
     id: 1,
     overline: "The Festive Edit '26",
-    titleA: 'Woven for the',
+    titleA: 'Dressed for the',
     titleB: 'Festive Season',
     description:
-      'Premium sarees, suit sets and more — made with love by artisans across India, for every celebration.',
+      'Premium styles in rich festive colours — easy fits and standout pieces for every celebration.',
     image: '/banner-1.jpeg',
     ctaPrimary: { label: 'Shop Now', to: '/products' },
     ctaSecondary: { label: 'New Arrivals', to: '/new-arrivals' },
@@ -49,7 +49,7 @@ const fallbackSlides: HeroSlide[] = [
     titleA: 'Made for',
     titleB: 'Every Single Day',
     description:
-      'Breathable weaves and easy silhouettes, crafted to be lived in from morning chai to last light.',
+      'Breathable fabrics and easy silhouettes, made to be lived in from morning chai to last light.',
     image: '/jbanner.jpg',
     ctaPrimary: { label: 'Shop Everyday', to: '/products' },
     ctaSecondary: { label: 'Bestsellers', to: '/best-sellers' },

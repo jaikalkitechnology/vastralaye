@@ -11,7 +11,7 @@ import {
 import { Mail, MailOpen, Trash2, RefreshCw, Send, Loader2 } from 'lucide-react';
 
 /**
- * Admin › Enquiries — "Letters from the Loom" subscribers. The home page's
+ * Admin › Enquiries — Style Letter subscribers. The home page's
  * newsletter band stores addresses in newsletter_subscribers; this panel
  * lists them and writes to one with the same branded email machinery the
  * enquiry replies use (and the same sending account from Email settings).
@@ -105,7 +105,7 @@ const AdminSubscribers = () => {
       <div className="flex items-center justify-between mb-4">
         <div>
           <h2 className="text-lg font-semibold flex items-center gap-2">
-            <MailOpen className="h-5 w-5 text-maroon" /> Letters from the Loom
+            <MailOpen className="h-5 w-5 text-maroon" /> The Style Letter
             <span className="text-sm font-normal text-muted-foreground">
               · {subs.length} subscriber{subs.length === 1 ? '' : 's'}
             </span>

@@ -648,7 +648,7 @@ const InvoicePageView: React.FC<{
                         </div>
 
                         <p className="px-6 pb-2 text-center font-serif text-[15px] text-espresso sm:px-9">
-                            Thank you for weaving us into your story.
+                            Thank you for making us part of your story.
                         </p>
                         <p className="px-6 pb-6 text-center text-[10.5px] leading-relaxed text-muted-foreground sm:px-9">
                             This is a computer-generated invoice and does not require a physical signature.
