@@ -218,7 +218,13 @@ const NavBar = () => {
       {/* HEADER */}
       <div className="container flex items-center h-16 px-4">
         {/* LOGO */}
-        <Link to="/" className="flex flex-col items-start shrink-0">
+        <Link to="/" className="flex items-center gap-2.5 shrink-0">
+          <img
+            src="/logo-mark.png"
+            alt=""
+            aria-hidden
+            className="h-9 w-9 rounded-md"
+          />
           <span className="font-serif text-2xl md:text-[26px] font-semibold leading-none text-espresso">
             Vastra<span className="text-maroon">liya</span>
           </span>

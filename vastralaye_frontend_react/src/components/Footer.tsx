@@ -60,7 +60,13 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr] gap-10 lg:gap-12 py-14">
           {/* Brand */}
           <div>
-            <Link to="/" className="inline-block">
+            <Link to="/" className="inline-flex items-center gap-2.5">
+              <img
+                src="/logo-mark.png"
+                alt=""
+                aria-hidden
+                className="h-9 w-9 rounded-md"
+              />
               <span className="font-serif text-2xl font-semibold text-ivory">
                 Vastra<span className="text-gold">liya</span>
               </span>
