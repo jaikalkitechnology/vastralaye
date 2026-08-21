@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useStore } from '@/contexts/StoreContext';
+import { useStore, MAX_QTY_PER_PRODUCT } from '@/contexts/StoreContext';
 import { Product } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -1776,6 +1776,10 @@ const CartPage: React.FC = () => {
 
   const handleQuantityChange = (id: string, quantity: number) => {
     if (quantity < 1) return;
+    if (quantity > MAX_QTY_PER_PRODUCT) {
+      toast.error(`Maximum ${MAX_QTY_PER_PRODUCT} per product`);
+      return;
+    }
     updateCartItem(id, quantity);
   };
 
@@ -2213,6 +2217,7 @@ const CartPage: React.FC = () => {
                                 item.quantity + 1
                               )
                             }
+                            disabled={item.quantity >= MAX_QTY_PER_PRODUCT}
                           >
                             <Plus className="h-3 w-3" />
                           </Button>

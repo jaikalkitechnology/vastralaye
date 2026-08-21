@@ -43,6 +43,11 @@ import {
   addProductReview
 } from '@/api/apihelper';
 
+/** Most of one product a single order may carry. Enforced in the cart
+ *  reducer, so no add or update path can exceed it; the steppers also
+ *  disable their + button here so shoppers see the ceiling. */
+export const MAX_QTY_PER_PRODUCT = 5;
+
 interface StoreState {
   products: Product[];
   filteredProducts: Product[];
@@ -204,11 +209,23 @@ const storeReducer = (state: StoreState, action: StoreAction): StoreState => {
       if (existingItem) {
         newCart = state.cart.map(item =>
           item.id === existingItem.id
-            ? { ...item, quantity: item.quantity + action.payload.quantity }
+            ? {
+                ...item,
+                quantity: Math.min(
+                  MAX_QTY_PER_PRODUCT,
+                  item.quantity + action.payload.quantity
+                ),
+              }
             : item
         );
       } else {
-        newCart = [...state.cart, action.payload];
+        newCart = [
+          ...state.cart,
+          {
+            ...action.payload,
+            quantity: Math.min(MAX_QTY_PER_PRODUCT, action.payload.quantity),
+          },
+        ];
       }
 
       saveToStorage('cart', newCart);
@@ -222,8 +239,15 @@ const storeReducer = (state: StoreState, action: StoreAction): StoreState => {
     }
 
     case 'UPDATE_CART_ITEM': {
+      const clamped = {
+        ...action.payload,
+        quantity: Math.max(
+          1,
+          Math.min(MAX_QTY_PER_PRODUCT, action.payload.quantity)
+        ),
+      };
       const newCart = state.cart.map(item =>
-        item.id === action.payload.id ? action.payload : item
+        item.id === clamped.id ? clamped : item
       );
       saveToStorage('cart', newCart);
       return { ...state, cart: newCart };

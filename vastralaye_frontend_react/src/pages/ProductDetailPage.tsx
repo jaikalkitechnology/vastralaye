@@ -1,7 +1,7 @@
 import { Product } from "@/types";
 import { useState, useEffect, useRef } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { useStore } from "@/contexts/StoreContext";
+import { useStore, MAX_QTY_PER_PRODUCT } from "@/contexts/StoreContext";
 import {
   ShoppingBag,
   Heart,
@@ -815,8 +815,8 @@ return (
               </div>
               <button
                 className="w-[38px] h-10 flex items-center justify-center text-lg text-muted-foreground hover:text-espresso disabled:opacity-50 transition-colors"
-                onClick={() => setQuantity(quantity + 1)}
-                disabled={outOfStock}
+                onClick={() => setQuantity(Math.min(MAX_QTY_PER_PRODUCT, quantity + 1))}
+                disabled={outOfStock || quantity >= MAX_QTY_PER_PRODUCT}
               >
                 +
               </button>
