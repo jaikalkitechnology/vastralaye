@@ -1,5 +1,5 @@
 # models/category.py
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 from app.database import Base
 
@@ -9,6 +9,10 @@ class Category(Base):
     name = Column(String(255), nullable=False)
     slug = Column(String(255), index=True)
     image = Column(String(255))
+    # Storefront visibility. schema_sync adds this NULLable on live
+    # databases, so rows predating the column are NULL — every fronted
+    # filter must treat NULL as visible, only False hides.
+    is_active = Column(Boolean, default=True)
 
     subcategories = relationship("SubCategory", back_populates="category")
     products = relationship("Product", back_populates="category")
