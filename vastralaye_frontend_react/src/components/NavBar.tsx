@@ -217,17 +217,13 @@ const NavBar = () => {
       {showTopBar && <TopBarStrip text={topBarText} />}
       {/* HEADER */}
       <div className="container flex items-center h-16 px-4">
-        {/* LOGO */}
-        <Link to="/" className="flex items-center gap-2.5 shrink-0">
+        {/* LOGO — the artwork carries the brand name itself, so no text */}
+        <Link to="/" className="flex items-center shrink-0">
           <img
             src="/logo_vas.png"
-            alt=""
-            aria-hidden
-            className="h-11 w-11 object-contain"
+            alt="Vastraliya"
+            className="h-14 w-14 object-contain"
           />
-          <span className="font-serif text-2xl md:text-[26px] font-semibold leading-none text-espresso">
-            Vastra<span className="text-maroon">liya</span>
-          </span>
         </Link>
 
 
