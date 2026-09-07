@@ -2,53 +2,45 @@
  * Discount labels that always survive a customer's own arithmetic.
  *
  * Selling prices here are kept round by design (₹3,000 → ₹2,900), so the
- * true percentage is often fractional (3.33%). Rounding it to "3% off"
- * prints a claim the two visible prices contradict — 3% off ₹3,000 would
- * be ₹2,910, not ₹2,900. So the rule is: quote the percentage only when
- * it is exactly a whole number, and otherwise quote the rupees saved,
- * which is always true to the paisa.
+ * true percentage is often fractional. Rounding it to "3% off" prints a
+ * claim the two visible prices contradict — 3% off ₹3,000 would be
+ * ₹2,910, not ₹2,900. The label is always a percentage (the shop's
+ * preference), quoted exactly: whole when it is whole ("10% off"),
+ * otherwise with just enough decimals to be true ("3.33% off").
  */
 
-const IN = (n: number) => n.toLocaleString('en-IN');
+/** "10", "3.33", "5.26", "12.5" — whole numbers stay whole. */
+const formatPct = (pct: number): string => {
+  const rounded = Math.round(pct);
+  // 0.05pp tolerance absorbs float error only, not real fractions.
+  if (Math.abs(pct - rounded) < 0.05) return String(rounded);
+  return pct.toFixed(2).replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '');
+};
 
-export interface DiscountInfo {
-  /** Rupees saved (original − selling). */
-  saved: number;
-  /** Whole-number percent when mathematically exact, else null. */
-  percent: number | null;
-}
-
-export const discountInfo = (
+const truePercent = (
   price?: number | null,
   sellingPrice?: number | null
-): DiscountInfo | null => {
+): number | null => {
   const p = Number(price);
   const s = Number(sellingPrice);
   if (!Number.isFinite(p) || !Number.isFinite(s) || p <= 0 || s < 0 || s >= p) return null;
-  const saved = p - s;
-  const pct = (saved / p) * 100;
-  const rounded = Math.round(pct);
-  // 0.05pp tolerance absorbs float error only, not real fractions.
-  const exact = rounded > 0 && Math.abs(pct - rounded) < 0.05;
-  return { saved, percent: exact ? rounded : null };
+  return ((p - s) / p) * 100;
 };
 
-/** Inline label: "10% off" when exact, else "₹100 off". */
+/** Inline label: "10% off" / "3.33% off". */
 export const discountLabel = (
   price?: number | null,
   sellingPrice?: number | null
 ): string | null => {
-  const d = discountInfo(price, sellingPrice);
-  if (!d) return null;
-  return d.percent !== null ? `${d.percent}% off` : `₹${IN(d.saved)} off`;
+  const pct = truePercent(price, sellingPrice);
+  return pct === null ? null : `${formatPct(pct)}% off`;
 };
 
-/** Corner-badge label: "-10%" when exact, else "-₹100". */
+/** Corner-badge label: "-10%" / "-3.33%". */
 export const discountBadgeText = (
   price?: number | null,
   sellingPrice?: number | null
 ): string | null => {
-  const d = discountInfo(price, sellingPrice);
-  if (!d) return null;
-  return d.percent !== null ? `-${d.percent}%` : `-₹${IN(d.saved)}`;
+  const pct = truePercent(price, sellingPrice);
+  return pct === null ? null : `-${formatPct(pct)}%`;
 };
