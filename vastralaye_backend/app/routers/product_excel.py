@@ -9,8 +9,15 @@ import pandas as pd
 from app.database import get_db
 from app.models import Category, SubCategory
 from app.models.product import Product
+from app.authentication import get_current_admin_user
 
-router = APIRouter(prefix="/products", tags=["Products"])
+# Every endpoint here writes to the catalogue, so the whole router sits
+# behind the admin guard — these were open to anyone before.
+router = APIRouter(
+    prefix="/products",
+    tags=["Products"],
+    dependencies=[Depends(get_current_admin_user)],
+)
 
 @router.post("/upload-excel")
 async def upload_products_excel(

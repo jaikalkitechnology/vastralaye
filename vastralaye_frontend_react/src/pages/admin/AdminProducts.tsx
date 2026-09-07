@@ -42,6 +42,7 @@ import {
   Package,
   X,
   RefreshCw,
+  Download,
   ShieldAlert,
   Star,
   Upload,
@@ -94,6 +95,10 @@ type ProductType = {
   subcategory?: string;
   /** Storefront visibility — false means hidden from every fronted route. */
   is_active?: boolean;
+  hsn_code?: string | null;
+  /** GST split, percentages. */
+  sgst?: number | null;
+  cgst?: number | null;
 };
 
 type CategoryType = {
@@ -247,6 +252,8 @@ const ENDPOINTS = {
   productUpdate: (id: string | number) => `${BASE_URL}/admin/product/${id}`,
   productDelete: (id: string | number) => `${BASE_URL}/admin/product/${id}`,
   productVisibility: `${BASE_URL}/admin/products/visibility`,
+  productsBulkDelete: `${BASE_URL}/admin/products/bulk-delete`,
+  productsExport: `${BASE_URL}/admin/products/export`,
   categoriesList: `${BASE_URL}/admin/cat/list`,
   subcategoriesList: `${BASE_URL}/admin/cat/subcategory/list`,
 };
@@ -294,6 +301,9 @@ export default function AdminProductsPage(): JSX.Element {
      hiding or showing a whole batch in one call. */
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [visibilityBusy, setVisibilityBusy] = useState(false);
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
+  const [bulkDeleteLoading, setBulkDeleteLoading] = useState(false);
+  const [exportLoading, setExportLoading] = useState(false);
 
   const [form, setForm] = useState({
     name: "",
@@ -303,6 +313,8 @@ export default function AdminProductsPage(): JSX.Element {
     highlights: "",
     price: "",
     discount_price: "",
+    sgst: "",
+    cgst: "",
     category_id: "",
     subcategory_id: "",
     colors: "",
@@ -580,7 +592,7 @@ export default function AdminProductsPage(): JSX.Element {
   const resetForm = () => {
     setForm({
       name: "", description: "", details: "", specifications: "", highlights: "",
-      price: "", discount_price: "", category_id: "", subcategory_id: "",
+      price: "", discount_price: "", sgst: "", cgst: "", category_id: "", subcategory_id: "",
       colors: "", sizes: "", in_stock: true, featured: false, best_seller: false,
       new_arrival: false, images: [], rating: "", reviews: "", video: null, pdf: null,
     });
@@ -608,6 +620,8 @@ export default function AdminProductsPage(): JSX.Element {
       formData.append("highlights", form.highlights.trim());
       formData.append("price", form.price);
       formData.append("discount_price", form.discount_price || "0");
+      if (form.sgst) formData.append("sgst", form.sgst);
+      if (form.cgst) formData.append("cgst", form.cgst);
       formData.append("category_id", form.category_id);
       formData.append("subcategory_id", form.subcategory_id || "");
       formData.append("colors", form.colors);
@@ -674,6 +688,51 @@ export default function AdminProductsPage(): JSX.Element {
       toast.error(`Failed to update visibility: ${message}`);
     } finally {
       setVisibilityBusy(false);
+    }
+  };
+
+  /** Delete the selection — sold products get archived server-side. */
+  const confirmBulkDelete = async () => {
+    if (!isAdminUser() || !getAuthToken()) { toast.error("Admin privileges required"); navigate("/login"); return; }
+    setBulkDeleteLoading(true);
+    try {
+      const res = await axiosInstance.post(ENDPOINTS.productsBulkDelete, {
+        product_ids: [...selectedIds],
+      });
+      const data = res.data as { message?: string };
+      toast.success(data?.message || "Selection deleted");
+      setSelectedIds(new Set());
+      setBulkDeleteOpen(false);
+      await fetchProducts();
+    } catch (error: any) {
+      const { message } = formatAxiosError(error);
+      toast.error(`Failed to delete selection: ${message}`);
+    } finally {
+      setBulkDeleteLoading(false);
+    }
+  };
+
+  /** The whole catalogue as a spreadsheet, saved through the browser. */
+  const downloadExcel = async () => {
+    if (!isAdminUser() || !getAuthToken()) { toast.error("Admin privileges required"); navigate("/login"); return; }
+    setExportLoading(true);
+    try {
+      const res = await axiosInstance.get(ENDPOINTS.productsExport, { responseType: "blob" });
+      const dispo = (res.headers?.["content-disposition"] as string | undefined) || "";
+      const match = /filename="?([^";]+)/.exec(dispo);
+      const name = match ? match[1] : `vastraliya-products-${new Date().toISOString().slice(0, 10)}.xlsx`;
+      const url = URL.createObjectURL(res.data as Blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = name;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success("Product list downloaded");
+    } catch (error: any) {
+      const { message } = formatAxiosError(error);
+      toast.error(`Download failed: ${message}`);
+    } finally {
+      setExportLoading(false);
     }
   };
 
@@ -763,6 +822,10 @@ export default function AdminProductsPage(): JSX.Element {
             <p className="text-[13px] text-muted-foreground mt-1">Manage your product catalog</p>
           </div>
           <div className="flex gap-3">
+            <Button variant="outline" onClick={downloadExcel} disabled={exportLoading} className="uppercase text-[11px] tracking-[0.12em] px-5 py-2.5 rounded-sm">
+              <Download className={`h-4 w-4 mr-2 ${exportLoading ? "animate-bounce" : ""}`} />
+              {exportLoading ? "Preparing…" : "Download Excel"}
+            </Button>
             <Button variant="outline" onClick={() => { fetchProducts(); fetchCategories(); }} disabled={loading} className="uppercase text-[11px] tracking-[0.12em] px-5 py-2.5 rounded-sm">
               <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />Refresh
             </Button>
@@ -1020,6 +1083,14 @@ export default function AdminProductsPage(): JSX.Element {
                   className="h-8 rounded-[5px] border-border px-3 text-[12px] uppercase tracking-[0.08em] text-espresso hover:bg-white"
                 >
                   <Eye className="mr-1.5 h-3.5 w-3.5" />Show on store
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() => setBulkDeleteOpen(true)}
+                  disabled={visibilityBusy || bulkDeleteLoading}
+                  className="h-8 rounded-[5px] bg-sale px-3 text-[12px] uppercase tracking-[0.08em] text-ivory hover:bg-sale/90"
+                >
+                  <Trash2 className="mr-1.5 h-3.5 w-3.5" />Delete selected
                 </Button>
                 <button
                   type="button"
@@ -1323,6 +1394,14 @@ export default function AdminProductsPage(): JSX.Element {
                     <Input type="number" step="0.01" value={form.discount_price} onChange={(e) => updateForm("discount_price", e.target.value)} placeholder="0.00" className="bg-white rounded-sm border-border text-[13px] focus:border-maroon focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0" />
                   </div>
                   <div className="space-y-2">
+                    <Label className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">SGST (%)</Label>
+                    <Input type="number" step="0.01" min="0" max="100" value={form.sgst} onChange={(e) => updateForm("sgst", e.target.value)} placeholder="e.g. 2.5" className="bg-white rounded-sm border-border text-[13px] focus:border-maroon focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">CGST (%)</Label>
+                    <Input type="number" step="0.01" min="0" max="100" value={form.cgst} onChange={(e) => updateForm("cgst", e.target.value)} placeholder="e.g. 2.5" className="bg-white rounded-sm border-border text-[13px] focus:border-maroon focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0" />
+                  </div>
+                  <div className="space-y-2">
                     <Label className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">Sizes</Label>
                     <Input value={form.sizes} onChange={(e) => updateForm("sizes", e.target.value)} placeholder="S, M, L, XL" className="bg-white rounded-sm border-border text-[13px] focus:border-maroon focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0" />
                     <p className="text-xs text-muted-foreground">Separate with commas</p>
@@ -1484,6 +1563,30 @@ export default function AdminProductsPage(): JSX.Element {
           </DialogContent>
         </Dialog>
       </div>
+
+      {/* Bulk delete confirmation */}
+      <Dialog open={bulkDeleteOpen} onOpenChange={setBulkDeleteOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 font-serif text-xl font-medium text-espresso">
+              <Trash2 className="h-5 w-5 text-sale" />Delete {selectedIds.size} selected
+            </DialogTitle>
+          </DialogHeader>
+          <div className="p-4">
+            <p className="text-[13px] text-muted-foreground mb-6">
+              Products that appear in past orders are archived (hidden from the
+              store) instead of deleted, so order history stays safe. The rest
+              are removed permanently — this cannot be undone.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <Button variant="outline" onClick={() => setBulkDeleteOpen(false)}>Cancel</Button>
+              <Button variant="destructive" onClick={confirmBulkDelete} disabled={bulkDeleteLoading} className="bg-sale text-ivory uppercase text-[11px] tracking-[0.12em] rounded-sm hover:bg-sale/90">
+                {bulkDeleteLoading ? <><RefreshCw className="h-4 w-4 animate-spin mr-2" />Deleting...</> : <><Trash2 className="h-4 w-4 mr-2" />Delete selection</>}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Edit dialog */}
       <AdminEditProductForm

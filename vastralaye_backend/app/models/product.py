@@ -63,6 +63,10 @@ class Product(Base):
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     hsn_code = Column(String(20))   # NEW FIELD
+    # GST split for this product, as percentages (e.g. 2.5 + 2.5 for 5% GST).
+    # schema_sync adds them NULLable on the live database.
+    sgst = Column(Float, nullable=True)
+    cgst = Column(Float, nullable=True)
     # ------------------ Relationships ----------------
     category = relationship("Category", back_populates="products")
     subcategory = relationship("SubCategory", back_populates="products")

@@ -111,6 +111,10 @@ class ProductOut(ProductBase):
     # Storefront visibility — False means hidden from all fronted routes.
     # Surfaced so Admin → Products can show and toggle the state.
     is_active: bool = True
+    # Tax details, editable from Admin → Products.
+    hsn_code: Optional[str] = None
+    sgst: Optional[float] = None
+    cgst: Optional[float] = None
 
     # -------- FIELD VALIDATORS (Pydantic v2) --------
     @field_validator("sizes", mode="before")

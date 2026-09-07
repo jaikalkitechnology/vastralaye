@@ -67,6 +67,10 @@ class ProductBase(BaseModel):
     best_seller: bool = False
     new_arrival: bool = False
     is_active: bool = True
+    # Tax details, managed in Admin → Products.
+    hsn_code: Optional[str] = None
+    sgst: Optional[float] = None
+    cgst: Optional[float] = None
 
 
 class ProductCreate(ProductBase):
