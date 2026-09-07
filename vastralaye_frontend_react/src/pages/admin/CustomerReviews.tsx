@@ -12,6 +12,8 @@ import {
   Search,
   Filter,
   RefreshCw,
+  Download,
+  Upload,
   Edit2,
   Trash2,
   Reply,
@@ -538,6 +540,8 @@ const DeleteModal = ({ isOpen, onClose, review, onDelete }: DeleteModalProps) =>
 
 export default function Reviews() {
   const [reviews, setReviews] = useState<Review[]>([]);
+  const [exporting, setExporting] = useState(false);
+  const [importing, setImporting] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
@@ -568,6 +572,58 @@ export default function Reviews() {
       return token;
     } catch (error) {
       return null;
+    }
+  };
+
+  /* ============ EXCEL EXPORT / IMPORT ============ */
+
+  const downloadExcel = async () => {
+    const token = getToken();
+    if (!token) return;
+    setExporting(true);
+    try {
+      const res = await axios.get(`${BASE_URL}/admin/reviews/export`, {
+        headers: { Authorization: `Bearer ${token}` },
+        responseType: "blob",
+      });
+      const dispo = (res.headers?.["content-disposition"] as string | undefined) || "";
+      const match = /filename="?([^";]+)/.exec(dispo);
+      const name = match ? match[1] : `vastraliya-reviews-${new Date().toISOString().slice(0, 10)}.xlsx`;
+      const url = URL.createObjectURL(res.data as Blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = name;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success("Reviews downloaded");
+    } catch {
+      toast.error("Download failed");
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const importExcel = async (file: File) => {
+    const token = getToken();
+    if (!token) return;
+    setImporting(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await axios.post(`${BASE_URL}/admin/reviews/import`, fd, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = res.data as { message?: string; errors?: { row: number; error: string }[] };
+      toast.success(data?.message || "Import finished");
+      if (data?.errors?.length) {
+        // Surface the first few problems so the admin can fix the sheet.
+        data.errors.slice(0, 3).forEach((e) => toast.error(`Row ${e.row}: ${e.error}`));
+      }
+      await fetchReviews();
+    } catch (err: any) {
+      toast.error(err?.response?.data?.detail || "Import failed");
+    } finally {
+      setImporting(false);
     }
   };
 
@@ -986,13 +1042,38 @@ export default function Reviews() {
               )}
             </p>
           </div>
-          <button
-            onClick={fetchReviews}
-            className="border border-espresso text-espresso px-5 py-2.5 rounded-sm uppercase text-[11px] tracking-[0.12em] hover:bg-espresso hover:text-ivory transition-all flex items-center gap-2 font-semibold"
-          >
-            <RefreshCw className="w-4 h-4" />
-            Refresh
-          </button>
+          <div className="flex flex-wrap items-center gap-3">
+            <label className={`border border-espresso text-espresso px-5 py-2.5 rounded-sm uppercase text-[11px] tracking-[0.12em] hover:bg-espresso hover:text-ivory transition-all flex items-center gap-2 font-semibold cursor-pointer ${importing ? "pointer-events-none opacity-60" : ""}`}>
+              <Upload className="w-4 h-4" />
+              {importing ? "Importing…" : "Import Excel"}
+              <input
+                type="file"
+                accept=".xlsx"
+                className="hidden"
+                disabled={importing}
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  e.target.value = "";
+                  if (f) importExcel(f);
+                }}
+              />
+            </label>
+            <button
+              onClick={downloadExcel}
+              disabled={exporting}
+              className="border border-espresso text-espresso px-5 py-2.5 rounded-sm uppercase text-[11px] tracking-[0.12em] hover:bg-espresso hover:text-ivory transition-all flex items-center gap-2 font-semibold disabled:opacity-60"
+            >
+              <Download className="w-4 h-4" />
+              {exporting ? "Preparing…" : "Download Excel"}
+            </button>
+            <button
+              onClick={fetchReviews}
+              className="border border-espresso text-espresso px-5 py-2.5 rounded-sm uppercase text-[11px] tracking-[0.12em] hover:bg-espresso hover:text-ivory transition-all flex items-center gap-2 font-semibold"
+            >
+              <RefreshCw className="w-4 h-4" />
+              Refresh
+            </button>
+          </div>
         </div>
 
         {/* ===== STATS ===== */}
