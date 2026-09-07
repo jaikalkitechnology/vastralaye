@@ -346,7 +346,7 @@ const InvoiceTemplate = React.forwardRef<HTMLDivElement, { invoice: Invoice }>(
             }}>
               <div>{"Pride Industrial Estate, Vasai East, Maharashtra 401208"}</div>
               <div>support@vastraliya.com · +91 70661 81207</div>
-              <div>GSTIN 27AAMCV4451F</div>
+              <div>GSTIN 27AAMCV4451F1Z4</div>
             </div>
           </div>
 
