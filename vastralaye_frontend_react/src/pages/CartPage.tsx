@@ -28,6 +28,7 @@ import PaymentBadges from '@/components/PaymentBadges';
 import ProductGrid from '@/components/ProductGrid';
 import { PAISLEY_TILE } from '@/components/decor/patterns';
 import { BASE_URL } from '../config';
+import { discountLabel } from '@/lib/discount';
 import QRCode from 'qrcode';
 
 type CouponShape = {
@@ -2136,13 +2137,9 @@ const CartPage: React.FC = () => {
                 const price = product.discountPrice || product.price;
                 const itemTotal = price * item.quantity;
                 const hasDiscount = !!product.discountPrice;
-                const discountPercent = hasDiscount
-                  ? Math.round(
-                      ((product.price - product.discountPrice) /
-                        product.price) *
-                        100
-                    )
-                  : 0;
+                const offLabel = hasDiscount
+                  ? discountLabel(product.price, product.discountPrice)
+                  : null;
 
                 return (
                   <div
@@ -2181,9 +2178,9 @@ const CartPage: React.FC = () => {
                             {item.size && <span>Size: {item.size}</span>}
                           </span>
                         )}
-                        {hasDiscount && (
+                        {offLabel && (
                           <span className={item.color || item.size ? 'ml-2 text-sale font-medium' : 'text-sale font-medium'}>
-                            {discountPercent}% off
+                            {offLabel}
                           </span>
                         )}
                       </div>

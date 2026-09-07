@@ -5,6 +5,7 @@ import { Heart, ShoppingBag, Star } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import { useMemo, useState } from "react";
 import { BASE_IMG, BASE_URL } from "@/config";
+import { discountBadgeText, discountLabel } from "@/lib/discount";
 
 interface ProductCardProps {
   product: Product;
@@ -110,7 +111,8 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
   const finalPrice = discountPrice && discountPrice > 0 ? discountPrice : price;
   const hasDiscount = !!(discountPrice && discountPrice > 0 && price > discountPrice);
-  const discountPercent = hasDiscount ? Math.round(((price - (discountPrice as number)) / price) * 100) : 0;
+  const offBadge = hasDiscount ? discountBadgeText(price, discountPrice as number) : null;
+  const offLabel = hasDiscount ? discountLabel(price, discountPrice as number) : null;
 
   const isInStock = (product as any).in_stock ?? true;
   const isNew = (product as any).new_arrival ?? (product as any).newArrival ?? false;
@@ -184,9 +186,9 @@ const ProductCard = ({ product }: ProductCardProps) => {
               Bestseller
             </span>
           )}
-          {hasDiscount && (
+          {offBadge && (
             <span className="bg-sale text-white text-[10px] font-semibold uppercase tracking-[0.12em] px-2 py-1 rounded-[2px] w-max">
-              -{discountPercent}%
+              {offBadge}
             </span>
           )}
           {!isInStock && (
@@ -255,7 +257,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
           {hasDiscount && (
             <>
               <span className="text-[13px] text-muted-foreground line-through">{INR(price)}</span>
-              <span className="text-xs font-semibold text-sale">({discountPercent}% off)</span>
+              {offLabel && <span className="text-xs font-semibold text-sale">({offLabel})</span>}
             </>
           )}
         </div>

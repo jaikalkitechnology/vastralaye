@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { Product } from "@/types";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { discountBadgeText, discountLabel } from "@/lib/discount";
 
 interface Review {
   id: number;
@@ -444,7 +445,8 @@ useEffect(() => {
                 const discountPrice: number | null = product.discount_price ?? product.discountPrice ?? null;
                 const finalPrice = discountPrice && discountPrice > 0 ? discountPrice : price;
                 const hasDiscount = discountPrice && discountPrice > 0 && price > discountPrice;
-                const discountPercent = hasDiscount ? Math.round(((price - discountPrice) / price) * 100) : 0;
+                const offBadge = hasDiscount ? discountBadgeText(price, discountPrice) : null;
+                const offLabel = hasDiscount ? discountLabel(price, discountPrice) : null;
                 
                 const isInStock = checkStockStatus(product);
                 const productInCart = isInCart(String(product.id));
@@ -491,9 +493,9 @@ useEffect(() => {
 
                       {/* Stock & Discount Badges */}
                       <div className="absolute top-2.5 left-2.5 flex flex-col gap-1.5">
-                        {hasDiscount && (
+                        {offBadge && (
                           <Badge className="bg-sale text-white border-0 rounded-[1px] text-[10px] font-semibold uppercase tracking-[0.12em] px-2 py-0.5 hover:bg-sale">
-                            -{discountPercent}%
+                            {offBadge}
                           </Badge>
                         )}
                         <Badge className={`border-0 rounded-[1px] text-[10px] font-semibold uppercase tracking-[0.12em] px-2 py-0.5 ${isInStock ? 'bg-ivory/95 text-green-700 hover:bg-ivory/95' : 'bg-espresso text-ivory hover:bg-espresso'}`}>
@@ -537,9 +539,11 @@ useEffect(() => {
                               <span className="text-[13px] text-muted-foreground line-through">
                                 {formatINR(price)}
                               </span>
-                              <span className="text-xs font-semibold text-sale">
-                                ({discountPercent}% off)
-                              </span>
+                              {offLabel && (
+                                <span className="text-xs font-semibold text-sale">
+                                  ({offLabel})
+                                </span>
+                              )}
                             </>
                           )}
                         </div>
