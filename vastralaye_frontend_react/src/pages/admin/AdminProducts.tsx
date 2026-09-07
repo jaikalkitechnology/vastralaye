@@ -37,6 +37,8 @@ import {
   Plus,
   Edit,
   Trash2,
+  Eye,
+  EyeOff,
   Package,
   X,
   RefreshCw,
@@ -90,6 +92,8 @@ type ProductType = {
   created_at?: string | null;
   category?: string;
   subcategory?: string;
+  /** Storefront visibility — false means hidden from every fronted route. */
+  is_active?: boolean;
 };
 
 type CategoryType = {
@@ -242,6 +246,7 @@ const ENDPOINTS = {
   productCreate: `${BASE_URL}/admin/product/create`,
   productUpdate: (id: string | number) => `${BASE_URL}/admin/product/${id}`,
   productDelete: (id: string | number) => `${BASE_URL}/admin/product/${id}`,
+  productVisibility: `${BASE_URL}/admin/products/visibility`,
   categoriesList: `${BASE_URL}/admin/cat/list`,
   subcategoriesList: `${BASE_URL}/admin/cat/subcategory/list`,
 };
@@ -284,6 +289,11 @@ export default function AdminProductsPage(): JSX.Element {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<ProductType | null>(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
+
+  /* Storefront visibility: per-row eye toggle plus checkbox selection for
+     hiding or showing a whole batch in one call. */
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [visibilityBusy, setVisibilityBusy] = useState(false);
 
   const [form, setForm] = useState({
     name: "",
@@ -643,6 +653,42 @@ export default function AdminProductsPage(): JSX.Element {
     setIsEditOpen(true);
   };
 
+  /** Hide or show products on the storefront — one id or a selection. */
+  const setVisibility = async (ids: number[], isActive: boolean) => {
+    if (!isAdminUser() || !getAuthToken()) { toast.error("Admin privileges required"); navigate("/login"); return; }
+    if (!ids.length) return;
+    setVisibilityBusy(true);
+    try {
+      const res = await axiosInstance.patch(ENDPOINTS.productVisibility, {
+        product_ids: ids,
+        is_active: isActive,
+      });
+      const msg = (res.data as { message?: string })?.message;
+      toast.success(msg || (isActive ? "Shown on storefront" : "Hidden from storefront"));
+      setProducts(prev =>
+        prev.map(p => (ids.includes(Number(p.id)) ? { ...p, is_active: isActive } : p))
+      );
+      setSelectedIds(new Set());
+    } catch (error: any) {
+      const { message } = formatAxiosError(error);
+      toast.error(`Failed to update visibility: ${message}`);
+    } finally {
+      setVisibilityBusy(false);
+    }
+  };
+
+  const toggleSelect = (id: number) =>
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+
+  const pageIds = products.map(p => Number(p.id)).filter(Number.isFinite);
+  const allSelected = pageIds.length > 0 && pageIds.every(id => selectedIds.has(id));
+  const toggleSelectAll = () => setSelectedIds(allSelected ? new Set() : new Set(pageIds));
+
   const confirmDelete = async () => {
     if (!deleteTargetId) return;
     if (!isAdminUser() || !getAuthToken()) { toast.error("Please log in"); navigate("/login"); return; }
@@ -955,9 +1001,47 @@ export default function AdminProductsPage(): JSX.Element {
           </div>
 
           <div>
+            {selectedIds.size > 0 && (
+              <div className="mx-4 mb-3 flex flex-wrap items-center gap-2.5 rounded-sm border border-border bg-[#FBF8F3] px-4 py-2.5">
+                <span className="text-[13px] font-semibold text-espresso">{selectedIds.size} selected</span>
+                <Button
+                  size="sm"
+                  onClick={() => setVisibility([...selectedIds], false)}
+                  disabled={visibilityBusy}
+                  className="h-8 rounded-[5px] bg-espresso px-3 text-[12px] uppercase tracking-[0.08em] text-ivory hover:bg-espresso/85"
+                >
+                  <EyeOff className="mr-1.5 h-3.5 w-3.5" />Hide from store
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setVisibility([...selectedIds], true)}
+                  disabled={visibilityBusy}
+                  className="h-8 rounded-[5px] border-border px-3 text-[12px] uppercase tracking-[0.08em] text-espresso hover:bg-white"
+                >
+                  <Eye className="mr-1.5 h-3.5 w-3.5" />Show on store
+                </Button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedIds(new Set())}
+                  className="ml-auto text-[12px] text-muted-foreground underline underline-offset-2 hover:text-espresso"
+                >
+                  Clear selection
+                </button>
+              </div>
+            )}
             <Table>
               <TableHeader>
                 <TableRow className="bg-[#FBF8F3] hover:bg-[#FBF8F3] border-border">
+                  <TableHead className="h-auto w-10 px-3 py-2.5">
+                    <input
+                      type="checkbox"
+                      aria-label="Select all products on this page"
+                      className="h-4 w-4 cursor-pointer accent-maroon"
+                      checked={allSelected}
+                      onChange={toggleSelectAll}
+                    />
+                  </TableHead>
                   <TableHead className="h-auto px-3 py-2.5 text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground font-semibold whitespace-nowrap">Product</TableHead>
                   <TableHead className="h-auto px-3 py-2.5 text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground font-semibold whitespace-nowrap">Category</TableHead>
                   <TableHead className="h-auto px-3 py-2.5 text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground font-semibold whitespace-nowrap text-right">Price</TableHead>
@@ -970,7 +1054,7 @@ export default function AdminProductsPage(): JSX.Element {
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="p-0">
+                    <TableCell colSpan={8} className="p-0">
                       <AdminLoading label="products" />
                     </TableCell>
                   </TableRow>
@@ -987,7 +1071,19 @@ export default function AdminProductsPage(): JSX.Element {
                     const reviewsValue = hasReviews ? Number(p.reviews) : null;
 
                     return (
-                      <TableRow key={p.id} className="hover:bg-[#FBF8F3] border-border transition-colors">
+                      <TableRow
+                        key={p.id}
+                        className={`hover:bg-[#FBF8F3] border-border transition-colors ${p.is_active === false ? "opacity-60" : ""}`}
+                      >
+                        <TableCell className="w-10 px-3 py-3">
+                          <input
+                            type="checkbox"
+                            aria-label={`Select ${p.name}`}
+                            className="h-4 w-4 cursor-pointer accent-maroon"
+                            checked={selectedIds.has(Number(p.id))}
+                            onChange={() => toggleSelect(Number(p.id))}
+                          />
+                        </TableCell>
                         <TableCell className="px-3 py-3 text-[13px]">
                           <div className="flex items-center gap-3">
                             {firstImage ? (
@@ -1038,6 +1134,7 @@ export default function AdminProductsPage(): JSX.Element {
 
                         <TableCell className="px-3 py-3 text-[13px]">
                           <div className="flex gap-1.5 flex-wrap">
+                            {p.is_active === false && <span className="text-[9.5px] font-bold uppercase tracking-[0.1em] rounded-[3px] px-1.5 py-0.5 bg-espresso/10 text-espresso">Hidden</span>}
                             {p.featured && <span className="text-[9.5px] font-bold uppercase tracking-[0.1em] rounded-[3px] px-1.5 py-0.5 bg-maroon/10 text-maroon">Featured</span>}
                             {p.best_seller && <span className="text-[9.5px] font-bold uppercase tracking-[0.1em] rounded-[3px] px-1.5 py-0.5 bg-espresso text-ivory">Bestseller</span>}
                             {p.new_arrival && <span className="text-[9.5px] font-bold uppercase tracking-[0.1em] rounded-[3px] px-1.5 py-0.5 bg-gold/20 text-[#8a6414]">New</span>}
@@ -1046,6 +1143,18 @@ export default function AdminProductsPage(): JSX.Element {
 
                         <TableCell className="px-3 py-3 text-[13px] text-right">
                           <div className="flex justify-end gap-1.5">
+                            <button
+                              title={p.is_active === false ? "Show on storefront" : "Hide from storefront"}
+                              onClick={() => setVisibility([Number(p.id)], p.is_active === false)}
+                              disabled={visibilityBusy}
+                              className={`w-7 h-7 border rounded-[5px] inline-flex items-center justify-center bg-white transition-colors disabled:opacity-50 ${
+                                p.is_active === false
+                                  ? "border-espresso/40 text-espresso hover:bg-espresso/5"
+                                  : "border-border text-muted-foreground hover:text-espresso hover:border-espresso"
+                              }`}
+                            >
+                              {p.is_active === false ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                            </button>
                             <button
                               title="Edit product"
                               onClick={() => openEdit(p)}
@@ -1067,7 +1176,7 @@ export default function AdminProductsPage(): JSX.Element {
                   })
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center py-12">
+                    <TableCell colSpan={8} className="text-center py-12">
                       <div className="flex flex-col items-center gap-3">
                         <div className="w-16 h-16 bg-espresso/5 rounded-full flex items-center justify-center">
                           <Package className="h-8 w-8 text-muted-foreground" />

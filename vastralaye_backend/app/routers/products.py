@@ -414,10 +414,12 @@ async def get_product(product_id: int, db: Session = Depends(get_db)):
     Get a specific product by ID with full details
     """
     try:
+        # Hidden products (is_active False) 404 here too — hiding must cover
+        # a direct /product/<id> link, not just the listings.
         product = db.query(Product).options(
             joinedload(Product.category),
             joinedload(Product.subcategory)
-        ).filter(Product.id == product_id).first()
+        ).filter(Product.id == product_id, Product.is_active == True).first()
 
         if not product:
             raise HTTPException(
