@@ -1953,6 +1953,225 @@ def export_products(
         )
 
 
+@router.post("/products/import")
+async def import_products(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    admin=Depends(get_current_admin_user),
+):
+    """Bulk add or edit products from the Download Excel layout.
+
+    Matched by header name, order free. A row WITH an ID updates that
+    product — only non-empty cells overwrite. A row WITHOUT one creates a
+    product and needs Name, Category (by name) and Price. Sizes/Colors are
+    comma-separated; In Stock/Visible/Featured/Best Seller/New Arrival take
+    Yes or No. Rating, Reviews, Created At and Images columns are ignored —
+    ratings are computed from reviews, and photos are added in the editor.
+    Bad rows are reported individually and do not stop the rest.
+    """
+    from io import BytesIO
+    from openpyxl import load_workbook
+
+    raw = await file.read()
+    if len(raw) > 5 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="File too large (max 5 MB)")
+    try:
+        sheet = load_workbook(BytesIO(raw), read_only=True, data_only=True).active
+    except Exception:
+        raise HTTPException(
+            status_code=400,
+            detail="Could not read the file — upload the .xlsx sheet from Download Excel",
+        )
+
+    rows = sheet.iter_rows(values_only=True)
+    try:
+        header = [str(h).strip().lower() if h is not None else "" for h in next(rows)]
+    except StopIteration:
+        raise HTTPException(status_code=400, detail="The sheet is empty")
+
+    def col(*names):
+        for n in names:
+            if n in header:
+                return header.index(n)
+        return None
+
+    idx = {
+        "id": col("id", "product id"),
+        "name": col("name"),
+        "description": col("description"),
+        "category": col("category"),
+        "subcategory": col("subcategory"),
+        "price": col("price"),
+        "discount": col("discount price"),
+        "sizes": col("sizes"),
+        "colors": col("colors"),
+        "hsn": col("hsn code"),
+        "sgst": col("sgst %", "sgst"),
+        "cgst": col("cgst %", "cgst"),
+        "in_stock": col("in stock"),
+        "visible": col("visible"),
+        "featured": col("featured"),
+        "best_seller": col("best seller"),
+        "new_arrival": col("new arrival"),
+    }
+    if idx["name"] is None or idx["price"] is None or idx["category"] is None:
+        raise HTTPException(
+            status_code=400,
+            detail="Missing columns — the sheet needs at least Name, Category and Price",
+        )
+
+    categories = {c.name.strip().lower(): c for c in db.query(models.Category).all()}
+    subcats = {}
+    for s in db.query(models.SubCategory).all():
+        subcats[(s.category_id, (s.name or "").strip().lower())] = s
+
+    def cell(row, key):
+        i = idx[key]
+        if i is None or i >= len(row) or row[i] is None:
+            return None
+        v = str(row[i]).strip()
+        return v or None
+
+    def as_bool(v):
+        if v is None:
+            return None
+        return v.strip().lower() in ("yes", "true", "1", "y")
+
+    def as_float(v):
+        try:
+            return float(v) if v is not None else None
+        except ValueError:
+            return None
+
+    created = updated = 0
+    errors = []
+
+    for line_no, row in enumerate(rows, start=2):
+        if row is None or all(v is None or str(v).strip() == "" for v in row):
+            continue
+        if line_no > 2001:
+            errors.append({"row": line_no, "error": "Too many rows (max 2000 per upload)"})
+            break
+
+        try:
+            pid_raw = cell(row, "id")
+            product = None
+            if pid_raw:
+                try:
+                    pid = int(float(pid_raw))
+                except ValueError:
+                    errors.append({"row": line_no, "error": f"Bad ID '{pid_raw}'"})
+                    continue
+                product = db.query(Product).filter(Product.id == pid).first()
+                if not product:
+                    errors.append({"row": line_no, "error": f"Product ID {pid} not found"})
+                    continue
+
+            name = cell(row, "name")
+            price = as_float(cell(row, "price"))
+            cat_name = cell(row, "category")
+            category = categories.get(cat_name.lower()) if cat_name else None
+
+            if product is None:
+                if not name:
+                    errors.append({"row": line_no, "error": "Name is required for a new product"})
+                    continue
+                if price is None or price <= 0:
+                    errors.append({"row": line_no, "error": "Price must be a number above 0"})
+                    continue
+                if category is None:
+                    errors.append({"row": line_no, "error": f"Category '{cat_name}' not found"})
+                    continue
+                product = Product(
+                    name=name, price=price, category_id=category.id,
+                    in_stock=True, is_active=True, rating=0.0, reviews=0,
+                )
+                db.add(product)
+                created += 1
+            else:
+                if name:
+                    product.name = name
+                if price is not None:
+                    if price <= 0:
+                        errors.append({"row": line_no, "error": "Price must be above 0"})
+                        continue
+                    product.price = price
+                if cat_name:
+                    if category is None:
+                        errors.append({"row": line_no, "error": f"Category '{cat_name}' not found"})
+                        continue
+                    product.category_id = category.id
+                updated += 1
+
+            sub_name = cell(row, "subcategory")
+            if sub_name:
+                sub = subcats.get((product.category_id, sub_name.lower()))
+                if sub:
+                    product.subcategory_id = sub.id
+                else:
+                    errors.append({"row": line_no, "error": f"Subcategory '{sub_name}' not in that category (other fields saved)"})
+
+            desc = cell(row, "description")
+            if desc is not None:
+                product.description = desc
+
+            discount = as_float(cell(row, "discount"))
+            if discount is not None:
+                base = product.price or 0
+                if discount <= 0:
+                    product.discount_price = None
+                elif discount >= base:
+                    errors.append({"row": line_no, "error": "Discount Price must be below Price (other fields saved)"})
+                else:
+                    product.discount_price = discount
+
+            sizes = cell(row, "sizes")
+            if sizes is not None:
+                product.sizes = ",".join(p.strip() for p in sizes.split(",") if p.strip())
+            colors = cell(row, "colors")
+            if colors is not None:
+                product.colors = ",".join(p.strip() for p in colors.split(",") if p.strip())
+
+            hsn = cell(row, "hsn")
+            if hsn is not None:
+                product.hsn_code = hsn[:20]
+            sgst = as_float(cell(row, "sgst"))
+            if sgst is not None:
+                product.sgst = _validate_gst_percent(sgst, "SGST")
+            cgst = as_float(cell(row, "cgst"))
+            if cgst is not None:
+                product.cgst = _validate_gst_percent(cgst, "CGST")
+
+            for key, attr in (
+                ("in_stock", "in_stock"), ("visible", "is_active"),
+                ("featured", "featured"), ("best_seller", "best_seller"),
+                ("new_arrival", "new_arrival"),
+            ):
+                b = as_bool(cell(row, key))
+                if b is not None:
+                    setattr(product, attr, b)
+        except HTTPException as exc:
+            errors.append({"row": line_no, "error": str(exc.detail)})
+            continue
+
+    db.commit()
+
+    parts = []
+    if created:
+        parts.append(f"{created} product(s) added")
+    if updated:
+        parts.append(f"{updated} updated")
+    if errors:
+        parts.append(f"{len(errors)} problem(s) reported")
+    return {
+        "status": True,
+        "created": created,
+        "updated": updated,
+        "errors": errors[:50],
+        "message": ", ".join(parts) or "Nothing imported",
+    }
+
+
 # ------------------- REVIEWS: EXCEL EXPORT / IMPORT -------------------
 
 REVIEW_SHEET_HEADERS = [

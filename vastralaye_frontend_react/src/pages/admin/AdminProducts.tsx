@@ -254,6 +254,7 @@ const ENDPOINTS = {
   productVisibility: `${BASE_URL}/admin/products/visibility`,
   productsBulkDelete: `${BASE_URL}/admin/products/bulk-delete`,
   productsExport: `${BASE_URL}/admin/products/export`,
+  productsImport: `${BASE_URL}/admin/products/import`,
   categoriesList: `${BASE_URL}/admin/cat/list`,
   subcategoriesList: `${BASE_URL}/admin/cat/subcategory/list`,
 };
@@ -304,6 +305,7 @@ export default function AdminProductsPage(): JSX.Element {
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
   const [bulkDeleteLoading, setBulkDeleteLoading] = useState(false);
   const [exportLoading, setExportLoading] = useState(false);
+  const [importLoading, setImportLoading] = useState(false);
 
   const [form, setForm] = useState({
     name: "",
@@ -712,6 +714,28 @@ export default function AdminProductsPage(): JSX.Element {
     }
   };
 
+  /** Bulk add/edit from the Download Excel layout — ID = update, blank = new. */
+  const importExcel = async (file: File) => {
+    if (!isAdminUser() || !getAuthToken()) { toast.error("Admin privileges required"); navigate("/login"); return; }
+    setImportLoading(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await axiosInstance.post(ENDPOINTS.productsImport, fd);
+      const data = res.data as { message?: string; errors?: { row: number; error: string }[] };
+      toast.success(data?.message || "Import finished");
+      if (data?.errors?.length) {
+        data.errors.slice(0, 3).forEach((e) => toast.error(`Row ${e.row}: ${e.error}`));
+      }
+      await fetchProducts();
+    } catch (error: any) {
+      const { message } = formatAxiosError(error);
+      toast.error(`Import failed: ${message}`);
+    } finally {
+      setImportLoading(false);
+    }
+  };
+
   /** The whole catalogue as a spreadsheet, saved through the browser. */
   const downloadExcel = async () => {
     if (!isAdminUser() || !getAuthToken()) { toast.error("Admin privileges required"); navigate("/login"); return; }
@@ -822,6 +846,21 @@ export default function AdminProductsPage(): JSX.Element {
             <p className="text-[13px] text-muted-foreground mt-1">Manage your product catalog</p>
           </div>
           <div className="flex gap-3">
+            <label className={`inline-flex items-center border border-input bg-background hover:bg-accent hover:text-accent-foreground uppercase text-[11px] tracking-[0.12em] px-5 py-2.5 rounded-sm font-medium cursor-pointer ${importLoading ? "pointer-events-none opacity-60" : ""}`}>
+              <Upload className="h-4 w-4 mr-2" />
+              {importLoading ? "Importing…" : "Import Excel"}
+              <input
+                type="file"
+                accept=".xlsx"
+                className="hidden"
+                disabled={importLoading}
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  e.target.value = "";
+                  if (f) importExcel(f);
+                }}
+              />
+            </label>
             <Button variant="outline" onClick={downloadExcel} disabled={exportLoading} className="uppercase text-[11px] tracking-[0.12em] px-5 py-2.5 rounded-sm">
               <Download className={`h-4 w-4 mr-2 ${exportLoading ? "animate-bounce" : ""}`} />
               {exportLoading ? "Preparing…" : "Download Excel"}
