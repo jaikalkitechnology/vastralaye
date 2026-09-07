@@ -24,6 +24,7 @@ import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { toast } from "@/components/ui/use-toast";
 import { BASE_IMG, BASE_URL } from "@/config";
+import { discountLabel } from "@/lib/discount";
 import ReviewSection from "@/pages/ReviewSection";
 import ReelsSection from "@/components/ReelsSection";
 import StickyReelVideo from "@/components/StickyReelVideo";
@@ -728,7 +729,7 @@ return (
                   {formatPrice(product.price)}
                 </span>
                 <span className="text-[12.5px] font-semibold text-sale">
-                  ({Math.round(((product.price - product.discount_price) / product.price) * 100)}% off)
+                  ({discountLabel(product.price, product.discount_price)})
                 </span>
               </>
             )}
@@ -1079,7 +1080,7 @@ return (
             <div className="text-[11px] leading-tight whitespace-nowrap">
               <span className="text-muted-foreground line-through">{formatPrice(product.price)}</span>{" "}
               <span className="text-sale font-semibold">
-                ({Math.round(((product.price - product.discount_price) / product.price) * 100)}% off)
+                ({discountLabel(product.price, product.discount_price)})
               </span>
             </div>
           ) : (
