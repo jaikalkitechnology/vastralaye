@@ -60,16 +60,14 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr] gap-10 lg:gap-12 py-14">
           {/* Brand */}
           <div>
-            <Link to="/" className="inline-flex items-center gap-2.5">
+            <Link to="/" className="inline-block">
+              {/* The artwork carries the brand name; an ivory tile keeps the
+                  maroon logo readable on the espresso footer. */}
               <img
-                src="/logo-mark.png"
-                alt=""
-                aria-hidden
-                className="h-9 w-9 rounded-md"
+                src="/logo_vas.png"
+                alt="Vastraliya"
+                className="h-24 w-24 rounded-md bg-ivory object-contain p-1"
               />
-              <span className="font-serif text-2xl font-semibold text-ivory">
-                Vastra<span className="text-gold">liya</span>
-              </span>
             </Link>
             <p className="text-sm leading-relaxed mt-4 mb-6 max-w-xs">
               Quality fashion, chosen with care. Timeless style for every
