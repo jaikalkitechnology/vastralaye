@@ -1970,7 +1970,16 @@ async def import_products(
     Bad rows are reported individually and do not stop the rest.
     """
     from io import BytesIO
-    from openpyxl import load_workbook
+    try:
+        from openpyxl import load_workbook
+    except ImportError:
+        raise HTTPException(
+            status_code=503,
+            detail=(
+                "Excel support is not installed on the server. Run: "
+                ".venv/bin/pip install openpyxl — then restart the service."
+            ),
+        )
 
     raw = await file.read()
     if len(raw) > 5 * 1024 * 1024:
@@ -2217,14 +2226,8 @@ def export_reviews(
         .all()
     )
 
-    from openpyxl import Workbook
-
-    wb = Workbook()
-    ws = wb.active
-    ws.title = "Reviews"
-    ws.append(REVIEW_SHEET_HEADERS)
-    for r in reviews:
-        ws.append([
+    def row(r):
+        return [
             r.id,
             r.product_id,
             r.product.name if r.product else "",
@@ -2232,16 +2235,41 @@ def export_reviews(
             r.rating,
             r.comment or "",
             r.created_at.strftime("%Y-%m-%d %H:%M") if r.created_at else "",
-        ])
-    buf = BytesIO()
-    wb.save(buf)
-    buf.seek(0)
+        ]
+
     stamp = date.today().isoformat()
-    return StreamingResponse(
-        buf,
-        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        headers={"Content-Disposition": f'attachment; filename="vastraliya-reviews-{stamp}.xlsx"'},
-    )
+    try:
+        from openpyxl import Workbook
+
+        wb = Workbook()
+        ws = wb.active
+        ws.title = "Reviews"
+        ws.append(REVIEW_SHEET_HEADERS)
+        for r in reviews:
+            ws.append(row(r))
+        buf = BytesIO()
+        wb.save(buf)
+        buf.seek(0)
+        return StreamingResponse(
+            buf,
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={"Content-Disposition": f'attachment; filename="vastraliya-reviews-{stamp}.xlsx"'},
+        )
+    except ImportError:
+        # No openpyxl on this install — a CSV opens in Excel just the same.
+        import csv
+        from io import StringIO
+
+        text = StringIO()
+        writer = csv.writer(text)
+        writer.writerow(REVIEW_SHEET_HEADERS)
+        for r in reviews:
+            writer.writerow(row(r))
+        return StreamingResponse(
+            BytesIO(text.getvalue().encode("utf-8-sig")),
+            media_type="text/csv",
+            headers={"Content-Disposition": f'attachment; filename="vastraliya-reviews-{stamp}.csv"'},
+        )
 
 
 @router.post("/reviews/import")
@@ -2260,7 +2288,16 @@ async def import_reviews(
     account; the storefront shows the Customer Name column.
     """
     from io import BytesIO
-    from openpyxl import load_workbook
+    try:
+        from openpyxl import load_workbook
+    except ImportError:
+        raise HTTPException(
+            status_code=503,
+            detail=(
+                "Excel support is not installed on the server. Run: "
+                ".venv/bin/pip install openpyxl — then restart the service."
+            ),
+        )
     from app.models import ProductReview
 
     raw = await file.read()
