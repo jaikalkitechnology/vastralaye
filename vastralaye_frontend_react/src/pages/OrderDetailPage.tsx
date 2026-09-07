@@ -451,7 +451,7 @@ const InvoicePageView: React.FC<{
                                 </p>
                                 <p className="mt-2.5 text-[11px] leading-relaxed text-ivory/60">
                                     Gala No 230, Pride Industrial Estate, Vasai East, Thane, Maharashtra – 401208<br />
-                                    support@vastraliya.com · +91 70661 81207 · GSTIN 27AAMCV4451F
+                                    support@vastraliya.com · +91 70661 81207 · GSTIN 27AAMCV4451F1Z4
                                 </p>
                             </div>
                             <div className="relative sm:text-right">

@@ -191,7 +191,7 @@ const Footer = () => {
           <div className="text-center md:text-left">
             <span>© {new Date().getFullYear()} Vastraliya Fashion Pvt. Ltd. · All rights reserved</span>
             <p className="mt-1 text-[11px] tracking-[0.04em] text-ivory/45">
-              CIN: U47711MR2026PTC478420 · GSTIN: 27AAMCV4451F
+              CIN: U47711MR2026PTC478420 · GSTIN: 27AAMCV4451F1Z4
             </p>
           </div>
           <PaymentBadges />

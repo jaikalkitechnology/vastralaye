@@ -9,7 +9,7 @@ from reportlab.platypus import Table, TableStyle
 
 # Configuration — the seller identity printed on every tax invoice.
 COMPANY_NAME = "Vastraliya Fashion Pvt. Ltd."
-GST_NUMBER = "27AAMCV4451F"
+GST_NUMBER = "27AAMCV4451F1Z4"
 CIN_NUMBER = "U47711MR2026PTC478420"
 COMPANY_ADDRESS = [
     "Gala No 230, Second Floor, Pride Industrial Estate,",
