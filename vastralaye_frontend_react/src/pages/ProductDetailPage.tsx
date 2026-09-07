@@ -776,11 +776,8 @@ return (
           {/* Size */}
           {product.sizes.length > 0 && (
             <div>
-              <div className="mt-4 mb-2 flex items-center justify-between text-[11px] font-semibold uppercase tracking-[0.16em] text-espresso">
-                <span>Size</span>
-                <button className="font-medium normal-case tracking-[0.02em] text-xs text-maroon underline underline-offset-[3px] whitespace-nowrap">
-                  Size Guide
-                </button>
+              <div className="mt-4 mb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-espresso">
+                Size
               </div>
               <div className="flex flex-wrap gap-2.5">
                 {product.sizes.map((size) => (

@@ -46,7 +46,7 @@ import {
 /** Most of one product a single order may carry. Enforced in the cart
  *  reducer, so no add or update path can exceed it; the steppers also
  *  disable their + button here so shoppers see the ceiling. */
-export const MAX_QTY_PER_PRODUCT = 5;
+export const MAX_QTY_PER_PRODUCT = 2;
 
 interface StoreState {
   products: Product[];
