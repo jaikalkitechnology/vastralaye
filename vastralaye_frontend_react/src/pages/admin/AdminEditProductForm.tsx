@@ -70,6 +70,8 @@ export default function AdminEditProductForm({
     highlights: "",
     price: "",
     discount_price: "",
+    sgst: "",
+    cgst: "",
     category_id: "",
     subcategory_id: "",
     colors: "",
@@ -110,6 +112,8 @@ export default function AdminEditProductForm({
         highlights: "",
         price: "",
         discount_price: "",
+        sgst: "",
+        cgst: "",
         category_id: "",
         subcategory_id: "",
         colors: "",
@@ -157,6 +161,8 @@ export default function AdminEditProductForm({
       highlights: Array.isArray((product as any).highlights) ? (product as any).highlights.join(",") : ((product as any).highlights as string) ?? "",
       price: (product.price ?? "").toString(),
       discount_price: (product.discount_price ?? "").toString(),
+      sgst: ((product as any).sgst ?? "").toString(),
+      cgst: ((product as any).cgst ?? "").toString(),
       category_id: (product.category_id ?? "").toString(),
       subcategory_id: (product.subcategory_id ?? "").toString(),
       colors: Array.isArray(product.colors) ? (product.colors as string[]).join(",") : ((product.colors as string) ?? ""),
@@ -303,6 +309,8 @@ export default function AdminEditProductForm({
       const highlights = nonEmpty(form.highlights); if (highlights) fd.append("highlights", highlights);
 
       const dp = toMaybeNumberString(form.discount_price); if (dp !== null) fd.append("discount_price", dp);
+      const sg = toMaybeNumberString(form.sgst); if (sg !== null) fd.append("sgst", sg);
+      const cg = toMaybeNumberString(form.cgst); if (cg !== null) fd.append("cgst", cg);
       const sub = toMaybeIntString(form.subcategory_id); if (sub !== null) fd.append("subcategory_id", sub);
 
       const colors = nonEmpty(form.colors); if (colors) fd.append("colors", colors);
@@ -475,14 +483,48 @@ export default function AdminEditProductForm({
                     </label>
                     <div className="relative">
                       <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground font-medium">₹</span>
-                      <Input 
-                        type="number" 
-                        value={form.discount_price} 
-                        onChange={(e) => updateForm("discount_price", e.target.value)} 
-                        placeholder="0.00" 
-                        className="pl-10 h-10 text-[13px] bg-white rounded-sm border-border focus:border-maroon focus-visible:ring-0 focus-visible:ring-offset-0" 
+                      <Input
+                        type="number"
+                        value={form.discount_price}
+                        onChange={(e) => updateForm("discount_price", e.target.value)}
+                        placeholder="0.00"
+                        className="pl-10 h-10 text-[13px] bg-white rounded-sm border-border focus:border-maroon focus-visible:ring-0 focus-visible:ring-offset-0"
                       />
                     </div>
+                  </div>
+
+                  <div>
+                    <label className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso mb-2">
+                      <span>SGST (%)</span>
+                      <span className="text-[10px] text-muted-foreground font-normal normal-case tracking-normal">(Optional)</span>
+                    </label>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      max="100"
+                      value={form.sgst}
+                      onChange={(e) => updateForm("sgst", e.target.value)}
+                      placeholder="e.g. 2.5"
+                      className="h-10 text-[13px] bg-white rounded-sm border-border focus:border-maroon focus-visible:ring-0 focus-visible:ring-offset-0"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso mb-2">
+                      <span>CGST (%)</span>
+                      <span className="text-[10px] text-muted-foreground font-normal normal-case tracking-normal">(Optional)</span>
+                    </label>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      max="100"
+                      value={form.cgst}
+                      onChange={(e) => updateForm("cgst", e.target.value)}
+                      placeholder="e.g. 2.5"
+                      className="h-10 text-[13px] bg-white rounded-sm border-border focus:border-maroon focus-visible:ring-0 focus-visible:ring-offset-0"
+                    />
                   </div>
 
                   <div>

@@ -986,6 +986,9 @@ def get_new_arrivals(
             "pdf_url": p.pdf_url,
             "in_stock": p.in_stock,
             "is_active": p.is_active,
+            "hsn_code": p.hsn_code,
+            "sgst": p.sgst,
+            "cgst": p.cgst,
             "rating": p.rating,
             "reviews": p.reviews,
             "featured": p.featured,
@@ -995,6 +998,19 @@ def get_new_arrivals(
         })
 
     return result
+
+
+def _validate_gst_percent(value: Optional[float], label: str) -> Optional[float]:
+    """SGST/CGST are percentages — half of the product's GST rate each."""
+    if value is None:
+        return None
+    try:
+        v = float(value)
+    except (TypeError, ValueError):
+        raise HTTPException(status_code=400, detail=f"{label} must be a number")
+    if not (0 <= v <= 100):
+        raise HTTPException(status_code=400, detail=f"{label} must be between 0 and 100")
+    return round(v, 2)
 
 
 def _ensure_list_from_form(val: Optional[str]):
@@ -1057,6 +1073,8 @@ async def create_product(
     highlights: Optional[str] = Form(None),
     specifications: Optional[str] = Form(None),
     details: Optional[str] = Form(None),
+    sgst: Optional[float] = Form(None),
+    cgst: Optional[float] = Form(None),
     db: Session = Depends(get_db),
     admin=Depends(get_current_admin_user),
 ):
@@ -1064,6 +1082,8 @@ async def create_product(
     # ---------------- VALIDATIONS ----------------
     name = validate_name(name)
     price = validate_price(price)
+    sgst = _validate_gst_percent(sgst, "SGST")
+    cgst = _validate_gst_percent(cgst, "CGST")
 
     if discount_price is not None:
         discount_price = validate_price(discount_price)
@@ -1147,6 +1167,8 @@ async def create_product(
         featured=featured,
         best_seller=best_seller,
         new_arrival=new_arrival,
+        sgst=sgst,
+        cgst=cgst,
     )
 
     product.images = image_urls
@@ -1228,6 +1250,9 @@ def get_best_sellers(
             "pdf_url": p.pdf_url,
             "in_stock": p.in_stock,
             "is_active": p.is_active,
+            "hsn_code": p.hsn_code,
+            "sgst": p.sgst,
+            "cgst": p.cgst,
             "rating": p.rating,
             "reviews": p.reviews,
             "featured": p.featured,
@@ -1459,6 +1484,9 @@ def list_products(
             "pdf_url": p.pdf_url,
             "in_stock": p.in_stock,
             "is_active": p.is_active,
+            "hsn_code": p.hsn_code,
+            "sgst": p.sgst,
+            "cgst": p.cgst,
             "rating": p.rating,
             "reviews": p.reviews,
             "featured": p.featured,
@@ -1497,6 +1525,8 @@ async def update_product(
         highlights: Optional[str] = Form(None),
         specifications: Optional[str] = Form(None),
         details: Optional[str] = Form(None),
+        sgst: Optional[float] = Form(None),
+        cgst: Optional[float] = Form(None),
 
         db: Session = Depends(get_db),
         admin=Depends(get_current_admin_user)
@@ -1574,6 +1604,14 @@ async def update_product(
             raise HTTPException(status_code=400, detail="reviews cannot be negative")
 
         product.reviews = rv
+
+    # --------------------------------------
+    # GST SPLIT
+    # --------------------------------------
+    if sgst is not None:
+        product.sgst = _validate_gst_percent(sgst, "SGST")
+    if cgst is not None:
+        product.cgst = _validate_gst_percent(cgst, "CGST")
 
     # --------------------------------------
     # COLORS & SIZES
@@ -1847,6 +1885,7 @@ def export_products(
     headers = [
         "ID", "Name", "Description", "Category", "Subcategory",
         "Price", "Discount Price", "Sizes", "Colors", "HSN Code",
+        "SGST %", "CGST %",
         "In Stock", "Visible", "Featured", "Best Seller", "New Arrival",
         "Rating", "Reviews", "Created At", "Images",
     ]
@@ -1868,6 +1907,8 @@ def export_products(
             cell_list(p.sizes),
             cell_list(p.colors),
             p.hsn_code or "",
+            p.sgst if p.sgst is not None else "",
+            p.cgst if p.cgst is not None else "",
             "Yes" if p.in_stock else "No",
             "No" if p.is_active is False else "Yes",
             "Yes" if p.featured else "No",
