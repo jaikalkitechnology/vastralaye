@@ -217,13 +217,12 @@ const NavBar = () => {
       {showTopBar && <TopBarStrip text={topBarText} />}
       {/* HEADER */}
       <div className="container flex items-center h-16 px-4">
-        {/* LOGO — wide lockup cut from the official artwork (emblem +
-            wordmark side by side) so the name stays legible at header size */}
+        {/* LOGO — the official artwork, untouched */}
         <Link to="/" className="flex items-center shrink-0">
           <img
-            src="/logo-wide.png"
+            src="/logo_vas.png"
             alt="Vastraliya"
-            className="h-9 md:h-10 w-auto"
+            className="h-14 w-14 object-contain"
           />
         </Link>
 
