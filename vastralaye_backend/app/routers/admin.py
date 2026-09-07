@@ -569,10 +569,54 @@ def get_categories(
             "name": cat.name,
             "slug": cat.slug,
             "image": cat.image,
+            "is_active": cat.is_active,
             "subcategories": subcats or None,
         })
 
     return response
+
+
+class CategoryVisibilityUpdate(BaseModel):
+    category_ids: List[int]
+    is_active: bool
+
+
+@router.patch("/cat/visibility")
+def set_categories_visibility(
+    payload: CategoryVisibilityUpdate,
+    db: Session = Depends(get_db),
+    admin=Depends(get_current_admin_user),
+):
+    """Show or hide categories on the storefront in one call.
+
+    Hiding flips is_active only — the category, its subcategories and its
+    products stay in the catalogue; the category just vanishes from the
+    storefront's menus, listings and its own page until shown again. The
+    products remain reachable through All Products and search unless
+    hidden individually.
+    """
+    ids = list({int(i) for i in payload.category_ids})
+    if not ids:
+        raise HTTPException(status_code=400, detail="No categories selected")
+    if len(ids) > 200:
+        raise HTTPException(status_code=400, detail="Too many categories in one request (max 200)")
+
+    categories = db.query(models.Category).filter(models.Category.id.in_(ids)).all()
+    for category in categories:
+        category.is_active = payload.is_active
+
+    db.commit()
+
+    found_ids = [c.id for c in categories]
+    missing = sorted(set(ids) - set(found_ids))
+    verb = "shown" if payload.is_active else "hidden"
+    return {
+        "updated": len(found_ids),
+        "category_ids": found_ids,
+        "missing_ids": missing,
+        "is_active": payload.is_active,
+        "message": f"{len(found_ids)} {'category' if len(found_ids) == 1 else 'categories'} {verb}",
+    }
 @router.put("/cat/update/{category_id}", response_model=schemas.CategoryOut)
 async def update_category(
     category_id: int,

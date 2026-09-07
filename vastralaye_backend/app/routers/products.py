@@ -12,6 +12,11 @@ from app.schemas.products import CategoryResponse, CategoryWithSubcategories, Su
 
 router = APIRouter(prefix="/api/v1/fronted/products", tags=['FrontedProducts'])
 
+# A category is storefront-visible unless explicitly hidden. NULL rows
+# predate the is_active column (schema_sync adds it NULLable on live
+# databases) and must stay visible, so `== True` alone would be wrong.
+CATEGORY_VISIBLE = or_(Category.is_active == True, Category.is_active.is_(None))
+
 
 # ==================== Category Routes ====================
 
@@ -28,9 +33,10 @@ async def list_categories(
     try:
         query = db.query(Category)
 
-        # Optional: Add active filter if you have is_active field on Category
-        # if not include_inactive:
-        #     query = query.filter(Category.is_active == True)
+        # Hidden categories stay off the storefront. NULL means the row
+        # predates the is_active column — visible, only False hides.
+        if not include_inactive:
+            query = query.filter(CATEGORY_VISIBLE)
 
         categories = query.order_by(Category.name).all()
         return categories
@@ -49,7 +55,7 @@ async def list_categories_with_subcategories(db: Session = Depends(get_db)):
     try:
         categories = db.query(Category).options(
             joinedload(Category.subcategories)
-        ).order_by(Category.name).all()
+        ).filter(CATEGORY_VISIBLE).order_by(Category.name).all()
         return categories
     except Exception as e:
         raise HTTPException(
@@ -90,9 +96,10 @@ async def get_category_by_slug(slug: str, db: Session = Depends(get_db)):
     Get a specific category by slug with its subcategories
     """
     try:
+        # Hidden categories 404 by slug too — hiding covers a direct link.
         category = db.query(Category).options(
             joinedload(Category.subcategories)
-        ).filter(Category.slug == slug).first()
+        ).filter(Category.slug == slug, CATEGORY_VISIBLE).first()
 
         if not category:
             raise HTTPException(

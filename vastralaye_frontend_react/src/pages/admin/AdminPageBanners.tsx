@@ -92,7 +92,9 @@ const AdminPageBanners = () => {
          banners arrive — otherwise a saved category banner has nowhere to land. */
       let slots: { key: string; label: string; route: string }[] = [];
       try {
-        const cats = await api.get('/fronted/products/categories');
+        // include_inactive: a hidden category keeps its banner card here,
+        // so its artwork survives until the category is shown again.
+        const cats = await api.get('/fronted/products/categories?include_inactive=true');
         if (Array.isArray(cats.data)) {
           slots = (cats.data as any[]).map((c) => ({
             key: `category_${c.id}`,

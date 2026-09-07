@@ -42,6 +42,8 @@ class CategoryOut(BaseModel):
     name: str
     slug: str
     image: Optional[str] = None
+    # Storefront visibility; None (pre-migration rows) counts as visible.
+    is_active: Optional[bool] = True
 
     # Avoid mutable defaults — set None
     subcategories: Optional[List[SubcategoryOut]] = None

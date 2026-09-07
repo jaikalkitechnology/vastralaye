@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { IoAdd, IoSearchSharp } from "react-icons/io5";
-import { BiPencil, BiTrash } from "react-icons/bi";
+import { BiPencil, BiTrash, BiShow, BiHide } from "react-icons/bi";
 import { FiChevronDown, FiChevronUp } from "react-icons/fi";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { MdImage, MdFolder, MdSubdirectoryArrowRight } from "react-icons/md";
@@ -32,6 +32,8 @@ interface Category {
   name: string;
   slug: string;
   image: string;
+  /** Storefront visibility — false hides; null/undefined counts as visible. */
+  is_active?: boolean | null;
   subcategories?: Subcategory[];
 }
 
@@ -139,6 +141,10 @@ const AdminCategories: React.FC = () => {
 
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
   const [isEditCategoryOpen, setIsEditCategoryOpen] = useState(false);
+
+  /* Storefront visibility: per-card eye toggle plus checkbox selection. */
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [visibilityBusy, setVisibilityBusy] = useState(false);
   const [isSubcategoryDialogOpen, setIsSubcategoryDialogOpen] = useState(false);
   const [subcategoryMode, setSubcategoryMode] = useState<"add" | "edit">("add");
 
@@ -243,6 +249,42 @@ const AdminCategories: React.FC = () => {
     setCatForm({ id: "", name: "", slug: "", image: null, imagePreview: null });
     setIsAddCategoryOpen(true);
   };
+
+  /** Hide or show categories on the storefront — one id or a selection. */
+  const setVisibility = async (ids: number[], isActive: boolean) => {
+    if (!ids.length) return;
+    setVisibilityBusy(true);
+    try {
+      const token = getAuthToken();
+      const res = await fetch(`${BASE_URL}/admin/cat/visibility`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ category_ids: ids, is_active: isActive }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data?.detail || `Request failed (${res.status})`);
+      toast.success(data?.message || (isActive ? "Shown on storefront" : "Hidden from storefront"));
+      setCategories(prev =>
+        prev.map(c => (ids.includes(c.id) ? { ...c, is_active: isActive } : c))
+      );
+      setSelectedIds(new Set());
+    } catch (err: any) {
+      toast.error(err.message || "Failed to update visibility");
+    } finally {
+      setVisibilityBusy(false);
+    }
+  };
+
+  const toggleSelect = (id: number) =>
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
 
   const openEditCategory = (cat: Category) => {
     setCatForm({
@@ -590,14 +632,63 @@ const AdminCategories: React.FC = () => {
             )}
           </div>
         ) : (
+          <>
+          {selectedIds.size > 0 && (
+            <div className="mb-4 flex flex-wrap items-center gap-2.5 rounded-sm border border-border bg-white px-4 py-2.5">
+              <span className="text-[13px] font-semibold text-espresso">{selectedIds.size} selected</span>
+              <Button
+                size="sm"
+                onClick={() => setVisibility([...selectedIds], false)}
+                disabled={visibilityBusy}
+                className="h-8 rounded-[5px] bg-espresso px-3 text-[12px] uppercase tracking-[0.08em] text-ivory hover:bg-espresso/85"
+              >
+                <BiHide className="mr-1.5 h-3.5 w-3.5" />Hide from store
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setVisibility([...selectedIds], true)}
+                disabled={visibilityBusy}
+                className="h-8 rounded-[5px] border-border px-3 text-[12px] uppercase tracking-[0.08em] text-espresso hover:bg-ivory"
+              >
+                <BiShow className="mr-1.5 h-3.5 w-3.5" />Show on store
+              </Button>
+              <button
+                type="button"
+                onClick={() => setSelectedIds(new Set())}
+                className="ml-auto text-[12px] text-muted-foreground underline underline-offset-2 hover:text-espresso"
+              >
+                Clear selection
+              </button>
+            </div>
+          )}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {filteredCategories.map((cat) => (
-              <div key={cat.id} className="bg-white border border-border rounded-md overflow-hidden flex flex-col">
-                <ImageWithFallback
-                  src={cat.image}
-                  alt={cat.name}
-                  className="w-full h-24 object-cover"
-                />
+              <div
+                key={cat.id}
+                className={`bg-white border border-border rounded-md overflow-hidden flex flex-col ${cat.is_active === false ? "opacity-60" : ""}`}
+              >
+                <div className="relative">
+                  <ImageWithFallback
+                    src={cat.image}
+                    alt={cat.name}
+                    className="w-full h-24 object-cover"
+                  />
+                  <label className="absolute top-2 left-2 inline-flex h-6 w-6 cursor-pointer items-center justify-center rounded-[5px] border border-border bg-white/95 shadow-sm">
+                    <input
+                      type="checkbox"
+                      aria-label={`Select ${cat.name}`}
+                      className="h-3.5 w-3.5 cursor-pointer accent-maroon"
+                      checked={selectedIds.has(cat.id)}
+                      onChange={() => toggleSelect(cat.id)}
+                    />
+                  </label>
+                  {cat.is_active === false && (
+                    <span className="absolute top-2 right-2 rounded-[3px] bg-espresso px-1.5 py-0.5 text-[9.5px] font-bold uppercase tracking-[0.1em] text-ivory">
+                      Hidden
+                    </span>
+                  )}
+                </div>
                 <div className="p-4 flex-1 flex flex-col">
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
@@ -605,6 +696,19 @@ const AdminCategories: React.FC = () => {
                       <p className="text-[11.5px] text-muted-foreground truncate">/{cat.slug}</p>
                     </div>
                     <div className="flex gap-1.5 flex-none">
+                      <button
+                        type="button"
+                        title={cat.is_active === false ? "Show on storefront" : "Hide from storefront"}
+                        onClick={() => setVisibility([cat.id], cat.is_active === false)}
+                        disabled={visibilityBusy}
+                        className={`w-7 h-7 border rounded-[5px] inline-flex items-center justify-center bg-white transition-colors disabled:opacity-50 ${
+                          cat.is_active === false
+                            ? "border-espresso/40 text-espresso hover:bg-espresso/5"
+                            : "border-border text-muted-foreground hover:text-espresso hover:border-espresso"
+                        }`}
+                      >
+                        {cat.is_active === false ? <BiHide className="h-3.5 w-3.5" /> : <BiShow className="h-3.5 w-3.5" />}
+                      </button>
                       <button
                         type="button"
                         title="Edit category"
@@ -670,6 +774,7 @@ const AdminCategories: React.FC = () => {
               </div>
             ))}
           </div>
+          </>
         )}
       </div>
 
