@@ -941,6 +941,7 @@ def get_new_arrivals(
             "video_url": p.video_url,
             "pdf_url": p.pdf_url,
             "in_stock": p.in_stock,
+            "is_active": p.is_active,
             "rating": p.rating,
             "reviews": p.reviews,
             "featured": p.featured,
@@ -1182,6 +1183,7 @@ def get_best_sellers(
             "video_url": p.video_url,
             "pdf_url": p.pdf_url,
             "in_stock": p.in_stock,
+            "is_active": p.is_active,
             "rating": p.rating,
             "reviews": p.reviews,
             "featured": p.featured,
@@ -1412,6 +1414,7 @@ def list_products(
             "video_url": p.video_url,
             "pdf_url": p.pdf_url,
             "in_stock": p.in_stock,
+            "is_active": p.is_active,
             "rating": p.rating,
             "reviews": p.reviews,
             "featured": p.featured,
@@ -1624,6 +1627,48 @@ async def update_product(
     return product
 
 
+
+
+class ProductVisibilityUpdate(BaseModel):
+    product_ids: List[int]
+    is_active: bool
+
+
+@router.patch("/products/visibility")
+def set_products_visibility(
+    payload: ProductVisibilityUpdate,
+    db: Session = Depends(get_db),
+    admin=Depends(get_current_admin_user),
+):
+    """Show or hide products on the storefront in one call.
+
+    Hiding flips is_active only — the catalogue entry, images, stock and
+    order history stay untouched, and the product vanishes from storefront
+    listings and its own page until shown again. Takes one id or a whole
+    selection; ids that don't exist are reported back, not errors.
+    """
+    ids = list({int(i) for i in payload.product_ids})
+    if not ids:
+        raise HTTPException(status_code=400, detail="No products selected")
+    if len(ids) > 200:
+        raise HTTPException(status_code=400, detail="Too many products in one request (max 200)")
+
+    products = db.query(Product).filter(Product.id.in_(ids)).all()
+    for product in products:
+        product.is_active = payload.is_active
+
+    db.commit()
+
+    found_ids = [p.id for p in products]
+    missing = sorted(set(ids) - set(found_ids))
+    verb = "shown" if payload.is_active else "hidden"
+    return {
+        "updated": len(found_ids),
+        "product_ids": found_ids,
+        "missing_ids": missing,
+        "is_active": payload.is_active,
+        "message": f"{len(found_ids)} product(s) {verb}",
+    }
 
 
 @router.delete("/product/{product_id}", status_code=200)

@@ -108,6 +108,9 @@ class ProductOut(ProductBase):
     rating: float
     reviews: int
     created_at: Optional[datetime]
+    # Storefront visibility — False means hidden from all fronted routes.
+    # Surfaced so Admin → Products can show and toggle the state.
+    is_active: bool = True
 
     # -------- FIELD VALIDATORS (Pydantic v2) --------
     @field_validator("sizes", mode="before")
