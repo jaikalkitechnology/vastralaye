@@ -12,31 +12,10 @@ interface TestimonialItem {
   image?: string | null;
 }
 
-/** Static fallback shown until admin adds testimonials at /admin/testimonials. */
-const fallbackTestimonials: TestimonialItem[] = [
-  {
-    quote:
-      'The chanderi suit set is even prettier in person — the fabric feels like a hug. Got endless compliments at my cousin’s mehendi.',
-    who: 'Ananya S. · Jaipur',
-    rating: 5,
-  },
-  {
-    quote:
-      'Ordered a Banarasi for my mother’s 60th. The fall, the colours, the packaging — everything felt thoughtful and premium.',
-    who: 'Ritika M. · Bengaluru',
-    rating: 5,
-  },
-  {
-    quote:
-      'Fast delivery, easy exchange when I got the size wrong, and the kurta itself is my new everyday favourite.',
-    who: 'Farhan K. · Delhi',
-    rating: 5,
-  },
-];
-
-/** Customer quote cards (design.md §5.7) — admin-managed via /admin/testimonials. */
+/** Customer quote cards (design.md §5.7) — admin-managed via /admin/testimonials.
+ *  No invented reviews: until real ones exist the section says "coming soon". */
 const Testimonials = () => {
-  const [items, setItems] = useState<TestimonialItem[]>(fallbackTestimonials);
+  const [items, setItems] = useState<TestimonialItem[]>([]);
 
   useEffect(() => {
     let cancelled = false;
@@ -54,7 +33,7 @@ const Testimonials = () => {
         );
       })
       .catch(() => {
-        /* keep fallback */
+        /* stay in the coming-soon state */
       });
     return () => {
       cancelled = true;
@@ -71,6 +50,17 @@ const Testimonials = () => {
           </h2>
           <Ornament />
         </Reveal>
+
+        {items.length === 0 && (
+          <Reveal>
+            <div className="mx-auto max-w-xl rounded-sm border border-dashed border-gold/50 bg-white px-8 py-10 text-center">
+              <p className="font-serif text-2xl italic text-espresso">Coming soon</p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Reviews from our first customers will appear here.
+              </p>
+            </div>
+          </Reveal>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6">
           {items.slice(0, 6).map((t, i) => (

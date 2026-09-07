@@ -217,7 +217,7 @@ const NavBar = () => {
       {showTopBar && <TopBarStrip text={topBarText} />}
       {/* HEADER */}
       <div className="container flex items-center h-16 px-4">
-        {/* LOGO — the artwork carries the brand name itself, so no text */}
+        {/* LOGO — the official artwork, untouched */}
         <Link to="/" className="flex items-center shrink-0">
           <img
             src="/logo_vas.png"
