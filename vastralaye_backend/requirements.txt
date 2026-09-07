@@ -24,6 +24,9 @@ Jinja2==3.1.6
 MarkupSafe==3.0.3
 numpy==2.5.1
 pandas==3.0.5
+# Writes the Admin → Products Excel export (and lets pandas read .xlsx
+# uploads). The export endpoint falls back to CSV if this is missing.
+openpyxl==3.1.5
 # Password hashing calls bcrypt directly (app/security.py); passlib is gone —
 # it probed bcrypt internals that newer bcrypt removed, printing an
 # AttributeError traceback at startup and hard-failing under bcrypt 5. Any

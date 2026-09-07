@@ -1715,6 +1715,39 @@ def set_products_visibility(
     }
 
 
+def _remove_or_archive_product(db: Session, product) -> dict:
+    """The one true product-removal path, shared by single and bulk delete.
+
+    Carts and wishlists only point at the catalogue — cleared either way.
+    (Their FKs have no ON DELETE action; deleting the product first raised
+    1451.) Order and invoice lines are records of money that changed hands
+    and are never deleted: a product that appears in them is archived —
+    hidden from the storefront, kept so past orders stay whole. Only a
+    never-sold product is removed outright (reviews cascade, reels keep
+    playing with their product link cleared). Does not commit.
+    """
+    from app.models.cart import CartItem
+    from app.models.invoice import InvoiceItem
+
+    db.query(CartItem).filter(
+        CartItem.product_id == product.id
+    ).delete(synchronize_session=False)
+    db.query(WishlistItem).filter(
+        WishlistItem.product_id == product.id
+    ).delete(synchronize_session=False)
+
+    ordered = db.query(OrderItem).filter(OrderItem.product_id == product.id).count()
+    invoiced = db.query(InvoiceItem).filter(InvoiceItem.product_id == product.id).count()
+
+    if ordered or invoiced:
+        product.is_active = False
+        product.in_stock = False
+        return {"archived": True, "ordered": ordered, "invoiced": invoiced, "name": product.name}
+
+    db.delete(product)
+    return {"archived": False, "name": product.name}
+
+
 @router.delete("/product/{product_id}", status_code=200)
 def delete_product(
     product_id: int,
@@ -1728,51 +1761,155 @@ def delete_product(
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
 
-    from app.models.cart import CartItem
-    from app.models.invoice import InvoiceItem
+    outcome = _remove_or_archive_product(db, product)
+    db.commit()
 
-    # Carts and wishlists only point at the catalogue — clear them either way.
-    # (These two tables were also what made the old version crash: their FKs
-    # have no ON DELETE action, so deleting the product first raised 1451.)
-    db.query(CartItem).filter(
-        CartItem.product_id == product_id
-    ).delete(synchronize_session=False)
-    db.query(WishlistItem).filter(
-        WishlistItem.product_id == product_id
-    ).delete(synchronize_session=False)
-
-    # Order and invoice lines are records of money that changed hands. They
-    # are never deleted — the old version destroyed order history here. If
-    # any exist, the product is archived instead of removed: hidden from the
-    # storefront (which filters is_active) but kept so past orders stay whole.
-    ordered = db.query(OrderItem).filter(OrderItem.product_id == product_id).count()
-    invoiced = db.query(InvoiceItem).filter(InvoiceItem.product_id == product_id).count()
-
-    if ordered or invoiced:
-        product.is_active = False
-        product.in_stock = False
-        db.commit()
+    if outcome["archived"]:
         return {
             "status": True,
             "archived": True,
             "message": (
-                f"'{product.name}' appears in {ordered} past order line(s)"
-                + (f" and {invoiced} invoice line(s)" if invoiced else "")
+                f"'{outcome['name']}' appears in {outcome['ordered']} past order line(s)"
+                + (f" and {outcome['invoiced']} invoice line(s)" if outcome["invoiced"] else "")
                 + " — order history can't lose it, so it was archived instead: "
                   "hidden from the store and removed from carts and wishlists."
             ),
         }
-
-    # Never sold: safe to remove outright. Reviews cascade with the product
-    # and reels keep playing with their product link cleared (SET NULL).
-    db.delete(product)
-    db.commit()
 
     return {
         "status": True,
         "archived": False,
         "message": "Product deleted permanently"
     }
+
+
+class ProductBulkDelete(BaseModel):
+    product_ids: List[int]
+
+
+@router.post("/products/bulk-delete")
+def bulk_delete_products(
+    payload: ProductBulkDelete,
+    db: Session = Depends(get_db),
+    admin=Depends(get_current_admin_user),
+):
+    """Delete a selection of products under the same rules as single delete:
+    never-sold ones go permanently, ones in past orders are archived."""
+    ids = list({int(i) for i in payload.product_ids})
+    if not ids:
+        raise HTTPException(status_code=400, detail="No products selected")
+    if len(ids) > 200:
+        raise HTTPException(status_code=400, detail="Too many products in one request (max 200)")
+
+    products = db.query(Product).filter(Product.id.in_(ids)).all()
+    deleted = archived = 0
+    for product in products:
+        if _remove_or_archive_product(db, product)["archived"]:
+            archived += 1
+        else:
+            deleted += 1
+    db.commit()
+
+    missing = sorted(set(ids) - {p.id for p in products})
+    parts = []
+    if deleted:
+        parts.append(f"{deleted} deleted permanently")
+    if archived:
+        parts.append(f"{archived} archived (in past orders — hidden from the store instead)")
+    return {
+        "status": True,
+        "deleted": deleted,
+        "archived": archived,
+        "missing_ids": missing,
+        "message": "; ".join(parts) or "No matching products found",
+    }
+
+
+@router.get("/products/export")
+def export_products(
+    db: Session = Depends(get_db),
+    admin=Depends(get_current_admin_user),
+):
+    """The whole catalogue as a spreadsheet — .xlsx via openpyxl, or a CSV
+    that Excel opens just the same if openpyxl isn't installed."""
+    from datetime import date
+    from io import BytesIO, StringIO
+    from fastapi.responses import StreamingResponse
+    from sqlalchemy.orm import joinedload
+
+    products = (
+        db.query(Product)
+        .options(joinedload(Product.category), joinedload(Product.subcategory))
+        .order_by(Product.id)
+        .all()
+    )
+
+    headers = [
+        "ID", "Name", "Description", "Category", "Subcategory",
+        "Price", "Discount Price", "Sizes", "Colors", "HSN Code",
+        "In Stock", "Visible", "Featured", "Best Seller", "New Arrival",
+        "Rating", "Reviews", "Created At", "Images",
+    ]
+
+    def cell_list(value):
+        if isinstance(value, list):
+            return ", ".join(str(v) for v in value)
+        return value or ""
+
+    def row(p):
+        return [
+            p.id,
+            p.name,
+            p.description or "",
+            p.category.name if p.category else "",
+            p.subcategory.name if p.subcategory else "",
+            p.price,
+            p.discount_price or "",
+            cell_list(p.sizes),
+            cell_list(p.colors),
+            p.hsn_code or "",
+            "Yes" if p.in_stock else "No",
+            "No" if p.is_active is False else "Yes",
+            "Yes" if p.featured else "No",
+            "Yes" if p.best_seller else "No",
+            "Yes" if p.new_arrival else "No",
+            p.rating or 0,
+            p.reviews or 0,
+            p.created_at.strftime("%Y-%m-%d %H:%M") if p.created_at else "",
+            cell_list(p.images),
+        ]
+
+    stamp = date.today().isoformat()
+    try:
+        from openpyxl import Workbook
+
+        wb = Workbook()
+        ws = wb.active
+        ws.title = "Products"
+        ws.append(headers)
+        for p in products:
+            ws.append(row(p))
+        buf = BytesIO()
+        wb.save(buf)
+        buf.seek(0)
+        return StreamingResponse(
+            buf,
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={"Content-Disposition": f'attachment; filename="vastraliya-products-{stamp}.xlsx"'},
+        )
+    except ImportError:
+        import csv
+
+        text = StringIO()
+        writer = csv.writer(text)
+        writer.writerow(headers)
+        for p in products:
+            writer.writerow(row(p))
+        return StreamingResponse(
+            BytesIO(text.getvalue().encode("utf-8-sig")),
+            media_type="text/csv",
+            headers={"Content-Disposition": f'attachment; filename="vastraliya-products-{stamp}.csv"'},
+        )
 
 
 
