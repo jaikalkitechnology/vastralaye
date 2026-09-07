@@ -220,10 +220,10 @@ const NavBar = () => {
         {/* LOGO */}
         <Link to="/" className="flex items-center gap-2.5 shrink-0">
           <img
-            src="/logo-mark.png"
+            src="/logo_vas.png"
             alt=""
             aria-hidden
-            className="h-9 w-9 rounded-md"
+            className="h-11 w-11 object-contain"
           />
           <span className="font-serif text-2xl md:text-[26px] font-semibold leading-none text-espresso">
             Vastra<span className="text-maroon">liya</span>

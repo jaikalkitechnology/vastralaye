@@ -61,11 +61,13 @@ const Footer = () => {
           {/* Brand */}
           <div>
             <Link to="/" className="inline-flex items-center gap-2.5">
+              {/* The logo's maroon artwork needs a light ground to read on
+                  the espresso footer, hence the ivory chip. */}
               <img
-                src="/logo-mark.png"
+                src="/logo_vas.png"
                 alt=""
                 aria-hidden
-                className="h-9 w-9 rounded-md"
+                className="h-10 w-10 rounded-md bg-ivory object-contain p-0.5"
               />
               <span className="font-serif text-2xl font-semibold text-ivory">
                 Vastra<span className="text-gold">liya</span>
