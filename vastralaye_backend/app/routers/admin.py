@@ -2328,6 +2328,24 @@ async def import_reviews(
     i_name = col("customer name", "name")
     i_rating = col("rating")
     i_comment = col("comment", "review")
+    i_created = col("created at", "date")
+
+    def parse_created(row):
+        """Excel date cells arrive as datetime; typed cells as text."""
+        from datetime import datetime
+
+        if i_created is None or i_created >= len(row) or row[i_created] in (None, ""):
+            return None
+        v = row[i_created]
+        if isinstance(v, datetime):
+            return v
+        s = str(v).strip()
+        for fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M", "%Y-%m-%d", "%d-%m-%Y", "%d/%m/%Y"):
+            try:
+                return datetime.strptime(s, fmt)
+            except ValueError:
+                continue
+        return "bad"
 
     if i_pid is None or i_name is None or i_rating is None:
         raise HTTPException(
@@ -2366,6 +2384,11 @@ async def import_reviews(
             errors.append({"row": line_no, "error": "Customer Name is required"})
             continue
 
+        created_at = parse_created(row)
+        if created_at == "bad":
+            errors.append({"row": line_no, "error": "Created At not understood — use YYYY-MM-DD HH:MM"})
+            continue
+
         review_id = cell(row, i_id)
         if review_id:
             try:
@@ -2380,6 +2403,8 @@ async def import_reviews(
             review.name = name[:120]
             review.rating = rating
             review.comment = comment
+            if created_at is not None:
+                review.created_at = created_at
             touched_products.add(review.product_id)
             updated += 1
         else:
@@ -2391,13 +2416,16 @@ async def import_reviews(
             if pid is None or not db.query(Product.id).filter(Product.id == pid).first():
                 errors.append({"row": line_no, "error": f"Product ID '{pid_raw}' not found"})
                 continue
-            db.add(ProductReview(
+            new_review = ProductReview(
                 product_id=pid,
                 user_id=admin.id,
                 name=name[:120],
                 rating=rating,
                 comment=comment,
-            ))
+            )
+            if created_at is not None:
+                new_review.created_at = created_at
+            db.add(new_review)
             touched_products.add(pid)
             created += 1
 
