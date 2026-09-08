@@ -1777,10 +1777,16 @@ const CartPage: React.FC = () => {
     if (Number.isFinite(split) && split > 0) return split;
     return 18;
   };
-  const gstAmount = cartItems.reduce((sum, item) => {
+  /* Prices are GST-inclusive, so the summary splits them: Base Amount is
+     each line divided by (1 + rate), GST is the remainder — the two always
+     add back to the subtotal exactly. */
+  const rawBase = cartItems.reduce((sum, item) => {
     const price = item.product?.discountPrice || item.product?.price || 0;
-    return sum + (price * item.quantity * productGstRate(item.product)) / 100;
+    const line = price * item.quantity;
+    return sum + line / (1 + productGstRate(item.product) / 100);
   }, 0);
+  const baseAmount = Math.round(rawBase * 100) / 100;
+  const gstAmount = Math.round((subtotal - rawBase) * 100) / 100;
   const gstRates = Array.from(new Set(cartItems.map((i) => productGstRate(i.product))));
   const gstLabel = gstRates.length === 1 ? `GST (${gstRates[0]}%)` : 'GST';
 
@@ -2351,11 +2357,8 @@ const CartPage: React.FC = () => {
                 {/* Summary lines */}
                 <div className="space-y-2.5 text-sm pt-2">
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">
-                      Subtotal ({cartItems.length}{' '}
-                      {cartItems.length === 1 ? 'item' : 'items'})
-                    </span>
-                    <span className="text-espresso">{formatPrice(subtotal)}</span>
+                    <span className="text-muted-foreground">Base Amount</span>
+                    <span className="text-espresso">{formatPrice(baseAmount)}</span>
                   </div>
 
                   <div className="flex justify-between">
