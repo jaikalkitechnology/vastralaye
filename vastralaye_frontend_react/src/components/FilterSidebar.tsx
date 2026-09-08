@@ -35,17 +35,29 @@ interface FilterSidebarProps {
    * UI without desync. Fully backward compatible when omitted.
    */
   value?: SidebarFilterValue;
+  /**
+   * When provided, clicking a category/subcategory row hands the whole row to
+   * the parent (which typically navigates to that category's page) instead of
+   * toggling the in-place filter. The selected mark still follows `value`.
+   */
+  onCategoryClick?: (category: Category) => void;
+  onSubcategoryClick?: (subcategory: Subcategory) => void;
+  /** Overrides the "N products match your filters" figure when the parent's
+      result set is narrower than the `products` list used for counts. */
+  resultCount?: number;
 }
 
-interface Category {
+export interface Category {
   id: number;
   name: string;
+  slug?: string;
 }
 
-interface Subcategory {
+export interface Subcategory {
   id: number;
   name: string;
   category_id: number;
+  slug?: string;
 }
 
 const DEFAULT_PRICE: [number, number] = [0, 5000];
@@ -203,10 +215,12 @@ const FilterSidebar = ({
   onFilterChange,
   className,
   value,
+  onCategoryClick,
+  onSubcategoryClick,
+  resultCount,
 }: FilterSidebarProps) => {
   const [categories,    setCategories]    = useState<Category[]>([]);
   const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
-  const [dataReady,     setDataReady]     = useState(false);
 
   const [filters, setFilters] = useState({
     category_id:    null as number | null,
@@ -249,7 +263,6 @@ const FilterSidebar = ({
         ]);
         setCategories((catRes.data as Category[]) || []);
         setSubcategories((subRes.data as Subcategory[]) || []);
-        setDataReady(true);
       } catch (err) {
         console.error("Category load error:", err);
         setCategories([]);
@@ -258,41 +271,6 @@ const FilterSidebar = ({
     };
     load();
   }, []);
-
-  // ── Debug: runs once when both products + subcategories are ready ──
-  useEffect(() => {
-    if (!dataReady || products.length === 0 || subcategories.length === 0) return;
-
-    console.group("🔍 FilterSidebar — Subcategory Count Debug");
-    const sample = products[0] as any;
-    console.log("📦 First product fields:", Object.keys(sample));
-    console.log("📦 First product raw:", sample);
-
-    // Find which key holds subcategory info
-    const subKey = Object.keys(sample).find((k) =>
-      k.toLowerCase().includes("sub"),
-    );
-    console.log("🔑 Detected sub-key:", subKey ?? "NOT FOUND");
-
-    // All unique subcategory IDs in products
-    const uniqueSubIds = [
-      ...new Set(products.map((p) => getProductSubcategoryId(p))),
-    ];
-    console.log("📊 Unique subcategory IDs in products:", uniqueSubIds);
-    console.log(
-      "📋 Subcategory IDs from API:",
-      subcategories.map((s) => ({ id: s.id, name: s.name })),
-    );
-
-    // Per-subcategory count
-    subcategories.forEach((sub) => {
-      const count = products.filter(
-        (p) => String(getProductSubcategoryId(p)) === String(sub.id),
-      ).length;
-      console.log(`  ✅ "${sub.name}" (id=${sub.id}) → ${count} products`);
-    });
-    console.groupEnd();
-  }, [dataReady, products.length, subcategories.length]);
 
   // ── Notify parent ──
   useEffect(() => {
@@ -443,7 +421,9 @@ const FilterSidebar = ({
                   {/* Category row */}
                   <button
                     type="button"
-                    onClick={() => handleCategoryChange(cat.id)}
+                    onClick={() =>
+                      onCategoryClick ? onCategoryClick(cat) : handleCategoryChange(cat.id)
+                    }
                     className={`flex w-full cursor-pointer items-center justify-between gap-2 py-1
                                 text-left text-[13px] transition-colors
                                 ${isSelected
@@ -475,7 +455,11 @@ const FilterSidebar = ({
                           <button
                             key={sub.id}
                             type="button"
-                            onClick={() => handleSubcategoryChange(sub.id)}
+                            onClick={() =>
+                              onSubcategoryClick
+                                ? onSubcategoryClick(sub)
+                                : handleSubcategoryChange(sub.id)
+                            }
                             className={`flex w-full cursor-pointer items-center justify-between gap-2 py-1
                                         text-left text-[13px] transition-colors
                                         ${isSubSelected
@@ -536,7 +520,7 @@ const FilterSidebar = ({
       {/* ── RESULTS COUNT ── */}
       <div className="px-4 py-4">
         <p className="text-[13px] text-muted-foreground">
-          <span className="font-medium text-espresso">{products.length}</span>{" "}
+          <span className="font-medium text-espresso">{resultCount ?? products.length}</span>{" "}
           products match your filters
         </p>
         <button
