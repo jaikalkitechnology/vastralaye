@@ -43,10 +43,10 @@ import {
   addProductReview
 } from '@/api/apihelper';
 
-/** Most of one product a single order may carry. Enforced in the cart
- *  reducer, so no add or update path can exceed it; the steppers also
- *  disable their + button here so shoppers see the ceiling. */
-export const MAX_QTY_PER_PRODUCT = 2;
+/** Most of one product a single order may carry. Infinity = no limit —
+ *  every clamp and stepper guard reads this, so set a number here (it was
+ *  2, then 5, at different times) to bring a ceiling back. */
+export const MAX_QTY_PER_PRODUCT = Infinity;
 
 interface StoreState {
   products: Product[];
