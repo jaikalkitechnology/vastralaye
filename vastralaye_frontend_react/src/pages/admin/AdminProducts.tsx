@@ -721,7 +721,9 @@ export default function AdminProductsPage(): JSX.Element {
     try {
       const fd = new FormData();
       fd.append("file", file);
-      const res = await axiosInstance.post(ENDPOINTS.productsImport, fd);
+      const res = await axiosInstance.post(ENDPOINTS.productsImport, fd, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
       const data = res.data as { message?: string; errors?: { row: number; error: string }[] };
       toast.success(data?.message || "Import finished");
       if (data?.errors?.length) {
