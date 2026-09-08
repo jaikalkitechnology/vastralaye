@@ -989,6 +989,7 @@ def get_new_arrivals(
             "hsn_code": p.hsn_code,
             "sgst": p.sgst,
             "cgst": p.cgst,
+            "igst": p.igst,
             "rating": p.rating,
             "reviews": p.reviews,
             "featured": p.featured,
@@ -1075,6 +1076,7 @@ async def create_product(
     details: Optional[str] = Form(None),
     sgst: Optional[float] = Form(None),
     cgst: Optional[float] = Form(None),
+    igst: Optional[float] = Form(None),
     db: Session = Depends(get_db),
     admin=Depends(get_current_admin_user),
 ):
@@ -1084,6 +1086,7 @@ async def create_product(
     price = validate_price(price)
     sgst = _validate_gst_percent(sgst, "SGST")
     cgst = _validate_gst_percent(cgst, "CGST")
+    igst = _validate_gst_percent(igst, "IGST")
 
     if discount_price is not None:
         discount_price = validate_price(discount_price)
@@ -1169,6 +1172,7 @@ async def create_product(
         new_arrival=new_arrival,
         sgst=sgst,
         cgst=cgst,
+        igst=igst,
     )
 
     product.images = image_urls
@@ -1253,6 +1257,7 @@ def get_best_sellers(
             "hsn_code": p.hsn_code,
             "sgst": p.sgst,
             "cgst": p.cgst,
+            "igst": p.igst,
             "rating": p.rating,
             "reviews": p.reviews,
             "featured": p.featured,
@@ -1487,6 +1492,7 @@ def list_products(
             "hsn_code": p.hsn_code,
             "sgst": p.sgst,
             "cgst": p.cgst,
+            "igst": p.igst,
             "rating": p.rating,
             "reviews": p.reviews,
             "featured": p.featured,
@@ -1527,6 +1533,7 @@ async def update_product(
         details: Optional[str] = Form(None),
         sgst: Optional[float] = Form(None),
         cgst: Optional[float] = Form(None),
+        igst: Optional[float] = Form(None),
 
         db: Session = Depends(get_db),
         admin=Depends(get_current_admin_user)
@@ -1612,6 +1619,8 @@ async def update_product(
         product.sgst = _validate_gst_percent(sgst, "SGST")
     if cgst is not None:
         product.cgst = _validate_gst_percent(cgst, "CGST")
+    if igst is not None:
+        product.igst = _validate_gst_percent(igst, "IGST")
 
     # --------------------------------------
     # COLORS & SIZES
@@ -1885,7 +1894,7 @@ def export_products(
     headers = [
         "ID", "Name", "Description", "Category", "Subcategory",
         "Price", "Discount Price", "Sizes", "Colors", "HSN Code",
-        "SGST %", "CGST %",
+        "SGST %", "CGST %", "IGST %",
         "In Stock", "Visible", "Featured", "Best Seller", "New Arrival",
         "Rating", "Reviews", "Created At", "Images",
     ]
@@ -1909,6 +1918,7 @@ def export_products(
             p.hsn_code or "",
             p.sgst if p.sgst is not None else "",
             p.cgst if p.cgst is not None else "",
+            p.igst if p.igst is not None else "",
             "Yes" if p.in_stock else "No",
             "No" if p.is_active is False else "Yes",
             "Yes" if p.featured else "No",
@@ -2017,6 +2027,7 @@ async def import_products(
         "hsn": col("hsn code"),
         "sgst": col("sgst %", "sgst"),
         "cgst": col("cgst %", "cgst"),
+        "igst": col("igst %", "igst"),
         "in_stock": col("in stock"),
         "visible": col("visible"),
         "featured": col("featured"),
@@ -2150,6 +2161,9 @@ async def import_products(
             cgst = as_float(cell(row, "cgst"))
             if cgst is not None:
                 product.cgst = _validate_gst_percent(cgst, "CGST")
+            igst = as_float(cell(row, "igst"))
+            if igst is not None:
+                product.igst = _validate_gst_percent(igst, "IGST")
 
             for key, attr in (
                 ("in_stock", "in_stock"), ("visible", "is_active"),

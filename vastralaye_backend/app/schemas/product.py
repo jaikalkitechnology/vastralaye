@@ -115,6 +115,7 @@ class ProductOut(ProductBase):
     hsn_code: Optional[str] = None
     sgst: Optional[float] = None
     cgst: Optional[float] = None
+    igst: Optional[float] = None
 
     # -------- FIELD VALIDATORS (Pydantic v2) --------
     @field_validator("sizes", mode="before")

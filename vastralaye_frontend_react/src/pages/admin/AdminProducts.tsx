@@ -99,6 +99,7 @@ type ProductType = {
   /** GST split, percentages. */
   sgst?: number | null;
   cgst?: number | null;
+  igst?: number | null;
 };
 
 type CategoryType = {
@@ -317,6 +318,7 @@ export default function AdminProductsPage(): JSX.Element {
     discount_price: "",
     sgst: "",
     cgst: "",
+    igst: "",
     category_id: "",
     subcategory_id: "",
     colors: "",
@@ -594,7 +596,7 @@ export default function AdminProductsPage(): JSX.Element {
   const resetForm = () => {
     setForm({
       name: "", description: "", details: "", specifications: "", highlights: "",
-      price: "", discount_price: "", sgst: "", cgst: "", category_id: "", subcategory_id: "",
+      price: "", discount_price: "", sgst: "", cgst: "", igst: "", category_id: "", subcategory_id: "",
       colors: "", sizes: "", in_stock: true, featured: false, best_seller: false,
       new_arrival: false, images: [], rating: "", reviews: "", video: null, pdf: null,
     });
@@ -624,6 +626,7 @@ export default function AdminProductsPage(): JSX.Element {
       formData.append("discount_price", form.discount_price || "0");
       if (form.sgst) formData.append("sgst", form.sgst);
       if (form.cgst) formData.append("cgst", form.cgst);
+      if (form.igst) formData.append("igst", form.igst);
       formData.append("category_id", form.category_id);
       formData.append("subcategory_id", form.subcategory_id || "");
       formData.append("colors", form.colors);
@@ -1441,6 +1444,10 @@ export default function AdminProductsPage(): JSX.Element {
                   <div className="space-y-2">
                     <Label className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">CGST (%)</Label>
                     <Input type="number" step="0.01" min="0" max="100" value={form.cgst} onChange={(e) => updateForm("cgst", e.target.value)} placeholder="e.g. 2.5" className="bg-white rounded-sm border-border text-[13px] focus:border-maroon focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">IGST (%)</Label>
+                    <Input type="number" step="0.01" min="0" max="100" value={form.igst} onChange={(e) => updateForm("igst", e.target.value)} placeholder="e.g. 5" className="bg-white rounded-sm border-border text-[13px] focus:border-maroon focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0" />
                   </div>
                   <div className="space-y-2">
                     <Label className="text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso">Sizes</Label>

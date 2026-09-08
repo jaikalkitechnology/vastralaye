@@ -72,6 +72,7 @@ export default function AdminEditProductForm({
     discount_price: "",
     sgst: "",
     cgst: "",
+    igst: "",
     category_id: "",
     subcategory_id: "",
     colors: "",
@@ -114,6 +115,7 @@ export default function AdminEditProductForm({
         discount_price: "",
         sgst: "",
         cgst: "",
+        igst: "",
         category_id: "",
         subcategory_id: "",
         colors: "",
@@ -163,6 +165,7 @@ export default function AdminEditProductForm({
       discount_price: (product.discount_price ?? "").toString(),
       sgst: ((product as any).sgst ?? "").toString(),
       cgst: ((product as any).cgst ?? "").toString(),
+      igst: ((product as any).igst ?? "").toString(),
       category_id: (product.category_id ?? "").toString(),
       subcategory_id: (product.subcategory_id ?? "").toString(),
       colors: Array.isArray(product.colors) ? (product.colors as string[]).join(",") : ((product.colors as string) ?? ""),
@@ -311,6 +314,7 @@ export default function AdminEditProductForm({
       const dp = toMaybeNumberString(form.discount_price); if (dp !== null) fd.append("discount_price", dp);
       const sg = toMaybeNumberString(form.sgst); if (sg !== null) fd.append("sgst", sg);
       const cg = toMaybeNumberString(form.cgst); if (cg !== null) fd.append("cgst", cg);
+      const ig = toMaybeNumberString(form.igst); if (ig !== null) fd.append("igst", ig);
       const sub = toMaybeIntString(form.subcategory_id); if (sub !== null) fd.append("subcategory_id", sub);
 
       const colors = nonEmpty(form.colors); if (colors) fd.append("colors", colors);
@@ -506,6 +510,23 @@ export default function AdminEditProductForm({
                       value={form.sgst}
                       onChange={(e) => updateForm("sgst", e.target.value)}
                       placeholder="e.g. 2.5"
+                      className="h-10 text-[13px] bg-white rounded-sm border-border focus:border-maroon focus-visible:ring-0 focus-visible:ring-offset-0"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso mb-2">
+                      <span>IGST (%)</span>
+                      <span className="text-[10px] text-muted-foreground font-normal normal-case tracking-normal">(Optional — used in the cart)</span>
+                    </label>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      max="100"
+                      value={form.igst}
+                      onChange={(e) => updateForm("igst", e.target.value)}
+                      placeholder="e.g. 5"
                       className="h-10 text-[13px] bg-white rounded-sm border-border focus:border-maroon focus-visible:ring-0 focus-visible:ring-offset-0"
                     />
                   </div>
