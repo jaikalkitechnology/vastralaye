@@ -1,6 +1,44 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useStore, MAX_QTY_PER_PRODUCT } from '@/contexts/StoreContext';
+
+/* ---------- GST helpers, shared by the cart summary and checkout rail ----------
+   Prices are GST-inclusive; the split is informational. Place of supply
+   decides the heads: Maharashtra (the seller's state) pays SGST+CGST,
+   every other state pays IGST — same money either way. */
+const productGstRate = (p: any): number => {
+  const igst = Number(p?.igst);
+  if (Number.isFinite(igst) && igst > 0) return igst;
+  const split = Number(p?.sgst ?? 0) + Number(p?.cgst ?? 0);
+  if (Number.isFinite(split) && split > 0) return split;
+  return 18;
+};
+
+const gstBreakup = (items: any[]) => {
+  let inclusive = 0;
+  let base = 0;
+  const rates = new Set<number>();
+  items.forEach((item) => {
+    const price = item.product?.discountPrice || item.product?.price || 0;
+    const line = price * item.quantity;
+    inclusive += line;
+    const rate = productGstRate(item.product);
+    rates.add(rate);
+    base += line / (1 + rate / 100);
+  });
+  const gst = Math.round((inclusive - base) * 100) / 100;
+  const sgst = Math.round((gst / 2) * 100) / 100;
+  return {
+    baseAmount: Math.round(base * 100) / 100,
+    gst,
+    sgst,
+    cgst: Math.round((gst - sgst) * 100) / 100,
+    uniformRate: rates.size === 1 && items.length > 0 ? Array.from(rates)[0] : null,
+  };
+};
+
+const isMaharashtra = (s?: string | null) => (s || '').toLowerCase().includes('maharashtra');
+const fmtRate = (r: number) => (Number.isInteger(r) ? String(r) : String(Math.round(r * 100) / 100));
 import { Product } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -691,6 +729,10 @@ const PaymentMethodModal: React.FC<PaymentMethodModalProps> = ({
   );
   const modalShipping = modalSubtotal > 999 ? 0 : 150;
 
+  /* The rail's tax heads follow the shipping state as the customer types:
+     Maharashtra shows the SGST+CGST split, anywhere else shows IGST. */
+  const modalTaxes = gstBreakup(cartItems);
+
   const [selectedMethod, setSelectedMethod] = useState<string>('cod');
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [addressLine1, setAddressLine1] = useState('');
@@ -1121,7 +1163,7 @@ const PaymentMethodModal: React.FC<PaymentMethodModalProps> = ({
                 </div>
 
                 <p className="hidden md:block font-serif text-[15px] leading-[1.55] text-ivory/90 mt-5">
-                  Almost yours — woven by hand, wrapped with care.
+                  Almost yours — packed and shipped with care.
                 </p>
 
                 {/* Items */}
@@ -1167,11 +1209,34 @@ const PaymentMethodModal: React.FC<PaymentMethodModalProps> = ({
                 {/* Totals */}
                 <div className="mt-3 pt-3 md:mt-4 md:pt-3.5 border-t border-ivory/15">
                   <div className="flex justify-between text-[12px] text-ivory/60 py-[3px]">
-                    <span>Subtotal</span>
+                    <span>Base Amount</span>
                     <span className="text-ivory/95 font-medium">
-                      {formatPrice(modalSubtotal)}
+                      {formatPrice(modalTaxes.baseAmount)}
                     </span>
                   </div>
+                  {isMaharashtra(addressState) ? (
+                    <>
+                      <div className="flex justify-between text-[12px] text-ivory/60 py-[3px]">
+                        <span>
+                          SGST{modalTaxes.uniformRate !== null ? ` (${fmtRate(modalTaxes.uniformRate / 2)}%)` : ''}
+                        </span>
+                        <span className="text-ivory/95 font-medium">{formatPrice(modalTaxes.sgst)}</span>
+                      </div>
+                      <div className="flex justify-between text-[12px] text-ivory/60 py-[3px]">
+                        <span>
+                          CGST{modalTaxes.uniformRate !== null ? ` (${fmtRate(modalTaxes.uniformRate / 2)}%)` : ''}
+                        </span>
+                        <span className="text-ivory/95 font-medium">{formatPrice(modalTaxes.cgst)}</span>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="flex justify-between text-[12px] text-ivory/60 py-[3px]">
+                      <span>
+                        IGST{modalTaxes.uniformRate !== null ? ` (${fmtRate(modalTaxes.uniformRate)}%)` : ''}
+                      </span>
+                      <span className="text-ivory/95 font-medium">{formatPrice(modalTaxes.gst)}</span>
+                    </div>
+                  )}
                   {discount > 0 && (
                     <div className="flex justify-between text-[12px] text-ivory/60 py-[3px]">
                       <span>Coupon</span>
@@ -1581,7 +1646,7 @@ const OrderSuccessModal: React.FC<OrderSuccessModalProps> = ({
 const CartPage: React.FC = () => {
   const navigate = useNavigate();
   const { state, updateCartItem, removeFromCart, clearCart } = useStore();
-  const { cart, products } = state;
+  const { cart, products, currentUser } = state;
 
   const { isLoggedIn } = useAuthState();
 
@@ -1767,28 +1832,18 @@ const CartPage: React.FC = () => {
 
   const shipping = subtotal > 999 ? 0 : 150;
 
-  /* Every product carries its own GST rate: IGST first, the SGST+CGST
-     split as fallback, and 18 for products with no rate set yet. The GST
-     line is informational — prices are GST-inclusive, nothing is added. */
-  const productGstRate = (p: any): number => {
-    const igst = Number(p?.igst);
-    if (Number.isFinite(igst) && igst > 0) return igst;
-    const split = Number(p?.sgst ?? 0) + Number(p?.cgst ?? 0);
-    if (Number.isFinite(split) && split > 0) return split;
-    return 18;
-  };
-  /* Prices are GST-inclusive, so the summary splits them: Base Amount is
-     each line divided by (1 + rate), GST is the remainder — the two always
-     add back to the subtotal exactly. */
-  const rawBase = cartItems.reduce((sum, item) => {
-    const price = item.product?.discountPrice || item.product?.price || 0;
-    const line = price * item.quantity;
-    return sum + line / (1 + productGstRate(item.product) / 100);
-  }, 0);
-  const baseAmount = Math.round(rawBase * 100) / 100;
-  const gstAmount = Math.round((subtotal - rawBase) * 100) / 100;
-  const gstRates = Array.from(new Set(cartItems.map((i) => productGstRate(i.product))));
-  const gstLabel = gstRates.length === 1 ? `GST (${gstRates[0]}%)` : 'GST';
+  /* Tax heads follow the delivery state: Maharashtra (the seller's state)
+     splits into SGST+CGST, everywhere else pays IGST. Before any state is
+     known the line stays a neutral "GST". Amounts are identical either
+     way — prices are GST-inclusive and the split is informational. */
+  const taxes = gstBreakup(cartItems);
+  const { baseAmount, gst: gstAmount } = taxes;
+  const buyerState = (currentUser as any)?.state || '';
+  const taxMode = !buyerState.trim() ? 'gst' : isMaharashtra(buyerState) ? 'split' : 'igst';
+  const gstLabel =
+    taxes.uniformRate !== null
+      ? `${taxMode === 'igst' ? 'IGST' : 'GST'} (${fmtRate(taxes.uniformRate)}%)`
+      : taxMode === 'igst' ? 'IGST' : 'GST';
 
   const totalBeforeDiscount = subtotal + shipping - discount;
 
@@ -2361,10 +2416,27 @@ const CartPage: React.FC = () => {
                     <span className="text-espresso">{formatPrice(baseAmount)}</span>
                   </div>
 
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">{gstLabel}</span>
-                    <span className="text-espresso">{formatPrice(gstAmount)}</span>
-                  </div>
+                  {taxMode === 'split' ? (
+                    <>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">
+                          SGST{taxes.uniformRate !== null ? ` (${fmtRate(taxes.uniformRate / 2)}%)` : ''}
+                        </span>
+                        <span className="text-espresso">{formatPrice(taxes.sgst)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">
+                          CGST{taxes.uniformRate !== null ? ` (${fmtRate(taxes.uniformRate / 2)}%)` : ''}
+                        </span>
+                        <span className="text-espresso">{formatPrice(taxes.cgst)}</span>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">{gstLabel}</span>
+                      <span className="text-espresso">{formatPrice(gstAmount)}</span>
+                    </div>
+                  )}
 
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Shipping</span>
