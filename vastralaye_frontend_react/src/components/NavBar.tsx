@@ -555,8 +555,9 @@ const NavBar = () => {
                   onClick={closeMobileMenu}
                 >
                   <span>{cat.name}</span>
+                  {/* Visible-product count, served by the categories API */}
                   <span className="text-xs text-muted-foreground">
-                    {cat.subcategories?.length || 0}
+                    {cat.product_count ?? 0}
                   </span>
                 </Link>
               ))}
