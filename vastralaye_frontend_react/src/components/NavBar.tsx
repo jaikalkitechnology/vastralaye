@@ -216,13 +216,16 @@ const NavBar = () => {
       {/* ANNOUNCEMENT BAR — text and on/off from Admin › Categories */}
       {showTopBar && <TopBarStrip text={topBarText} />}
       {/* HEADER */}
-      <div className="container flex items-center h-16 px-4">
-        {/* LOGO — the official artwork, untouched */}
-        <Link to="/" className="flex items-center shrink-0">
+      <div className="container flex items-center h-16 md:h-20 px-4">
+        {/* LOGO — oversized on desktop, hanging below the header bar like a
+            badge (the reference mockup). The Link reserves the horizontal
+            slot; the artwork itself is absolutely placed so it can spill
+            past the bar without stretching it. */}
+        <Link to="/" className="relative block shrink-0 h-full w-[64px] md:w-[120px]">
           <img
             src="/logo_vas.png"
             alt="Vastraliya"
-            className="h-14 w-14 object-contain"
+            className="absolute left-0 top-1 z-20 h-14 w-14 md:h-[116px] md:w-[116px] object-contain"
           />
         </Link>
 
