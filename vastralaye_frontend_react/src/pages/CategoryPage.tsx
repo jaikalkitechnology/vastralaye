@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import ProductGrid from '@/components/ProductGrid';
 import FilterSidebar from '@/components/FilterSidebar';
 import { Input } from '@/components/ui/input';
@@ -80,14 +80,15 @@ const Breadcrumb = ({ items }: { items: Array<{ label: string; href: string; ico
 
 const CategoryPage = () => {
   const { slug } = useParams<{ slug: string }>();
+  const navigate = useNavigate();
 
   // State
   const [categories, setCategories] = useState<Category[]>([]);
   const [subcategories, setSubcategories] = useState<Category[]>([]);
   const [currentCategory, setCurrentCategory] = useState<Category | null>(null);
   const [currentSubCategory, setCurrentSubCategory] = useState<Category | null>(null);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [sidebarFilters, setSidebarFilters] = useState<any>(null);
   const [localSearchQuery, setLocalSearchQuery] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortOption, setSortOption] = useState<SortOption>('featured');
@@ -125,48 +126,26 @@ const CategoryPage = () => {
     }
   }, []);
 
-  const fetchProductsData = useCallback(async (categoryId?: string, subcategoryId?: string, search?: string) => {
+  /* The whole catalogue loads once; the page scopes it to the current
+     category client-side. That way the sidebar can show every category with
+     its real product count, not zeros. */
+  const fetchProductsData = useCallback(async () => {
     try {
       setProductsLoading(true);
       setError(null);
 
       const productsData = await listProducts();
-
       if (!Array.isArray(productsData)) {
         console.error('Products data is not an array:', productsData);
-        setProducts([]);
-        setFilteredProducts([]);
-        return [];
+        setAllProducts([]);
+        return;
       }
-
-      let filteredData = productsData;
-
-      if (subcategoryId) {
-        filteredData = filteredData.filter(product => product.subcategory === subcategoryId);
-      } else if (categoryId) {
-        filteredData = filteredData.filter(product => product.category_id === (categoryId as unknown as number));
-      }
-
-      if (search?.trim()) {
-        const query = search.toLowerCase().trim();
-        filteredData = filteredData.filter(product =>
-          product.name.toLowerCase().includes(query) ||
-          product.description?.toLowerCase().includes(query) ||
-          (Array.isArray(product.tags) && product.tags.some(tag => tag.toLowerCase().includes(query))) ||
-          product.brand?.toLowerCase().includes(query)
-        );
-      }
-
-      setProducts(filteredData);
-      setFilteredProducts(filteredData);
-      return filteredData;
+      setAllProducts(productsData);
     } catch (err) {
       console.error('Error loading products:', err);
       const errorMessage = err instanceof Error ? err.message : 'Failed to load products';
       setError(errorMessage);
-      setProducts([]);
-      setFilteredProducts([]);
-      throw err;
+      setAllProducts([]);
     } finally {
       setProductsLoading(false);
     }
@@ -206,16 +185,10 @@ const CategoryPage = () => {
     setCurrentSubCategory(null);
   }, [slug, categories, subcategories]);
 
-  // Fetch Products when category/subcategory or search changes
+  // Fetch the catalogue once; scoping below reacts to category/search changes
   useEffect(() => {
-    if (!currentCategory && !currentSubCategory) {
-      setProducts([]);
-      setFilteredProducts([]);
-      return;
-    }
-
-    fetchProductsData(currentCategory?.id, currentSubCategory?.id, searchQuery);
-  }, [currentCategory, currentSubCategory, searchQuery, fetchProductsData]);
+    fetchProductsData();
+  }, [fetchProductsData]);
 
   // Memoized Computed Values
   const breadcrumbItems = useMemo(() => {
@@ -242,12 +215,64 @@ const CategoryPage = () => {
     return items;
   }, [currentCategory, currentSubCategory]);
 
-  const sortedAndFilteredProducts = useMemo(() => {
-    if (!Array.isArray(filteredProducts)) {
-      console.warn('filteredProducts is not an array:', filteredProducts);
-      return [];
+  /* Keeps the sidebar's Category section marking the page we're on; clicking
+     another category there navigates rather than filtering in place. */
+  const sidebarValue = useMemo(
+    () => ({
+      category_id: currentCategory ? Number(currentCategory.id) : null,
+      subcategory_id: currentSubCategory ? Number(currentSubCategory.id) : null,
+    }),
+    [currentCategory, currentSubCategory]
+  );
+
+  // Products belonging to the category (or subcategory) this page shows
+  const scopedProducts = useMemo(() => {
+    if (!currentCategory && !currentSubCategory) return [];
+
+    let result = allProducts;
+
+    if (currentSubCategory) {
+      result = result.filter(
+        (p: any) => String(p.subcategory_id ?? p.subcategory ?? '') === String(currentSubCategory.id)
+      );
+    } else if (currentCategory) {
+      result = result.filter(
+        (p: any) => String(p.category_id ?? p.category?.id ?? '') === String(currentCategory.id)
+      );
     }
 
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim();
+      result = result.filter(product =>
+        product.name.toLowerCase().includes(query) ||
+        product.description?.toLowerCase().includes(query) ||
+        (Array.isArray(product.tags) && product.tags.some(tag => tag.toLowerCase().includes(query))) ||
+        product.brand?.toLowerCase().includes(query)
+      );
+    }
+
+    return result;
+  }, [allProducts, currentCategory, currentSubCategory, searchQuery]);
+
+  // Sidebar refinements (price / availability / highlights) on top of the scope
+  const filteredProducts = useMemo(() => {
+    const f = sidebarFilters;
+    if (!f) return scopedProducts;
+
+    return scopedProducts.filter((p: any) => {
+      const price = p.discountPrice ?? p.discount_price ?? p.price ?? 0;
+      if (f.min_price != null && price < f.min_price) return false;
+      // The slider ceiling reads as "no upper limit" so ₹5000+ pieces stay visible
+      if (f.max_price != null && f.max_price < 5000 && price > f.max_price) return false;
+      if (f.in_stock === true && !p.in_stock) return false;
+      if (f.featured === true && !p.featured) return false;
+      if (f.best_seller === true && !p.best_seller) return false;
+      if (f.new_arrival === true && !p.new_arrival) return false;
+      return true;
+    });
+  }, [scopedProducts, sidebarFilters]);
+
+  const sortedAndFilteredProducts = useMemo(() => {
     let result = [...filteredProducts];
 
     switch (sortOption) {
@@ -291,14 +316,9 @@ const CategoryPage = () => {
   }, [sortedAndFilteredProducts, currentPage, productsPerPage]);
 
   // Event Handlers
-  const handleFilterChange = useCallback((filtered: Product[] | any) => {
-    if (Array.isArray(filtered)) {
-      setFilteredProducts(filtered);
-      setCurrentPage(1);
-    } else {
-      console.error('FilterSidebar returned non-array value:', filtered);
-      setFilteredProducts([]);
-    }
+  const handleFilterChange = useCallback((filters: any) => {
+    setSidebarFilters(filters);
+    setCurrentPage(1);
   }, []);
 
   const handleSearch = useCallback((e: React.FormEvent) => {
@@ -349,13 +369,11 @@ const CategoryPage = () => {
   const handleRetry = useCallback(async () => {
     try {
       await fetchInitialData();
-      if (currentCategory || currentSubCategory) {
-        await fetchProductsData(currentCategory?.id, currentSubCategory?.id, searchQuery);
-      }
+      await fetchProductsData();
     } catch (err) {
       console.error('Retry failed:', err);
     }
-  }, [fetchInitialData, fetchProductsData, currentCategory, currentSubCategory, searchQuery]);
+  }, [fetchInitialData, fetchProductsData]);
 
   // Loading and Error States
   if (loading) {
@@ -424,8 +442,12 @@ const CategoryPage = () => {
           <FilterSidebar
             isOpen={isFilterOpen}
             onClose={() => setIsFilterOpen(false)}
-            products={products}
+            products={allProducts}
             onFilterChange={handleFilterChange}
+            value={sidebarValue}
+            onCategoryClick={(cat) => navigate(`/category/${cat.slug || cat.id}`)}
+            onSubcategoryClick={(sub) => navigate(`/category/${sub.slug || sub.id}`)}
+            resultCount={sortedAndFilteredProducts.length}
             className="lg:w-64 lg:flex-shrink-0"
           />
 
