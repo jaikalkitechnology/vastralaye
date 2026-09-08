@@ -216,19 +216,15 @@ const NavBar = () => {
       {/* ANNOUNCEMENT BAR — text and on/off from Admin › Categories */}
       {showTopBar && <TopBarStrip text={topBarText} />}
       {/* HEADER */}
-      <div className="container flex items-center h-14 sm:h-16 md:h-20 px-4">
-        {/* LOGO — the badge look scales with the screen: inline on phones,
-            a modest overhang on tablets, the full 116px spill on desktop.
-            The Link reserves the horizontal slot; the artwork is absolutely
-            placed so the overflow never stretches the bar. */}
-        <Link
-          to="/"
-          className="relative block shrink-0 h-full w-[48px] sm:w-[60px] md:w-[104px] lg:w-[122px]"
-        >
+      <div className="container flex items-center h-14 sm:h-16 md:h-24 lg:h-[120px] px-4">
+        {/* LOGO — lives fully inside the bar, vertically centred on the same
+            line as the menu, search and icons; the bar is tall enough to hold
+            it at every width, so nothing hangs over the page. */}
+        <Link to="/" className="flex items-center shrink-0">
           <img
             src="/logo_vas.png"
             alt="Vastraliya"
-            className="absolute left-0 top-1 z-20 object-contain h-12 w-12 sm:h-14 sm:w-14 md:h-[96px] md:w-[96px] lg:h-[116px] lg:w-[116px]"
+            className="object-contain h-12 w-12 sm:h-14 sm:w-14 md:h-20 md:w-20 lg:h-[100px] lg:w-[100px]"
           />
         </Link>
 
