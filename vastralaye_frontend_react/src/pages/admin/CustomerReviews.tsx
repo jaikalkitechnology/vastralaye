@@ -611,7 +611,9 @@ export default function Reviews() {
       const fd = new FormData();
       fd.append("file", file);
       const res = await axios.post(`${BASE_URL}/admin/reviews/import`, fd, {
-        headers: { Authorization: `Bearer ${token}` },
+        // The global axios default forces JSON on POSTs; without this the
+        // file never reaches the server (422 "file field required").
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" },
       });
       const data = res.data as { message?: string; errors?: { row: number; error: string }[] };
       toast.success(data?.message || "Import finished");
