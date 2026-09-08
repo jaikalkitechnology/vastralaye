@@ -39,6 +39,19 @@ async def list_categories(
             query = query.filter(CATEGORY_VISIBLE)
 
         categories = query.order_by(Category.name).all()
+
+        # One grouped query attaches each category's visible-product count —
+        # same is_active filter as the products list, so menu figures always
+        # match what the category page actually shows.
+        counts = dict(
+            db.query(Product.category_id, func.count(Product.id))
+            .filter(Product.is_active == True)
+            .group_by(Product.category_id)
+            .all()
+        )
+        for category in categories:
+            category.product_count = counts.get(category.id, 0)
+
         return categories
     except Exception as e:
         raise HTTPException(

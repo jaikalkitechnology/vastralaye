@@ -16,6 +16,9 @@ class CategoryCreate(CategoryBase):
 
 class CategoryResponse(CategoryBase):
     id: int
+    # How many visible products the category holds — the storefront menus
+    # show this figure next to each category name.
+    product_count: Optional[int] = None
 
     model_config = ConfigDict(from_attributes=True)
 
