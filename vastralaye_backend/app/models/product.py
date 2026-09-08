@@ -63,10 +63,13 @@ class Product(Base):
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     hsn_code = Column(String(20))   # NEW FIELD
-    # GST split for this product, as percentages (e.g. 2.5 + 2.5 for 5% GST).
-    # schema_sync adds them NULLable on the live database.
+    # GST for this product, as percentages. sgst+cgst is the intra-state
+    # split; igst is the inter-state rate (normally their sum). The cart
+    # quotes GST from igst. schema_sync adds all three NULLable on the
+    # live database.
     sgst = Column(Float, nullable=True)
     cgst = Column(Float, nullable=True)
+    igst = Column(Float, nullable=True)
     # ------------------ Relationships ----------------
     category = relationship("Category", back_populates="products")
     subcategory = relationship("SubCategory", back_populates="products")

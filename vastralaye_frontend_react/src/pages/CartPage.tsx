@@ -1196,7 +1196,7 @@ const PaymentMethodModal: React.FC<PaymentMethodModalProps> = ({
                     </span>
                   </div>
                   <p className="text-[9px] text-ivory/45 text-right mt-1">
-                    Inclusive of GST (18%)
+                    Inclusive of GST
                   </p>
                 </div>
               </div>
@@ -1766,14 +1766,27 @@ const CartPage: React.FC = () => {
   );
 
   const shipping = subtotal > 999 ? 0 : 150;
-  const gstRate = 18;
-  const gstAmount = (subtotal * gstRate) / 100;
+
+  /* Every product carries its own GST rate: IGST first, the SGST+CGST
+     split as fallback, and 18 for products with no rate set yet. The GST
+     line is informational — prices are GST-inclusive, nothing is added. */
+  const productGstRate = (p: any): number => {
+    const igst = Number(p?.igst);
+    if (Number.isFinite(igst) && igst > 0) return igst;
+    const split = Number(p?.sgst ?? 0) + Number(p?.cgst ?? 0);
+    if (Number.isFinite(split) && split > 0) return split;
+    return 18;
+  };
+  const gstAmount = cartItems.reduce((sum, item) => {
+    const price = item.product?.discountPrice || item.product?.price || 0;
+    return sum + (price * item.quantity * productGstRate(item.product)) / 100;
+  }, 0);
+  const gstRates = Array.from(new Set(cartItems.map((i) => productGstRate(i.product))));
+  const gstLabel = gstRates.length === 1 ? `GST (${gstRates[0]}%)` : 'GST';
+
   const totalBeforeDiscount = subtotal + shipping - discount;
 
   const total = Math.max(0, totalBeforeDiscount);
-
-  const baseAmount = Number((total / 1.18).toFixed(2));
-  const includedGstAmount = Number((total - baseAmount).toFixed(2));
 
   const handleQuantityChange = (id: string, quantity: number) => {
     if (quantity < 1) return;
@@ -2346,7 +2359,7 @@ const CartPage: React.FC = () => {
                   </div>
 
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">GST (18%)</span>
+                    <span className="text-muted-foreground">{gstLabel}</span>
                     <span className="text-espresso">{formatPrice(gstAmount)}</span>
                   </div>
 

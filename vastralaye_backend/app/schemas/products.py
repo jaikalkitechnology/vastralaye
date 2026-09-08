@@ -71,6 +71,7 @@ class ProductBase(BaseModel):
     hsn_code: Optional[str] = None
     sgst: Optional[float] = None
     cgst: Optional[float] = None
+    igst: Optional[float] = None
 
 
 class ProductCreate(ProductBase):
@@ -104,6 +105,10 @@ class ProductListResponse(BaseModel):
     new_arrival: bool = False
     category_id: int
     subcategory: Optional[int] = Field(None, description="subcategory_id")
+    # GST rates ride along so the cart can quote each product's own rate.
+    sgst: Optional[float] = None
+    cgst: Optional[float] = None
+    igst: Optional[float] = None
     brand: Optional[str] = None
     tags: Optional[List[str]]
     created_at: datetime
@@ -130,6 +135,9 @@ class ProductListResponse(BaseModel):
             new_arrival=product.new_arrival,
             category_id=product.category_id,
             subcategory=product.subcategory_id,  # Frontend expects 'subcategory' not 'subcategory_id'
+            sgst=product.sgst,
+            cgst=product.cgst,
+            igst=product.igst,
             brand=None,  # Add brand logic if available
             tags=[],  # Add tags logic if available
             created_at=product.created_at,
