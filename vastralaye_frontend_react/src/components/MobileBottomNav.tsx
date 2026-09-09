@@ -40,7 +40,9 @@ const MobileBottomNav = () => {
   return (
     <nav
       aria-label="Mobile navigation"
-      className="md:hidden fixed inset-x-0 bottom-0 z-50 bg-white border-t border-border shadow-[0_-4px_14px_rgba(43,27,18,0.08)]"
+      // print:hidden — a fixed app bar must never end up on printed pages
+      // or PDF invoices (it sat at the bottom of phone-printed invoices).
+      className="md:hidden print:hidden fixed inset-x-0 bottom-0 z-50 bg-white border-t border-border shadow-[0_-4px_14px_rgba(43,27,18,0.08)]"
     >
       <div className="grid grid-cols-5 items-end pt-2 pb-1.5">
         {tabs.map((tab, i) => {
