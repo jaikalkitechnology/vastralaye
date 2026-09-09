@@ -495,11 +495,14 @@ const InvoicePageView: React.FC<{
                                 className="pointer-events-none absolute inset-0 opacity-[0.07]"
                                 style={{ backgroundImage: PAISLEY_BG, backgroundSize: '130px 130px' }}
                             />
-                            <div className="relative">
-                                <p className="font-serif text-2xl font-semibold leading-none text-ivory">
-                                    Vastra<span className="text-gold">liya</span>
-                                </p>
-                                <p className="mt-2.5 text-[11px] leading-relaxed text-ivory/60">
+                            {/* Image-only logo on an ivory chip — the artwork carries the name */}
+                            <div className="relative flex items-center gap-3.5">
+                                <img
+                                    src="/logo_vas.png"
+                                    alt="Vastraliya"
+                                    className="h-[72px] w-[72px] shrink-0 rounded-md bg-ivory object-contain p-1"
+                                />
+                                <p className="text-[11px] leading-relaxed text-ivory/60">
                                     Gala No 230, Pride Industrial Estate, Vasai East, Thane, Maharashtra – 401208<br />
                                     support@vastraliya.com · +91 70661 81207 · GSTIN 27AAMCV4451F1Z4
                                 </p>
