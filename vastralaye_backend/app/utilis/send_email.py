@@ -3,6 +3,7 @@ import os
 from fastapi_mail import FastMail, MessageSchema
 from app.utilis.email_config import conf
 from app.utilis.invoice_pdf import generate_invoice_pdf
+from app.utilis.gst import items_gst_total, uniform_rate, tax_heads
 
 # The API serves product images; the storefront serves the pages links open.
 BASE_URL = os.getenv("API_PUBLIC_URL", "https://api.vastraliya.com")
@@ -23,8 +24,8 @@ async def send_order_email(
     country,
     order_date,
     phone,
-
-
+    full_address=None,
+    state=None,
 ):
     # Generate invoice PDF
 
@@ -41,17 +42,28 @@ async def send_order_email(
     invoice_path = generate_invoice_pdf(
         order_id,
         customer_name,
-        address_line1,
+        full_address or address_line1,
         phone,
         amount,
         items,
         order_date,
-        coupon_discount=coupon_discount
+        coupon_discount=coupon_discount,
+        buyer_state=state,
     )
 
-    # GST
-    base_amount = round(amount / 1.18, 2)
-    gst = round(amount - base_amount, 2)
+    # GST comes out of each product's own rate (igst / sgst+cgst / 18%),
+    # scaled for the coupon so base + GST still equal the amount paid.
+    scale = (amount / total_mrp) if total_mrp else 1
+    gst = round(items_gst_total(items) * scale, 2)
+    base_amount = round(amount - gst, 2)
+    gst_head_rows = "".join(
+        f"""
+        <tr>
+            <td>{label}</td>
+            <td align="right">₹{head_amount:.2f}</td>
+        </tr>"""
+        for label, head_amount in tax_heads(gst, state, uniform_rate(items))
+    )
     # Links
     first_product_id = items[0].get("product_id", "") if items else ""
     product_page_link = f"{PRODUCT_URL}{first_product_id}"
@@ -67,10 +79,6 @@ async def send_order_email(
         <td align="right" style="padding:10px;">Rate</td>
     </tr>
     """
-    for item in items:
-        print(item)
-    product = item.get("product", {})
-    price = item.get("price", 0)
     for item in items:
         price = item.get("price", 0)
         qty = item.get("quantity", item.get("qty", 1))
@@ -119,11 +127,7 @@ async def send_order_email(
         <tr>
             <td>Base Amount</td>
             <td align="right">₹{base_amount:.2f}</td>
-        </tr>
-        <tr>
-            <td>GST (18%)</td>
-            <td align="right">₹{gst:.2f}</td>
-        </tr>
+        </tr>{gst_head_rows}
         <tr>
             <td style="border-top:2px solid #e7e7e7;"><strong>Total</strong></td>
             <td align="right" style="border-top:2px solid #e7e7e7;">
@@ -158,7 +162,7 @@ async def send_order_email(
                 <table width="100%">
                     <tr>
                         <td style="border-bottom:1px solid #e7e7e7; padding-bottom:20px;">
-                            <img src="https://mizorpaymart.com/logo.png" width="140" alt="MizorPayMart" style="display:block;">
+                            <img src="{BASE_URL}/static/logo.png" width="90" alt="Vastraliya" style="display:block;">
                         </td>
                     </tr>
                 </table>
@@ -234,7 +238,7 @@ async def send_order_email(
                 <table width="100%" style="border-top:1px solid #e7e7e7; padding-top:20px;">
                     <tr>
                         <td align="center" style="font-size:12px; color:#868e96;">
-                            © 2026 MizorPayMart. All rights reserved.<br>
+                            © 2026 Vastraliya Fashion Pvt. Ltd. All rights reserved.<br>
                             <a href="#" style="color:#007185; text-decoration:none;">Privacy Policy</a> | <a href="#" style="color:#007185; text-decoration:none;">Terms of Use</a>
                         </td>
                     </tr>
@@ -250,18 +254,15 @@ async def send_order_email(
 
     # ================= EMAIL MESSAGE =================
     message = MessageSchema(
-        subject=f"Your MizorPayMart Order #{order_id} is Confirmed",
+        subject=f"Your Vastraliya Order #{order_id} is Confirmed",
         recipients=[customer_email],
         body=html,
         subtype="html",
         attachments=[invoice_path]
     )
 
-    try:
-        fm = FastMail(conf)
-        await fm.send_message(message)
-        # print("Email sent successfully")
-    except Exception as e:
-        # print("EMAIL ERROR:", e)
-        if items:
-            print(items[0])
+    # Callers decide what a failed send means (order creation logs and
+    # carries on; the resend-invoice endpoint reports the error) — so
+    # let the exception propagate instead of swallowing it here.
+    fm = FastMail(conf)
+    await fm.send_message(message)
