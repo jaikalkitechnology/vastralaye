@@ -338,29 +338,24 @@ const InvoiceTemplate = React.forwardRef<HTMLDivElement, { invoice: Invoice }>(
             pointerEvents: "none",
           }} />
 
-          {/* Brand — logo on an ivory chip so it reads on the dark letterhead */}
-          <div style={{ position: "relative", display: "flex", alignItems: "flex-start", gap: "14px" }}>
+          {/* Brand — image-only logo on an ivory chip; the artwork carries
+              the name, so no wordmark text beside it */}
+          <div style={{ position: "relative", display: "flex", alignItems: "center", gap: "14px" }}>
             <img
               src="/logo_vas.png"
               alt="Vastraliya"
               style={{
-                width: "64px", height: "64px", objectFit: "contain",
+                width: "78px", height: "78px", objectFit: "contain",
                 backgroundColor: "#FAF6F0", borderRadius: "6px",
                 padding: "5px", flexShrink: 0,
               }}
             />
-            <div>
-              <div style={{ fontFamily: SERIF, fontSize: "23px", fontWeight: 600 }}>
-                Vastra<span style={{ color: "#C99A45" }}>liya</span>
-              </div>
-              <div style={{
-                fontSize: "11px", color: "rgba(250,246,240,0.6)",
-                marginTop: "9px", lineHeight: 1.65,
-              }}>
-                <div>{"Pride Industrial Estate, Vasai East, Maharashtra 401208"}</div>
-                <div>support@vastraliya.com · +91 70661 81207</div>
-                <div>GSTIN 27AAMCV4451F1Z4</div>
-              </div>
+            <div style={{
+              fontSize: "11px", color: "rgba(250,246,240,0.6)", lineHeight: 1.65,
+            }}>
+              <div>{"Pride Industrial Estate, Vasai East, Maharashtra 401208"}</div>
+              <div>support@vastraliya.com · +91 70661 81207</div>
+              <div>GSTIN 27AAMCV4451F1Z4</div>
             </div>
           </div>
 
