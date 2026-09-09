@@ -27,6 +27,8 @@ import {
   RefreshCw,
   IndianRupee,
   MapPin,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { BASE_URL } from '@/config';
 import UserLayout from "@/components/user/UserLayout";
@@ -197,6 +199,10 @@ const OrdersPage: React.FC = () => {
   const [paymentFilter, setPaymentFilter] = useState('all');
   const [sortBy, setSortBy] = useState('newest');
 
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const [perPage, setPerPage] = useState(10);
+
   // ─── FETCH ORDERS ───
   useEffect(() => {
     const fetchOrders = async () => {
@@ -339,6 +345,34 @@ const OrdersPage: React.FC = () => {
 
     return result;
   }, [orders, searchQuery, statusFilter, paymentFilter, sortBy]);
+
+  // ─── PAGINATION ───
+  const totalPages = Math.max(1, Math.ceil(filteredOrders.length / perPage));
+  const safePage = Math.min(currentPage, totalPages);
+  const pagedOrders = useMemo(
+    () => filteredOrders.slice((safePage - 1) * perPage, safePage * perPage),
+    [filteredOrders, safePage, perPage]
+  );
+
+  // A changed filter or page size starts back at page 1
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, statusFilter, paymentFilter, sortBy, perPage]);
+
+  const goToPage = (page: number) => {
+    setCurrentPage(Math.min(Math.max(1, page), totalPages));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Compact pager: 1 … pages around the current one … last
+  const pageNumbers = useMemo(() => {
+    const pages: Array<number | '…'> = [];
+    for (let p = 1; p <= totalPages; p++) {
+      if (p === 1 || p === totalPages || Math.abs(p - safePage) <= 1) pages.push(p);
+      else if (pages[pages.length - 1] !== '…') pages.push('…');
+    }
+    return pages;
+  }, [totalPages, safePage]);
 
   // ─── STATS ───
   const stats = useMemo(() => {
@@ -550,6 +584,17 @@ const OrdersPage: React.FC = () => {
               <SelectItem value="price_low">Price: Low-High</SelectItem>
             </SelectContent>
           </Select>
+          <Select value={String(perPage)} onValueChange={(v) => setPerPage(Number(v))}>
+            <SelectTrigger className="w-full rounded-sm border-input bg-white md:w-[140px]">
+              <SelectValue placeholder="Per page" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="10">10 per page</SelectItem>
+              <SelectItem value="20">20 per page</SelectItem>
+              <SelectItem value="50">50 per page</SelectItem>
+              <SelectItem value="100">100 per page</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Results Count */}
@@ -576,7 +621,7 @@ const OrdersPage: React.FC = () => {
           </div>
         ) : (
           <div className="space-y-5">
-            {filteredOrders.map((order) => {
+            {pagedOrders.map((order) => {
               const statusConfig = getStatusConfig(order.status);
               const paymentInfo = getPaymentMethodInfo(order.payment_method);
               const PaymentIcon = paymentInfo.icon;
@@ -768,6 +813,63 @@ const OrdersPage: React.FC = () => {
                 </div>
               );
             })}
+          </div>
+        )}
+
+        {/* Pagination */}
+        {filteredOrders.length > 0 && totalPages > 1 && (
+          <div className="flex flex-col items-center justify-between gap-4 border-t border-border pt-6 md:flex-row">
+            <p className="text-sm text-muted-foreground">
+              Showing{' '}
+              <span className="font-medium text-espresso">
+                {(safePage - 1) * perPage + 1}–{Math.min(safePage * perPage, filteredOrders.length)}
+              </span>{' '}
+              of <span className="font-medium text-espresso">{filteredOrders.length}</span> orders
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              <button
+                type="button"
+                onClick={() => goToPage(safePage - 1)}
+                disabled={safePage === 1}
+                className="inline-flex items-center gap-1 rounded-sm border border-espresso px-4 py-2.5 text-[11px]
+                           font-semibold uppercase tracking-[0.14em] text-espresso transition-colors
+                           hover:bg-espresso hover:text-ivory disabled:pointer-events-none disabled:opacity-40"
+              >
+                <ChevronLeft className="h-3.5 w-3.5" />
+                Prev
+              </button>
+              <div className="flex items-center gap-1.5">
+                {pageNumbers.map((p, i) =>
+                  p === '…' ? (
+                    <span key={`gap-${i}`} className="px-1 text-sm text-muted-foreground">…</span>
+                  ) : (
+                    <button
+                      key={p}
+                      type="button"
+                      onClick={() => goToPage(p)}
+                      className={`h-9 w-9 rounded-sm border text-sm transition-colors ${
+                        safePage === p
+                          ? 'border-maroon bg-maroon text-ivory'
+                          : 'border-border bg-white text-espresso hover:border-espresso'
+                      }`}
+                    >
+                      {p}
+                    </button>
+                  )
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={() => goToPage(safePage + 1)}
+                disabled={safePage === totalPages}
+                className="inline-flex items-center gap-1 rounded-sm border border-espresso px-4 py-2.5 text-[11px]
+                           font-semibold uppercase tracking-[0.14em] text-espresso transition-colors
+                           hover:bg-espresso hover:text-ivory disabled:pointer-events-none disabled:opacity-40"
+              >
+                Next
+                <ChevronRight className="h-3.5 w-3.5" />
+              </button>
+            </div>
           </div>
         )}
       </div>
