@@ -737,6 +737,7 @@ const InvoicePageView: React.FC<{
                     * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
                     body { margin: 0; padding: 0; background: white; }
                     .no-print { display: none !important; }
+                    [data-sonner-toaster], [role="region"][aria-label^="Notifications"] { display: none !important; }
                     @page { size: A4 portrait; margin: 8mm; }
                     tr { page-break-inside: avoid; }
                     thead { display: table-header-group; }
