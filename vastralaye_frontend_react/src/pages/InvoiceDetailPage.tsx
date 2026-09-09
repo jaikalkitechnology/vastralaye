@@ -297,6 +297,7 @@ const InvoiceTemplate = React.forwardRef<HTMLDivElement, { invoice: Invoice }>(
     return (
       <div
         ref={ref}
+        className="invoice-paper"
         style={{
           position: "relative",
           backgroundColor: "#ffffff",
@@ -1089,7 +1090,8 @@ const InvoicesPage: React.FC = () => {
 
   return (
     <>
-      <NavBar />
+      {/* Site chrome stays off paper — the printed PDF is just the invoice */}
+      <div className="no-print"><NavBar /></div>
       <main className="min-h-screen bg-background">
       {/* ══ ESPRESSO BAND ══ */}
       <div className="no-print border-b-[3px] border-gold bg-espresso">
@@ -1146,7 +1148,7 @@ const InvoicesPage: React.FC = () => {
       </div>
 
       {/* ══ THE PAPER ══ */}
-      <div className="py-7 md:py-9">
+      <div className="py-7 md:py-9 print:py-0">
         <div className="overflow-x-auto pb-2">
           <InvoiceTemplate ref={invoiceRef} invoice={invoice} />
         </div>
@@ -1175,13 +1177,17 @@ const InvoicesPage: React.FC = () => {
           * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
           body { margin: 0; padding: 0; background: white; }
           .no-print { display: none !important; }
+          /* Toast pop-ups must never land on paper */
+          [data-sonner-toaster], [role="region"][aria-label^="Notifications"] { display: none !important; }
+          /* A whisker under one A4 — keeps the whole invoice on a single page */
+          .invoice-paper { zoom: 0.94; box-shadow: none !important; }
           @page { size: A4 portrait; margin: 8mm; }
           tr { page-break-inside: avoid; }
           thead { display: table-header-group; }
         }
       `}</style>
       </main>
-      <Footer />
+      <div className="no-print"><Footer /></div>
     </>
   );
 };
