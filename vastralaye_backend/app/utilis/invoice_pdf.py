@@ -20,9 +20,11 @@ COMPANY_ADDRESS = [
 COMPANY_PHONE = "+91 70661 81207"
 COMPANY_EMAIL = "support@vastraliya.com"
 # No remote logo: the old URL pointed at a host we no longer control, and a
-# network fetch inside PDF generation is a failure point. The letterhead's
-# company name is the mark; drop a file at static/logo.png to add one back.
-LOGO_PATH = "static/logo.png"
+# network fetch inside PDF generation is a failure point. The path resolves
+# from this file, not the process cwd, so the logo appears no matter which
+# directory the server (or a script) was started from.
+_BACKEND_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+LOGO_PATH = os.path.join(_BACKEND_ROOT, "static", "logo.png")
 
 # Colors
 COLOR_PRIMARY = colors.HexColor("#232F3E")
@@ -62,12 +64,14 @@ def generate_invoice_pdf(order_id, customer_name, address, phone, total_amount, 
     # Logo (Left Side)
     try:
         logo = ImageReader(LOGO_PATH)
+        # The artwork is square — a square box keeps it flush left instead
+        # of floating in the middle of a wide slot.
         c.drawImage(
             logo,
             margin,
-            header_bottom + 2 * mm,
-            height=20 * mm,
-            width=55 * mm,
+            header_bottom + 1.5 * mm,
+            height=22 * mm,
+            width=22 * mm,
             preserveAspectRatio=True,
             mask='auto'
         )
