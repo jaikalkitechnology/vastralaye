@@ -57,6 +57,7 @@ import json
 import string
 from app.utilis.invoice_pdf import generate_invoice_pdf
 from app.utilis.send_email import send_order_email
+from app.utilis.gst import gst_rate, extract_tax, items_gst_total, uniform_rate, tax_heads
 
 
 import requests
@@ -962,6 +963,7 @@ async def create_order(
             "product_id": product.id,
             "quantity": item.quantity,
             "price": product.price,  # MRP ✅
+            "selling_price": selling_price,
         })
     coupon_discount = 0
 
@@ -984,15 +986,20 @@ async def create_order(
     # ✅ FINAL AMOUNT
     final_amount = subtotal - coupon_discount
 
-    base_amount = final_amount / 1.18
-    gst_amount = final_amount - base_amount
-
     subtotal = round(subtotal, 2)
     coupon_discount = round(coupon_discount, 2)
     final_amount = round(final_amount, 2)
 
-    base_amount = round(final_amount / 1.18, 2)
-    gst_amount = round(final_amount - base_amount, 2)
+    # GST lives inside each product's price at that product's own rate
+    # (igst / sgst+cgst / 18% fallback); a coupon shrinks it pro rata so
+    # base + GST always equal the amount actually paid.
+    items_gst = sum(
+        extract_tax(entry["selling_price"] * entry["quantity"], gst_rate(entry["product"]))[1]
+        for entry in order_items_data
+    )
+    gst_scale = (final_amount / subtotal) if subtotal else 1
+    gst_amount = round(items_gst * gst_scale, 2)
+    base_amount = round(final_amount - gst_amount, 2)
     # 2️⃣ Determine payment status based on payment method
     payment_method = data.payment_method if data.payment_method else "cod"
     if payment_method == "cod":
@@ -1050,7 +1057,12 @@ async def create_order(
             "quantity": item["quantity"],  # use same key
             "image": product.images[0] if product.images else "",
             "product_id": product.id,
-            "hsn_code": product.hsn_code
+            "hsn_code": product.hsn_code,
+            # Per-product GST rates ride along so the invoice PDF and the
+            # email summary can tax each line at its own rate.
+            "sgst": product.sgst,
+            "cgst": product.cgst,
+            "igst": product.igst,
         })
     # 4️⃣ Create Order Items
     for item in order_items_data:
@@ -1097,7 +1109,11 @@ async def create_order(
                 postal_code=current_user.postal_code,
                 country=current_user.country,
                 phone=current_user.phone,
-                order_date=formatted_date
+                order_date=formatted_date,
+                # The full shipping address goes on the invoice; its state
+                # text decides SGST/CGST (Maharashtra) vs IGST heads.
+                full_address=order.shipping_address,
+                state=order.shipping_address if order.shipping_address not in (None, "", "N/A") else None,
             )
         except Exception as e:
             logger.error(f"Order email failed: {e}")
@@ -1207,6 +1223,12 @@ def get_order_detail(
 
                 # ✅ ADD THIS LINE
                 "hsn_code": product.hsn_code if product and hasattr(product, "hsn_code") else None,
+
+                # Per-product GST rates — the invoice page taxes each line
+                # at its own rate instead of a flat 18%.
+                "sgst": product.sgst if product else None,
+                "cgst": product.cgst if product else None,
+                "igst": product.igst if product else None,
             }
         )
 
@@ -1226,14 +1248,13 @@ def get_order_detail(
     # Total items
     total_items = sum(item["quantity"] for item in items_data)
 
-    # GST calculation
-    subtotal = order.total_amount
-    gst = subtotal * 0.18
-    grand_total = subtotal + gst
-
-    # Invoice URL
-    api_public = os.getenv("API_PUBLIC_URL", "https://api.vastraliya.com")
-    invoice_url = f"{api_public}/orders/{order.id}/invoice"
+    # GST is INSIDE the price — extract it per product, never add on top.
+    # (This previously returned total_amount inflated by +18%.)
+    lines_total = sum(i["subtotal"] for i in items_data)
+    scale = (order.total_amount / lines_total) if lines_total else 1
+    gst = round(items_gst_total(items_data) * scale, 2)
+    grand_total = round(order.total_amount, 2)
+    base_amount = round(grand_total - gst, 2)
 
     return {
         "id": order.id,
@@ -1254,11 +1275,10 @@ def get_order_detail(
         "payment_method": order.payment_method or "cod",
         "payment_status": order.payment_status or "unpaid",
 
-        "subtotal": subtotal,
+        "subtotal": grand_total,
+        "base_amount": base_amount,
         "gst": gst,
         "total_amount": grand_total,
-
-        "invoice_url": invoice_url,
 
         "created_at": order.created_at.isoformat() if order.created_at else None,
         "total_items": total_items,
@@ -1926,7 +1946,6 @@ def create_invoice_from_order(
     order: Order,
     user: User,
     db: Session,
-    tax_rate: float = 18,
     shipping_amount: float = 0,
     discount_amount: float = 0,
     notes: Optional[str] = None,
@@ -1948,7 +1967,13 @@ def create_invoice_from_order(
         invoice_number = Invoice.generate_invoice_number()
 
     # ── Calculate amounts ──
-    subtotal = 0
+    # Prices are GST-inclusive: each line's tax is EXTRACTED at that
+    # product's own rate (igst / sgst+cgst / 18% fallback), never added
+    # on top — the invoice total must equal what the customer paid.
+    subtotal = 0.0     # taxable value (before GST)
+    tax_amount = 0.0
+    lines_total = 0.0  # GST-inclusive
+    item_rates = set()
     invoice_items_data = []
 
     for item in order.items:
@@ -1956,10 +1981,14 @@ def create_invoice_from_order(
             Product.id == item.product_id
         ).first()
 
-        item_subtotal = item.price * item.quantity
-        item_tax = (item_subtotal * tax_rate) / 100
-        item_total = item_subtotal + item_tax
-        subtotal += item_subtotal
+        line_total = item.price * item.quantity
+        rate = gst_rate(product)
+        taxable, item_tax = extract_tax(line_total, rate)
+
+        subtotal += taxable
+        tax_amount += item_tax
+        lines_total += line_total
+        item_rates.add(rate)
 
         product_image = get_first_product_image(product)
 
@@ -1974,19 +2003,17 @@ def create_invoice_from_order(
             "unit_price": item.price,
             "quantity": item.quantity,
             "discount": 0,
-            "tax_rate": tax_rate,
-            "tax_amount": round(item_tax, 2),
-            "subtotal": round(item_subtotal, 2),
-            "total": round(item_total, 2),
+            "tax_rate": rate,
+            "tax_amount": item_tax,
+            "subtotal": taxable,
+            "total": round(line_total, 2),
         })
 
     # ── Calculate totals ──
-    tax_amount = (subtotal * tax_rate) / 100
+    # Shipping is free storewide; tax_rate stores the uniform % (0 = mixed).
+    tax_rate = item_rates.pop() if len(item_rates) == 1 else 0
 
-    if shipping_amount == 0:
-        shipping_amount = 0 if subtotal > 999 else 150
-
-    total_amount = subtotal + tax_amount + shipping_amount - discount_amount
+    total_amount = lines_total + shipping_amount - discount_amount
 
     # ── Build customer name ──
     customer_name = ""
@@ -2426,50 +2453,69 @@ def get_active_coupons(db: Session = Depends(get_db)):
 
 
 
-# ── 4. GET INVOICE BY ORDER ID ──
-@router.get("/orders/{order_id}/invoice")
-def download_invoice(order_id: int, db: Session = Depends(get_db)):
+# The old GET /orders/{order_id}/invoice endpoint is gone: it called a
+# function that never existed (500 on every request) and skipped auth.
+# The storefront's invoice page builds from GET /user/orders/{order_id},
+# and PDFs are emailed via the email-invoice endpoint below.
 
-    order = db.query(Order).filter(Order.id == order_id).first()
 
+# ── 4. EMAIL INVOICE FOR AN ORDER ──
+@router.post("/user/orders/{order_id}/email-invoice")
+async def email_invoice(
+    order_id: int,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    """Send the order's GST invoice PDF to the customer's email."""
+    order = (
+        db.query(Order)
+        .filter(Order.id == order_id, Order.user_id == user.id)
+        .first()
+    )
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
+    if not user.email:
+        raise HTTPException(status_code=400, detail="Your account has no email address")
 
-    items = []
-    subtotal = 0
-
+    email_items = []
     for item in order.items:
-        subtotal += item.price * item.quantity
-
-        items.append({
-            "name": item.product.name,
-            "qty": item.quantity,
-            "price": item.price
+        product = db.query(Product).filter(Product.id == item.product_id).first()
+        email_items.append({
+            "name": product.name if product else f"Product #{item.product_id}",
+            "price": item.price,
+            "quantity": item.quantity,
+            "image": (product.images[0] if product and product.images else ""),
+            "product_id": item.product_id,
+            "hsn_code": product.hsn_code if product else None,
+            "sgst": product.sgst if product else None,
+            "cgst": product.cgst if product else None,
+            "igst": product.igst if product else None,
         })
 
-    order_date = order.created_at.strftime("%d %B %Y %I:%M %p")
+    order_date = order.created_at.strftime("%d %B %Y %I:%M %p") if order.created_at else ""
+    shipping_address = order.shipping_address or user.address_line1 or ""
 
-    pdf = generate_professional_invoice(
-        order_id=order.id,
-        order_date=order_date,
-        customer_name=order.user.first_name,
-        address_line1=order.user.address_line1,
-        city=order.user.city,
-        postal_code=order.user.postal_code,
-        country=order.user.country,
-        phone=order.user.phone,
-        items=items,
-        subtotal=subtotal,
-        payment_method=order.payment_method
-    )
+    try:
+        await send_order_email(
+            customer_email=user.email,
+            order_id=order.id,
+            amount=order.total_amount,
+            items=email_items,
+            customer_name=order.customer_name or user.first_name or "Customer",
+            address_line1=user.address_line1,
+            city=order.city or user.city,
+            postal_code=order.pincode or user.postal_code,
+            country=user.country,
+            phone=order.phone_number or user.phone,
+            order_date=order_date,
+            full_address=shipping_address,
+            state=shipping_address if shipping_address not in ("", "N/A") else None,
+        )
+    except Exception as e:
+        logger.error(f"Invoice email failed for order {order_id}: {e}")
+        raise HTTPException(status_code=502, detail="Could not send the invoice email")
 
-    return StreamingResponse(
-        pdf,
-        media_type="application/pdf",
-        headers={
-            "Content-Disposition": f"attachment; filename=invoice_{order_id}.pdf"
-        }
-    )
+    return {"status": True, "message": f"Invoice for order #{order_id} sent to {user.email}"}
 
 from fastapi.responses import HTMLResponse
 
@@ -2583,6 +2629,15 @@ def get_invoice_html(
     )
 
     # ── Discount row ──
+    # Maharashtra buyers see SGST/CGST halves, other states IGST — the
+    # same place-of-supply rule the cart and the PDF invoice follow.
+    tax_rows_html = "".join(
+        f'<div class="totals-row"><span>{label}</span><span>&#8377;{amount:,.2f}</span></div>'
+        for label, amount in tax_heads(
+            invoice.tax_amount, order.shipping_address, invoice.tax_rate or None
+        )
+    )
+
     discount_html = ""
     if invoice.discount_amount and invoice.discount_amount > 0:
         discount_html = (
@@ -2809,10 +2864,7 @@ def get_invoice_html(
                         <span>Shipping</span>
                         <span>{'Free' if invoice.shipping_amount == 0 else f'₹{invoice.shipping_amount:,.2f}'}</span>
                     </div>
-                    <div class="totals-row">
-                        <span>GST ({invoice.tax_rate}%)</span>
-                        <span>₹{invoice.tax_amount:,.2f}</span>
-                    </div>
+                    {tax_rows_html}
                     {discount_html}
                     <div class="totals-row total">
                         <span>Total Amount</span>

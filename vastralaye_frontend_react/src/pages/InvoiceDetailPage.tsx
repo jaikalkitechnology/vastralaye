@@ -60,6 +60,9 @@ interface Invoice {
   total_products: number;
   total_items: number;
   items: InvoiceItem[];
+  /** SGST/CGST rows for Maharashtra buyers, IGST otherwise — built from
+      each product's own rate, mirroring the cart. */
+  tax_heads?: Array<{ label: string; amount: number }>;
 }
 
 // ═══════════════════════════════════════════════
@@ -335,14 +338,20 @@ const InvoiceTemplate = React.forwardRef<HTMLDivElement, { invoice: Invoice }>(
             pointerEvents: "none",
           }} />
 
-          {/* Brand */}
-          <div style={{ position: "relative" }}>
-            <div style={{ fontFamily: SERIF, fontSize: "23px", fontWeight: 600 }}>
-              Vastra<span style={{ color: "#C99A45" }}>liya</span>
-            </div>
+          {/* Brand — image-only logo on an ivory chip; the artwork carries
+              the name, so no wordmark text beside it */}
+          <div style={{ position: "relative", display: "flex", alignItems: "center", gap: "14px" }}>
+            <img
+              src="/logo_vas.png"
+              alt="Vastraliya"
+              style={{
+                width: "78px", height: "78px", objectFit: "contain",
+                backgroundColor: "#FAF6F0", borderRadius: "6px",
+                padding: "5px", flexShrink: 0,
+              }}
+            />
             <div style={{
-              fontSize: "11px", color: "rgba(250,246,240,0.6)",
-              marginTop: "9px", lineHeight: 1.65,
+              fontSize: "11px", color: "rgba(250,246,240,0.6)", lineHeight: 1.65,
             }}>
               <div>{"Pride Industrial Estate, Vasai East, Maharashtra 401208"}</div>
               <div>support@vastraliya.com · +91 70661 81207</div>
@@ -648,7 +657,7 @@ const InvoiceTemplate = React.forwardRef<HTMLDivElement, { invoice: Invoice }>(
             {/* RIGHT — totals */}
             <div style={{ fontSize: "13px" }}>
               <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", color: "#6E5F53" }}>
-                <span>Subtotal</span>
+                <span>Base Amount</span>
                 <b style={{ color: "#2B1B12", fontWeight: 500 }}>{formatPrice(subtotal)}</b>
               </div>
 
@@ -666,10 +675,15 @@ const InvoiceTemplate = React.forwardRef<HTMLDivElement, { invoice: Invoice }>(
                 </>
               )}
 
-              <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", color: "#6E5F53" }}>
-                <span>GST ({invoice.tax_rate || 18}%)</span>
-                <b style={{ color: "#2B1B12", fontWeight: 500 }}>{formatPrice(tax)}</b>
-              </div>
+              {(invoice.tax_heads?.length
+                ? invoice.tax_heads
+                : [{ label: invoice.tax_rate ? `GST (${invoice.tax_rate}%)` : "GST", amount: tax }]
+              ).map((head) => (
+                <div key={head.label} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", color: "#6E5F53" }}>
+                  <span>{head.label}</span>
+                  <b style={{ color: "#2B1B12", fontWeight: 500 }}>{formatPrice(head.amount)}</b>
+                </div>
+              ))}
 
               <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", color: "#6E5F53" }}>
                 <span>Shipping</span>
@@ -849,12 +863,21 @@ const InvoicesPage: React.FC = () => {
           const orderData  = await orderRes.json();
           const raw        = orderData.order || orderData.data || orderData;
 
-          // Build a synthetic invoice from order
+          // Build a synthetic invoice from order — each line taxed at its
+          // product's own GST rate (igst / sgst+cgst / 18%), like the cart.
+          const rateOf = (it: any): number => {
+            const igst = Number(it?.igst);
+            if (Number.isFinite(igst) && igst > 0) return igst;
+            const split = Number(it?.sgst ?? 0) + Number(it?.cgst ?? 0);
+            if (Number.isFinite(split) && split > 0) return split;
+            return 18;
+          };
+
           const items: InvoiceItem[] = (raw.items || []).map((item: any, i: number) => {
             const price    = Number(item.price || 0);
             const qty      = item.quantity || 1;
-            const taxRate  = 18;
-            const baseAmt  = (price * qty) / 1.18;
+            const taxRate  = rateOf(item);
+            const baseAmt  = (price * qty) / (1 + taxRate / 100);
             const taxAmt   = price * qty - baseAmt;
 
             return {
@@ -877,9 +900,35 @@ const InvoicesPage: React.FC = () => {
             };
           });
 
-          const subtotal     = items.reduce((s, i) => s + i.subtotal, 0);
-          const taxAmount    = items.reduce((s, i) => s + i.tax_amount, 0);
-          const totalAmount  = Number(raw.total_amount || 0);
+          const linesTotal   = items.reduce((s, i) => s + i.total, 0);
+          const totalAmount  = Number(raw.total_amount || linesTotal || 0);
+          // Item lines are list prices; the paid total reflects discounts —
+          // scale the tax pro rata so Base + GST always equal the total.
+          const taxScale     = linesTotal > 0 ? totalAmount / linesTotal : 1;
+          const taxAmount    = Number((items.reduce((s, i) => s + i.tax_amount, 0) * taxScale).toFixed(2));
+          const subtotal     = Number((totalAmount - taxAmount).toFixed(2));
+
+          // Place of supply: Maharashtra buyer -> SGST/CGST halves, another
+          // state -> IGST, unknown -> neutral GST (same rule as the cart).
+          const stateText = String(raw.state || raw.shipping_address || "");
+          const rates     = new Set(items.map((i) => i.tax_rate));
+          const oneRate   = rates.size === 1 ? [...rates][0] : null;
+          let taxHeads: Array<{ label: string; amount: number }>;
+          if (stateText.toLowerCase().includes("maharashtra")) {
+            const cgst = Number((taxAmount / 2).toFixed(2));
+            const sgst = Number((taxAmount - cgst).toFixed(2));
+            const half = oneRate ? ` (${oneRate / 2}%)` : "";
+            taxHeads = [
+              { label: `SGST${half}`, amount: sgst },
+              { label: `CGST${half}`, amount: cgst },
+            ];
+          } else {
+            const headName = stateText.trim() ? "IGST" : "GST";
+            taxHeads = [{
+              label: oneRate ? `${headName} (${oneRate}%)` : headName,
+              amount: taxAmount,
+            }];
+          }
 
           const synthetic: Invoice = {
             id:               0,
@@ -898,9 +947,10 @@ const InvoicesPage: React.FC = () => {
             customer_phone:   raw.user?.phone  || raw.customer_phone || undefined,
             billing_address:  raw.shipping_address || undefined,
             shipping_address: raw.shipping_address || undefined,
-            subtotal:         parseFloat(subtotal.toFixed(2)),
-            tax_amount:       parseFloat(taxAmount.toFixed(2)),
-            tax_rate:         18,
+            subtotal:         subtotal,
+            tax_amount:       taxAmount,
+            tax_rate:         oneRate ?? 0,
+            tax_heads:        taxHeads,
             shipping_amount:  0,
             discount_amount:  0,
             total_amount:     totalAmount,

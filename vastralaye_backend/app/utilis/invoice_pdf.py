@@ -6,6 +6,8 @@ from reportlab.lib.utils import ImageReader
 from reportlab.lib import colors
 from reportlab.platypus import Table, TableStyle
 
+from app.utilis.gst import gst_rate, extract_tax, uniform_rate, fmt_rate, tax_heads
+
 
 # Configuration — the seller identity printed on every tax invoice.
 COMPANY_NAME = "Vastraliya Fashion Pvt. Ltd."
@@ -18,9 +20,11 @@ COMPANY_ADDRESS = [
 COMPANY_PHONE = "+91 70661 81207"
 COMPANY_EMAIL = "support@vastraliya.com"
 # No remote logo: the old URL pointed at a host we no longer control, and a
-# network fetch inside PDF generation is a failure point. The letterhead's
-# company name is the mark; drop a file at static/logo.png to add one back.
-LOGO_PATH = "static/logo.png"
+# network fetch inside PDF generation is a failure point. The path resolves
+# from this file, not the process cwd, so the logo appears no matter which
+# directory the server (or a script) was started from.
+_BACKEND_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+LOGO_PATH = os.path.join(_BACKEND_ROOT, "static", "logo.png")
 
 # Colors
 COLOR_PRIMARY = colors.HexColor("#232F3E")
@@ -44,7 +48,8 @@ def draw_text_block(c, x, y, title, lines):
     return y
 
 
-def generate_invoice_pdf(order_id, customer_name, address, phone, total_amount, items, order_date, coupon_discount=0):
+def generate_invoice_pdf(order_id, customer_name, address, phone, total_amount, items, order_date,
+                         coupon_discount=0, buyer_state=None):
     os.makedirs("invoices", exist_ok=True)
     file_path = f"invoices/invoice_{order_id}.pdf"
 
@@ -59,12 +64,14 @@ def generate_invoice_pdf(order_id, customer_name, address, phone, total_amount, 
     # Logo (Left Side)
     try:
         logo = ImageReader(LOGO_PATH)
+        # The artwork is square — a square box keeps it flush left instead
+        # of floating in the middle of a wide slot.
         c.drawImage(
             logo,
             margin,
-            header_bottom + 2 * mm,
-            height=20 * mm,
-            width=55 * mm,
+            header_bottom + 1.5 * mm,
+            height=22 * mm,
+            width=22 * mm,
             preserveAspectRatio=True,
             mask='auto'
         )
@@ -137,16 +144,19 @@ def generate_invoice_pdf(order_id, customer_name, address, phone, total_amount, 
     c.drawString(width / 2 + 22 * mm, meta_y + 3 * mm, str(order_date))
 
     # ================= ITEMS TABLE =================
+    # Each line uses the product's own GST rate (igst, else sgst+cgst,
+    # else 18%). Prices are GST-inclusive, so tax is extracted, not added.
     table_data = [
-        ["#", "Product / Description", "HSN", "Qty", "Rate (Rs.)", "Taxable", "GST (18%)", "Total (Rs.)"]
+        ["#", "Product / Description", "HSN", "Qty", "Rate (Rs.)", "Taxable", "GST %", "GST (Rs.)", "Total (Rs.)"]
     ]
 
     total_mrp = 0
+    items_gst = 0.0
 
     for i, item in enumerate(items, 1):
         name = item.get("name", "Unknown Item")
-        if len(name) > 30:
-            name = name[:27] + "..."
+        if len(name) > 26:
+            name = name[:23] + "..."
 
         hsn = item.get("hsn_code", "N/A")
         qty = item.get("quantity", 1)
@@ -157,12 +167,9 @@ def generate_invoice_pdf(order_id, customer_name, address, phone, total_amount, 
         line_total = qty * price
         total_mrp += line_total
 
-        # ✅ CALCULATE TAXABLE & GST
-        taxable = line_total / 1.18
-        gst = line_total - taxable
-
-        taxable = round(taxable, 2)
-        gst = round(gst, 2)
+        rate = gst_rate(item)
+        taxable, gst = extract_tax(line_total, rate)
+        items_gst += gst
 
         table_data.append([
             str(i),
@@ -170,26 +177,28 @@ def generate_invoice_pdf(order_id, customer_name, address, phone, total_amount, 
             str(hsn),
             str(qty),
             f"{price:.2f}",
-            f"{taxable:.2f}",  # ✅ FIXED
-            f"{gst:.2f}",  # ✅ FIXED
+            f"{taxable:.2f}",
+            fmt_rate(rate),
+            f"{gst:.2f}",
             f"{line_total:.2f}"
         ])
-    final_total = total_amount  # already after coupon
+    final_total = round(total_amount, 2)  # already after coupon
 
-    base_amount = final_total / 1.18
-    gst_amount = final_total - base_amount
+    # A coupon discounts the GST-inclusive total, so the tax inside it
+    # shrinks proportionally — base + GST must still equal the total paid.
+    scale = (final_total / total_mrp) if total_mrp else 1
+    gst_amount = round(items_gst * scale, 2)
+    base_amount = round(final_total - gst_amount, 2)
 
-    base_amount = round(base_amount, 2)
-    gst_amount = round(gst_amount, 2)
-    final_total = round(final_total, 2)
     # Column Widths
     col_widths = [
+        8 * mm,
+        50 * mm,
+        14 * mm,
         10 * mm,
-        60 * mm,
         20 * mm,
-        12 * mm,
-        20 * mm,
-        20 * mm,
+        22 * mm,
+        13 * mm,
         20 * mm,
         23 * mm
     ]
@@ -232,14 +241,21 @@ def generate_invoice_pdf(order_id, customer_name, address, phone, total_amount, 
     c.setFont("Helvetica", 8)
     c.setFillColor(colors.HexColor("#555555"))
     c.drawString(margin, summary_y - 5 * mm, "1. Goods once sold will not be taken back.")
-    c.drawString(margin, summary_y - 9 * mm, "2. Subject to Mizoram Jurisdiction.")
+    c.drawString(margin, summary_y - 9 * mm, "2. Subject to Maharashtra Jurisdiction.")
     c.drawString(margin, summary_y - 13 * mm, "3. This is a computer generated invoice.")
+
+    # Maharashtra buyers see the SGST/CGST split, other states IGST,
+    # and an unknown state a neutral GST head — same rule as the cart.
+    head_rows = [
+        [f"{label}:", f"Rs. {amount:.2f}"]
+        for label, amount in tax_heads(gst_amount, buyer_state, uniform_rate(items))
+    ]
 
     summary_data = [
         ["Subtotal (MRP):", f"Rs. {total_mrp:.2f}"],
         ["Coupon Discount:", f"- Rs. {coupon_discount:.2f}"],
         ["Base Amount:", f"Rs. {base_amount:.2f}"],
-        ["GST (18%):", f"Rs. {gst_amount:.2f}"],
+        *head_rows,
         ["Shipping:", "Free"],
         ["Grand Total:", f"Rs. {final_total:.2f}"]
     ]
@@ -287,30 +303,28 @@ if __name__ == "__main__":
     items_data = [
         {
             "name": "Men's Cotton T-Shirt",
-            "qty": 2,
+            "quantity": 2,
             "price": 499.00,
-            "hsn_code": "6109"
+            "hsn_code": "6109",
+            "igst": 5,
         },
         {
-            "name": "Wireless Bluetooth Earbuds",
-            "qty": 1,
+            "name": "Silk Kurta",
+            "quantity": 1,
             "price": 1299.00,
-            "hsn_code": "8517"
+            "hsn_code": "6203",
+            "sgst": 2.5,
+            "cgst": 2.5,
         },
-        {
-            "name": "USB-C Charging Cable",
-            "qty": 1,
-            "price": 299.00,
-            "hsn_code": "8544"
-        }
     ]
 
     generate_invoice_pdf(
         order_id="ORD-987654",
         customer_name="John Doe",
-        address="Flat 4B, Green Valley Apts, Aizawl, Mizoram - 796001",
+        address="Flat 4B, Green Valley Apts, Lucknow, Uttar Pradesh - 226001",
         phone="+91 98765 43210",
-        total_amount=2596.00,
+        total_amount=2297.00,
         items=items_data,
-        order_date="2023-10-27"
+        order_date="2026-09-09",
+        buyer_state="Uttar Pradesh",
     )

@@ -33,8 +33,52 @@ interface OrderItem {
     product_sku?: string;
     product_image?: string;
     hsn_code?: string;
+    sgst?: number | null;
+    cgst?: number | null;
+    igst?: number | null;
     product?: { id: number; name: string; images?: string; sku?: string; hsn_code?: string };
 }
+
+/** Per-product GST rate: igst, else sgst+cgst, else 18 — mirrors the cart. */
+const productGstRate = (it: any): number => {
+    const igst = Number(it?.igst);
+    if (Number.isFinite(igst) && igst > 0) return igst;
+    const split = Number(it?.sgst ?? 0) + Number(it?.cgst ?? 0);
+    if (Number.isFinite(split) && split > 0) return split;
+    return 18;
+};
+
+/** GST inside `goodsTotal`, split into place-of-supply heads.
+    Item lines are list prices; the tax is scaled pro rata so
+    base + GST always add back to the amount actually paid. */
+const orderTaxBreakup = (items: any[], goodsTotal: number, stateText: string) => {
+    const linesTotal = items.reduce((s, it) => s + (Number(it.price) || 0) * (it.quantity || 1), 0);
+    const rawGst = items.reduce((s, it) => {
+        const line = (Number(it.price) || 0) * (it.quantity || 1);
+        const rate = productGstRate(it);
+        return s + (line - line / (1 + rate / 100));
+    }, 0);
+    const scale = linesTotal > 0 ? goodsTotal / linesTotal : 1;
+    const gstAmount = Number((rawGst * scale).toFixed(2));
+    const baseAmount = Number((goodsTotal - gstAmount).toFixed(2));
+
+    const rates = new Set(items.map(productGstRate));
+    const oneRate = rates.size === 1 && items.length > 0 ? [...rates][0] : null;
+    let heads: Array<{ label: string; amount: number }>;
+    if (stateText.toLowerCase().includes('maharashtra')) {
+        const cgst = Number((gstAmount / 2).toFixed(2));
+        const sgst = Number((gstAmount - cgst).toFixed(2));
+        const half = oneRate ? ` (${oneRate / 2}%)` : '';
+        heads = [
+            { label: `SGST${half}`, amount: sgst },
+            { label: `CGST${half}`, amount: cgst },
+        ];
+    } else {
+        const name = stateText.trim() ? 'IGST' : 'GST';
+        heads = [{ label: oneRate ? `${name} (${oneRate}%)` : name, amount: gstAmount }];
+    }
+    return { baseAmount, gstAmount, heads };
+};
 
 interface TrackingUpdate {
     id?: number;
@@ -293,6 +337,9 @@ const useOrderData = (
         quantity: item.quantity || 1,
         price: Number(item.price || 0),
         hsn_code: item.hsn_code || item.product?.hsn_code || null,
+        sgst: item.sgst ?? null,
+        cgst: item.cgst ?? null,
+        igst: item.igst ?? null,
         product_name: item.product_name || item.product?.name || `Product #${item.product_id}`,
         product_sku: item.sku || item.product_sku || item.product?.sku || null,
         product_image: item.product_image || item.product?.images || null,
@@ -371,8 +418,11 @@ const InvoicePageView: React.FC<{
     const shipping = order.shipping_amount || 0;
     const discount = order.discount_amount || 0;
     const total = Math.max(0, subtotal + shipping - discount);
-    const baseAmount = Number((total / 1.18).toFixed(2));
-    const gstAmount = Number((total - baseAmount).toFixed(2));
+    const { baseAmount, gstAmount, heads: taxHeads } = orderTaxBreakup(
+        order.items || [],
+        Math.max(0, subtotal - discount),
+        String(order.state || order.shipping_address || ''),
+    );
 
     const handlePrint = () => window.print();
 
@@ -602,13 +652,15 @@ const InvoicePageView: React.FC<{
                                         </div>
                                     )}
                                     <div className={totRow}>
-                                        <span>Taxable value</span>
+                                        <span>Base Amount</span>
                                         <b className="font-medium text-espresso">{formatPrice(baseAmount)}</b>
                                     </div>
-                                    <div className={totRow}>
-                                        <span>GST 18% (incl.)</span>
-                                        <b className="font-medium text-espresso">{formatPrice(gstAmount)}</b>
-                                    </div>
+                                    {taxHeads.map((head) => (
+                                        <div key={head.label} className={totRow}>
+                                            <span>{head.label} (incl.)</span>
+                                            <b className="font-medium text-espresso">{formatPrice(head.amount)}</b>
+                                        </div>
+                                    ))}
                                     <div className={totRow}>
                                         <span>Shipping</span>
                                         <b className="font-medium text-espresso">{shipping === 0 ? 'Free' : formatPrice(shipping)}</b>
@@ -807,8 +859,11 @@ const OrderDetailPage = () => {
     const shipping = order.shipping_amount || 0;
     const discount = order.discount_amount || 0;
     const total = Math.max(0, subtotal + shipping - discount);
-    const baseAmount = Number((total / 1.18).toFixed(2));
-    const gstAmount = Number((total - baseAmount).toFixed(2));
+    const { baseAmount, gstAmount, heads: taxHeads } = orderTaxBreakup(
+        order.items || [],
+        Math.max(0, subtotal - discount),
+        String(order.state || order.shipping_address || ''),
+    );
 
     const isCancelled = order.status.toLowerCase() === 'cancelled';
     const statusKey = order.status.toLowerCase();
@@ -1074,9 +1129,15 @@ const OrderDetailPage = () => {
                                         </div>
                                     )}
                                     <div className={summaryRow}>
-                                        <span>GST 18% (incl.)</span>
-                                        <b className="font-medium text-espresso">{formatPrice(gstAmount)}</b>
+                                        <span>Base Amount</span>
+                                        <b className="font-medium text-espresso">{formatPrice(baseAmount)}</b>
                                     </div>
+                                    {taxHeads.map((head) => (
+                                        <div key={head.label} className={summaryRow}>
+                                            <span>{head.label} (incl.)</span>
+                                            <b className="font-medium text-espresso">{formatPrice(head.amount)}</b>
+                                        </div>
+                                    ))}
                                     <div className={summaryRow}>
                                         <span>Shipping</span>
                                         <b className="font-medium text-espresso">{shipping === 0 ? 'Free' : formatPrice(shipping)}</b>
