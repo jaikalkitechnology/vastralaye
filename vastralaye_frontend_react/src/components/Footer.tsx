@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { MapPin, Phone, Mail } from 'lucide-react';
-import { useSiteSettings, FALLBACK_WHATSAPP } from '@/hooks/use-site-settings';
+import { useSiteSettings, FALLBACK_WHATSAPP, isHidden } from '@/hooks/use-site-settings';
 import PaymentBadges from '@/components/PaymentBadges';
 import FooterScene from '@/components/decor/FooterScene';
 import {
@@ -74,27 +74,32 @@ const Footer = () => {
               celebration — and every day in between.
             </p>
             <div className="flex flex-wrap gap-3">
-              {/* Original brand logos on ivory chips; links managed from Admin → Store Settings */}
+              {/* Original brand logos on ivory chips; links and per-icon
+                  visibility managed from Admin → Store Settings */}
               {[
                 {
                   label: 'Chat on WhatsApp',
                   href: `https://wa.me/${(settings.whatsapp_number || FALLBACK_WHATSAPP).replace(/[^\d]/g, '')}`,
                   glyph: <WhatsAppLogo className="w-[18px] h-[18px] text-[#25D366]" />,
+                  hidden: isHidden(settings.whatsapp_hidden),
                 },
                 {
                   label: 'Instagram',
                   href: settings.instagram_url || 'https://instagram.com',
                   glyph: <InstagramLogo gradient className="w-[18px] h-[18px]" />,
+                  hidden: isHidden(settings.instagram_hidden),
                 },
                 {
                   label: 'Facebook',
                   href: settings.facebook_url || 'https://facebook.com',
                   glyph: <FacebookLogo className="w-[18px] h-[18px] text-[#1877F2]" />,
+                  hidden: isHidden(settings.facebook_hidden),
                 },
                 {
                   label: 'X (Twitter)',
                   href: settings.twitter_url || 'https://twitter.com',
                   glyph: <XLogo className="w-4 h-4 text-black" />,
+                  hidden: isHidden(settings.twitter_hidden),
                 },
                 ...(settings.youtube_url
                   ? [
@@ -102,10 +107,11 @@ const Footer = () => {
                         label: 'YouTube',
                         href: settings.youtube_url,
                         glyph: <YouTubeLogo className="w-[18px] h-[18px] text-[#FF0000]" />,
+                        hidden: isHidden(settings.youtube_hidden),
                       },
                     ]
                   : []),
-              ].map(({ href, label, glyph }) => (
+              ].filter((entry) => !entry.hidden).map(({ href, label, glyph }) => (
                 <a
                   key={label}
                   href={href}

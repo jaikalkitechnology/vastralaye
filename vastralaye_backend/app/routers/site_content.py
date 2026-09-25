@@ -49,6 +49,15 @@ SETTING_KEYS = [
     # Announcement strip above the header, edited from Admin › Categories.
     "topbar_enabled",   # "true" / "false"
     "topbar_text",
+    # Per-item visibility, edited from Admin › Store Settings. "true" hides
+    # that link/icon on the storefront (footer chips + floating contact hub);
+    # anything else — including no row at all — leaves it visible.
+    "whatsapp_hidden",
+    "call_hidden",
+    "instagram_hidden",
+    "facebook_hidden",
+    "twitter_hidden",
+    "youtube_hidden",
 ]
 
 # site_settings.value is VARCHAR(500); a longer strip would be silently
@@ -492,6 +501,13 @@ class SettingsIn(BaseModel):
     float_enabled: Optional[str] = None  # "true" / "false"
     topbar_enabled: Optional[str] = None  # "true" / "false"
     topbar_text: Optional[str] = None
+    # "true" hides that link/icon on the storefront; anything else shows it.
+    whatsapp_hidden: Optional[str] = None
+    call_hidden: Optional[str] = None
+    instagram_hidden: Optional[str] = None
+    facebook_hidden: Optional[str] = None
+    twitter_hidden: Optional[str] = None
+    youtube_hidden: Optional[str] = None
 
 
 def _settings_dict(db: Session) -> Dict[str, str]:

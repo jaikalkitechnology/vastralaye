@@ -18,7 +18,18 @@ export interface SiteSettings {
   topbar_enabled?: string;
   /** What that strip says. */
   topbar_text?: string;
+  /** Per-item visibility from Admin › Store Settings — "true" hides that
+      link/icon in the footer and the floating contact hub. */
+  whatsapp_hidden?: string;
+  call_hidden?: string;
+  instagram_hidden?: string;
+  facebook_hidden?: string;
+  twitter_hidden?: string;
+  youtube_hidden?: string;
 }
+
+/** "true" hides — any other value (or no row yet) keeps the item visible. */
+export const isHidden = (flag?: string) => flag === 'true';
 
 const SETTINGS_CACHE = 'site-settings';
 
