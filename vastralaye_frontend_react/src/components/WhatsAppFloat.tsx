@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { MessageCircle, X, Phone } from 'lucide-react';
-import { useSiteSettings, FALLBACK_WHATSAPP } from '@/hooks/use-site-settings';
+import { useSiteSettings, FALLBACK_WHATSAPP, isHidden } from '@/hooks/use-site-settings';
 import {
   WhatsAppLogo,
   InstagramLogo,
@@ -30,15 +30,18 @@ const WhatsAppFloat = () => {
 
   const whatsappNumber = (settings.whatsapp_number || FALLBACK_WHATSAPP).replace(/[^\d]/g, '');
 
+  // Each entry honours its Admin › Store Settings hide switch.
   const links = [
-    {
-      key: 'whatsapp',
-      label: 'Chat on WhatsApp',
-      href: `https://wa.me/${whatsappNumber}`,
-      icon: <WhatsAppLogo className="w-5 h-5" />,
-      className: 'bg-[#25D366] text-white',
-    },
-    settings.call_number
+    !isHidden(settings.whatsapp_hidden)
+      ? {
+          key: 'whatsapp',
+          label: 'Chat on WhatsApp',
+          href: `https://wa.me/${whatsappNumber}`,
+          icon: <WhatsAppLogo className="w-5 h-5" />,
+          className: 'bg-[#25D366] text-white',
+        }
+      : null,
+    settings.call_number && !isHidden(settings.call_hidden)
       ? {
           key: 'call',
           label: 'Call us',
@@ -47,7 +50,7 @@ const WhatsAppFloat = () => {
           className: 'bg-maroon text-ivory',
         }
       : null,
-    settings.instagram_url
+    settings.instagram_url && !isHidden(settings.instagram_hidden)
       ? {
           key: 'instagram',
           label: 'Instagram',
@@ -57,7 +60,7 @@ const WhatsAppFloat = () => {
           style: { background: INSTAGRAM_GRADIENT },
         }
       : null,
-    settings.facebook_url
+    settings.facebook_url && !isHidden(settings.facebook_hidden)
       ? {
           key: 'facebook',
           label: 'Facebook',
@@ -66,7 +69,7 @@ const WhatsAppFloat = () => {
           className: 'bg-[#1877F2] text-white',
         }
       : null,
-    settings.twitter_url
+    settings.twitter_url && !isHidden(settings.twitter_hidden)
       ? {
           key: 'twitter',
           label: 'X (Twitter)',
@@ -75,7 +78,7 @@ const WhatsAppFloat = () => {
           className: 'bg-black text-white',
         }
       : null,
-    settings.youtube_url
+    settings.youtube_url && !isHidden(settings.youtube_hidden)
       ? {
           key: 'youtube',
           label: 'YouTube',
@@ -92,6 +95,9 @@ const WhatsAppFloat = () => {
     className: string;
     style?: React.CSSProperties;
   }[];
+
+  // Every entry hidden from Admin -> nothing left to launch.
+  if (links.length === 0) return null;
 
   return (
     <div className="fixed right-3 md:right-4 top-1/2 -translate-y-1/2 z-40 flex flex-col items-center">
