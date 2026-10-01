@@ -789,6 +789,15 @@ def clear_cart(
 # ORDER ROUTES
 # -------------------------
 
+async def _send_order_email_in_background(**email_kwargs) -> None:
+    """Background task wrapper for the order-confirmation email: a mail
+    failure is logged and affects nothing else — the order already exists."""
+    try:
+        await send_order_email(**email_kwargs)
+    except Exception as e:
+        logger.error(f"Order email failed: {e}")
+
+
 def sync_order_to_tracking_system(order_id: int) -> None:
     """Background task: push a fresh order into the Vastraliya tracking
     system and save the returned tracking number on the order.
@@ -1157,28 +1166,29 @@ async def create_order(
     # Register the order with the tracking system once the response is sent
     background_tasks.add_task(sync_order_to_tracking_system, order.id)
 
-    # 6️⃣ Send email only for COD
+    # 6️⃣ Send email only for COD — in the background: building the invoice
+    # PDF and talking to the mail server can be slow (or hang outright when
+    # SMTP misbehaves), and a stuck email must never 504 the checkout
+    # response. The order is already committed either way.
     if payment_method == "cod" and current_user.email:
-        try:
-            await send_order_email(
-                customer_email=current_user.email,
-                order_id=order.id,
-                amount=final_amount,
-                items=email_items,
-                customer_name=current_user.first_name,
-                address_line1=current_user.address_line1,
-                city=current_user.city,
-                postal_code=current_user.postal_code,
-                country=current_user.country,
-                phone=current_user.phone,
-                order_date=formatted_date,
-                # The full shipping address goes on the invoice; its state
-                # text decides SGST/CGST (Maharashtra) vs IGST heads.
-                full_address=order.shipping_address,
-                state=order.shipping_address if order.shipping_address not in (None, "", "N/A") else None,
-            )
-        except Exception as e:
-            logger.error(f"Order email failed: {e}")
+        background_tasks.add_task(
+            _send_order_email_in_background,
+            customer_email=current_user.email,
+            order_id=order.id,
+            amount=final_amount,
+            items=email_items,
+            customer_name=current_user.first_name,
+            address_line1=current_user.address_line1,
+            city=current_user.city,
+            postal_code=current_user.postal_code,
+            country=current_user.country,
+            phone=current_user.phone,
+            order_date=formatted_date,
+            # The full shipping address goes on the invoice; its state
+            # text decides SGST/CGST (Maharashtra) vs IGST heads.
+            full_address=order.shipping_address,
+            state=order.shipping_address if order.shipping_address not in (None, "", "N/A") else None,
+        )
 
     # 7️⃣ Return response
     return {
