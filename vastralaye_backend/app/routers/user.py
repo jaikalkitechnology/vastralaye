@@ -4,7 +4,8 @@ import os, shutil, re, json
 
 import pytz
 from fastapi import (
-    APIRouter, Depends, HTTPException, status, UploadFile, File, Form, Request,Query
+    APIRouter, Depends, HTTPException, status, UploadFile, File, Form, Request,Query,
+    BackgroundTasks
 )
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session,joinedload
@@ -58,6 +59,8 @@ import string
 from app.utilis.invoice_pdf import generate_invoice_pdf
 from app.utilis.send_email import send_order_email
 from app.utilis.gst import gst_rate, extract_tax, items_gst_total, uniform_rate, tax_heads
+from app.utilis import vastraliya_tracking
+from app.database import SessionLocal
 
 
 import requests
@@ -786,8 +789,59 @@ def clear_cart(
 # ORDER ROUTES
 # -------------------------
 
+def sync_order_to_tracking_system(order_id: int) -> None:
+    """Background task: push a fresh order into the Vastraliya tracking
+    system and save the returned tracking number on the order.
+
+    Runs after the checkout response is sent, so it never slows checkout
+    down — and it never raises, because a tracking hiccup must not affect
+    the order itself. Does nothing until TRACKING_API_EMAIL /
+    TRACKING_API_PASSWORD are configured in the backend .env.
+    """
+    if not vastraliya_tracking.is_tracking_configured():
+        return
+
+    db = SessionLocal()
+    try:
+        order = db.query(Order).filter(Order.id == order_id).first()
+        if not order or order.tracking_number:
+            return
+
+        line_items = []
+        for item in order.items:
+            product = db.query(Product).filter(Product.id == item.product_id).first()
+            line_items.append({
+                # Products here have no SKU column — the stable per-product id
+                # keeps the tracking catalogue in sync across repeat orders.
+                "sku": f"VAS-P{item.product_id}",
+                "name": product.name if product else f"Product #{item.product_id}",
+                "price": float(item.price or 0),
+                "quantity": item.quantity or 1,
+            })
+        if not line_items:
+            return
+
+        buyer = order.user
+        tracking_number = vastraliya_tracking.sync_order_to_tracking(
+            customer_name=order.customer_name or (buyer.first_name if buyer else None) or "Customer",
+            customer_email=(buyer.email if buyer else None) or f"order-{order.id}@vastraliya.com",
+            customer_phone=order.phone_number or (buyer.phone if buyer else None),
+            line_items=line_items,
+            origin="Vastraliya Warehouse, Vasai East",
+            destination=order.shipping_address,
+        )
+        order.tracking_number = tracking_number
+        db.commit()
+        logger.info(f"Order {order_id} registered with tracking system: {tracking_number}")
+    except Exception as e:
+        logger.error(f"Tracking sync failed for order {order_id}: {e}")
+    finally:
+        db.close()
+
+
 @router.post("/checkout", response_model=SuccessMessage)
-def checkout_from_cart(db: Session = Depends(get_db), user: User = Depends(get_current_user),
+def checkout_from_cart(background_tasks: BackgroundTasks,
+                       db: Session = Depends(get_db), user: User = Depends(get_current_user),
                        coupon_code: Optional[str] = None):
     """Convert cart to order with validations"""
     cart_items = db.query(CartItem).filter(CartItem.user_id == user.id).all()
@@ -826,6 +880,9 @@ def checkout_from_cart(db: Session = Depends(get_db), user: User = Depends(get_c
         db.add(OrderItem(order_id=order.id, product_id=item.product_id, quantity=item.quantity, price=item.price))
         db.delete(item)
     db.commit()
+
+    # Register the order with the tracking system once the response is sent
+    background_tasks.add_task(sync_order_to_tracking_system, order.id)
 
     try:
         send_email(user.email, "Order Placed", f"Your order #{order.id} has been placed successfully.")
@@ -901,6 +958,7 @@ def get_my_orders(
 
             # ✅ Shipping
             "shipping_address": order.shipping_address,
+            "tracking_number": order.tracking_number,
 
             # ✅ Items
             "items": items_data,
@@ -930,6 +988,7 @@ PAYMENT_METHOD_LABELS = {
 @router.post("/orders/create", response_model=OrderOut)
 async def create_order(
     data: OrderCreate,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user),
 ):
@@ -1094,6 +1153,9 @@ async def create_order(
 
     db.commit()
     db.refresh(order)
+
+    # Register the order with the tracking system once the response is sent
+    background_tasks.add_task(sync_order_to_tracking_system, order.id)
 
     # 6️⃣ Send email only for COD
     if payment_method == "cod" and current_user.email:
@@ -1270,6 +1332,7 @@ def get_order_detail(
         "city": order.city,
         "state": order.state,
         "pincode": order.pincode,
+        "tracking_number": order.tracking_number,
 
         "status": order.status,
         "payment_method": order.payment_method or "cod",

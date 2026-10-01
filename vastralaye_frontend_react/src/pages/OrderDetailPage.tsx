@@ -98,6 +98,7 @@ interface OrderDetails {
     transaction_id?: string;
     utr_number?: string;           // ✅ NEW
     shipping_address?: string;
+    tracking_number?: string | null;  // from the Vastraliya tracking system
     customer_name?: string;        // ✅ NEW
     phone_number?: string;         // ✅ NEW
     city?: string | null;          // ✅ NEW
@@ -320,6 +321,7 @@ const useOrderData = (
     transaction_id: raw.transaction_id || raw.txn_id || raw.razorpay_payment_id || null,
     utr_number: raw.utr_number || null,                    // ✅ NEW
     shipping_address: raw.shipping_address || null,
+    tracking_number: raw.tracking_number || null,
     customer_name: raw.customer_name || null,               // ✅ NEW
     phone_number: raw.phone_number || null,                 // ✅ NEW
     city: raw.city || null,                                 // ✅ NEW
@@ -1081,6 +1083,22 @@ const OrderDetailPage = () => {
                                             </button>
                                         </div>
                                     </header>
+                                    {order.tracking_number && (
+                                        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border bg-gold/10 px-5 py-2.5">
+                                            <p className="text-[12.5px] text-muted-foreground">
+                                                Tracking number:{' '}
+                                                <b className="font-semibold tracking-wide text-espresso">{order.tracking_number}</b>
+                                            </p>
+                                            <a
+                                                href="https://tracking.vastraliya.com"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-[11px] font-semibold uppercase tracking-[0.12em] text-maroon underline underline-offset-[3px] hover:text-terracotta"
+                                            >
+                                                Track parcel
+                                            </a>
+                                        </div>
+                                    )}
                                     {showTracking && (
                                         <div className="p-5">
                                             {[...order.tracking].reverse().map((t, i, arr) => (
