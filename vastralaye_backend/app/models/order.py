@@ -36,6 +36,11 @@ class Order(Base):
     transaction_id = Column(String(100), nullable=True, unique=True, index=True)
     utr_number = Column(String(100), nullable=True)
 
+    # Shipment number from the Vastraliya tracking system — filled in by a
+    # background sync right after checkout; shown to the customer so they can
+    # follow the parcel on tracking.vastraliya.com.
+    tracking_number = Column(String(100), nullable=True)
+
     # ✅ Mizorpay Payment Fields (NEW)
     merchant_ref = Column(String(255), nullable=True, unique=True, index=True)
     mizor_pay_txn_id = Column(String(255), nullable=True, unique=True, index=True)
