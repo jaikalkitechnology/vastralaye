@@ -251,3 +251,19 @@ if __name__ == "__main__":
         origin="Mumbai Warehouse",
     )
     print("Tracking number:", tracking_number)
+
+
+def get_shipment_by_tracking_number(tracking_number: str) -> dict | None:
+    """Fetch the live shipment record for a tracking number, or None.
+
+    Lets the store follow status changes made by staff on
+    tracking.vastraliya.com - the shipment's current status is mirrored
+    back onto the website order.
+    """
+    if not tracking_number:
+        return None
+    data = _request("GET", "/shipments", params={"search": tracking_number, "page_size": 5})
+    for item in data.get("items", []):
+        if str(item.get("tracking_number", "")).strip().lower() == tracking_number.strip().lower():
+            return item
+    return None
