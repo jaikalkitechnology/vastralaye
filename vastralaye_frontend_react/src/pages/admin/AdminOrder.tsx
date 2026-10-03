@@ -1206,6 +1206,17 @@ export default function AdminOrders() {
                       <p className="font-semibold text-espresso text-[13px]">{formatDate(order.created_at)}</p>
                       <p className="text-xs text-muted-foreground mt-1">{formatTime(order.created_at)}</p>
                     </div>
+                    {((order as any).tracking_number || (order as any).tracking_status) && (
+                      <div className="p-4 bg-gold/10 border border-gold/30 rounded-md">
+                        <p className="text-[10.5px] font-semibold text-[#8A6414] uppercase tracking-[0.14em] mb-2">Courier Status</p>
+                        <p className="font-semibold text-espresso text-[13px]">
+                          {(order as any).tracking_status || '—'}
+                        </p>
+                        {(order as any).tracking_number && (
+                          <p className="mt-1 font-mono text-xs text-muted-foreground">{(order as any).tracking_number}</p>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   {/* Customer Info */}

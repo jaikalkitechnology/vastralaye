@@ -99,6 +99,7 @@ interface OrderDetails {
     utr_number?: string;           // ✅ NEW
     shipping_address?: string;
     tracking_number?: string | null;  // from the Vastraliya tracking system
+    tracking_status?: string | null;  // the tracking system's own stage name
     customer_name?: string;        // ✅ NEW
     phone_number?: string;         // ✅ NEW
     city?: string | null;          // ✅ NEW
@@ -322,6 +323,7 @@ const useOrderData = (
     utr_number: raw.utr_number || null,                    // ✅ NEW
     shipping_address: raw.shipping_address || null,
     tracking_number: raw.tracking_number || null,
+    tracking_status: raw.tracking_status || null,
     customer_name: raw.customer_name || null,               // ✅ NEW
     phone_number: raw.phone_number || null,                 // ✅ NEW
     city: raw.city || null,                                 // ✅ NEW
@@ -1085,9 +1087,16 @@ const OrderDetailPage = () => {
                                     </header>
                                     {order.tracking_number && (
                                         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border bg-gold/10 px-5 py-2.5">
-                                            <p className="text-[12.5px] text-muted-foreground">
-                                                Tracking number:{' '}
-                                                <b className="font-semibold tracking-wide text-espresso">{order.tracking_number}</b>
+                                            <p className="flex flex-wrap items-center gap-2 text-[12.5px] text-muted-foreground">
+                                                <span>
+                                                    Tracking number:{' '}
+                                                    <b className="font-semibold tracking-wide text-espresso">{order.tracking_number}</b>
+                                                </span>
+                                                {order.tracking_status && (
+                                                    <span className="inline-flex items-center rounded-full border border-gold/40 bg-gold/15 px-2.5 py-0.5 text-[10.5px] font-semibold uppercase tracking-[0.1em] text-[#8A6414]">
+                                                        {order.tracking_status}
+                                                    </span>
+                                                )}
                                             </p>
                                             <a
                                                 href="https://tracking.vastraliya.com"
