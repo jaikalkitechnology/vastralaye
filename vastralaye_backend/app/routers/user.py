@@ -956,13 +956,18 @@ def refresh_order_status_from_tracking(order_id: int) -> None:
         if not raw_status or _normalize_stage(raw_status) == _normalize_stage(order.tracking_status):
             return
 
-        order.tracking_status = raw_status[:50]
+        # "ORDER_CONFIRMED" and friends read badly on the site — store the
+        # stage in display form ("Order Confirmed"); matching stays
+        # normalization-based either way.
+        display_status = " ".join(raw_status.replace("_", " ").replace("-", " ").split()).title()[:50]
+
+        order.tracking_status = display_status
         mapped = _map_tracking_status(raw_status)
         if mapped and mapped != (order.status or "").lower():
             order.status = mapped
         db.add(OrderTracking(
             order_id=order.id,
-            status=raw_status[:50],
+            status=display_status,
             message="Status updated from the tracking system.",
             timestamp=datetime.utcnow(),
         ))
@@ -1269,7 +1274,12 @@ async def create_order(
                 order_id=order.id,
                 product_id=item["product_id"],
                 quantity=item["quantity"],
-                price=item["price"],  # MRP# ADD THIS FIELD
+                # The price the customer actually pays per unit (discounted
+                # selling price). Storing MRP here made the order page add
+                # up to more than the amount charged whenever a discount or
+                # coupon applied — every display must agree with
+                # order.total_amount.
+                price=item["selling_price"],
             )
         )
 

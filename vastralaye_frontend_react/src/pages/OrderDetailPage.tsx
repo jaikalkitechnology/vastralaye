@@ -421,10 +421,14 @@ const InvoicePageView: React.FC<{
 
     const shipping = order.shipping_amount || 0;
     const discount = order.discount_amount || 0;
-    const total = Math.max(0, subtotal + shipping - discount);
+    /* order.total_amount is what the customer is actually charged (COD
+       collection, invoice, success popup). Line items on old orders were
+       stored at MRP, so a recomputed sum can exceed it — the stored total
+       always wins. */
+    const total = order.total_amount || Math.max(0, subtotal + shipping - discount);
     const { baseAmount, gstAmount, heads: taxHeads } = orderTaxBreakup(
         order.items || [],
-        Math.max(0, subtotal - discount),
+        Math.max(0, (order.total_amount || subtotal - discount) - shipping),
         String(order.state || order.shipping_address || ''),
     );
 
@@ -866,10 +870,14 @@ const OrderDetailPage = () => {
     );
     const shipping = order.shipping_amount || 0;
     const discount = order.discount_amount || 0;
-    const total = Math.max(0, subtotal + shipping - discount);
+    /* order.total_amount is what the customer is actually charged (COD
+       collection, invoice, success popup). Line items on old orders were
+       stored at MRP, so a recomputed sum can exceed it — the stored total
+       always wins. */
+    const total = order.total_amount || Math.max(0, subtotal + shipping - discount);
     const { baseAmount, gstAmount, heads: taxHeads } = orderTaxBreakup(
         order.items || [],
-        Math.max(0, subtotal - discount),
+        Math.max(0, (order.total_amount || subtotal - discount) - shipping),
         String(order.state || order.shipping_address || ''),
     );
 
