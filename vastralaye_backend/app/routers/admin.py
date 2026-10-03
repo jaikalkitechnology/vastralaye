@@ -1,5 +1,6 @@
 from fastapi import (
-    APIRouter, Depends, HTTPException, UploadFile, Form, File, status, Request, Query, Body
+    APIRouter, Depends, HTTPException, UploadFile, Form, File, status, Request, Query, Body,
+    BackgroundTasks
 )
 from pydantic import BaseModel, constr
 from sqlalchemy import or_, desc,cast, String,asc
@@ -3041,6 +3042,7 @@ def admin_deactivate_user(user_id: int, db: Session = Depends(get_db)):
 @router.get("/orders/{order_id}")
 def get_order_by_id(
     order_id: int,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
     admin: User = Depends(get_current_user)
 ):
@@ -3048,6 +3050,12 @@ def get_order_by_id(
         raise HTTPException(status_code=403, detail="Admins only")
 
     order = db.query(Order).filter(Order.id == order_id).first()
+
+    if order and order.tracking_number and (order.status or "").lower() not in ("delivered", "cancelled"):
+        # Opening an order in admin refreshes its status from the tracking
+        # system in the background (same as the customer's order page).
+        from app.routers.user import refresh_order_status_from_tracking
+        background_tasks.add_task(refresh_order_status_from_tracking, order.id)
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
 

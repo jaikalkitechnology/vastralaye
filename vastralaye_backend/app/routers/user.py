@@ -866,6 +866,72 @@ def sync_order_to_tracking_system(order_id: int) -> None:
             db.close()
 
 
+def _map_tracking_status(raw: str) -> Optional[str]:
+    """Translate a tracking-system shipment status into a store order status.
+    Returns None when the status has no store equivalent (order unchanged)."""
+    s = (raw or "").strip().lower().replace("-", " ").replace("_", " ")
+    if not s:
+        return None
+    # "out for delivery" must win over the bare "deliver" match below
+    if "out for" in s:
+        return "shipped"
+    if "deliver" in s:
+        return "delivered"
+    if "cancel" in s or "return" in s or "rto" in s:
+        return "cancelled"
+    if "transit" in s or "ship" in s or "dispatch" in s or "out for" in s or "courier" in s:
+        return "shipped"
+    if "pack" in s or "process" in s or "confirm" in s or "ready" in s:
+        return "processing"
+    return None
+
+
+def refresh_order_status_from_tracking(order_id: int) -> None:
+    """Background task: mirror the shipment status from the tracking system
+    (tracking.vastraliya.com) onto the website order, so a status change a
+    staff member makes there shows up on the customer's order page and in
+    Admin → Orders. Never raises; delivered/cancelled orders are final."""
+    db = None
+    try:
+        if not vastraliya_tracking.is_tracking_configured():
+            return
+
+        db = SessionLocal()
+        order = db.query(Order).filter(Order.id == order_id).first()
+        if not order or not order.tracking_number:
+            return
+        if (order.status or "").lower() in ("delivered", "cancelled"):
+            return
+
+        shipment = vastraliya_tracking.get_shipment_by_tracking_number(order.tracking_number)
+        if not shipment:
+            return
+        raw_status = str(
+            shipment.get("status")
+            or shipment.get("current_status")
+            or shipment.get("shipment_status")
+            or ""
+        )
+        mapped = _map_tracking_status(raw_status)
+        if not mapped or mapped == (order.status or "").lower():
+            return
+
+        order.status = mapped
+        db.add(OrderTracking(
+            order_id=order.id,
+            status=mapped.capitalize(),
+            message=f"Status updated from the tracking system ({raw_status}).",
+            timestamp=datetime.utcnow(),
+        ))
+        db.commit()
+        logger.info(f"Order {order_id} status refreshed from tracking: {raw_status} -> {mapped}")
+    except Exception as e:
+        logger.error(f"Tracking status refresh failed for order {order_id}: {e}")
+    finally:
+        if db is not None:
+            db.close()
+
+
 @router.post("/checkout", response_model=SuccessMessage)
 def checkout_from_cart(background_tasks: BackgroundTasks,
                        db: Session = Depends(get_db), user: User = Depends(get_current_user),
@@ -1265,6 +1331,7 @@ def get_live_order(
 @router.get("/user/orders/{order_id}")
 def get_order_detail(
     order_id: int,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
@@ -1276,6 +1343,11 @@ def get_order_detail(
 
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
+
+    # Viewing the order refreshes its status from the tracking system in the
+    # background — staff updates on tracking.vastraliya.com show up here.
+    if order.tracking_number and (order.status or "").lower() not in ("delivered", "cancelled"):
+        background_tasks.add_task(refresh_order_status_from_tracking, order.id)
 
     # Build items with product names AND images
     items_data = []
