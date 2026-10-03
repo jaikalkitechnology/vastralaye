@@ -42,6 +42,11 @@ class OrderCreate(BaseModel):
     payment_method: PaymentMethod = PaymentMethod.COD
     shipping_address: Optional[str] = None
     coupon_code: Optional[str] = None
+    # Structured address parts from the checkout form — stored on the order
+    # for GST place-of-supply and the tracking-system shipping address.
+    city: Optional[str] = None
+    state: Optional[str] = None
+    pincode: Optional[str] = None
 
 
 class OrderProductOut(BaseModel):

@@ -2,9 +2,12 @@
 Vastraliya Tracking System integration.
 
 Call `sync_order_to_tracking(...)` right after an order is confirmed / paid
-on the website. It pushes the order into the tracking system
-(tracking-api.vastraliya.com) so it gets a tracking number and shows up on
-tracking.vastraliya.com automatically.
+on the website, passing the customer's real shipping address from your own
+checkout form data. It pushes the order (customer, address, products,
+order, shipment) into the tracking system (tracking-api.vastraliya.com) so
+it gets a tracking number and shows up on tracking.vastraliya.com
+automatically - with the correct shipping address attached, not a blank
+one that a staff member has to fill in by hand afterwards.
 
 Requires: pip install requests
 
@@ -99,6 +102,39 @@ def find_or_create_customer(name: str, email: str, phone: str | None = None) -> 
     return created["id"]
 
 
+def create_address(
+    customer_id: int,
+    *,
+    address_line1: str,
+    city: str,
+    state: str,
+    pincode: str,
+    address_line2: str | None = None,
+    country: str = "India",
+) -> int:
+    """Creates a new address for this customer and returns its id.
+
+    Always creates a fresh address rather than searching for a matching one,
+    since the tracking system doesn't have a "find existing address"
+    endpoint - each order's shipping address is recorded as its own entry,
+    the same way a real order history works.
+    """
+    created = _request(
+        "POST",
+        "/addresses",
+        json={
+            "customer_id": customer_id,
+            "address_line1": address_line1,
+            "address_line2": address_line2,
+            "city": city,
+            "state": state,
+            "pincode": pincode,
+            "country": country,
+        },
+    )
+    return created["id"]
+
+
 def find_or_create_product(sku: str, name: str, price: float, weight: float | None = None) -> int:
     """Returns the tracking-system product id for this SKU, creating it on first use."""
     existing = _request("GET", "/products", params={"search": sku, "page_size": 1})
@@ -110,9 +146,24 @@ def find_or_create_product(sku: str, name: str, price: float, weight: float | No
     return created["id"]
 
 
-def create_order(customer_id: int, items: list[dict]) -> dict:
+def create_order(
+    customer_id: int,
+    items: list[dict],
+    *,
+    shipping_address_id: int | None = None,
+    billing_address_id: int | None = None,
+) -> dict:
     """items: [{"product_id": 1, "quantity": 2}, ...]"""
-    return _request("POST", "/orders", json={"customer_id": customer_id, "items": items})
+    return _request(
+        "POST",
+        "/orders",
+        json={
+            "customer_id": customer_id,
+            "items": items,
+            "shipping_address_id": shipping_address_id,
+            "billing_address_id": billing_address_id,
+        },
+    )
 
 
 def create_shipment(
@@ -140,31 +191,48 @@ def sync_order_to_tracking(
     customer_email: str,
     customer_phone: str | None,
     line_items: list[dict],
+    shipping_address: dict,
+    billing_address: dict | None = None,
     origin: str | None = None,
-    destination: str | None = None,
 ) -> str:
     """
-    High-level entry point: call this once, right after checkout succeeds.
+    High-level entry point: call this once, right after checkout succeeds,
+    using the real address the customer entered at checkout - not a
+    placeholder. No one has to type it in by hand afterwards.
 
     line_items: [{"sku": "SAREE-RED-01", "name": "Red Silk Saree", "price": 2500.0,
                    "weight": 0.5, "quantity": 1}, ...]
 
+    shipping_address / billing_address: {"address_line1": "...", "address_line2": "...",
+                   "city": "...", "state": "...", "pincode": "...", "country": "India"}
+    billing_address defaults to the same as shipping_address if omitted.
+
     Returns the tracking_number to show/email to the customer.
     """
     customer_id = find_or_create_customer(customer_name, customer_email, customer_phone)
+
+    shipping_address_id = create_address(customer_id, **shipping_address)
+    billing_address_id = (
+        create_address(customer_id, **billing_address) if billing_address else shipping_address_id
+    )
 
     order_items = []
     for line in line_items:
         product_id = find_or_create_product(line["sku"], line["name"], line["price"], line.get("weight"))
         order_items.append({"product_id": product_id, "quantity": line["quantity"]})
 
-    order = create_order(customer_id, order_items)
+    order = create_order(
+        customer_id, order_items, shipping_address_id=shipping_address_id, billing_address_id=billing_address_id
+    )
+
+    destination = f"{shipping_address['city']}, {shipping_address['state']}"
     shipment = create_shipment(order["id"], origin=origin, destination=destination)
     return shipment["tracking_number"]
 
 
 if __name__ == "__main__":
-    # Example - wire this call into your real checkout/order-confirmation code.
+    # Example - wire this call into your real checkout/order-confirmation code,
+    # using the address fields your checkout form actually collects.
     tracking_number = sync_order_to_tracking(
         customer_name="Priya Sharma",
         customer_email="priya@example.com",
@@ -172,7 +240,14 @@ if __name__ == "__main__":
         line_items=[
             {"sku": "SAREE-RED-01", "name": "Red Silk Saree", "price": 2500.0, "weight": 0.5, "quantity": 1},
         ],
+        shipping_address={
+            "address_line1": "12 MG Road",
+            "address_line2": "Near City Mall",
+            "city": "Pune",
+            "state": "Maharashtra",
+            "pincode": "411001",
+            "country": "India",
+        },
         origin="Mumbai Warehouse",
-        destination="Priya's shipping address, Pune",
     )
     print("Tracking number:", tracking_number)
