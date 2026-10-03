@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request, Depends, HTTPException
+from fastapi import APIRouter, Request, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
 from app.authentication import get_current_admin_user
 from app.database import get_db
@@ -65,7 +65,7 @@ def _record_event(db: Session, merchant_ref: str, status: str, payload: dict) ->
 
 
 @router.post("/webhook")
-async def payment_webhook(request: Request, db: Session = Depends(get_db)):
+async def payment_webhook(request: Request, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
     """
     Vastraliya payment webhook.
 
@@ -234,6 +234,17 @@ async def payment_webhook(request: Request, db: Session = Depends(get_db)):
 
             db.commit()
             logger.info(f"✅ Database updated successfully")
+
+            # Online order confirmed -> register it with the tracking system
+            # (background, after the webhook response; COD orders get the
+            # same sync from create_order). Idempotent: already-synced
+            # orders are skipped inside the task.
+            if order.payment_status == "paid":
+                try:
+                    from app.routers.user import sync_order_to_tracking_system
+                    background_tasks.add_task(sync_order_to_tracking_system, order.id)
+                except Exception as sync_err:
+                    logger.error(f"Could not schedule tracking sync: {sync_err}")
 
         except Exception as db_error:
             db.rollback()

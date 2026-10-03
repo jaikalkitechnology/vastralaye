@@ -1527,6 +1527,60 @@ const OrderSuccessModal: React.FC<OrderSuccessModalProps> = ({
   orderData,
 }) => {
   const navigate = useNavigate();
+
+  /* The tracking ID is generated a few seconds after checkout (background
+     sync with the tracking system, so checkout itself never waits on it).
+     While this popup is open, poll the order until the number arrives. */
+  const [trackingNumber, setTrackingNumber] = useState<string | null>(null);
+  const [trackingPending, setTrackingPending] = useState(true);
+  useEffect(() => {
+    if (!isOpen) return;
+    const oid = orderData?.id || orderData?.order_id;
+    if (!oid) return;
+    if (orderData?.tracking_number) {
+      setTrackingNumber(orderData.tracking_number);
+      setTrackingPending(false);
+      return;
+    }
+    setTrackingNumber(null);
+    setTrackingPending(true);
+    let stopped = false;
+    let tries = 0;
+    const token =
+      localStorage.getItem('access_token') ||
+      localStorage.getItem('token') ||
+      localStorage.getItem('userToken') || '';
+    const poll = async () => {
+      if (stopped) return;
+      tries += 1;
+      try {
+        const r = await fetch(`${BASE_URL}/users/user/orders/${oid}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (r.ok) {
+          const d = await r.json();
+          if (d?.tracking_number) {
+            setTrackingNumber(d.tracking_number);
+            setTrackingPending(false);
+            return;
+          }
+        }
+      } catch {
+        /* transient — keep polling */
+      }
+      if (tries >= 12) {
+        setTrackingPending(false);
+        return;
+      }
+      window.setTimeout(poll, 2500);
+    };
+    const starter = window.setTimeout(poll, 2000);
+    return () => {
+      stopped = true;
+      window.clearTimeout(starter);
+    };
+  }, [isOpen, orderData?.id, orderData?.order_id, orderData?.tracking_number]);
+
   const formatPrice = (price: number) => `₹${price.toLocaleString('en-IN')}`;
   const paymentLabels: Record<string, string> = {
     cod: 'Cash on Delivery',
@@ -1559,6 +1613,24 @@ const OrderSuccessModal: React.FC<OrderSuccessModalProps> = ({
               </p>
             </div>
           )}
+          {/* Tracking ID — appears a few seconds after the order is placed */}
+          <div className="p-4 bg-ivory rounded-sm border border-border text-center">
+            <p className="text-xs uppercase tracking-[0.12em] text-muted-foreground">Tracking ID</p>
+            {trackingNumber ? (
+              <p className="mt-1 font-mono text-lg font-semibold tracking-wide text-maroon">
+                {trackingNumber}
+              </p>
+            ) : trackingPending ? (
+              <p className="mt-1.5 flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                <Loader2 className="h-3.5 w-3.5 animate-spin" strokeWidth={1.5} />
+                Generating your tracking ID…
+              </p>
+            ) : (
+              <p className="mt-1.5 text-sm text-muted-foreground">
+                It will appear on your order page in a few minutes
+              </p>
+            )}
+          </div>
           <div className="p-4 bg-green-50 rounded-sm border border-green-200">
             <div className="flex items-start gap-3">
               <Package className="h-5 w-5 text-green-700 flex-shrink-0 mt-0.5" strokeWidth={1.5} />
