@@ -3051,10 +3051,10 @@ def get_order_by_id(
 
     order = db.query(Order).filter(Order.id == order_id).first()
 
-    if order and order.tracking_number and (order.status or "").lower() not in ("delivered", "cancelled"):
+    from app.routers.user import refresh_order_status_from_tracking, tracking_refresh_wanted
+    if tracking_refresh_wanted(order):
         # Opening an order in admin refreshes its status from the tracking
         # system in the background (same as the customer's order page).
-        from app.routers.user import refresh_order_status_from_tracking
         background_tasks.add_task(refresh_order_status_from_tracking, order.id)
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")

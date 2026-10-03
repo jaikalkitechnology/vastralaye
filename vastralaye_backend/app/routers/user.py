@@ -866,31 +866,74 @@ def sync_order_to_tracking_system(order_id: int) -> None:
             db.close()
 
 
+# The tracking system's 14 shipment stages -> the store's coarse order
+# status (badges, timeline, filters). The verbatim stage name is stored in
+# order.tracking_status and shown on the order pages.
+TRACKING_STAGE_TO_ORDER_STATUS = {
+    "order confirmed": "processing",
+    "packed": "processing",
+    "ready for pickup": "processing",
+    "picked up": "shipped",
+    "in transit": "shipped",
+    "arrived at hub": "shipped",
+    "out for delivery": "shipped",
+    "delivered": "delivered",
+    "delivery failed": "shipped",      # still with the courier, retry pending
+    "cancelled": "cancelled",
+    "return requested": "delivered",   # parcel is still with the customer
+    "returned": "cancelled",
+    "return to origin": "cancelled",
+    "on hold": None,                   # pause - keep the current site status
+}
+
+# Once the tracking system says one of these, the journey is over and the
+# refresh stops polling. Delivered is NOT final here: a return can follow.
+TRACKING_FINAL_STAGES = {"cancelled", "returned", "return to origin"}
+
+
+def _normalize_stage(raw) -> str:
+    return (raw or "").strip().lower().replace("-", " ").replace("_", " ")
+
+
 def _map_tracking_status(raw: str) -> Optional[str]:
     """Translate a tracking-system shipment status into a store order status.
-    Returns None when the status has no store equivalent (order unchanged)."""
-    s = (raw or "").strip().lower().replace("-", " ").replace("_", " ")
+    Exact names first (the system's 14 stages), then a forgiving fallback.
+    Returns None when the order status should stay as it is."""
+    s = _normalize_stage(raw)
     if not s:
         return None
-    # "out for delivery" must win over the bare "deliver" match below
-    if "out for" in s:
+    if s in TRACKING_STAGE_TO_ORDER_STATUS:
+        return TRACKING_STAGE_TO_ORDER_STATUS[s]
+    # Unknown wording from the tracking side - match on fragments.
+    # "out for delivery" must win over the bare "deliver" match below.
+    if "out for" in s or "pickup" in s or "picked" in s:
         return "shipped"
-    if "deliver" in s:
-        return "delivered"
-    if "cancel" in s or "return" in s or "rto" in s:
+    if "return" in s or "rto" in s:
         return "cancelled"
-    if "transit" in s or "ship" in s or "dispatch" in s or "out for" in s or "courier" in s:
+    if "deliver" in s and "fail" not in s:
+        return "delivered"
+    if "cancel" in s:
+        return "cancelled"
+    if "transit" in s or "ship" in s or "dispatch" in s or "courier" in s or "hub" in s or "fail" in s:
         return "shipped"
     if "pack" in s or "process" in s or "confirm" in s or "ready" in s:
         return "processing"
     return None
 
 
+def tracking_refresh_wanted(order) -> bool:
+    """Whether viewing this order should trigger a tracking-status refresh."""
+    if not order or not order.tracking_number:
+        return False
+    return _normalize_stage(order.tracking_status) not in TRACKING_FINAL_STAGES
+
+
 def refresh_order_status_from_tracking(order_id: int) -> None:
     """Background task: mirror the shipment status from the tracking system
     (tracking.vastraliya.com) onto the website order, so a status change a
     staff member makes there shows up on the customer's order page and in
-    Admin → Orders. Never raises; delivered/cancelled orders are final."""
+    Admin -> Orders. Stores the exact stage name in order.tracking_status
+    and the coarse equivalent in order.status. Never raises."""
     db = None
     try:
         if not vastraliya_tracking.is_tracking_configured():
@@ -898,9 +941,7 @@ def refresh_order_status_from_tracking(order_id: int) -> None:
 
         db = SessionLocal()
         order = db.query(Order).filter(Order.id == order_id).first()
-        if not order or not order.tracking_number:
-            return
-        if (order.status or "").lower() in ("delivered", "cancelled"):
+        if not tracking_refresh_wanted(order):
             return
 
         shipment = vastraliya_tracking.get_shipment_by_tracking_number(order.tracking_number)
@@ -911,20 +952,22 @@ def refresh_order_status_from_tracking(order_id: int) -> None:
             or shipment.get("current_status")
             or shipment.get("shipment_status")
             or ""
-        )
-        mapped = _map_tracking_status(raw_status)
-        if not mapped or mapped == (order.status or "").lower():
+        ).strip()
+        if not raw_status or _normalize_stage(raw_status) == _normalize_stage(order.tracking_status):
             return
 
-        order.status = mapped
+        order.tracking_status = raw_status[:50]
+        mapped = _map_tracking_status(raw_status)
+        if mapped and mapped != (order.status or "").lower():
+            order.status = mapped
         db.add(OrderTracking(
             order_id=order.id,
-            status=mapped.capitalize(),
-            message=f"Status updated from the tracking system ({raw_status}).",
+            status=raw_status[:50],
+            message="Status updated from the tracking system.",
             timestamp=datetime.utcnow(),
         ))
         db.commit()
-        logger.info(f"Order {order_id} status refreshed from tracking: {raw_status} -> {mapped}")
+        logger.info(f"Order {order_id} tracking status: {raw_status} (site status: {order.status})")
     except Exception as e:
         logger.error(f"Tracking status refresh failed for order {order_id}: {e}")
     finally:
@@ -1052,6 +1095,7 @@ def get_my_orders(
             # ✅ Shipping
             "shipping_address": order.shipping_address,
             "tracking_number": order.tracking_number,
+            "tracking_status": order.tracking_status,
 
             # ✅ Items
             "items": items_data,
@@ -1346,7 +1390,7 @@ def get_order_detail(
 
     # Viewing the order refreshes its status from the tracking system in the
     # background — staff updates on tracking.vastraliya.com show up here.
-    if order.tracking_number and (order.status or "").lower() not in ("delivered", "cancelled"):
+    if tracking_refresh_wanted(order):
         background_tasks.add_task(refresh_order_status_from_tracking, order.id)
 
     # Build items with product names AND images
@@ -1435,6 +1479,7 @@ def get_order_detail(
         "state": order.state,
         "pincode": order.pincode,
         "tracking_number": order.tracking_number,
+        "tracking_status": order.tracking_status,
 
         "status": order.status,
         "payment_method": order.payment_method or "cod",

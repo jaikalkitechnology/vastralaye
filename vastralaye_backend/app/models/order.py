@@ -40,6 +40,10 @@ class Order(Base):
     # background sync right after checkout; shown to the customer so they can
     # follow the parcel on tracking.vastraliya.com.
     tracking_number = Column(String(100), nullable=True)
+    # The tracking system's own status name, verbatim (one of its 14 stages,
+    # e.g. "Out for Delivery", "Arrived at Hub") — displayed on the customer
+    # and admin order pages; order.status keeps the coarse site vocabulary.
+    tracking_status = Column(String(50), nullable=True)
 
     # ✅ Mizorpay Payment Fields (NEW)
     merchant_ref = Column(String(255), nullable=True, unique=True, index=True)
@@ -101,6 +105,8 @@ class Order(Base):
             "paid_amount": self.paid_amount,
             "payment_date": self.payment_date.isoformat() if self.payment_date else None,
             "status": self.status,
+            "tracking_number": self.tracking_number,
+            "tracking_status": self.tracking_status,
             "total_amount": self.total_amount,
             "discount_amount": self.discount_amount,
             "gst_amount": self.gst_amount,
