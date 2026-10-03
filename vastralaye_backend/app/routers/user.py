@@ -807,11 +807,12 @@ def sync_order_to_tracking_system(order_id: int) -> None:
     the order itself. Does nothing until TRACKING_API_EMAIL /
     TRACKING_API_PASSWORD are configured in the backend .env.
     """
-    if not vastraliya_tracking.is_tracking_configured():
-        return
-
-    db = SessionLocal()
+    db = None
     try:
+        if not vastraliya_tracking.is_tracking_configured():
+            return
+
+        db = SessionLocal()
         order = db.query(Order).filter(Order.id == order_id).first()
         if not order or order.tracking_number:
             return
@@ -830,14 +831,30 @@ def sync_order_to_tracking_system(order_id: int) -> None:
         if not line_items:
             return
 
+        # The tracking system records the real shipping address. Structured
+        # fields come from the order; the state falls back to reading the
+        # composed address text ("line, city, state, India") for orders
+        # placed before the state column was filled in.
+        parts = [p.strip() for p in (order.shipping_address or "").split(",") if p.strip()]
+        state_guess = ""
+        if parts:
+            state_guess = parts[-2] if ("india" in parts[-1].lower() and len(parts) >= 2) else parts[-1]
+        shipping_address = {
+            "address_line1": order.shipping_address or "N/A",
+            "city": order.city or "",
+            "state": order.state or state_guess,
+            "pincode": order.pincode or "",
+            "country": "India",
+        }
+
         buyer = order.user
         tracking_number = vastraliya_tracking.sync_order_to_tracking(
             customer_name=order.customer_name or (buyer.first_name if buyer else None) or "Customer",
             customer_email=(buyer.email if buyer else None) or f"order-{order.id}@vastraliya.com",
             customer_phone=order.phone_number or (buyer.phone if buyer else None),
             line_items=line_items,
+            shipping_address=shipping_address,
             origin="Vastraliya Warehouse, Vasai East",
-            destination=order.shipping_address,
         )
         order.tracking_number = tracking_number
         db.commit()
@@ -845,7 +862,8 @@ def sync_order_to_tracking_system(order_id: int) -> None:
     except Exception as e:
         logger.error(f"Tracking sync failed for order {order_id}: {e}")
     finally:
-        db.close()
+        if db is not None:
+            db.close()
 
 
 @router.post("/checkout", response_model=SuccessMessage)
@@ -1092,8 +1110,10 @@ async def create_order(
         phone_number=current_user.phone or "0000000000",
 
         shipping_address=data.shipping_address or current_user.address_line1 or "N/A",
-        city=current_user.city or "N/A",
-        pincode=current_user.postal_code or "000000",
+        # Prefer what the customer typed at checkout over stale profile data
+        city=data.city or current_user.city or "N/A",
+        state=data.state or None,
+        pincode=data.pincode or current_user.postal_code or "000000",
 
         created_at=datetime.utcnow(),
     )

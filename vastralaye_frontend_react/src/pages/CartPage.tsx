@@ -1052,6 +1052,11 @@ const PaymentMethodModal: React.FC<PaymentMethodModalProps> = ({
           })),
           payment_method: 'cod',
           shipping_address: fullShippingAddress,
+          // Structured parts of the typed address — the backend stores them
+          // on the order (GST place-of-supply + tracking-system address).
+          city: city.trim(),
+          state: addressState.trim(),
+          pincode: zipCode.trim(),
         };
 
         const response = await fetch(`${BASE_URL}/users/orders/create`, {
