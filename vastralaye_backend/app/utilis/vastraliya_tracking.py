@@ -210,6 +210,38 @@ def create_shipment(
     )
 
 
+def get_shipment_by_tracking_number(tracking_number: str) -> dict:
+    """
+    Looks up a shipment's current status by tracking number, for your "tracking
+    status refresh" job to call periodically (or whenever a customer checks their
+    order) and update order["tracking_status"] on vastraliya.com with.
+
+    Uses the tracking system's public tracking endpoint - no login required, so
+    this works even if TRACKING_API_EMAIL/PASSWORD aren't set.
+
+    Returns a dict:
+        {
+            "tracking_number": "TRK...",
+            "status": "IN_TRANSIT",  # see the status list below
+            "estimated_delivery": "2026-10-10" or None,
+            "origin": "Mumbai" or None,
+            "destination": "Thane, Maharashtra" or None,
+            "events": [
+                {"id": 1, "status": "ORDER_CONFIRMED", "title": "Order Confirmed",
+                 "description": "...", "location": "...", "event_time": "2026-10-03T12:07:09"},
+                ...
+            ],
+        }
+
+    "status" is one of: ORDER_CONFIRMED, PACKED, READY_FOR_PICKUP, PICKED_UP,
+    IN_TRANSIT, ARRIVED_AT_HUB, OUT_FOR_DELIVERY, DELIVERED, DELIVERY_FAILED,
+    CANCELLED, RETURN_REQUESTED, RETURNED, RTO, ON_HOLD.
+
+    Raises TrackingApiError (404) if the tracking number doesn't exist.
+    """
+    return _request("GET", f"/track/{tracking_number}", auth=False)
+
+
 def sync_order_to_tracking(
     *,
     customer_name: str,
