@@ -1,8 +1,9 @@
 """
 Vastraliya Tracking System integration.
 
-Call `sync_order_to_tracking(...)` right after an order is confirmed / paid
-on the website, passing the customer's real shipping address from your own
+Drop this file into the vastraliya.com backend codebase and call
+`sync_order_to_tracking(...)` right after an order is confirmed / paid on
+the website, passing the customer's real shipping address from your own
 checkout form data. It pushes the order (customer, address, products,
 order, shipment) into the tracking system (tracking-api.vastraliya.com) so
 it gets a tracking number and shows up on tracking.vastraliya.com
@@ -27,6 +28,8 @@ from dataclasses import dataclass
 import requests
 
 BASE_URL = os.environ.get("TRACKING_API_BASE_URL", "https://tracking-api.vastraliya.com/api/v1")
+EMAIL = os.environ.get("TRACKING_API_EMAIL")
+PASSWORD = os.environ.get("TRACKING_API_PASSWORD")
 
 _TIMEOUT = 15  # seconds
 
@@ -36,22 +39,13 @@ class TrackingApiError(RuntimeError):
 
 
 def is_tracking_configured() -> bool:
-    """True once TRACKING_API_EMAIL / TRACKING_API_PASSWORD are set in .env."""
-    return bool(os.environ.get("TRACKING_API_EMAIL") and os.environ.get("TRACKING_API_PASSWORD"))
+    """Returns True if TRACKING_API_EMAIL and TRACKING_API_PASSWORD are set.
 
-
-def _credentials() -> tuple[str, str]:
-    # Read lazily, at call time: a hard os.environ[...] at import time would
-    # crash the whole backend on startup on any server where the tracking
-    # credentials aren't configured yet.
-    email = os.environ.get("TRACKING_API_EMAIL")
-    password = os.environ.get("TRACKING_API_PASSWORD")
-    if not email or not password:
-        raise TrackingApiError(
-            "Tracking system credentials missing — set TRACKING_API_EMAIL and "
-            "TRACKING_API_PASSWORD in the backend .env to enable order tracking sync."
-        )
-    return email, password
+    Call this before sync_order_to_tracking(...) so a missing/misconfigured
+    env var on a given server (e.g. staging) just skips the sync instead of
+    raising.
+    """
+    return bool(EMAIL) and bool(PASSWORD)
 
 
 @dataclass
@@ -74,17 +68,21 @@ def _request(method: str, path: str, *, auth: bool = True, **kwargs) -> dict:
 
 
 def _get_access_token() -> str:
+    if not is_tracking_configured():
+        raise TrackingApiError(
+            "TRACKING_API_EMAIL / TRACKING_API_PASSWORD are not set - tracking sync is not configured on this server."
+        )
+
     # Reuse the token until ~1 minute before it's likely to expire, instead
     # of logging in again on every call.
     if _token_cache.access_token and time.time() < _token_cache.expires_at:
         return _token_cache.access_token
 
-    email, password = _credentials()
     data = _request(
         "POST",
         "/auth/login",
         auth=False,
-        json={"email": email, "password": password},
+        json={"email": EMAIL, "password": PASSWORD},
     )
     _token_cache.access_token = data["access_token"]
     _token_cache.expires_at = time.time() + 25 * 60  # refresh well before a typical 30-60 min JWT expiry
@@ -135,14 +133,37 @@ def create_address(
     return created["id"]
 
 
-def find_or_create_product(sku: str, name: str, price: float, weight: float | None = None) -> int:
-    """Returns the tracking-system product id for this SKU, creating it on first use."""
+def find_or_create_product(
+    sku: str,
+    name: str,
+    price: float,
+    weight: float | None = None,
+    image_url: str | None = None,
+    category: str | None = None,
+) -> int:
+    """Returns the tracking-system product id for this SKU, creating it on first use.
+
+    If the product already exists but is missing its image or category (or either
+    has changed on vastraliya.com), this updates it in place so the tracking admin
+    stays in sync with the product catalog shown on the website.
+    """
     existing = _request("GET", "/products", params={"search": sku, "page_size": 1})
     for item in existing.get("items", []):
         if item["sku"] == sku:
+            patch = {}
+            if image_url and item.get("image_url") != image_url:
+                patch["image_url"] = image_url
+            if category and item.get("category") != category:
+                patch["category"] = category
+            if patch:
+                _request("PUT", f"/products/{item['id']}", json=patch)
             return item["id"]
 
-    created = _request("POST", "/products", json={"sku": sku, "name": name, "price": price, "weight": weight})
+    created = _request(
+        "POST",
+        "/products",
+        json={"sku": sku, "name": name, "price": price, "weight": weight, "image_url": image_url, "category": category},
+    )
     return created["id"]
 
 
@@ -152,8 +173,11 @@ def create_order(
     *,
     shipping_address_id: int | None = None,
     billing_address_id: int | None = None,
+    payment_method: str = "ONLINE",
 ) -> dict:
-    """items: [{"product_id": 1, "quantity": 2}, ...]"""
+    """items: [{"product_id": 1, "quantity": 2}, ...]
+    payment_method: "ONLINE" or "COD" - whatever the customer actually chose at your checkout.
+    """
     return _request(
         "POST",
         "/orders",
@@ -162,6 +186,7 @@ def create_order(
             "items": items,
             "shipping_address_id": shipping_address_id,
             "billing_address_id": billing_address_id,
+            "payment_method": payment_method,
         },
     )
 
@@ -193,6 +218,7 @@ def sync_order_to_tracking(
     line_items: list[dict],
     shipping_address: dict,
     billing_address: dict | None = None,
+    payment_method: str = "ONLINE",
     origin: str | None = None,
 ) -> str:
     """
@@ -201,11 +227,18 @@ def sync_order_to_tracking(
     placeholder. No one has to type it in by hand afterwards.
 
     line_items: [{"sku": "SAREE-RED-01", "name": "Red Silk Saree", "price": 2500.0,
-                   "weight": 0.5, "quantity": 1}, ...]
+                   "weight": 0.5, "quantity": 1, "image_url": "https://vastraliya.com/images/saree-red-01.jpg",
+                   "category": "Sarees"}, ...]
+    "image_url" and "category" are optional per line item - pass the same product
+    photo URL and category used on vastraliya.com so the tracking admin's Products
+    and Inventory pages show them too (the Category column and filter dropdown stay
+    empty for any product this isn't set for).
 
     shipping_address / billing_address: {"address_line1": "...", "address_line2": "...",
                    "city": "...", "state": "...", "pincode": "...", "country": "India"}
     billing_address defaults to the same as shipping_address if omitted.
+
+    payment_method: "ONLINE" or "COD" - whichever the customer picked at checkout.
 
     Returns the tracking_number to show/email to the customer.
     """
@@ -218,16 +251,88 @@ def sync_order_to_tracking(
 
     order_items = []
     for line in line_items:
-        product_id = find_or_create_product(line["sku"], line["name"], line["price"], line.get("weight"))
+        product_id = find_or_create_product(
+            line["sku"], line["name"], line["price"], line.get("weight"), line.get("image_url"), line.get("category")
+        )
         order_items.append({"product_id": product_id, "quantity": line["quantity"]})
 
     order = create_order(
-        customer_id, order_items, shipping_address_id=shipping_address_id, billing_address_id=billing_address_id
+        customer_id,
+        order_items,
+        shipping_address_id=shipping_address_id,
+        billing_address_id=billing_address_id,
+        payment_method=payment_method,
     )
 
     destination = f"{shipping_address['city']}, {shipping_address['state']}"
     shipment = create_shipment(order["id"], origin=origin, destination=destination)
     return shipment["tracking_number"]
+
+
+def sync_vastraliya_order(order: dict, *, website_base_url: str = "https://vastraliya.com") -> str:
+    """
+    Convenience wrapper built from the exact order shape you showed me - call this
+    with your raw order dict (the one with "items", "customer_name", "phone_number",
+    "shipping_address", "city", "state", "pincode", "payment_method", etc.) instead
+    of sync_order_to_tracking(...) directly. It handles the field mapping for you:
+
+      - Builds each product's sku as "VAS-P<product_id>" (matching what your orders
+        already use).
+      - Turns each item's relative product_image path (e.g.
+        "/static/products/foo.jpg") into a full URL by prefixing website_base_url -
+        change website_base_url if your images are served from a different domain
+        or CDN.
+      - Pulls the category name out of the nested product_category object
+        (product_category["name"]), since the tracking system's category is a
+        plain string, not an object.
+      - Maps payment_method ("cod" / "online", any case) to the tracking system's
+        "COD" / "ONLINE".
+
+    Your sample order had no "customer_email" / "email" key, so if the order dict
+    doesn't have one, this falls back to a synthetic email built from "user_id" so
+    the same customer still dedupes correctly across orders
+    ("vastraliya-user-<user_id>@vastraliya.local"). Once your checkout actually
+    collects a real email, include it as order["customer_email"] (or ["email"])
+    and this will use that instead - update this function if your real key is
+    named something else.
+    """
+    email = order.get("customer_email") or order.get("email")
+    if not email:
+        user_id = order.get("user_id")
+        if user_id is None:
+            raise TrackingApiError("order has no customer_email/email and no user_id to fall back on")
+        email = f"vastraliya-user-{user_id}@vastraliya.local"
+
+    payment_method = "COD" if str(order.get("payment_method", "")).strip().lower() == "cod" else "ONLINE"
+
+    line_items = [
+        {
+            "sku": f"VAS-P{item['product_id']}",
+            "name": item["product_name"],
+            "price": item["price"],
+            "quantity": item["quantity"],
+            "image_url": f"{website_base_url}{item['product_image']}" if item.get("product_image") else None,
+            "category": item["product_category"]["name"] if item.get("product_category") else None,
+        }
+        for item in order["items"]
+    ]
+
+    shipping_address = {
+        "address_line1": order["shipping_address"],
+        "city": order["city"],
+        "state": order["state"],
+        "pincode": order["pincode"],
+        "country": "India",
+    }
+
+    return sync_order_to_tracking(
+        customer_name=order["customer_name"],
+        customer_email=email,
+        customer_phone=order.get("phone_number"),
+        line_items=line_items,
+        shipping_address=shipping_address,
+        payment_method=payment_method,
+    )
 
 
 if __name__ == "__main__":
@@ -238,7 +343,15 @@ if __name__ == "__main__":
         customer_email="priya@example.com",
         customer_phone="9800000000",
         line_items=[
-            {"sku": "SAREE-RED-01", "name": "Red Silk Saree", "price": 2500.0, "weight": 0.5, "quantity": 1},
+            {
+                "sku": "SAREE-RED-01",
+                "name": "Red Silk Saree",
+                "price": 2500.0,
+                "weight": 0.5,
+                "quantity": 1,
+                "image_url": "https://vastraliya.com/images/saree-red-01.jpg",
+                "category": "Sarees",
+            },
         ],
         shipping_address={
             "address_line1": "12 MG Road",
@@ -248,22 +361,34 @@ if __name__ == "__main__":
             "pincode": "411001",
             "country": "India",
         },
+        payment_method="COD",  # or "ONLINE" - use whatever the customer picked at checkout
         origin="Mumbai Warehouse",
     )
     print("Tracking number:", tracking_number)
 
-
-def get_shipment_by_tracking_number(tracking_number: str) -> dict | None:
-    """Fetch the live shipment record for a tracking number, or None.
-
-    Lets the store follow status changes made by staff on
-    tracking.vastraliya.com - the shipment's current status is mirrored
-    back onto the website order.
-    """
-    if not tracking_number:
-        return None
-    data = _request("GET", "/shipments", params={"search": tracking_number, "page_size": 5})
-    for item in data.get("items", []):
-        if str(item.get("tracking_number", "")).strip().lower() == tracking_number.strip().lower():
-            return item
-    return None
+    # --- Or, if you already have a raw order dict in this exact shape (from your
+    # order API/DB - the one you showed me), skip building line_items/shipping_address
+    # by hand and just call sync_vastraliya_order(order) instead:
+    sample_order = {
+        "id": 361,
+        "user_id": 129,
+        "customer_name": "vikas",
+        "phone_number": "8748789787",
+        "shipping_address": "sdfdsf, sdfsdfsdf, sdfsdfsd, India",
+        "city": "sdfsdfsdf",
+        "state": "sdfsdfsd",
+        "pincode": "545446",
+        "payment_method": "cod",
+        "items": [
+            {
+                "product_id": 68,
+                "quantity": 1,
+                "price": 1500,
+                "product_name": "Women Designer Anarkali Kurta Variant 19",
+                "product_image": "/static/products/Women-Designer-Anarkali-Kurta-Variant-19-1.jpg",
+                "product_category": {"name": "Ethnic"},
+            },
+        ],
+    }
+    tracking_number_2 = sync_vastraliya_order(sample_order)
+    print("Tracking number:", tracking_number_2)
