@@ -73,6 +73,8 @@ interface OrderHistoryItem {
   tracking?: TrackingUpdate[];
   total_items?: number;
   latest_tracking?: TrackingUpdate | null;
+  tracking_number?: string | null;
+  tracking_status?: string | null;  // the tracking system's own stage name
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -170,15 +172,36 @@ const statusChipClasses = (cfg: any) =>
 const quietChipClasses = (cfg: any) =>
   `inline-flex items-center rounded-full border px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-[0.1em] ${cfg.bgColor} ${cfg.color} ${cfg.borderColor}`;
 
-// Status timeline (presentation only)
-const TIMELINE_STEPS = ['Placed', 'Processing', 'Shipped', 'Delivered'];
+// Status timeline (presentation only) — the same stage names, in the same
+// order, as the tracking system's stepper, so this list matches the courier
+// site and the order detail page.
+const TIMELINE_STEPS = ['Order Confirmed', 'Packed', 'Picked Up', 'In Transit', 'Out for Delivery', 'Delivered'];
 
-const getTimelineIndex = (status: string): number => {
+/* Where each courier stage sits on that bar. Stages missing here (Cancelled,
+   On Hold…) don't advance it; cancelled orders don't render the bar at all. */
+const TRACKING_STAGE_STEP: Record<string, number> = {
+  'order confirmed': 0,
+  'packed': 1,
+  'ready for pickup': 1,
+  'picked up': 2,
+  'in transit': 3,
+  'arrived at hub': 3,
+  'out for delivery': 4,
+  'delivery failed': 4,
+  'delivered': 5,
+  'return requested': 5,
+  'returned': 5,
+  'return to origin': 5,
+};
+
+const getTimelineIndex = (status: string, trackingStatus?: string | null): number => {
+  const stage = (trackingStatus || '').trim().toLowerCase();
+  if (stage in TRACKING_STAGE_STEP) return TRACKING_STAGE_STEP[stage];
+  // Orders without tracking fall back to the coarse order status.
   switch (status.toLowerCase()) {
-    case 'processing': return 1;
-    case 'shipped': return 2;
-    case 'delivered': return 3;
-    default: return 0; // pending
+    case 'shipped': return 3;
+    case 'delivered': return 5;
+    default: return 0; // pending / processing
   }
 };
 
@@ -286,6 +309,8 @@ const OrdersPage: React.FC = () => {
             ? order.items.reduce((sum: number, i: any) => sum + (i.quantity || 1), 0)
             : 0),
           latest_tracking: order.latest_tracking || null,
+          tracking_number: order.tracking_number || null,
+          tracking_status: order.tracking_status || null,
         }));
 
         setOrders(normalized);
@@ -627,8 +652,8 @@ const OrdersPage: React.FC = () => {
               const PaymentIcon = paymentInfo.icon;
               const payStatusConfig = getPaymentStatusConfig(order.payment_status || 'unpaid');
               const isCancelled = order.status.toLowerCase() === 'cancelled';
-              const isDelivered = order.status.toLowerCase() === 'delivered';
-              const currentStep = getTimelineIndex(order.status);
+              const currentStep = getTimelineIndex(order.status, order.tracking_status);
+              const journeyComplete = currentStep === TIMELINE_STEPS.length - 1;
 
               return (
                 <div
@@ -729,8 +754,8 @@ const OrdersPage: React.FC = () => {
                     <div className="border-t border-border px-5 pt-4 pb-4">
                       <div className="flex">
                         {TIMELINE_STEPS.map((step, idx) => {
-                          const done = idx < currentStep || (idx === currentStep && isDelivered);
-                          const active = idx === currentStep && !isDelivered;
+                          const done = idx < currentStep || (idx === currentStep && journeyComplete);
+                          const active = idx === currentStep && !journeyComplete;
                           return (
                             <div key={step} className="relative flex-1 text-center">
                               {idx > 0 && (
@@ -750,7 +775,7 @@ const OrdersPage: React.FC = () => {
                                 }`}
                               />
                               <span
-                                className={`block mt-1.5 text-[10px] uppercase tracking-[0.12em] ${
+                                className={`block mt-1.5 px-0.5 text-[9px] uppercase tracking-[0.1em] sm:text-[10px] sm:tracking-[0.12em] ${
                                   idx <= currentStep ? 'text-espresso font-semibold' : 'text-muted-foreground'
                                 }`}
                               >
