@@ -3,6 +3,7 @@ import React, { useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Download, Printer } from 'lucide-react';
 import { BASE_URL } from '@/config';
+import { parseApiDate } from '@/lib/apiDate';
 import html2pdf from 'html2pdf.js';
 
 interface OrderInvoiceProps {
@@ -21,7 +22,9 @@ const OrderInvoice: React.FC<OrderInvoiceProps> = ({ order, userDetails }) => {
   
   const formatDate = (dateString: string) => {
     try {
-      return new Date(dateString).toLocaleDateString('en-US', {
+      const parsed = parseApiDate(dateString);
+      if (!parsed) return dateString;
+      return parsed.toLocaleDateString('en-US', {
         day: 'numeric',
         month: 'long',
         year: 'numeric',

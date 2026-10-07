@@ -53,6 +53,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Label } from "@/components/ui/label";
+import { parseApiDate } from "@/lib/apiDate";
 
 interface User {
   id: number;
@@ -163,7 +164,7 @@ const AdminUsers = () => {
   const formatDate = (dateString: string | null | undefined) => {
     if (!dateString) return "—";
     try {
-      const date = new Date(dateString);
+      const date = parseApiDate(dateString) ?? new Date(dateString);
       return date.toLocaleDateString('en-US', {
         day: 'numeric',
         month: 'short',
@@ -177,7 +178,7 @@ const AdminUsers = () => {
   const formatTime = (dateString: string | null | undefined) => {
     if (!dateString) return "—";
     try {
-      const date = new Date(dateString);
+      const date = parseApiDate(dateString) ?? new Date(dateString);
       return date.toLocaleTimeString('en-US', {
         hour: '2-digit',
         minute: '2-digit',

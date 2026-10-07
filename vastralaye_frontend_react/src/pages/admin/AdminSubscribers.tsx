@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { api } from '@/api/api';
+import { parseApiDate } from '@/lib/apiDate';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/use-toast';
 import {
@@ -27,7 +28,9 @@ interface Subscriber {
 const fmtDate = (d: string | null) => {
   if (!d) return '—';
   try {
-    return new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+    const parsed = parseApiDate(d);
+    if (!parsed) return d;
+    return parsed.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
   } catch {
     return d;
   }

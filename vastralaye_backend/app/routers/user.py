@@ -1122,6 +1122,18 @@ def get_my_orders(
     return result
 
 
+IST = pytz.timezone("Asia/Kolkata")
+
+
+def utc_to_ist(dt):
+    """Timestamps are stored naive-UTC; server-rendered dates (emails, PDFs)
+    must show Indian time, so convert before strftime. Returns None for None."""
+    if not dt:
+        return None
+    from datetime import timezone as _tz
+    return dt.replace(tzinfo=_tz.utc).astimezone(IST)
+
+
 # Payment method display labels
 PAYMENT_METHOD_LABELS = {
     "cod": "Cash on Delivery",
@@ -1271,16 +1283,7 @@ async def create_order(
     db.add(order)
     db.commit()
     db.refresh(order)
-    from datetime import timezone
-    import pytz
-
-    ist = pytz.timezone("Asia/Kolkata")
-
-    order_date = order.created_at.replace(
-        tzinfo=timezone.utc
-    ).astimezone(
-        ist
-    )
+    order_date = utc_to_ist(order.created_at)
 
     formatted_date = order_date.strftime("%d %B %Y %I:%M %p IST")
     email_items = []
@@ -2747,7 +2750,11 @@ async def email_invoice(
             "igst": product.igst if product else None,
         })
 
-    order_date = order.created_at.strftime("%d %B %Y %I:%M %p") if order.created_at else ""
+    # created_at is naive UTC — show the customer IST, like the order email.
+    order_date = (
+        utc_to_ist(order.created_at).strftime("%d %B %Y %I:%M %p IST")
+        if order.created_at else ""
+    )
     shipping_address = order.shipping_address or user.address_line1 or ""
 
     try:
@@ -2875,11 +2882,11 @@ def get_invoice_html(
         """
 
     invoice_date = (
-        invoice.invoice_date.strftime("%B %d, %Y")
+        utc_to_ist(invoice.invoice_date).strftime("%B %d, %Y")
         if invoice.invoice_date else "N/A"
     )
     due_date = (
-        invoice.due_date.strftime("%B %d, %Y")
+        utc_to_ist(invoice.due_date).strftime("%B %d, %Y")
         if invoice.due_date else "N/A"
     )
 

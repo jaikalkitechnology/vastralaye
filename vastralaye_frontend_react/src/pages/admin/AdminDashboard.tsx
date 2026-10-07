@@ -14,6 +14,7 @@ import {
 import { api } from '@/api/api';
 import { BASE_IMG } from '@/config';
 import { cn } from '@/lib/utils';
+import { parseApiDate } from '@/lib/apiDate';
 import {
   AlertTriangle,
   BarChart3,
@@ -127,7 +128,7 @@ const formatNumber = (value: number) => new Intl.NumberFormat('en-IN').format(Nu
 
 const formatDateTime = (dateString: string) => {
   try {
-    const d = new Date(dateString);
+    const d = parseApiDate(dateString) ?? new Date(dateString);
     if (Number.isNaN(d.getTime())) return '—';
     return `${d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}, ${d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: false })}`;
   } catch {
