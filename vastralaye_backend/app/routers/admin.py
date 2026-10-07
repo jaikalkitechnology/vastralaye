@@ -19,8 +19,14 @@ from sqlalchemy import func, extract, literal
 from sqlalchemy.orm import Session, joinedload
 from typing import List, Union, Optional, Dict
 import os, shutil, json, time, re
-from datetime import datetime, timedelta,date
+from datetime import datetime, timedelta,date, timezone as _timezone
 import pathlib
+import pytz
+
+
+def _ist(dt):
+    """Timestamps are stored naive-UTC; Excel exports should read in IST."""
+    return dt.replace(tzinfo=_timezone.utc).astimezone(pytz.timezone("Asia/Kolkata"))
 from app.schemas.product import ProductOut
 from app.database import get_db
 from app import models, schemas
@@ -1927,7 +1933,7 @@ def export_products(
             "Yes" if p.new_arrival else "No",
             p.rating or 0,
             p.reviews or 0,
-            p.created_at.strftime("%Y-%m-%d %H:%M") if p.created_at else "",
+            _ist(p.created_at).strftime("%Y-%m-%d %H:%M") if p.created_at else "",
             cell_list(p.images),
         ]
 
@@ -2249,7 +2255,7 @@ def export_reviews(
             r.name,
             r.rating,
             r.comment or "",
-            r.created_at.strftime("%Y-%m-%d %H:%M") if r.created_at else "",
+            _ist(r.created_at).strftime("%Y-%m-%d %H:%M") if r.created_at else "",
         ]
 
     stamp = date.today().isoformat()

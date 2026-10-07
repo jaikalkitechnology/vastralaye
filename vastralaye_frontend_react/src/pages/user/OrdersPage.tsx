@@ -31,6 +31,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { BASE_URL } from '@/config';
+import { parseApiDate } from '@/lib/apiDate';
 import UserLayout from "@/components/user/UserLayout";
 import { toast } from 'sonner';
 
@@ -414,7 +415,9 @@ const OrdersPage: React.FC = () => {
   // ─── HELPERS ───
   const formatDate = (dateString: string) => {
     try {
-      return new Date(dateString).toLocaleDateString('en-US', {
+      const parsed = parseApiDate(dateString);
+      if (!parsed) return dateString;
+      return parsed.toLocaleDateString('en-US', {
         month: 'short', day: 'numeric', year: 'numeric',
       });
     } catch { return dateString; }
@@ -422,7 +425,9 @@ const OrdersPage: React.FC = () => {
 
   const formatDateTime = (dateString: string) => {
     try {
-      return new Date(dateString).toLocaleDateString('en-US', {
+      const parsed = parseApiDate(dateString);
+      if (!parsed) return dateString;
+      return parsed.toLocaleDateString('en-US', {
         month: 'short', day: 'numeric', year: 'numeric',
         hour: '2-digit', minute: '2-digit',
       });

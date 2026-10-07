@@ -4,6 +4,7 @@ import AdminLoading from '@/components/admin/AdminLoading';
 import { BASE_URL } from "@/config";
 import axios from "axios";
 import { toast } from "react-hot-toast";
+import { parseApiDate } from '@/lib/apiDate';
 import {
   MessageSquare,
   Star,
@@ -234,7 +235,7 @@ const ReplyModal = ({
                 {review.reply.comment}
               </p>
               <p className="text-xs text-muted-foreground">
-                Posted on {new Date(review.reply.created_at).toLocaleString()}
+                Posted on {(parseApiDate(review.reply.created_at) ?? new Date(review.reply.created_at)).toLocaleString()}
               </p>
               {!review.reply.id && (
                 <p className="text-xs text-sale mt-2 font-semibold">
@@ -1421,8 +1422,8 @@ export default function Reviews() {
                             Store Response
                           </span>
                           <span className="text-xs text-muted-foreground">
-                            {new Date(
-                              review.reply.created_at
+                            {(parseApiDate(review.reply.created_at) ??
+                              new Date(review.reply.created_at)
                             ).toLocaleDateString("en-US", {
                               year: "numeric",
                               month: "short",
@@ -1446,8 +1447,8 @@ export default function Reviews() {
                               review.reply.updated_at && (
                               <p className="text-xs text-muted-foreground">
                                 Edited{" "}
-                                {new Date(
-                                  review.reply.updated_at
+                                {(parseApiDate(review.reply.updated_at) ??
+                                  new Date(review.reply.updated_at)
                                 ).toLocaleDateString()}
                               </p>
                             )}
@@ -1488,7 +1489,7 @@ export default function Reviews() {
                       <div className="flex items-center gap-1.5 ml-auto">
                         <Calendar className="w-3.5 h-3.5" />
                         <span className="font-medium">
-                          {new Date(review.created_at).toLocaleDateString()}
+                          {(parseApiDate(review.created_at) ?? new Date(review.created_at)).toLocaleDateString()}
                         </span>
                       </div>
                     </div>

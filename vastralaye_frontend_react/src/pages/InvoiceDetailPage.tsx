@@ -7,6 +7,7 @@ import {
   Clock, XCircle,
 } from "lucide-react";
 import { BASE_URL } from "@/config";
+import { parseApiDate } from "@/lib/apiDate";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import { toast } from "sonner";
@@ -180,7 +181,9 @@ const formatPrice = (p: number) =>
 const formatDate = (d: string | null | undefined) => {
   if (!d) return "N/A";
   try {
-    return new Date(d).toLocaleDateString("en-IN", {
+    const parsed = parseApiDate(d);
+    if (!parsed) return d;
+    return parsed.toLocaleDateString("en-IN", {
       month: "long", day: "numeric", year: "numeric",
     });
   } catch { return d; }

@@ -9,6 +9,7 @@ import {
     Download, Printer, FileText, Mail
 } from 'lucide-react';
 import { BASE_URL } from '@/config';
+import { parseApiDate } from '@/lib/apiDate';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
 import PaymentBadges from '@/components/PaymentBadges';
@@ -187,7 +188,9 @@ const getProductImageUrl = (imageStr?: string | null): string => {
 
 const formatDate = (d: string) => {
     try {
-        return new Date(d).toLocaleDateString('en-US', {
+        const parsed = parseApiDate(d);
+        if (!parsed) return d;
+        return parsed.toLocaleDateString('en-US', {
             month: 'short', day: 'numeric', year: 'numeric',
             hour: '2-digit', minute: '2-digit',
         });
@@ -196,7 +199,9 @@ const formatDate = (d: string) => {
 
 const formatShortDate = (d: string) => {
     try {
-        return new Date(d).toLocaleDateString('en-IN', {
+        const parsed = parseApiDate(d);
+        if (!parsed) return d;
+        return parsed.toLocaleDateString('en-IN', {
             month: 'long', day: 'numeric', year: 'numeric',
         });
     } catch { return d; }

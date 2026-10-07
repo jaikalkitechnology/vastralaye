@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { parseApiDate } from "@/lib/apiDate";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -78,7 +79,9 @@ const formatPrice = (p: number) => `₹${p.toLocaleString("en-IN", { minimumFrac
 const formatDate = (d: string | null) => {
   if (!d) return "N/A";
   try {
-    return new Date(d).toLocaleDateString("en-US", {
+    const parsed = parseApiDate(d);
+    if (!parsed) return d;
+    return parsed.toLocaleDateString("en-US", {
       month: "long", day: "numeric", year: "numeric",
     });
   } catch { return d; }
@@ -87,7 +90,9 @@ const formatDate = (d: string | null) => {
 const formatDateTime = (d: string | null) => {
   if (!d) return "N/A";
   try {
-    return new Date(d).toLocaleDateString("en-US", {
+    const parsed = parseApiDate(d);
+    if (!parsed) return d;
+    return parsed.toLocaleDateString("en-US", {
       month: "short", day: "numeric", year: "numeric",
       hour: "2-digit", minute: "2-digit",
     });

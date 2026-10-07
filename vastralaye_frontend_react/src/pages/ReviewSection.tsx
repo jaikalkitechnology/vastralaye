@@ -19,6 +19,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { BASE_URL } from "@/config";
+import { parseApiDate } from "@/lib/apiDate";
 
 interface Reply {
   id: number;
@@ -112,8 +113,8 @@ export default function ReviewSection({ productId, isAdmin, user, onReviewAdded 
   // Format date and time function
   const formatDateTime = (dateString: string) => {
     try {
-      const date = new Date(dateString);
-      
+      const date = parseApiDate(dateString) ?? new Date(dateString);
+
       const options: Intl.DateTimeFormatOptions = {
         year: 'numeric',
         month: 'short',

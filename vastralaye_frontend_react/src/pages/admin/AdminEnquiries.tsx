@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { api } from '@/api/api';
+import { parseApiDate } from '@/lib/apiDate';
 import AdminLayout from '@/components/admin/AdminLayout';
 import AdminSubscribers from './AdminSubscribers';
 import AdminLoading from '@/components/admin/AdminLoading';
@@ -94,7 +95,9 @@ const MAX_CC = 5;
 const formatDate = (value: string | null) => {
   if (!value) return '—';
   try {
-    return new Date(value).toLocaleString('en-IN', {
+    const parsed = parseApiDate(value);
+    if (!parsed) return value;
+    return parsed.toLocaleString('en-IN', {
       day: 'numeric', month: 'short', year: 'numeric',
       hour: '2-digit', minute: '2-digit',
     });

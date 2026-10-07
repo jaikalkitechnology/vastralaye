@@ -38,6 +38,7 @@ import {
   Printer,
 } from "lucide-react";
 import { BASE_URL, BASE_IMG } from "@/config";
+import { parseApiDate } from "@/lib/apiDate";
 import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import {
@@ -487,7 +488,9 @@ export default function AdminOrders() {
   const formatDate = (d?: string) => {
     if (!d) return "—";
     try {
-      return new Date(d).toLocaleDateString("en-IN", {
+      const parsed = parseApiDate(d);
+      if (!parsed) return "—";
+      return parsed.toLocaleDateString("en-IN", {
         day: "numeric",
         month: "short",
         year: "numeric",
@@ -500,7 +503,9 @@ export default function AdminOrders() {
   const formatTime = (d?: string) => {
     if (!d) return "—";
     try {
-      return new Date(d).toLocaleTimeString("en-IN", {
+      const parsed = parseApiDate(d);
+      if (!parsed) return "—";
+      return parsed.toLocaleTimeString("en-IN", {
         hour: "2-digit",
         minute: "2-digit",
         hour12: true,
