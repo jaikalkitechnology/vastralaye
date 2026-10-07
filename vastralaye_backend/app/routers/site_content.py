@@ -58,6 +58,11 @@ SETTING_KEYS = [
     "facebook_hidden",
     "twitter_hidden",
     "youtube_hidden",
+    # Checkout payment options, edited from Admin › Payments. "true" hides
+    # that payment method in the cart checkout. If both end up hidden the
+    # storefront ignores the flags so checkout is never bricked.
+    "cod_disabled",
+    "online_payment_disabled",
 ]
 
 # site_settings.value is VARCHAR(500); a longer strip would be silently
@@ -508,6 +513,9 @@ class SettingsIn(BaseModel):
     facebook_hidden: Optional[str] = None
     twitter_hidden: Optional[str] = None
     youtube_hidden: Optional[str] = None
+    # "true" hides that payment method in the cart checkout.
+    cod_disabled: Optional[str] = None
+    online_payment_disabled: Optional[str] = None
 
 
 def _settings_dict(db: Session) -> Dict[str, str]:

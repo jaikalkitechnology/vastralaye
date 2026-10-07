@@ -3,13 +3,18 @@ import { api } from '@/api/api';
 import { toast } from '@/components/ui/use-toast';
 import {
   AlertTriangle,
+  Banknote,
   Check,
   Copy,
   CreditCard,
+  Eye,
+  EyeOff,
   KeyRound,
   Link2,
   RefreshCw,
   ShieldCheck,
+  Smartphone,
+  Wallet,
 } from 'lucide-react';
 import AdminLoading from '@/components/admin/AdminLoading';
 
@@ -62,6 +67,135 @@ const statusChip = (status: string | null) => {
   if (s === 'failed')
     return 'bg-sale/10 text-sale border-sale/30';
   return 'bg-gold/15 text-[#8A6414] border-gold/35';
+};
+
+/* ── Checkout payment options ──────────────────────────────────────
+   Which payment methods the cart checkout offers. "Hidden" removes the
+   option from the storefront checkout, and the backend refuses orders
+   placed with a hidden method. One method must always stay visible. */
+const CheckoutMethodsCard = () => {
+  const [flags, setFlags] = useState<{ cod: boolean; online: boolean } | null>(null);
+  const [busyKey, setBusyKey] = useState<'cod' | 'online' | null>(null);
+
+  useEffect(() => {
+    api
+      .get<any>('/fronted/settings')
+      .then((res) =>
+        setFlags({
+          cod: res.data?.cod_disabled === 'true',
+          online: res.data?.online_payment_disabled === 'true',
+        })
+      )
+      .catch(() => setFlags({ cod: false, online: false }));
+  }, []);
+
+  const toggle = async (which: 'cod' | 'online') => {
+    if (!flags || busyKey) return;
+    const label = which === 'cod' ? 'Cash on Delivery' : 'Online Payment';
+    const hide = !flags[which];
+    if (hide && flags[which === 'cod' ? 'online' : 'cod']) {
+      toast({
+        title: 'At least one payment method must stay visible',
+        description: 'Show the other method first, then hide this one.',
+      });
+      return;
+    }
+    const prev = flags;
+    setBusyKey(which);
+    setFlags({ ...flags, [which]: hide });
+    try {
+      await api.put('/admin/settings', {
+        [which === 'cod' ? 'cod_disabled' : 'online_payment_disabled']: String(hide),
+      });
+      toast({
+        title: hide
+          ? `${label} hidden from checkout`
+          : `${label} is visible at checkout again`,
+      });
+    } catch (err: any) {
+      setFlags(prev);
+      toast({
+        title: 'Could not save',
+        description: err?.response?.data?.detail || 'Please try again.',
+      });
+    } finally {
+      setBusyKey(null);
+    }
+  };
+
+  const rows: { key: 'cod' | 'online'; label: string; note: string; icon: any }[] = [
+    {
+      key: 'cod',
+      label: 'Cash on Delivery',
+      note: 'Customer pays the courier on arrival',
+      icon: Banknote,
+    },
+    {
+      key: 'online',
+      label: 'Online Payment',
+      note: 'UPI, card & net banking via the gateway',
+      icon: Smartphone,
+    },
+  ];
+
+  return (
+    <div className="mb-6 rounded-md border border-border bg-white p-5">
+      <h2 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em]">
+        <Wallet className="h-3.5 w-3.5 text-maroon" /> Checkout payment options
+      </h2>
+      <p className="mt-1 text-[12.5px] text-muted-foreground">
+        Hide a method to remove it from the cart checkout — customers won't see it and the
+        backend won't accept it. One method always stays visible.
+      </p>
+
+      <div className="mt-4 grid max-w-2xl grid-cols-1 gap-3 sm:grid-cols-2">
+        {rows.map(({ key, label, note, icon: Icon }) => {
+          const hidden = Boolean(flags?.[key]);
+          return (
+            <div
+              key={key}
+              className={`flex items-center justify-between gap-3 rounded-sm border border-border px-4 py-3 ${
+                hidden ? 'bg-ivory opacity-80' : 'bg-white'
+              }`}
+            >
+              <div className="flex min-w-0 items-center gap-3">
+                <Icon className="h-4 w-4 flex-none text-maroon" strokeWidth={1.5} />
+                <div className="min-w-0">
+                  <p className="text-[13px] font-semibold text-espresso">{label}</p>
+                  <p className="truncate text-[11px] text-muted-foreground">{note}</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => toggle(key)}
+                disabled={!flags || busyKey !== null}
+                aria-pressed={hidden}
+                title={
+                  hidden
+                    ? 'Hidden at checkout — click to show'
+                    : 'Visible at checkout — click to hide'
+                }
+                className={`inline-flex shrink-0 items-center gap-1.5 rounded-sm border px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.1em] transition-colors disabled:opacity-60 ${
+                  hidden
+                    ? 'border-maroon bg-maroon text-ivory hover:bg-terracotta'
+                    : 'border-input bg-white text-espresso hover:border-maroon hover:text-maroon'
+                }`}
+              >
+                {busyKey === key ? (
+                  <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+                ) : hidden ? (
+                  <EyeOff className="h-3.5 w-3.5" />
+                ) : (
+                  <Eye className="h-3.5 w-3.5" />
+                )}
+                {hidden ? 'Hidden' : 'Visible'}
+              </button>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
 };
 
 const AdminPayments = () => {
@@ -216,6 +350,9 @@ const AdminPayments = () => {
           </div>
         </div>
       )}
+
+      {/* Which payment methods the cart checkout offers */}
+      <CheckoutMethodsCard />
 
       <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-[440px_1fr]">
         {/* ── Credentials ── */}

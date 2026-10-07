@@ -67,6 +67,7 @@ import ProductGrid from '@/components/ProductGrid';
 import { PAISLEY_TILE } from '@/components/decor/patterns';
 import { BASE_URL } from '../config';
 import { discountLabel } from '@/lib/discount';
+import { useSiteSettings, isHidden } from '@/hooks/use-site-settings';
 import QRCode from 'qrcode';
 
 type CouponShape = {
@@ -721,6 +722,7 @@ const PaymentMethodModal: React.FC<PaymentMethodModalProps> = ({
   cartItems,
 }) => {
   const navigate = useNavigate();
+  const siteSettings = useSiteSettings();
 
   const modalSubtotal = cartItems.reduce(
     (sum, item) =>
@@ -875,7 +877,7 @@ const PaymentMethodModal: React.FC<PaymentMethodModalProps> = ({
     loadUserData();
   }, [isOpen]);
 
-  const paymentMethods = [
+  const allPaymentMethods = [
     {
       id: 'cod',
       name: 'Cash on Delivery',
@@ -893,6 +895,25 @@ const PaymentMethodModal: React.FC<PaymentMethodModalProps> = ({
       active: true,
     },
   ];
+
+  /* Admin › Payments can hide COD or Online Payment here. If both flags are
+     somehow on, ignore them — checkout must always offer a way to pay. */
+  const codOff = isHidden(siteSettings.cod_disabled);
+  const onlineOff = isHidden(siteSettings.online_payment_disabled);
+  const bothOff = codOff && onlineOff;
+  const paymentMethods = bothOff
+    ? allPaymentMethods
+    : allPaymentMethods.filter((m) =>
+        m.id === 'cod' ? !codOff : !onlineOff
+      );
+  const onlyMethodId = paymentMethods.length === 1 ? paymentMethods[0].id : null;
+
+  // If the admin hid the currently selected method, move to the one that's left.
+  useEffect(() => {
+    if (onlyMethodId && selectedMethod !== onlyMethodId) {
+      setSelectedMethod(onlyMethodId);
+    }
+  }, [onlyMethodId, selectedMethod]);
 
   const handlePlaceOrder = async () => {
     const token = getTokenFromStorage();
@@ -1363,7 +1384,11 @@ const PaymentMethodModal: React.FC<PaymentMethodModalProps> = ({
                 <span className="flex-1 h-px bg-border" />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <div
+                className={`grid grid-cols-1 gap-2.5 ${
+                  paymentMethods.length > 1 ? 'sm:grid-cols-2' : ''
+                }`}
+              >
                 {paymentMethods.map((method) => {
                   const isSelected = selectedMethod === method.id;
                   return (
