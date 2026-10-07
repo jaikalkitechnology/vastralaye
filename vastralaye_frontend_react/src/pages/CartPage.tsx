@@ -1915,7 +1915,9 @@ const CartPage: React.FC = () => {
      way — prices are GST-inclusive and the split is informational. */
   const taxes = gstBreakup(cartItems);
   const { baseAmount, gst: gstAmount } = taxes;
-  const buyerState = (currentUser as any)?.state || '';
+  // The profile stores the state under `region`; older sessions may still
+  // carry a `state` key — either one drives the SGST/CGST vs IGST heads.
+  const buyerState = (currentUser as any)?.state || (currentUser as any)?.region || '';
   const taxMode = !buyerState.trim() ? 'gst' : isMaharashtra(buyerState) ? 'split' : 'igst';
   const gstLabel =
     taxes.uniformRate !== null

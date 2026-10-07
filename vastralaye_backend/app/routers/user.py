@@ -541,6 +541,7 @@ def update_profile(
         address_line1: str = Form(None),
         address_line2: str = Form(None),
         city: str = Form(None),
+        region: str = Form(None),
         postal_code: str = Form(None),
         country: str = Form(None),
         avatar: UploadFile = File(None),
@@ -575,6 +576,9 @@ def update_profile(
     if address_line1: current_user.address_line1 = address_line1.strip()
     if address_line2: current_user.address_line2 = address_line2.strip()
     if city: current_user.city = city.strip()
+    # State / region — the profile form has sent this all along; the route
+    # simply never accepted it, so it silently vanished on save.
+    if region: current_user.region = region.strip()
     if postal_code: current_user.postal_code = postal_code.strip()
     if country: current_user.country = country.strip()
 
