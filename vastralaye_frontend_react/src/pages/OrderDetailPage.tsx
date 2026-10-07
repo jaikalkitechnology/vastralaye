@@ -759,7 +759,35 @@ const InvoicePageView: React.FC<{
 //  MAIN EXPORT
 // ═══════════════════════════════════════════════
 
-const JOURNEY_STEPS = ['Placed', 'Processing', 'Shipped', 'Delivered'];
+/* The journey bar mirrors the tracking system's stepper — same stage names,
+   in the same order, so what the customer sees here matches the courier site. */
+const JOURNEY_STEPS = ['Order Confirmed', 'Packed', 'Picked Up', 'In Transit', 'Out for Delivery', 'Delivered'];
+
+/* Where each courier stage sits on that bar. Stages missing here (Cancelled,
+   On Hold, Returned…) don't advance it — they get a note instead. */
+const TRACKING_STAGE_STEP: Record<string, number> = {
+    'order confirmed': 0,
+    'packed': 1,
+    'ready for pickup': 1,
+    'picked up': 2,
+    'in transit': 3,
+    'arrived at hub': 3,
+    'out for delivery': 4,
+    'delivery failed': 4,
+    'delivered': 5,
+    'return requested': 5,
+    'returned': 5,
+    'return to origin': 5,
+};
+
+/* Courier stages that need a plain-English note under the bar. */
+const STAGE_NOTES: Record<string, string> = {
+    'ready for pickup': 'Your parcel is packed and waiting for the courier to pick it up.',
+    'arrived at hub': 'Your parcel has reached a courier hub on the way to you.',
+    'delivery failed': 'The courier could not deliver your parcel — delivery will be attempted again.',
+    'on hold': 'Your parcel is currently on hold with the courier.',
+    'return requested': 'A return has been requested for this order.',
+};
 
 const OrderDetailPage = () => {
     const { orderId } = useParams<{ orderId: string }>();
@@ -883,10 +911,14 @@ const OrderDetailPage = () => {
 
     const isCancelled = order.status.toLowerCase() === 'cancelled';
     const statusKey = order.status.toLowerCase();
-    const journeyIdx =
-        statusKey === 'delivered' ? 3 :
-        statusKey === 'shipped' ? 2 :
-        statusKey === 'processing' ? 1 : 0;
+    /* The courier's exact stage drives the bar; orders without tracking fall
+       back to the coarse order status. */
+    const trackingStage = (order.tracking_status || '').trim().toLowerCase();
+    const statusFallbackIdx =
+        statusKey === 'delivered' ? 5 :
+        statusKey === 'shipped' ? 3 : 0;
+    const journeyIdx = TRACKING_STAGE_STEP[trackingStage] ?? statusFallbackIdx;
+    const stageNote = STAGE_NOTES[trackingStage];
 
     const stepStamp = (keys: string[]): string | null => {
         const u = (order.tracking || []).find(t =>
@@ -895,9 +927,11 @@ const OrderDetailPage = () => {
         return u?.timestamp ? formatDate(u.timestamp) : null;
     };
     const stepDates: (string | null)[] = [
-        order.created_at ? formatDate(order.created_at) : null,
-        stepStamp(['processing', 'confirmed']),
-        stepStamp(['shipped', 'dispatch']),
+        stepStamp(['order confirmed']) || (order.created_at ? formatDate(order.created_at) : null),
+        stepStamp(['packed', 'ready for pickup']),
+        stepStamp(['picked up']),
+        stepStamp(['in transit', 'arrived at hub', 'shipped', 'dispatch']),
+        stepStamp(['out for delivery']),
         stepStamp(['delivered']),
     ];
 
@@ -987,7 +1021,11 @@ const OrderDetailPage = () => {
                                         <div className="flex items-center gap-3 rounded-sm border border-sale/30 bg-sale/5 px-4 py-3.5 text-[13px] text-sale">
                                             <XCircle className="h-4 w-4 shrink-0" />
                                             <span>
-                                                This order has been cancelled.
+                                                {order.tracking_status && trackingStage !== 'cancelled' ? (
+                                                    <>This order is closed — courier status: <b className="font-semibold">{order.tracking_status}</b>.</>
+                                                ) : (
+                                                    'This order has been cancelled.'
+                                                )}
                                                 <span className="ml-1 capitalize text-sale/80">Payment status: {order.payment_status}.</span>
                                             </span>
                                         </div>
@@ -1009,21 +1047,33 @@ const OrderDetailPage = () => {
                                                                 done
                                                                     ? 'border-gold bg-gold'
                                                                     : now
-                                                                        ? `border-gold shadow-[0_0_0_5px_rgba(201,154,69,0.2)] ${journeyIdx === 3 ? 'bg-gold' : 'bg-white'}`
+                                                                        ? `border-gold shadow-[0_0_0_5px_rgba(201,154,69,0.2)] ${journeyIdx === 5 ? 'bg-gold' : 'bg-white'}`
                                                                         : 'border-sand bg-white'
                                                             }`}
                                                         />
-                                                        <span className={`mt-2 block text-[10px] uppercase tracking-[0.12em] ${done || now ? 'font-semibold text-espresso' : 'text-muted-foreground'}`}>
+                                                        <span className={`mt-2 block px-0.5 text-[9px] uppercase tracking-[0.1em] sm:text-[10px] sm:tracking-[0.12em] ${done || now ? 'font-semibold text-espresso' : 'text-muted-foreground'}`}>
                                                             {step}
                                                         </span>
                                                         {(done || now) && stepDates[i] && (
-                                                            <span className="mt-0.5 block px-1 text-[10.5px] text-muted-foreground">
+                                                            /* Six columns are tight on a phone — completed steps
+                                                               keep their dates for sm+ only; the current step
+                                                               always shows its date. */
+                                                            <span className={`mt-0.5 px-1 text-[9.5px] text-muted-foreground sm:text-[10.5px] ${now ? 'block' : 'hidden sm:block'}`}>
                                                                 {stepDates[i]}
                                                             </span>
                                                         )}
                                                     </div>
                                                 );
                                             })}
+                                        </div>
+                                    )}
+
+                                    {!isCancelled && stageNote && (
+                                        <div className="mt-4 flex items-start gap-2.5 rounded-sm border border-gold/40 bg-gold/10 px-4 py-3 text-[12.5px] text-espresso">
+                                            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-[#8A6414]" />
+                                            <span>
+                                                <b className="font-semibold">{order.tracking_status}</b> — {stageNote}
+                                            </span>
                                         </div>
                                     )}
 
