@@ -26,6 +26,10 @@ export interface SiteSettings {
   facebook_hidden?: string;
   twitter_hidden?: string;
   youtube_hidden?: string;
+  /** Checkout payment options from Admin › Payments — "true" hides that
+      method in the cart checkout. Both hidden ⇒ flags are ignored. */
+  cod_disabled?: string;
+  online_payment_disabled?: string;
 }
 
 /** "true" hides — any other value (or no row yet) keeps the item visible. */

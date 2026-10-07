@@ -1131,6 +1131,32 @@ PAYMENT_METHOD_LABELS = {
 }
 
 
+def hidden_checkout_methods(db: Session) -> set:
+    """Payment methods the admin hid on Admin › Payments.
+
+    Returns a subset of {"cod", "online"}. If the admin somehow hides both,
+    the flags are ignored so checkout is never left with no way to pay.
+    Any lookup problem (missing table, etc.) also means "hide nothing".
+    """
+    try:
+        from app.models.site_content import SiteSetting
+
+        rows = (
+            db.query(SiteSetting)
+            .filter(SiteSetting.key.in_(["cod_disabled", "online_payment_disabled"]))
+            .all()
+        )
+        values = {row.key: (row.value or "").strip().lower() for row in rows}
+        hidden = set()
+        if values.get("cod_disabled") == "true":
+            hidden.add("cod")
+        if values.get("online_payment_disabled") == "true":
+            hidden.add("online")
+        return hidden if len(hidden) < 2 else set()
+    except Exception:
+        return set()
+
+
 @router.post("/orders/create", response_model=OrderOut)
 async def create_order(
     data: OrderCreate,
@@ -1207,6 +1233,11 @@ async def create_order(
     base_amount = round(final_amount - gst_amount, 2)
     # 2️⃣ Determine payment status based on payment method
     payment_method = data.payment_method if data.payment_method else "cod"
+    if payment_method == "cod" and "cod" in hidden_checkout_methods(db):
+        raise HTTPException(
+            status_code=400,
+            detail="Cash on Delivery is currently unavailable. Please pay online.",
+        )
     if payment_method == "cod":
         payment_status = "unpaid"
         order_status = "processing"
@@ -3255,6 +3286,11 @@ async def initiate_payment(data: PaymentRequest, db: Session = Depends(get_db)):
     (Redirect vs. QR Code), and returns a structured
     response for the frontend to handle.
     """
+    if "online" in hidden_checkout_methods(db):
+        raise HTTPException(
+            status_code=400,
+            detail="Online payment is currently unavailable. Please use Cash on Delivery.",
+        )
     endpoint, headers = resolve_gateway(db)
     merchant_ref = generate_merchant_ref()
 
