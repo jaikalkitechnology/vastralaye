@@ -168,7 +168,7 @@ const AdminSettings = () => {
             type="checkbox"
             checked={form.float_enabled !== 'false'}
             onChange={(e) => set('float_enabled', e.target.checked ? 'true' : 'false')}
-            className="accent-[#7A1F2B]"
+            className="accent-[#992534]"
             disabled={loading}
           />
           Show the floating contact button on the storefront (middle-right; expands into WhatsApp,

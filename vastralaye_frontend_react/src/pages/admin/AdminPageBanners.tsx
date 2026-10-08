@@ -29,8 +29,8 @@ const ALL_SLOTS = [HOME_HERO, ...PAGES];
 /** Brand-palette shortcuts for a dark wash under ivory headings. */
 const OVERLAY_PRESETS = [
   { hex: '#2B1B12', label: 'Espresso' },
-  { hex: '#7A1F2B', label: 'Maroon' },
-  { hex: '#B85C38', label: 'Terracotta' },
+  { hex: '#992534', label: 'Maroon' },
+  { hex: '#AD6148', label: 'Terracotta' },
   { hex: '#8A6414', label: 'Deep gold' },
   { hex: '#000000', label: 'Black' },
 ] as const;
@@ -41,7 +41,7 @@ const HERO_OVERLAY_PRESETS = [
   { hex: '#F6E8E4', label: 'Blush' },
   { hex: '#EFE7DB', label: 'Sand' },
   { hex: '#2B1B12', label: 'Espresso' },
-  { hex: '#7A1F2B', label: 'Maroon' },
+  { hex: '#992534', label: 'Maroon' },
 ] as const;
 
 interface Draft {
@@ -225,7 +225,7 @@ const AdminPageBanners = () => {
               type="checkbox"
               checked={d.is_active}
               onChange={(e) => patchDraft(slot.key, { is_active: e.target.checked })}
-              className="h-3.5 w-3.5 accent-[#C99A45]"
+              className="h-3.5 w-3.5 accent-[#C29E5C]"
             />
             Active
           </label>
@@ -315,7 +315,7 @@ const AdminPageBanners = () => {
                 type="checkbox"
                 checked={d.full_bleed}
                 onChange={(e) => patchDraft(slot.key, { full_bleed: e.target.checked })}
-                className="mt-[3px] h-3.5 w-3.5 accent-[#C99A45]"
+                className="mt-[3px] h-3.5 w-3.5 accent-[#C29E5C]"
               />
               <span>
                 <span className="block text-[12.5px] font-medium text-espresso">
@@ -388,7 +388,7 @@ const AdminPageBanners = () => {
                   onChange={(e) =>
                     patchDraft(slot.key, { overlay_opacity: Number(e.target.value) })
                   }
-                  className="mt-1 w-full accent-[#C99A45]"
+                  className="mt-1 w-full accent-[#C29E5C]"
                 />
               </label>
 

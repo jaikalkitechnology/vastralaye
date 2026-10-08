@@ -436,7 +436,7 @@ const AdminPayments = () => {
                   type="checkbox"
                   checked={isActive}
                   onChange={(e) => setIsActive(e.target.checked)}
-                  className="accent-[#7A1F2B]"
+                  className="accent-[#992534]"
                 />
                 Use these credentials for live payments
               </label>
@@ -505,7 +505,7 @@ const AdminPayments = () => {
                 type="checkbox"
                 checked={verifyAmount}
                 onChange={(e) => setVerifyAmount(e.target.checked)}
-                className="mt-[3px] accent-[#7A1F2B]"
+                className="mt-[3px] accent-[#992534]"
               />
               <span>
                 <span className="block text-[12.5px] font-medium text-espresso">

@@ -23,12 +23,12 @@ const FEATURED_EYEBROWS = ['Most Loved', 'Festive Ready'];
 
 /** Toran garland divider under the section header (new_design.md §17). */
 const ToranDivider = () => (
-  <svg viewBox="0 0 340 26" className="mx-auto mt-3.5 h-[26px] w-[340px] max-w-full" fill="none" stroke="#C99A45" aria-hidden="true">
+  <svg viewBox="0 0 340 26" className="mx-auto mt-3.5 h-[26px] w-[340px] max-w-full" fill="none" stroke="#C29E5C" aria-hidden="true">
     <line x1="0" y1="4" x2="340" y2="4" strokeOpacity=".6" />
     <g strokeOpacity=".8">
       <path d="M30 4l7 12 7-12" /><path d="M72 4l7 12 7-12" /><path d="M114 4l7 12 7-12" /><path d="M156 4l7 12 7-12" /><path d="M198 4l7 12 7-12" /><path d="M240 4l7 12 7-12" /><path d="M282 4l7 12 7-12" />
     </g>
-    <g fill="#B85C38" stroke="none">
+    <g fill="#AD6148" stroke="none">
       <circle cx="37" cy="19" r="1.7" /><circle cx="79" cy="19" r="1.7" /><circle cx="121" cy="19" r="1.7" /><circle cx="163" cy="19" r="1.7" /><circle cx="205" cy="19" r="1.7" /><circle cx="247" cy="19" r="1.7" /><circle cx="289" cy="19" r="1.7" />
     </g>
     <rect x="166.5" y="0.5" width="7" height="7" transform="rotate(45 170 4)" fill="#FAF6F0" />

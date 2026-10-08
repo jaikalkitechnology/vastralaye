@@ -183,7 +183,7 @@ const AdminLoginMethods = () => {
               type="checkbox"
               checked={enabled}
               onChange={(e) => setEnabled(e.target.checked)}
-              className="mt-[3px] accent-[#7A1F2B]"
+              className="mt-[3px] accent-[#992534]"
             />
             <span>
               <span className="block text-[12.5px] font-medium text-espresso">
@@ -225,7 +225,7 @@ const AdminLoginMethods = () => {
               type="checkbox"
               checked={allowSignup}
               onChange={(e) => setAllowSignup(e.target.checked)}
-              className="mt-[3px] accent-[#7A1F2B]"
+              className="mt-[3px] accent-[#992534]"
             />
             <span>
               <span className="block text-[12.5px] font-medium text-espresso">
@@ -243,7 +243,7 @@ const AdminLoginMethods = () => {
               type="checkbox"
               checked={fetchProfile}
               onChange={(e) => setFetchProfile(e.target.checked)}
-              className="mt-[3px] accent-[#7A1F2B]"
+              className="mt-[3px] accent-[#992534]"
             />
             <span>
               <span className="block text-[12.5px] font-medium text-espresso">

@@ -248,8 +248,8 @@ const getStatusInlineStyle = (status: string): React.CSSProperties => {
 const getStatusDotColor = (status: string): string => {
     const map: Record<string, string> = {
         delivered: '#3E6B4F',
-        shipped: '#C99A45',
-        processing: '#C99A45',
+        shipped: '#C29E5C',
+        processing: '#C29E5C',
         cancelled: '#C62828',
         paid: '#3E6B4F',
         unpaid: '#C62828',
@@ -401,7 +401,7 @@ if (normalized.user || normalized.customer_name) {
 
 /* Ornamental assets shared by the invoice paper */
 const PAISLEY_BG =
-    "url(\"data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='130' height='130' viewBox='0 0 130 130'><g fill='none' stroke='%23C99A45'><path d='M33 11c14 6 22 18 20 32-2 12-11 22-22 24-8 2-13-2-14-8-1-6 3-11 9-11 5 0 9 3 9 8'/><rect x='92' y='26' width='6' height='6' transform='rotate(45 95 29)'/><path d='M97 119c-14-6-22-18-20-32 2-12 11-22 22-24 8-2 13 2 14 8 1 6-3 11-9 11-5 0-9-3-9-8'/><rect x='29' y='94' width='6' height='6' transform='rotate(45 32 97)'/></g></svg>\")";
+    "url(\"data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='130' height='130' viewBox='0 0 130 130'><g fill='none' stroke='%23C29E5C'><path d='M33 11c14 6 22 18 20 32-2 12-11 22-22 24-8 2-13-2-14-8-1-6 3-11 9-11 5 0 9 3 9 8'/><rect x='92' y='26' width='6' height='6' transform='rotate(45 95 29)'/><path d='M97 119c-14-6-22-18-20-32 2-12 11-22 22-24 8-2 13 2 14 8 1 6-3 11-9 11-5 0-9-3-9-8'/><rect x='29' y='94' width='6' height='6' transform='rotate(45 32 97)'/></g></svg>\")";
 
 const toolbarBtn =
     'inline-flex items-center gap-2 rounded-sm border border-border bg-white px-5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-espresso transition-colors hover:border-maroon/40 hover:text-maroon';
@@ -731,7 +731,7 @@ const InvoicePageView: React.FC<{
                                 preserveAspectRatio="xMidYMax slice"
                                 aria-hidden
                             >
-                                <g fill="none" stroke="#C99A45" strokeWidth="2" strokeOpacity=".55">
+                                <g fill="none" stroke="#C29E5C" strokeWidth="2" strokeOpacity=".55">
                                     <path d="M60 230V150h40v-28h44v28h40v80" /><path d="M266 230l9-110h16l9 110z" />
                                     <path d="M660 224v-72h120v72M692 152h56M694 152c-4-24 9-42 26-50 17 8 30 26 26 50zM720 102v-13M612 224l4-90M628 224l-4-90M828 224l-4-90M812 224l4-90" />
                                     <path d="M1044 230l12-100h32l12 100zM1288 230v-58h46v58M1394 230v-58h46v58M1334 230v-38h60v38" />

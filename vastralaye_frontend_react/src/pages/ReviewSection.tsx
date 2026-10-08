@@ -594,7 +594,7 @@ export default function ReviewSection({ productId, isAdmin, user, onReviewAdded 
         <g clipPath={`url(#${clipId})`}>
           <path
             d="M12 .587l3.668 7.431L23.4 9.75l-5.7 5.556L19.34 24 12 20.201 4.66 24l1.64-8.694L.6 9.75l7.733-1.732L12 .587z"
-            fill="#C99A45"
+            fill="#C29E5C"
           />
         </g>
       </svg>

@@ -653,8 +653,8 @@ export default function AdminOrders() {
 
     /* Brand palette — literal hex so the print window renders it exactly */
     const C = {
-      ivory: "#FAF6F0", esp: "#2B1B12", mar: "#7A1F2B", terra: "#B85C38",
-      gold: "#C99A45", gd: "#8A6414", sand: "#EFE7DB", blush: "#F6E8E4",
+      ivory: "#FAF6F0", esp: "#2B1B12", mar: "#992534", terra: "#AD6148",
+      gold: "#C29E5C", gd: "#8A6414", sand: "#EFE7DB", blush: "#F6E8E4",
       bd: "#E7DFD3", mut: "#6E5F53", sale: "#C62828", ok: "#3E6B4F",
     };
     const SERIF = "'Fraunces', Georgia, serif";
