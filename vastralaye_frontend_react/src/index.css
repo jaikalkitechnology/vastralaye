@@ -15,7 +15,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 22 41% 12%;
 
-    --primary: 352 59% 30%;          /* maroon */
+    --primary: 352 61% 37%;          /* maroon — sampled from logo_vas.png wordmark, not invented */
     --primary-foreground: 36 50% 96%;
 
     --secondary: 13 50% 93%;         /* blush */
@@ -24,7 +24,7 @@
     --muted: 36 38% 90%;             /* sand */
     --muted-foreground: 22 15% 38%;
 
-    --accent: 17 53% 47%;            /* terracotta */
+    --accent: 15 41% 48%;            /* terracotta — derived from logo's maroon+gold blend */
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 66% 47%;        /* sale red */
@@ -32,7 +32,7 @@
 
     --border: 33 28% 86%;
     --input: 33 28% 86%;
-    --ring: 352 59% 30%;
+    --ring: 352 61% 37%;
 
     --radius: 0.25rem;
   }

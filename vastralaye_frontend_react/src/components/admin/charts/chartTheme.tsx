@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
  * Series colors in fixed order — assign by slot, never cycle hues.
  * ---------------------------------------------------------------- */
 
-export const CHART_SERIES = ['#7A1F2B', '#C99A45', '#5C6B8A', '#3E6B4F', '#B85C38'];
+export const CHART_SERIES = ['#992534', '#C29E5C', '#5C6B8A', '#3E6B4F', '#AD6148'];
 
 export const CHART_GRID = '#EFE7DB';
 export const CHART_MUTED = '#6E5F53';

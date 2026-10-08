@@ -74,7 +74,7 @@ const SERIF = "'Fraunces', Georgia, serif";
 
 // Faint paisley layer for the espresso letterhead (inline data-URI, no network)
 const PAISLEY =
-  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='130' height='130' viewBox='0 0 130 130'%3E%3Cg fill='none' stroke='%23C99A45'%3E%3Cpath d='M33 11c14 6 22 18 20 32-2 12-11 22-22 24-8 2-13-2-14-8-1-6 3-11 9-11 5 0 9 3 9 8'/%3E%3Crect x='92' y='26' width='6' height='6' transform='rotate(45 95 29)'/%3E%3Cpath d='M97 119c-14-6-22-18-20-32 2-12 11-22 22-24 8-2 13 2 14 8 1 6-3 11-9 11-5 0-9-3-9-8'/%3E%3Crect x='29' y='94' width='6' height='6' transform='rotate(45 32 97)'/%3E%3C/g%3E%3C/svg%3E\")";
+  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='130' height='130' viewBox='0 0 130 130'%3E%3Cg fill='none' stroke='%23C29E5C'%3E%3Cpath d='M33 11c14 6 22 18 20 32-2 12-11 22-22 24-8 2-13-2-14-8-1-6 3-11 9-11 5 0 9 3 9 8'/%3E%3Crect x='92' y='26' width='6' height='6' transform='rotate(45 95 29)'/%3E%3Cpath d='M97 119c-14-6-22-18-20-32 2-12 11-22 22-24 8-2 13 2 14 8 1 6-3 11-9 11-5 0-9-3-9-8'/%3E%3Crect x='29' y='94' width='6' height='6' transform='rotate(45 32 97)'/%3E%3C/g%3E%3C/svg%3E\")";
 
 // ═══════════════════════════════════════════════
 //  HELPERS
@@ -89,7 +89,7 @@ const getPaymentInfo = (method: string) => {
   const map: Record<string, any> = {
     cod: {
       label: "Cash on Delivery", short: "COD", icon: Banknote,
-      gradient: "from-[#7A1F2B] to-[#B85C38]",
+      gradient: "from-[#992534] to-[#AD6148]",
       bg: "from-[#FAF6F0] to-[#EFE7DB]",
       border: "border-[#E7DFD3]", text: "text-[#2B1B12]",
       badge: "bg-[#EFE7DB] text-[#2B1B12] border-[#E7DFD3]",
@@ -97,15 +97,15 @@ const getPaymentInfo = (method: string) => {
     },
     card: {
       label: "Credit/Debit Card", short: "Card", icon: CreditCard,
-      gradient: "from-[#7A1F2B] to-[#B85C38]",
+      gradient: "from-[#992534] to-[#AD6148]",
       bg: "from-[#F6E8E4] to-[#FAF6F0]",
-      border: "border-[#E7DFD3]", text: "text-[#7A1F2B]",
-      badge: "bg-[#F6E8E4] text-[#7A1F2B] border-[#E7DFD3]",
-      inlineBg: "#F6E8E4", inlineColor: "#7A1F2B",
+      border: "border-[#E7DFD3]", text: "text-[#992534]",
+      badge: "bg-[#F6E8E4] text-[#992534] border-[#E7DFD3]",
+      inlineBg: "#F6E8E4", inlineColor: "#992534",
     },
     upi: {
       label: "UPI Payment", short: "UPI", icon: Wallet,
-      gradient: "from-[#C99A45] to-[#B85C38]",
+      gradient: "from-[#C29E5C] to-[#AD6148]",
       bg: "from-[#FAF6F0] to-[#EFE7DB]",
       border: "border-[#E7DFD3]", text: "text-[#8A6414]",
       badge: "bg-[#FAF6F0] text-[#8A6414] border-[#E7DFD3]",
@@ -113,11 +113,11 @@ const getPaymentInfo = (method: string) => {
     },
     netbanking: {
       label: "Net Banking", short: "NetBanking", icon: Shield,
-      gradient: "from-[#B85C38] to-[#C99A45]",
+      gradient: "from-[#AD6148] to-[#C29E5C]",
       bg: "from-[#F6E8E4] to-[#EFE7DB]",
-      border: "border-[#E7DFD3]", text: "text-[#B85C38]",
-      badge: "bg-[#F6E8E4] text-[#B85C38] border-[#E7DFD3]",
-      inlineBg: "#F6E8E4", inlineColor: "#B85C38",
+      border: "border-[#E7DFD3]", text: "text-[#AD6148]",
+      badge: "bg-[#F6E8E4] text-[#AD6148] border-[#E7DFD3]",
+      inlineBg: "#F6E8E4", inlineColor: "#AD6148",
     },
   };
   return map[(method || "cod").toLowerCase()] || map["cod"];
@@ -127,8 +127,8 @@ const getStatusConfig = (status: string) => {
   const map: Record<string, any> = {
     generated: {
       label: "Generated", icon: FileText,
-      color: "text-[#8A6414]", bg: "bg-[#C99A45]/15", border: "border-[#C99A45]/35",
-      inlineBg: "rgba(201,154,69,0.14)", inlineColor: "#8A6414", dot: "#C99A45",
+      color: "text-[#8A6414]", bg: "bg-[#C29E5C]/15", border: "border-[#C29E5C]/35",
+      inlineBg: "rgba(201,154,69,0.14)", inlineColor: "#8A6414", dot: "#C29E5C",
     },
     sent: {
       label: "Sent", icon: CheckCircle,
@@ -152,8 +152,8 @@ const getStatusConfig = (status: string) => {
     },
     overdue: {
       label: "Overdue", icon: Clock,
-      color: "text-[#8A6414]", bg: "bg-[#C99A45]/15", border: "border-[#C99A45]/35",
-      inlineBg: "rgba(201,154,69,0.16)", inlineColor: "#8A6414", dot: "#B85C38",
+      color: "text-[#8A6414]", bg: "bg-[#C29E5C]/15", border: "border-[#C29E5C]/35",
+      inlineBg: "rgba(201,154,69,0.16)", inlineColor: "#8A6414", dot: "#AD6148",
     },
   };
   return map[(status || "generated").toLowerCase()] || map["generated"];
@@ -367,7 +367,7 @@ const InvoiceTemplate = React.forwardRef<HTMLDivElement, { invoice: Invoice }>(
           <div style={{ position: "relative", textAlign: "right" }}>
             <div style={{
               fontFamily: SERIF, fontSize: "23px",
-              letterSpacing: "0.06em", color: "#C99A45",
+              letterSpacing: "0.06em", color: "#C29E5C",
             }}>
               TAX INVOICE
             </div>
@@ -378,7 +378,7 @@ const InvoiceTemplate = React.forwardRef<HTMLDivElement, { invoice: Invoice }>(
             </div>
             <span style={{
               display: "inline-block", marginTop: "9px",
-              border: "1px solid rgba(201,154,69,0.6)", color: "#C99A45",
+              border: "1px solid rgba(201,154,69,0.6)", color: "#C29E5C",
               borderRadius: "999px", padding: "4px 13px",
               fontSize: "10px", fontWeight: 600, letterSpacing: "0.14em",
               textTransform: "uppercase",
@@ -698,7 +698,7 @@ const InvoiceTemplate = React.forwardRef<HTMLDivElement, { invoice: Invoice }>(
 
               {/* Grand total */}
               <div style={{
-                borderTop: "2px solid #C99A45", marginTop: "6px", paddingTop: "11px",
+                borderTop: "2px solid #C29E5C", marginTop: "6px", paddingTop: "11px",
                 display: "flex", justifyContent: "space-between", alignItems: "baseline",
               }}>
                 <span style={{
@@ -709,7 +709,7 @@ const InvoiceTemplate = React.forwardRef<HTMLDivElement, { invoice: Invoice }>(
                 </span>
                 <span style={{
                   fontFamily: SERIF, fontSize: "23px",
-                  fontWeight: 500, color: "#7A1F2B",
+                  fontWeight: 500, color: "#992534",
                 }}>
                   {formatPrice(total)}
                 </span>
@@ -727,7 +727,7 @@ const InvoiceTemplate = React.forwardRef<HTMLDivElement, { invoice: Invoice }>(
                   }}>
                     {payKey === "cod" ? "Amount due on delivery" : "Amount due"}
                   </span>
-                  <b style={{ fontFamily: SERIF, fontSize: "15px", fontWeight: 500, color: "#C99A45" }}>
+                  <b style={{ fontFamily: SERIF, fontSize: "15px", fontWeight: 500, color: "#C29E5C" }}>
                     {formatPrice(total)}
                   </b>
                 </div>
@@ -748,7 +748,7 @@ const InvoiceTemplate = React.forwardRef<HTMLDivElement, { invoice: Invoice }>(
               }}>
                 <span style={{
                   width: "4px", height: "4px", borderRadius: "50%",
-                  background: "#C99A45", marginTop: "7px", flex: "none",
+                  background: "#C29E5C", marginTop: "7px", flex: "none",
                 }} />
                 <span>{line}</span>
               </div>
@@ -765,12 +765,12 @@ const InvoiceTemplate = React.forwardRef<HTMLDivElement, { invoice: Invoice }>(
                 display: "flex", alignItems: "center",
                 justifyContent: "center", gap: "9px",
               }}>
-                <span style={{ width: "36px", height: "1px", background: "#C99A45", opacity: 0.6 }} />
+                <span style={{ width: "36px", height: "1px", background: "#C29E5C", opacity: 0.6 }} />
                 <span style={{
                   width: "6px", height: "6px",
-                  border: "1px solid #C99A45", transform: "rotate(45deg)",
+                  border: "1px solid #C29E5C", transform: "rotate(45deg)",
                 }} />
-                <span style={{ width: "36px", height: "1px", background: "#C99A45", opacity: 0.6 }} />
+                <span style={{ width: "36px", height: "1px", background: "#C29E5C", opacity: 0.6 }} />
               </div>
               <div style={{ fontFamily: SERIF, fontSize: "14px", marginTop: "8px" }}>For Vastraliya</div>
               <div style={{
@@ -802,7 +802,7 @@ const InvoiceTemplate = React.forwardRef<HTMLDivElement, { invoice: Invoice }>(
         {/* ── EDGE BAR ── */}
         <div style={{
           height: "5px",
-          background: "linear-gradient(90deg,#7A1F2B,#C99A45,#B85C38)",
+          background: "linear-gradient(90deg,#992534,#C29E5C,#AD6148)",
         }} />
       </div>
     );
@@ -1033,7 +1033,7 @@ const InvoicesPage: React.FC = () => {
       <NavBar />
       <main className="min-h-screen bg-background">
       <div className="flex flex-col items-center justify-center gap-5 py-24">
-        <span className="h-10 w-10 animate-spin rounded-full border-2 border-[#7A1F2B]/20 border-t-[#7A1F2B]" />
+        <span className="h-10 w-10 animate-spin rounded-full border-2 border-[#992534]/20 border-t-[#992534]" />
         <p className="font-serif text-lg text-espresso">Preparing your invoice…</p>
         <p className="text-[11px] uppercase tracking-[0.16em] text-[#6E5F53]">
           Vastraliya
@@ -1051,7 +1051,7 @@ const InvoicesPage: React.FC = () => {
       <main className="min-h-screen bg-background">
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 px-4 text-center">
         <span className="flex h-16 w-16 items-center justify-center rounded-full bg-[#F6E8E4]">
-          <AlertCircle className="h-8 w-8 text-[#7A1F2B]" />
+          <AlertCircle className="h-8 w-8 text-[#992534]" />
         </span>
         <h2 className="font-serif text-2xl font-medium text-espresso">
           {error || "Invoice Not Found"}
@@ -1076,7 +1076,7 @@ const InvoicesPage: React.FC = () => {
           </button>
           <button
             onClick={() => navigate("/")}
-            className="inline-flex items-center gap-2 rounded-sm border border-[#7A1F2B] bg-[#7A1F2B] px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-ivory transition-colors hover:bg-[#B85C38]"
+            className="inline-flex items-center gap-2 rounded-sm border border-[#992534] bg-[#992534] px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-ivory transition-colors hover:bg-[#AD6148]"
           >
             <Home className="h-3.5 w-3.5" />Home
           </button>
@@ -1124,7 +1124,7 @@ const InvoicesPage: React.FC = () => {
         <div className="flex flex-wrap items-center gap-2.5 px-5 py-3">
           <button
             onClick={() => navigate(`/orders/${orderId}`)}
-            className="mr-auto inline-flex items-center gap-2 text-[12px] uppercase tracking-[0.12em] text-[#6E5F53] transition-colors hover:text-[#7A1F2B]"
+            className="mr-auto inline-flex items-center gap-2 text-[12px] uppercase tracking-[0.12em] text-[#6E5F53] transition-colors hover:text-[#992534]"
           >
             <ArrowLeft className="h-3.5 w-3.5" />Back to order
           </button>
@@ -1139,7 +1139,7 @@ const InvoicesPage: React.FC = () => {
           <button
             onClick={handleDownloadPDF}
             disabled={generatingPDF}
-            className="inline-flex items-center gap-2 rounded-sm border border-[#7A1F2B] bg-[#7A1F2B] px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-ivory transition-colors hover:bg-[#B85C38] disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex items-center gap-2 rounded-sm border border-[#992534] bg-[#992534] px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-ivory transition-colors hover:bg-[#AD6148] disabled:cursor-not-allowed disabled:opacity-60"
           >
             {generatingPDF
               ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -1160,14 +1160,14 @@ const InvoicesPage: React.FC = () => {
         <div className="no-print mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[11px] uppercase tracking-[0.14em] text-[#6E5F53]">
           <button
             onClick={() => navigate(`/orders/${invoice.order_id}`)}
-            className="inline-flex items-center gap-2 transition-colors hover:text-[#7A1F2B]"
+            className="inline-flex items-center gap-2 transition-colors hover:text-[#992534]"
           >
             <Package className="h-3.5 w-3.5" />View order
           </button>
-          <span className="text-[#C99A45]">◆</span>
+          <span className="text-[#C29E5C]">◆</span>
           <button
             onClick={() => navigate("/products")}
-            className="inline-flex items-center gap-2 transition-colors hover:text-[#7A1F2B]"
+            className="inline-flex items-center gap-2 transition-colors hover:text-[#992534]"
           >
             <Home className="h-3.5 w-3.5" />Continue shopping
           </button>

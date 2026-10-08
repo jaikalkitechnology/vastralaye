@@ -49,4 +49,4 @@ export const dailySales = [
 ];
 
 // Admin chart series palette (admin_design.md §3.5) — fixed order, never cycled
-export const COLORS = ['#7A1F2B', '#C99A45', '#5C6B8A', '#3E6B4F', '#B85C38'];
+export const COLORS = ['#992534', '#C29E5C', '#5C6B8A', '#3E6B4F', '#AD6148'];

@@ -545,7 +545,7 @@ const AdminEnquiries = () => {
                   type="checkbox"
                   checked={form.notify_enabled}
                   onChange={(e) => setForm((f) => ({ ...f, notify_enabled: e.target.checked }))}
-                  className="mt-0.5 h-4 w-4 accent-[#7A1F2B]"
+                  className="mt-0.5 h-4 w-4 accent-[#992534]"
                 />
                 <span>
                   <span className="block text-[13px] font-medium text-espresso">
@@ -562,7 +562,7 @@ const AdminEnquiries = () => {
                   type="checkbox"
                   checked={form.ack_enabled}
                   onChange={(e) => setForm((f) => ({ ...f, ack_enabled: e.target.checked }))}
-                  className="mt-0.5 h-4 w-4 accent-[#7A1F2B]"
+                  className="mt-0.5 h-4 w-4 accent-[#992534]"
                 />
                 <span>
                   <span className="block text-[13px] font-medium text-espresso">

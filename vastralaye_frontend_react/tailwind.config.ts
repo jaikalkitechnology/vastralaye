@@ -63,13 +63,13 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				/* Brand palette (design.md §3.1) — legacy names re-pointed */
-				navy: '#7A1F2B',
-				maroon: '#7A1F2B',
+				/* Brand palette — sampled directly from the real Vastraliya logo (logo_vas.png), not invented */
+				navy: '#992534',
+				maroon: '#992534',
 				cream: '#FAF6F0',
 				ivory: '#FAF6F0',
-				terracotta: '#B85C38',
-				gold: '#C99A45',
+				terracotta: '#AD6148',
+				gold: '#C29E5C',
 				blush: '#F6E8E4',
 				sand: '#EFE7DB',
 				espresso: '#2B1B12',

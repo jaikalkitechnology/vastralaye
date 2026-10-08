@@ -97,7 +97,7 @@ const AdminTopBarControl = () => {
             checked={enabled}
             disabled={loading}
             onChange={(e) => setEnabled(e.target.checked)}
-            className="mt-0.5 h-4 w-4 accent-[#7A1F2B]"
+            className="mt-0.5 h-4 w-4 accent-[#992534]"
           />
           <span>
             <span className="block text-[13px] font-medium text-espresso">Show the top bar</span>

@@ -340,7 +340,7 @@ const AdminReels = () => {
                 type="checkbox"
                 checked={showOnHome}
                 onChange={(e) => setShowOnHome(e.target.checked)}
-                className="accent-[#7A1F2B]"
+                className="accent-[#992534]"
               />
               Homepage — “Vastraliya in Motion” row
             </label>
@@ -349,7 +349,7 @@ const AdminReels = () => {
                 type="checkbox"
                 checked={showOnPdp}
                 onChange={(e) => setShowOnPdp(e.target.checked)}
-                className="accent-[#7A1F2B]"
+                className="accent-[#992534]"
               />
               Product page — “Watch It Styled”
             </label>
@@ -373,7 +373,7 @@ const AdminReels = () => {
               type="checkbox"
               checked={publishNow}
               onChange={(e) => setPublishNow(e.target.checked)}
-              className="accent-[#7A1F2B]"
+              className="accent-[#992534]"
             />
             Publish immediately
           </label>

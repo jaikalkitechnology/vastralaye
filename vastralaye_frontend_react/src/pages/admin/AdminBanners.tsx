@@ -262,7 +262,7 @@ const AdminBanners = () => {
               <input type="number" className={inputCls} value={form.sort_order} onChange={(e) => set('sort_order', Number(e.target.value) || 0)} />
             </div>
             <label className="flex items-center gap-2.5 text-sm cursor-pointer pb-2.5">
-              <input type="checkbox" checked={form.is_active} onChange={(e) => set('is_active', e.target.checked)} className="accent-[#7A1F2B]" />
+              <input type="checkbox" checked={form.is_active} onChange={(e) => set('is_active', e.target.checked)} className="accent-[#992534]" />
               Active on storefront
             </label>
           </div>

@@ -121,8 +121,8 @@ const COMPANY_DETAILS: {
 // outerHTML (no Tailwind stylesheet), so every style must be inline.
 const P = {
   espresso: "#2B1B12",
-  maroon: "#7A1F2B",
-  gold: "#C99A45",
+  maroon: "#992534",
+  gold: "#C29E5C",
   goldDeep: "#8A6414",
   ivory: "#FAF6F0",
   blush: "#F6E8E4",
