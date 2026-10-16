@@ -82,16 +82,18 @@ Hard‑coded colors to hunt down and replace everywhere (grep for them): `#559F4
 
 ### 3.1 Color palette
 
-Warm ivory canvas (Suta) + maroon/gold festive accents (Aachho):
+Warm ivory canvas (Suta) + maroon/gold festive accents (Aachho).
+
+> **Revision (2026-10-08, PR [#155](https://github.com/jaikalkitechnology/vastralaye/pull/155)):** `maroon`, `terracotta` and `gold` below were originally hand-picked approximations. They've since been replaced with colors sampled directly from pixels in the real logo (`vastralaye_frontend_react/public/logo_vas.png` — the one already wired into `NavBar`/`Footer`), so the site matches the actual brand mark exactly instead of an eyeballed guess. `maroon` was sampled from the "VASTRALIYA" wordmark text; `gold` from the dress's gold trim; `terracotta` has no source in the logo at all (the logo only has two colors), so it's now defined as the midpoint blend of the sampled maroon + gold rather than an invented orange. `ivory`, `espresso`, `blush`, `sand`, `sale` and `success` are unchanged — they're the supporting neutral canvas, not colors drawn from the logo.
 
 | Token | Hex | HSL | Usage |
 |---|---|---|---|
 | `ivory` (background) | `#FAF6F0` | `36 50% 96%` | Page background, light sections |
 | `surface` | `#FFFFFF` | `0 0% 100%` | Cards, header, inputs |
 | `espresso` (foreground) | `#2B1B12` | `22 41% 12%` | Headings, body text, dark footer bg |
-| `maroon` (**primary**) | `#7A1F2B` | `352 59% 30%` | Buttons, links, announcement bar, active states |
-| `terracotta` (**accent**) | `#B85C38` | `17 53% 47%` | Hovers, highlights, secondary CTAs |
-| `gold` | `#C99A45` | `39 54% 53%` | Overlines, stars, ornaments, thin borders |
+| `maroon` (**primary**) | `#992534` | `352 61% 37%` | Buttons, links, announcement bar, active states — sampled from logo wordmark |
+| `terracotta` (**accent**) | `#AD6148` | `15 41% 48%` | Hovers, highlights, secondary CTAs — derived as the midpoint of logo maroon + gold |
+| `gold` | `#C29E5C` | `39 46% 56%` | Overlines, stars, ornaments, thin borders — sampled from logo trim |
 | `blush` | `#F6E8E4` | `13 50% 93%` | Alternate section bands, hover fills |
 | `sand` (muted) | `#EFE7DB` | `36 38% 90%` | Muted fills, skeletons, dividers |
 | `sale` (destructive) | `#C62828` | `0 66% 47%` | Sale badges, errors, "% OFF" |
@@ -104,30 +106,30 @@ Warm ivory canvas (Suta) + maroon/gold festive accents (Aachho):
 --foreground: 22 41% 12%;        /* espresso */
 --card: 0 0% 100%;
 --card-foreground: 22 41% 12%;
---primary: 352 59% 30%;          /* maroon */
+--primary: 352 61% 37%;          /* maroon — sampled from logo_vas.png wordmark */
 --primary-foreground: 36 50% 96%;
 --secondary: 13 50% 93%;         /* blush */
 --secondary-foreground: 22 41% 12%;
 --muted: 36 38% 90%;             /* sand */
 --muted-foreground: 22 15% 38%;
---accent: 17 53% 47%;            /* terracotta */
+--accent: 15 41% 48%;            /* terracotta — midpoint of logo maroon + gold */
 --accent-foreground: 0 0% 100%;
 --destructive: 0 66% 47%;        /* sale red */
 --border: 33 28% 86%;
 --input: 33 28% 86%;
---ring: 352 59% 30%;
+--ring: 352 61% 37%;
 --radius: 0.25rem;               /* sharper, editorial */
 ```
 
 **Mapping in `tailwind.config.ts`** — re‑point the existing custom names (legacy classes migrate for free), add the new ones:
 
 ```ts
-navy:       '#7A1F2B',  // legacy name, now maroon (rename usages to `maroon` over time)
-maroon:     '#7A1F2B',
+navy:       '#992534',  // legacy name, now maroon (rename usages to `maroon` over time)
+maroon:     '#992534',
 cream:      '#FAF6F0',
 ivory:      '#FAF6F0',
-terracotta: '#B85C38',
-gold:       '#C99A45',
+terracotta: '#AD6148',
+gold:       '#C29E5C',
 blush:      '#F6E8E4',
 sand:       '#EFE7DB',
 espresso:   '#2B1B12',
@@ -190,7 +192,7 @@ Work top‑down; every item lists the file(s) and the exact change. **Delete all
 
 | File | Changes |
 |---|---|
-| `index.html` | Add Google Fonts (Fraunces + Jost) with preconnect; set real `<title>` ("Vastralaye — Handcrafted Ethnic Wear"), meta description, `theme-color` `#7A1F2B`; remove `cdn.gpteng.co` script for production builds |
+| `index.html` | Add Google Fonts (Fraunces + Jost) with preconnect; set real `<title>` ("Vastralaye — Handcrafted Ethnic Wear"), meta description, `theme-color` `#992534`; remove `cdn.gpteng.co` script for production builds |
 | `src/index.css` | Replace `:root` token values (§3.1); set `body { @apply bg-background text-foreground font-sans antialiased; }`; add `.section` (py‑14 md:py‑20), `.section-title` recipe, `.scallop-divider`, `.overline` utilities; delete `.product-card`, `.btn-*` legacy classes after migration |
 | `tailwind.config.ts` | New color values + `fontFamily` (§3.1/3.2); add `borderRadius: { arch: '10rem 10rem 0 0' }`; keyframes: `marquee` (announcement), `fade-up` (section reveal), `kenburns` (hero zoom) |
 | `src/components/ui/button.tsx` | Restyle variants per §3.3 |
